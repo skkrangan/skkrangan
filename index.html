@@ -408,6 +408,10 @@
       photos: [] 
     };
 
+    // Variable pemotong imej (WAJIB DITAMBAH)
+    let cropperInstance = null;
+    let currentCropIndex = null;
+
     const unitThemes = {
       'PRASEKOLAH': { badgeBg: 'bg-pink-500', blockBg: 'bg-pink-50', blockBorder: 'border-pink-500', ribbonBg: 'bg-pink-100/95', ribbonBorder: 'border-pink-200', textAccent: 'text-pink-600', artGlow1: 'bg-pink-300', artGlow2: 'bg-rose-200', artFloral: 'text-pink-400' },
       'HAL EHWAL MURID': { badgeBg: 'bg-sky-500', blockBg: 'bg-sky-50', blockBorder: 'border-sky-500', ribbonBg: 'bg-sky-100/95', ribbonBorder: 'border-sky-200', textAccent: 'text-sky-600', artGlow1: 'bg-sky-300', artGlow2: 'bg-blue-200', artFloral: 'text-sky-400' },
@@ -507,16 +511,66 @@
       updatePreview();
     }
 
+    // FUNGSI GANTIAN: Kawal muat naik & potong imej
     function handleImageUpload(event, index) {
       const file = event.target.files[0];
       if (!file) return;
+      
       const reader = new FileReader();
       reader.onload = function(e) {
-        state.photos[index] = e.target.result;
-        refreshUploaderBox(index, e.target.result);
-        updatePreview();
+        currentCropIndex = index;
+        const cropModal = document.getElementById('crop-modal');
+        const cropImage = document.getElementById('crop-image');
+        
+        cropImage.src = e.target.result;
+        cropModal.classList.remove('hidden');
+        
+        if (cropperInstance) cropperInstance.destroy();
+        
+        // Tetapan Mod Pemotong Bebas
+        cropperInstance = new Cropper(cropImage, {
+          viewMode: 1,
+          dragMode: 'move', // Boleh seret gambar
+          autoCropArea: 0.9,
+          restore: false,
+          guides: true, // Garisan bantuan
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: true,
+        });
+        
+        document.getElementById(`file-input-${index}`).value = ''; // reset fail 
       };
       reader.readAsDataURL(file);
+    }
+
+    function cancelCrop() {
+      document.getElementById('crop-modal').classList.add('hidden');
+      if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+      }
+      currentCropIndex = null;
+    }
+
+    function confirmCrop() {
+      if (!cropperInstance) return;
+      
+      const canvas = cropperInstance.getCroppedCanvas({
+        maxWidth: 1200,
+        maxHeight: 1200
+      });
+      
+      const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.85); // Kualiti tinggi 85%
+      
+      state.photos[currentCropIndex] = croppedDataUrl;
+      refreshUploaderBox(currentCropIndex, croppedDataUrl);
+      updatePreview();
+      
+      cancelCrop();
+      showToast('Gambar telah dipotong dan dimuat naik.');
     }
 
     function removeImage(index, event) {
