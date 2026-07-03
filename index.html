@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem One Page Report (OPR) Digital</title>
+  <title>Sistem One Page Report (OPR) Digital - SK Krangan</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -32,11 +32,11 @@
   </script>
 
   <style>
-    /* Print specific constraints for perfect A4 generation */
+    /* Print specific constraints for perfect A4 generation using Browser Print */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 0; /* Buang margin browser */
+        margin: 0;
       }
       body { 
         background: white !important; 
@@ -70,10 +70,10 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* Vertical text handling - Fixed for PDF bug */
+    /* Vertical text handling - Fixed for PDF generation */
     .vertical-text-upright {
       writing-mode: vertical-rl;
-      transform: rotate(180deg); /* Membaca dari bawah ke atas - 100% kalis ralat PDF */
+      transform: rotate(180deg);
       white-space: nowrap; 
       letter-spacing: 1px;
     }
@@ -98,7 +98,7 @@
         <h1 class="font-montserrat font-extrabold text-xl tracking-wide flex items-center gap-2">
           SISTEM OPR DIGITAL <span class="bg-yellow-400 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">PRO</span>
         </h1>
-        <p class="text-xs text-teal-100 font-medium"></p>
+        <p class="text-xs text-teal-100 font-medium">Auto-A4 Layout Engine</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -210,9 +210,10 @@
       <div class="no-print w-full max-w-[595px] bg-white rounded-xl shadow-sm border border-slate-200 p-3 mb-6 flex gap-2 items-center justify-between sticky top-0 z-30">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-          <span class="text-xs font-bold text-slate-700">Previu</span>
+          <span class="text-xs font-bold text-slate-700">Previu Langsung (A4)</span>
         </div>
         <div class="flex items-center gap-2">
+          <!-- Butang Simpan ditukar memanggil fungsi cetak natif pelayar web (100% stabil) -->
           <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-sm">
             <i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF
           </button>
@@ -228,7 +229,7 @@
           <div id="art-glow-1" class="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 bg-pink-300"></div>
           <div id="art-glow-2" class="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-20 transition-colors duration-700 bg-rose-200"></div>
           
-          <!-- 2. Corak Abstrak Moden -->
+          <!-- 2. Corak Abstrak Moden (Fluid / Geometric) -->
           <div id="art-floral-1" class="absolute -top-10 -right-16 w-96 h-96 opacity-20 transition-colors duration-700 text-pink-400">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-full h-full">
               <!-- Organik / Fluid Shape -->
@@ -257,12 +258,12 @@
         <!-- 1. HEADER (SK Krangan Logo & Info) -->
         <div class="relative z-10 flex justify-between items-center pb-3 border-b-2 border-slate-100">
           <div class="flex items-center gap-1.5">
-            <!-- Logo Sekolah Tetap -->
+            <!-- Logo Sekolah (Tetap) -->
             <div class="relative w-[95px] h-[100px] flex items-center justify-center shrink-0">
               <img src="logo.png" alt="Logo SK Krangan" class="w-full h-full object-contain drop-shadow-md z-10">
             </div>
             
-            <!-- Maklumat Hubungan FB & Email -->
+            <!-- Maklumat Hubungan FB & Email (Disusun rapat dan kemas) -->
             <div class="flex flex-col justify-center gap-1.5 border-l-2 border-slate-200/80 pl-2.5 py-1 shrink-0">
               <div class="flex items-center gap-1.5 text-[11px] text-slate-700 font-bold font-sans">
                 <div class="bg-rose-100 text-rose-600 p-1.5 rounded-full shadow-sm">
@@ -637,7 +638,6 @@
       document.getElementById('view-side-banner').className = `absolute right-0 bottom-0 w-[42px] flex flex-col items-center justify-center py-6 px-1 border-l border-t rounded-tl-lg shadow-sm transition-colors duration-300 ${conf.ribbonBg} ${conf.ribbonBorder} z-20`;
       document.getElementById('view-side-text').className = `vertical-text-upright font-montserrat font-bold text-[12px] uppercase transition-colors duration-300 ${conf.textAccent}`;
 
-      // Update Abstract Background Colors
       document.getElementById('art-glow-1').className = `absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 ${conf.artGlow1}`;
       document.getElementById('art-glow-2').className = `absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-20 transition-colors duration-700 ${conf.artGlow2}`;
       document.getElementById('art-floral-1').className = `absolute -top-10 -right-16 w-96 h-96 opacity-20 transition-colors duration-700 ${conf.artFloral}`;
