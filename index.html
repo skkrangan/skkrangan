@@ -210,7 +210,7 @@
       <div class="no-print w-full max-w-[595px] bg-white rounded-xl shadow-sm border border-slate-200 p-3 mb-6 flex gap-2 items-center justify-between sticky top-0 z-30">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-          <span class="text-xs font-bold text-slate-700">Previu</span>
+          <span class="text-xs font-bold text-slate-700"></span>
         </div>
         <div class="flex items-center gap-2">
           <!-- Butang Simpan ditukar memanggil fungsi cetak natif pelayar web (100% stabil) -->
@@ -333,7 +333,7 @@
           <!-- RIGHT COLUMN -->
           <div class="col-span-8 flex flex-col pb-2 pl-1 pr-8 relative h-full">
             <div class="w-full bg-slate-100 border-2 border-slate-200 shrink-0 z-10 overflow-hidden rounded-sm">
-              <div id="view-photo-grid" class="w-full h-[270px]">
+              <div id="view-photo-grid" class="w-full h-[270px] transition-all duration-300">
                 <div class="w-full h-full flex items-center justify-center text-slate-400 bg-white">
                   <span class="text-xs">Sila muat naik foto aktiviti...</span>
                 </div>
@@ -619,6 +619,28 @@
       const objList = document.getElementById('view-objectives');
       objList.innerHTML = '';
       const validObjs = state.objectives.filter(o => o.trim() !== '');
+      
+      // --- SISTEM SMART AUTO-FIT (ELAK TERPOTONG) ---
+      let totalChars = validObjs.join('').length;
+      const photoGrid = document.getElementById('view-photo-grid');
+      
+      // Jika teks sangat panjang (> 450 huruf) atau objektif >= 5
+      if (validObjs.length >= 5 || totalChars > 450) {
+        objList.className = "space-y-1.5 text-[9.5px] leading-[1.4] text-slate-800 text-justify";
+        photoGrid.className = "w-full h-[190px] transition-all duration-300"; // Bebaskan ruang 80px untuk teks
+      } 
+      // Jika teks sederhana panjang (> 250 huruf) atau objektif >= 3
+      else if (validObjs.length >= 3 || totalChars > 250) {
+        objList.className = "space-y-2 text-[11px] leading-[1.5] text-slate-800 text-justify";
+        photoGrid.className = "w-full h-[230px] transition-all duration-300"; // Bebaskan ruang 40px untuk teks
+      } 
+      // Keadaan asal (Teks sedikit)
+      else {
+        objList.className = "space-y-3 text-[12px] leading-[1.6] text-slate-800 text-justify";
+        photoGrid.className = "w-full h-[270px] transition-all duration-300"; // Kekal saiz asal
+      }
+      // ----------------------------------------------
+
       if (validObjs.length > 0) {
         validObjs.forEach((obj, idx) => {
           objList.innerHTML += `<li class="relative pl-4"><span class="absolute left-0 top-0 text-slate-500 font-bold">${idx+1}.</span> ${obj}</li>`;
