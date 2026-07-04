@@ -7,100 +7,104 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        .iframe-container { position: relative; width: 100%; height: 80vh; overflow: hidden; }
-        .iframe-container iframe { position: absolute; width: 100%; height: 100%; border: none; }
+        .sidebar-item { @apply block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 hover:text-white; }
+        .active-menu { @apply bg-blue-700 text-white; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans min-h-screen">
 
-    <nav class="bg-blue-800 text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Portal SKK Rangan</h1>
-            <div id="nav-links">
-                <button onclick="changePage('awam')" class="px-4 py-2 hover:bg-blue-700 rounded">Utama (Awam)</button>
-                <button onclick="changePage('login')" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded text-black font-bold">Log Masuk Staf</button>
-            </div>
-        </div>
-    </nav>
-
-    <main id="app" class="container mx-auto mt-6 p-4">
-    </main>
+    <!-- Container Utama -->
+    <div id="app" class="flex min-h-screen">
+        <!-- Kandungan akan diisi oleh JS -->
+    </div>
 
     <script>
         const CLIENT_ID = '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com';
 
-        function changePage(page) {
+        // Fungsi Tukar Laman (Navigasi Utama)
+        function changePage(page, subPage = 'dashboard') {
             const app = document.getElementById('app');
-            switch(page) {
-                case 'awam':
-                    app.innerHTML = `
-                        <div class="bg-white p-8 rounded-lg shadow">
+            
+            if (page === 'awam') {
+                app.innerHTML = `
+                    <div class="w-full">
+                        <nav class="bg-blue-800 text-white p-4 shadow-lg flex justify-between items-center">
+                            <h1 class="text-xl font-bold">Portal SKK Rangan</h1>
+                            <button onclick="changePage('login')" class="bg-yellow-500 text-black px-4 py-2 rounded font-bold">Log Masuk Staf</button>
+                        </nav>
+                        <div class="p-8">
                             <h2 class="text-3xl font-bold mb-4">Selamat Datang ke Portal Sekolah</h2>
-                            <p>Ini adalah paparan umum untuk ibu bapa dan orang awam.</p>
-                        </div>`;
-                    break;
-                case 'login':
-                    app.innerHTML = `
-                        <div class="max-w-md mx-auto bg-white p-8 rounded shadow text-center">
+                            <p>Paparan Awam.</p>
+                        </div>
+                    </div>`;
+            } 
+            else if (page === 'login') {
+                app.innerHTML = `
+                    <div class="w-full flex items-center justify-center">
+                        <div class="bg-white p-8 rounded shadow text-center max-w-sm w-full">
                             <h2 class="text-2xl font-bold mb-6">Log Masuk Staf (DELIMA)</h2>
-                            
-                            <!-- Div untuk Google -->
-                            <div id="google-login-container" class="flex justify-center mb-4">
-                                <div class="g_id_signin" data-type="standard" data-size="large"></div>
-                            </div>
-
-                            <!-- Butang Ujian (Hanya muncul jika Google Gagal/Preview) -->
-                            <div id="test-login-ui" class="mt-4 hidden">
-                                <p class="text-xs text-gray-500 mb-2">Mod Ujian (Tidak akan muncul di GitHub Pages):</p>
-                                <button onclick="changePage('staff')" class="bg-gray-800 text-white px-4 py-2 rounded">Uji Login Staf (Preview)</button>
-                            </div>
-                        </div>`;
-                    
-                    // Logic: Jika Google API tidak dimuatkan (dalam Preview), tunjukkan butang ujian
-                    setTimeout(() => {
-                        if (typeof google === 'undefined' || !google.accounts) {
-                            document.getElementById('test-login-ui').classList.remove('hidden');
-                        } else {
-                            google.accounts.id.initialize({
-                                client_id: CLIENT_ID,
-                                callback: handleCredentialResponse
-                            });
-                            google.accounts.id.renderButton(
-                                document.querySelector('.g_id_signin'),
-                                { theme: 'outline', size: 'large' }
-                            );
-                        }
-                    }, 1000);
-                    break;
-                case 'staff':
-                    app.innerHTML = `
-                        <div class="bg-white p-4 rounded shadow">
-                            <h2 class="text-xl font-bold mb-2">Panel Staf</h2>
-                            <div class="iframe-container">
-                                <iframe src="https://skkrangan.github.io/skk/" title="Sistem Staf"></iframe>
-                            </div>
-                        </div>`;
-                    break;
+                            <div class="g_id_signin" data-type="standard" data-size="large"></div>
+                            <button onclick="changePage('awam')" class="mt-4 text-gray-500 underline">Kembali ke Utama</button>
+                        </div>
+                    </div>`;
+                setTimeout(() => {
+                    if (window.google) {
+                        google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredentialResponse });
+                        google.accounts.id.renderButton(document.querySelector('.g_id_signin'), { theme: 'outline', size: 'large' });
+                    }
+                }, 500);
+            }
+            else if (page === 'staff') {
+                renderStaffDashboard(subPage);
             }
         }
 
-        function parseJwt (token) {
-            try {
-                var base64Url = token.split('.')[1];
-                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch(e) { return {}; }
+        // Dashboard Staf (Sidebar Layout)
+        function renderStaffDashboard(subPage) {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <!-- Sidebar -->
+                <div class="w-64 bg-blue-900 text-white p-4 hidden md:block">
+                    <h2 class="text-lg font-bold mb-6">Menu Staf</h2>
+                    <nav>
+                        <button onclick="changePage('staff', 'dashboard')" class="sidebar-item w-full text-left ${subPage === 'dashboard' ? 'active-menu' : ''}">Dashboard Utama</button>
+                        <button onclick="changePage('staff', 'keberadaan')" class="sidebar-item w-full text-left ${subPage === 'keberadaan' ? 'active-menu' : ''}">Sistem Keberadaan</button>
+                        <button onclick="changePage('staff', 'laporan')" class="sidebar-item w-full text-left ${subPage === 'laporan' ? 'active-menu' : ''}">Laporan OPR</button>
+                        <button onclick="changePage('staff', 'skk')" class="sidebar-item w-full text-left ${subPage === 'skk' ? 'active-menu' : ''}">Sistem SKK (Lama)</button>
+                        <button onclick="changePage('awam')" class="mt-10 block w-full text-center bg-red-600 py-2 rounded text-sm hover:bg-red-700">Log Keluar</button>
+                    </nav>
+                </div>
+                <!-- Main Content -->
+                <div class="flex-1 p-8">
+                    <h1 class="text-2xl font-bold mb-6 capitalize">${subPage}</h1>
+                    <div class="bg-white p-6 rounded shadow min-h-[400px]">
+                        ${renderContent(subPage)}
+                    </div>
+                </div>`;
+        }
+
+        function renderContent(subPage) {
+            switch(subPage) {
+                case 'dashboard': return `<p>Selamat datang ke Dashboard Staf. Pilih menu di sebelah kiri.</p>`;
+                case 'keberadaan': return `<p>Modul Sistem Keberadaan Guru sedang dibina...</p>`;
+                case 'laporan': return `<p>Modul Laporan OPR akan dipaparkan di sini.</p>`;
+                case 'skk': return `<iframe src="https://skkrangan.github.io/skk/" class="w-full h-[600px] border-0"></iframe>`;
+                default: return `<p>Modul tidak dijumpai.</p>`;
+            }
+        }
+
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
         }
 
         function handleCredentialResponse(response) {
             const userData = parseJwt(response.credential);
-            if (userData.email && userData.email.endsWith('@moe-dl.edu.my')) {
+            if (userData.email.endsWith('@moe-dl.edu.my')) {
                 changePage('staff');
             } else {
-                alert('Akses Ditolak: Hanya akaun DELIMA (@moe-dl.edu.my) dibenarkan.');
+                alert('Akses Ditolak: Akaun DELIMA sahaja.');
             }
         }
 
