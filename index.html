@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Sekolah SKK Rangan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Identity Services Library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         .iframe-container { position: relative; width: 100%; height: 80vh; overflow: hidden; }
@@ -28,8 +27,7 @@
     </main>
 
     <script>
-        // Sila masukkan Client ID anda daripada Google Cloud Console
-        const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        const CLIENT_ID = '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com';
 
         function changePage(page) {
             const app = document.getElementById('app');
@@ -45,13 +43,34 @@
                     app.innerHTML = `
                         <div class="max-w-md mx-auto bg-white p-8 rounded shadow text-center">
                             <h2 class="text-2xl font-bold mb-6">Log Masuk Staf (DELIMA)</h2>
-                            <div id="g_id_onload"
-                                 data-client_id="${CLIENT_ID}"
-                                 data-callback="handleCredentialResponse"
-                                 data-auto_prompt="false">
+                            
+                            <!-- Div untuk Google -->
+                            <div id="google-login-container" class="flex justify-center mb-4">
+                                <div class="g_id_signin" data-type="standard" data-size="large"></div>
                             </div>
-                            <div class="g_id_signin" data-type="standard"></div>
+
+                            <!-- Butang Ujian (Hanya muncul jika Google Gagal/Preview) -->
+                            <div id="test-login-ui" class="mt-4 hidden">
+                                <p class="text-xs text-gray-500 mb-2">Mod Ujian (Tidak akan muncul di GitHub Pages):</p>
+                                <button onclick="changePage('staff')" class="bg-gray-800 text-white px-4 py-2 rounded">Uji Login Staf (Preview)</button>
+                            </div>
                         </div>`;
+                    
+                    // Logic: Jika Google API tidak dimuatkan (dalam Preview), tunjukkan butang ujian
+                    setTimeout(() => {
+                        if (typeof google === 'undefined' || !google.accounts) {
+                            document.getElementById('test-login-ui').classList.remove('hidden');
+                        } else {
+                            google.accounts.id.initialize({
+                                client_id: CLIENT_ID,
+                                callback: handleCredentialResponse
+                            });
+                            google.accounts.id.renderButton(
+                                document.querySelector('.g_id_signin'),
+                                { theme: 'outline', size: 'large' }
+                            );
+                        }
+                    }, 1000);
                     break;
                 case 'staff':
                     app.innerHTML = `
@@ -65,21 +84,19 @@
             }
         }
 
-        // Fungsi untuk menyahkod token JWT daripada Google
         function parseJwt (token) {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
+            try {
+                var base64Url = token.split('.')[1];
+                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch(e) { return {}; }
         }
 
-        // Callback selepas login berjaya
         function handleCredentialResponse(response) {
             const userData = parseJwt(response.credential);
-            
-            // Semak domain e-mel
             if (userData.email && userData.email.endsWith('@moe-dl.edu.my')) {
                 changePage('staff');
             } else {
