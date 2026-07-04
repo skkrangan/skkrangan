@@ -1,114 +1,98 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="ms" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Sekolah SKK Rangan</title>
+    <title>Portal SKK Rangan Bersepadu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .sidebar-item { @apply block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700 hover:text-white; }
-        .active-menu { @apply bg-blue-700 text-white; }
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans min-h-screen">
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- Container Utama -->
-    <div id="app" class="flex min-h-screen">
-        <!-- Kandungan akan diisi oleh JS -->
-    </div>
+    <nav class="bg-slate-900 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Portal SKK Rangan</h1>
+            <div id="nav-menu">
+                <button onclick="showSection('home')" class="px-4 py-2 hover:bg-slate-700 rounded">Utama</button>
+                <button id="nav-skk" onclick="showSection('skk')" class="px-4 py-2 hover:bg-slate-700 rounded hidden">Sistem Keberadaan</button>
+                <button id="login-btn" onclick="showSection('login')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded">Log Masuk Staf</button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="app-container" class="container mx-auto p-4">
+        <div id="section-home" class="tab-content active p-8 bg-white rounded-xl shadow">
+            <h2 class="text-3xl font-bold">Selamat Datang ke Portal Bersepadu</h2>
+            <p class="mt-4 text-slate-600">Sila log masuk menggunakan akaun DELIMA untuk mengakses Sistem Keberadaan.</p>
+        </div>
+
+        <div id="section-login" class="tab-content p-8 bg-white rounded-xl shadow">
+            <h2 class="text-2xl font-bold mb-4">Log Masuk Staf (DELIMA)</h2>
+            <div id="g_id_signin" class="g_id_signin" data-type="standard"></div>
+        </div>
+
+        <div id="section-skk" class="tab-content p-4">
+            <div id="skk-wrapper">
+                <!-- Kod asal sistem SKK anda dimuatkan secara dinamik di sini -->
+            </div>
+        </div>
+    </main>
 
     <script>
         const CLIENT_ID = '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com';
 
-        // Fungsi Tukar Laman (Navigasi Utama)
-        function changePage(page, subPage = 'dashboard') {
-            const app = document.getElementById('app');
-            
-            if (page === 'awam') {
-                app.innerHTML = `
-                    <div class="w-full">
-                        <nav class="bg-blue-800 text-white p-4 shadow-lg flex justify-between items-center">
-                            <h1 class="text-xl font-bold">Portal SKK Rangan</h1>
-                            <button onclick="changePage('login')" class="bg-yellow-500 text-black px-4 py-2 rounded font-bold">Log Masuk Staf</button>
-                        </nav>
-                        <div class="p-8">
-                            <h2 class="text-3xl font-bold mb-4">Selamat Datang ke Portal Sekolah</h2>
-                            <p>Paparan Awam.</p>
-                        </div>
-                    </div>`;
-            } 
-            else if (page === 'login') {
-                app.innerHTML = `
-                    <div class="w-full flex items-center justify-center">
-                        <div class="bg-white p-8 rounded shadow text-center max-w-sm w-full">
-                            <h2 class="text-2xl font-bold mb-6">Log Masuk Staf (DELIMA)</h2>
-                            <div class="g_id_signin" data-type="standard" data-size="large"></div>
-                            <button onclick="changePage('awam')" class="mt-4 text-gray-500 underline">Kembali ke Utama</button>
-                        </div>
-                    </div>`;
-                setTimeout(() => {
-                    if (window.google) {
-                        google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleCredentialResponse });
-                        google.accounts.id.renderButton(document.querySelector('.g_id_signin'), { theme: 'outline', size: 'large' });
+        // Navigasi
+        function showSection(id) {
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            if(id === 'skk') initSKKSystem();
+        }
+
+        // Google Login
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: CLIENT_ID,
+                callback: (res) => {
+                    const payload = JSON.parse(atob(res.credential.split('.')[1]));
+                    if(payload.email.endsWith('@moe-dl.edu.my')) {
+                        document.getElementById('login-btn').innerText = "Log Keluar";
+                        document.getElementById('login-btn').onclick = () => location.reload();
+                        document.getElementById('nav-skk').classList.remove('hidden');
+                        showSection('skk');
+                    } else {
+                        alert("Akses ditolak: Sila gunakan akaun DELIMA (@moe-dl.edu.my).");
                     }
-                }, 500);
-            }
-            else if (page === 'staff') {
-                renderStaffDashboard(subPage);
-            }
-        }
+                }
+            });
+            google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "outline", size: "large" });
+        };
 
-        // Dashboard Staf (Sidebar Layout)
-        function renderStaffDashboard(subPage) {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <!-- Sidebar -->
-                <div class="w-64 bg-blue-900 text-white p-4 hidden md:block">
-                    <h2 class="text-lg font-bold mb-6">Menu Staf</h2>
-                    <nav>
-                        <button onclick="changePage('staff', 'dashboard')" class="sidebar-item w-full text-left ${subPage === 'dashboard' ? 'active-menu' : ''}">Dashboard Utama</button>
-                        <button onclick="changePage('staff', 'keberadaan')" class="sidebar-item w-full text-left ${subPage === 'keberadaan' ? 'active-menu' : ''}">Sistem Keberadaan</button>
-                        <button onclick="changePage('staff', 'laporan')" class="sidebar-item w-full text-left ${subPage === 'laporan' ? 'active-menu' : ''}">Laporan OPR</button>
-                        <button onclick="changePage('staff', 'skk')" class="sidebar-item w-full text-left ${subPage === 'skk' ? 'active-menu' : ''}">Sistem SKK (Lama)</button>
-                        <button onclick="changePage('awam')" class="mt-10 block w-full text-center bg-red-600 py-2 rounded text-sm hover:bg-red-700">Log Keluar</button>
-                    </nav>
+        // Integrasi Kod SKK Asal
+        function initSKKSystem() {
+            if (document.getElementById('skk-wrapper').innerHTML !== "") return;
+            
+            // Di sini anda boleh masukkan struktur HTML asal sistem SKK anda
+            document.getElementById('skk-wrapper').innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow">
+                    <h2 class="text-2xl font-bold mb-4">Sistem Keberadaan Staf</h2>
+                    <!-- Panggil fungsi asal sistem SKK di sini -->
+                    <p>Sistem berjaya dimuatkan. Pastikan fungsi asal anda (seperti updateClock, renderDashboard) telah dipanggil di sini.</p>
                 </div>
-                <!-- Main Content -->
-                <div class="flex-1 p-8">
-                    <h1 class="text-2xl font-bold mb-6 capitalize">${subPage}</h1>
-                    <div class="bg-white p-6 rounded shadow min-h-[400px]">
-                        ${renderContent(subPage)}
-                    </div>
-                </div>`;
+            `;
+            
+            // Panggil fungsi asal sistem SKK (pastikan fungsi-fungsi ini wujud dalam skrip anda)
+            if(typeof updateClock === 'function') updateClock();
+            if(typeof renderDashboard === 'function') renderDashboard();
+            if(typeof initChart === 'function') initChart();
         }
-
-        function renderContent(subPage) {
-            switch(subPage) {
-                case 'dashboard': return `<p>Selamat datang ke Dashboard Staf. Pilih menu di sebelah kiri.</p>`;
-                case 'keberadaan': return `<p>Modul Sistem Keberadaan Guru sedang dibina...</p>`;
-                case 'laporan': return `<p>Modul Laporan OPR akan dipaparkan di sini.</p>`;
-                case 'skk': return `<iframe src="https://skkrangan.github.io/skk/" class="w-full h-[600px] border-0"></iframe>`;
-                default: return `<p>Modul tidak dijumpai.</p>`;
-            }
-        }
-
-        function parseJwt(token) {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-        }
-
-        function handleCredentialResponse(response) {
-            const userData = parseJwt(response.credential);
-            if (userData.email.endsWith('@moe-dl.edu.my')) {
-                changePage('staff');
-            } else {
-                alert('Akses Ditolak: Akaun DELIMA sahaja.');
-            }
-        }
-
-        changePage('awam');
     </script>
 </body>
 </html>
