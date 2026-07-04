@@ -18,167 +18,137 @@
         }
 
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-        .tab-content { display: none; opacity: 0; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .tab-content { display: none; opacity: 0; transition: all 0.6s ease; }
         .tab-content.active { display: block; opacity: 1; }
-        
         .card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .card-hover:hover { transform: translateY(-10px) scale(1.02); }
-
-        [contenteditable="true"]:focus { 
-            outline: 2px solid #6366f1; 
-            padding: 10px; 
-            background: rgba(255,255,255,0.1); 
-            border-radius: 12px; 
-        }
+        [contenteditable="true"]:focus { outline: 2px solid #6366f1; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 12px; }
     </style>
 </head>
 <body class="text-white pb-20">
 
     <nav class="sticky top-6 z-50 mx-auto max-w-5xl rounded-3xl glass shadow-2xl px-8 py-5 border border-white/10">
         <div class="flex justify-between items-center">
-            <!-- Logo Section -->
-            <div class="flex items-center gap-4 cursor-pointer group" onclick="showSection('home')">
-                <img src="logo.png" alt="Logo SK Krangan" class="w-12 h-12 rounded-xl object-contain shadow-lg shadow-blue-500/20">
-                <span class="text-2xl font-extrabold tracking-tight">SK KRANGAN</span>
+            <div class="flex items-center gap-4 cursor-pointer" onclick="showSection('home')">
+                <img src="logo.png" alt="Logo" class="w-10 h-10 rounded-xl object-contain shadow-lg">
+                <span class="text-xl font-extrabold tracking-tight">SK KRANGAN</span>
             </div>
-            
             <div class="flex gap-4">
                 <button onclick="showSection('home')" class="hover:text-blue-400 font-semibold transition">Utama</button>
-                <button id="login-btn" onclick="showSection('login')" class="bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl transition font-semibold">Log Masuk</button>
+                <button id="nav-btn-login" onclick="showSection('login')" class="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition font-semibold">Log Masuk</button>
             </div>
         </div>
     </nav>
 
     <main class="container mx-auto px-6 py-12">
-        <!-- Home Section -->
+        <!-- Home Section (Awam) -->
         <div id="section-home" class="tab-content active space-y-16">
             <div class="text-center space-y-6">
                 <h1 class="text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-indigo-200">Portal Rasmi Sekolah</h1>
-                <p class="text-slate-400 text-xl max-w-xl mx-auto">Membina masa depan melalui kecemerlangan pendidikan.</p>
+                <p class="text-slate-400 text-lg">Selamat Datang ke Portal Rasmi SK Krangan.</p>
             </div>
             
+            <!-- Visi & Misi (Kembali ke sini) -->
             <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="glass p-10 rounded-3xl border border-white/10 hover:border-blue-500/50 transition-all">
+                <div class="glass p-10 rounded-3xl border border-white/10">
                     <h3 class="text-xs font-bold text-blue-400 mb-3 uppercase tracking-widest">Visi</h3>
                     <p class="text-xl font-medium leading-relaxed">Pendidikan Berkualiti Insan Terdidik Negara Sejahtera.</p>
                 </div>
-                <div class="glass p-10 rounded-3xl border border-white/10 hover:border-emerald-500/50 transition-all">
+                <div class="glass p-10 rounded-3xl border border-white/10">
                     <h3 class="text-xs font-bold text-emerald-400 mb-3 uppercase tracking-widest">Misi</h3>
                     <p class="text-xl font-medium leading-relaxed">Melestarikan Sistem Pendidikan Yang Berkualiti Untuk Membangunkan Potensi Individu.</p>
                 </div>
             </div>
-
+            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                <button onclick="openUnit('Pengurusan')" class="p-8 glass rounded-3xl card-hover">
-                    <i class="fas fa-briefcase text-4xl text-blue-400 mb-6"></i>
-                    <h4 class="font-bold text-lg">Pengurusan</h4>
-                </button>
-                <button onclick="openUnit('Kurikulum')" class="p-8 glass rounded-3xl card-hover">
-                    <i class="fas fa-book-open text-4xl text-emerald-400 mb-6"></i>
-                    <h4 class="font-bold text-lg">Kurikulum</h4>
-                </button>
-                <button onclick="openUnit('Kokurikulum')" class="p-8 glass rounded-3xl card-hover">
-                    <i class="fas fa-running text-4xl text-amber-400 mb-6"></i>
-                    <h4 class="font-bold text-lg">Kokurikulum</h4>
-                </button>
-                <button onclick="openUnit('Prasekolah')" class="p-8 glass rounded-3xl card-hover">
-                    <i class="fas fa-child text-4xl text-purple-400 mb-6"></i>
-                    <h4 class="font-bold text-lg">Prasekolah</h4>
-                </button>
+                <button onclick="openUnit('Pengurusan')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-briefcase text-3xl text-blue-400 mb-4"></i><h4 class="font-bold">Pengurusan</h4></button>
+                <button onclick="openUnit('Kurikulum')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-book-open text-3xl text-emerald-400 mb-4"></i><h4 class="font-bold">Kurikulum</h4></button>
+                <button onclick="openUnit('Kokurikulum')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-running text-3xl text-amber-400 mb-4"></i><h4 class="font-bold">Kokurikulum</h4></button>
+                <button onclick="openUnit('Prasekolah')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-child text-3xl text-purple-400 mb-4"></i><h4 class="font-bold">Prasekolah</h4></button>
+            </div>
+        </div>
+
+        <!-- Dashboard Staf (Selepas Login) -->
+        <div id="section-staff" class="tab-content max-w-4xl mx-auto space-y-12">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold mb-8">Dashboard Staf</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <button onclick="window.open('#', '_blank')" class="p-8 glass rounded-3xl text-left hover:border-blue-500/50 transition">
+                        <i class="fas fa-user-check text-3xl text-blue-400 mb-4"></i>
+                        <h3 class="text-xl font-bold">Sistem eHadir</h3>
+                    </button>
+                    <button onclick="window.open('#', '_blank')" class="p-8 glass rounded-3xl text-left hover:border-emerald-500/50 transition">
+                        <i class="fas fa-file-invoice text-3xl text-emerald-400 mb-4"></i>
+                        <h3 class="text-xl font-bold">Laporan eOPR</h3>
+                    </button>
+                </div>
+                <button onclick="logout()" class="mt-12 text-red-400 hover:text-red-300 font-semibold">Log Keluar</button>
             </div>
         </div>
 
         <!-- Detail Section -->
         <div id="section-unit-detail" class="tab-content max-w-4xl mx-auto">
-            <button onclick="showSection('home')" class="mb-8 text-slate-400 hover:text-white transition flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </button>
-            <div class="glass p-12 rounded-3xl shadow-2xl border border-white/10">
+            <button onclick="showSection('home')" class="mb-8 text-slate-400 hover:text-white flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
+            <div class="glass p-10 rounded-3xl">
                 <div id="admin-panel" class="hidden mb-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex justify-between items-center">
-                    <span class="text-amber-400 font-bold flex items-center gap-2"><i class="fas fa-magic"></i> Mod Admin Aktif</span>
-                    <button onclick="saveChanges()" class="bg-amber-500 text-slate-900 font-bold px-6 py-2.5 rounded-xl hover:bg-amber-400 transition">Simpan Perubahan</button>
+                    <span class="text-amber-400 font-bold flex items-center gap-2"><i class="fas fa-magic"></i> Mod Admin</span>
+                    <button onclick="saveChanges()" class="bg-amber-500 text-slate-900 font-bold px-6 py-2.5 rounded-xl">Simpan</button>
                 </div>
-                <h2 id="unit-title" class="text-5xl font-extrabold mb-8 text-white tracking-tight">Unit</h2>
-                <div id="sub-menu-area" class="flex flex-wrap gap-4 mb-10"></div>
-                <div id="content-area" class="text-slate-300 text-lg leading-relaxed min-h-[300px]"></div>
+                <h2 id="unit-title" class="text-4xl font-extrabold mb-6">Unit</h2>
+                <div id="sub-menu-area" class="flex flex-wrap gap-4 mb-8"></div>
+                <div id="content-area" class="text-slate-300 min-h-[300px]"></div>
             </div>
         </div>
 
         <!-- Login Section -->
-        <div id="section-login" class="tab-content max-w-sm mx-auto glass p-12 rounded-3xl text-center shadow-2xl border border-white/10">
-            <h2 class="text-3xl font-bold mb-4">Log Masuk Staf</h2>
-            <p class="text-slate-400 mb-8">Akses panel admin untuk mengemaskini portal.</p>
+        <div id="section-login" class="tab-content max-w-sm mx-auto glass p-10 rounded-3xl text-center shadow-2xl border border-white/10">
+            <h2 class="text-2xl font-bold mb-6">Log Masuk Staf</h2>
             <div id="g_id_signin" class="flex justify-center"></div>
         </div>
     </main>
 
     <script>
-        // Logik JavaScript kekal sama
         let db = JSON.parse(localStorage.getItem('skk_db')) || {
-            'Pengurusan': { subs: { 'Carta Organisasi': 'Sila edit kandungan carta organisasi di sini.', 'Perutusan Guru Besar': 'Sila edit perutusan guru besar di sini.', 'Takwim Sekolah': 'Sila edit takwim sekolah di sini.', 'Dasar & Peraturan': 'Sila edit dasar dan peraturan di sini.', 'Direktori Staf': 'Sila edit direktori staf di sini.' } },
-            'Kurikulum': { subs: { 'Utama': 'Kandungan Kurikulum...' } },
-            'Kokurikulum': { subs: { 'Utama': 'Kandungan Kokurikulum...' } },
-            'Prasekolah': { subs: { 'Utama': 'Kandungan Prasekolah...' } }
+            'Pengurusan': { subs: { 'Carta Organisasi': '...', 'Perutusan': '...' } },
+            'Kurikulum': { subs: { 'Utama': '...' } }
         };
-
         const authorized = ["admin@sk-krangan.edu.my", "su-kurikulum@moe-dl.edu.my"];
 
         function showSection(id) {
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
-            const el = document.getElementById('section-' + id);
-            if(el) el.classList.add('active');
+            document.getElementById('section-' + id).classList.add('active');
         }
 
         function openUnit(unitName) {
             document.getElementById('unit-title').innerText = unitName;
-            const subArea = document.getElementById('sub-menu-area');
-            const contentArea = document.getElementById('content-area');
-            subArea.innerHTML = '';
-            contentArea.innerHTML = '<div class="text-slate-500 italic">Pilih sub-menu untuk melihat kandungan.</div>';
-
-            Object.keys(db[unitName].subs).forEach(sub => {
-                const btn = document.createElement('button');
-                btn.className = "bg-white/5 border border-white/10 hover:bg-blue-500/20 px-6 py-3 rounded-xl font-semibold transition-all";
-                btn.innerText = sub;
-                btn.onclick = () => loadSubContent(unitName, sub);
-                subArea.appendChild(btn);
-            });
             showSection('unit-detail');
         }
 
-        function loadSubContent(unit, sub) {
-            const contentArea = document.getElementById('content-area');
-            contentArea.setAttribute('data-path', `${unit}|${sub}`);
-            contentArea.innerHTML = db[unit].subs[sub];
-        }
-
-        function saveChanges() {
-            const contentArea = document.getElementById('content-area');
-            if (!contentArea) return;
-            const path = contentArea.getAttribute('data-path');
-            if (!path) return;
-            const [unit, sub] = path.split('|');
-            db[unit].subs[sub] = contentArea.innerHTML;
-            localStorage.setItem('skk_db', JSON.stringify(db));
-            alert("Berjaya disimpan!");
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            location.reload();
         }
 
         window.onload = function () {
-            if (typeof google !== 'undefined') {
-                google.accounts.id.initialize({
-                    client_id: '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com',
-                    callback: (res) => {
-                        const payload = JSON.parse(atob(res.credential.split('.')[1]));
-                        if(authorized.includes(payload.email)) {
-                            document.getElementById('admin-panel').classList.remove('hidden');
-                            document.getElementById('content-area').contentEditable = "true";
-                            document.getElementById('login-btn').innerText = "Admin Panel";
-                            alert("Selamat datang Admin");
-                        }
-                    }
-                });
-                google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "filled_blue", size: "large" });
+            if(localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('nav-btn-login').innerText = "Dashboard Staf";
+                document.getElementById('nav-btn-login').onclick = () => showSection('staff');
             }
+
+            google.accounts.id.initialize({
+                client_id: '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com',
+                callback: (res) => {
+                    const payload = JSON.parse(atob(res.credential.split('.')[1]));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    if(authorized.includes(payload.email)) {
+                        document.getElementById('admin-panel').classList.remove('hidden');
+                        document.getElementById('content-area').contentEditable = "true";
+                    }
+                    showSection('staff');
+                    document.getElementById('nav-btn-login').innerText = "Dashboard Staf";
+                }
+            });
+            google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "filled_blue", size: "large" });
         };
     </script>
 </body>
