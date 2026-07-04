@@ -13,142 +13,259 @@
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: #0f172a; 
-            background-image: radial-gradient(at 0% 0%, #312e81 0px, transparent 50%), radial-gradient(at 100% 100%, #1e1b4b 0px, transparent 50%);
             min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
         }
 
+        .blob-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            overflow: hidden; pointer-events: none;
+        }
+        .blob {
+            position: absolute; width: 500px; height: 500px; background: rgba(37, 99, 235, 0.15);
+            filter: blur(100px); border-radius: 50%; animation: move 20s infinite alternate;
+        }
+        @keyframes move { from { transform: translate(-10%, -10%); } to { transform: translate(20%, 20%); } }
+
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-        .tab-content { display: none; opacity: 0; transition: all 0.6s ease; }
+        .tab-content { display: none; opacity: 0; transition: all 0.5s ease; }
         .tab-content.active { display: block; opacity: 1; }
-        .card-hover { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .card-hover:hover { transform: translateY(-10px) scale(1.02); }
-        [contenteditable="true"]:focus { outline: 2px solid #6366f1; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 12px; }
+        
+        .card-glow:hover { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
+        
+        [contenteditable="true"]:focus { 
+            outline: 2px solid #3b82f6; 
+            background: rgba(30, 58, 138, 0.2); 
+            border-radius: 12px; 
+            padding: 10px;
+        }
+
+        .slide { position: absolute; inset: 0; transition: opacity 1s ease-in-out; }
     </style>
 </head>
-<body class="text-white pb-20">
+<body class="pb-20">
+
+    <div class="blob-bg">
+        <div class="blob" style="top: -100px; left: -100px;"></div>
+        <div class="blob" style="bottom: -100px; right: -100px; background: rgba(30, 64, 175, 0.15);"></div>
+    </div>
 
     <nav class="sticky top-6 z-50 mx-auto max-w-5xl rounded-3xl glass shadow-2xl px-8 py-5 border border-white/10">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-4 cursor-pointer" onclick="showSection('home')">
-                <img src="logo.png" alt="Logo" class="w-10 h-10 rounded-xl object-contain shadow-lg">
-                <span class="text-xl font-extrabold tracking-tight">SK KRANGAN</span>
+                <img src="logo.png" alt="Logo" class="w-12 h-12 rounded-xl object-contain shadow-lg shadow-blue-500/20">
+                <span class="text-2xl font-extrabold tracking-tight">SK KRANGAN</span>
             </div>
             <div class="flex gap-4">
                 <button onclick="showSection('home')" class="hover:text-blue-400 font-semibold transition">Utama</button>
-                <button id="nav-btn-login" onclick="showSection('login')" class="bg-white/10 hover:bg-white/20 px-5 py-2 rounded-xl transition font-semibold">Log Masuk</button>
+                <button id="login-nav-btn" onclick="showSection('login')" class="bg-blue-600 hover:bg-blue-500 px-6 py-2.5 rounded-2xl transition font-semibold shadow-lg shadow-blue-500/20">Log Masuk</button>
             </div>
         </div>
     </nav>
 
     <main class="container mx-auto px-6 py-12">
-        <!-- Home Section (Awam) -->
         <div id="section-home" class="tab-content active space-y-16">
-            <div class="text-center space-y-6">
-                <h1 class="text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-indigo-200">Portal Rasmi Sekolah</h1>
-                <p class="text-slate-400 text-lg">Selamat Datang ke Portal Rasmi SK Krangan.</p>
-            </div>
             
-            <!-- Visi & Misi (Kembali ke sini) -->
+            <div class="relative w-full h-[500px] rounded-3xl overflow-hidden shadow-2xl glass">
+                <div id="slideshow" class="relative w-full h-full">
+                    <div class="slide opacity-100">
+                        <img src="IMG_9931_2.jpg" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-6">
+                            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tighter mb-4 text-white">Selamat Datang ke Portal Digital SK Krangan</h1>
+                        </div>
+                    </div>
+                    <div class="slide opacity-0">
+                        <img src="IMG_9926_2.jpg" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-6">
+                            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tighter mb-4 text-white">Mendidik, Menginspirasi, Mendigitalisasi.</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="glass p-10 rounded-3xl border border-white/10">
+                <div class="glass p-10 rounded-3xl border border-white/10 card-glow transition-all">
                     <h3 class="text-xs font-bold text-blue-400 mb-3 uppercase tracking-widest">Visi</h3>
                     <p class="text-xl font-medium leading-relaxed">Pendidikan Berkualiti Insan Terdidik Negara Sejahtera.</p>
                 </div>
-                <div class="glass p-10 rounded-3xl border border-white/10">
-                    <h3 class="text-xs font-bold text-emerald-400 mb-3 uppercase tracking-widest">Misi</h3>
+                <div class="glass p-10 rounded-3xl border border-white/10 card-glow transition-all">
+                    <h3 class="text-xs font-bold text-blue-400 mb-3 uppercase tracking-widest">Misi</h3>
                     <p class="text-xl font-medium leading-relaxed">Melestarikan Sistem Pendidikan Yang Berkualiti Untuk Membangunkan Potensi Individu.</p>
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                <button onclick="openUnit('Pengurusan')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-briefcase text-3xl text-blue-400 mb-4"></i><h4 class="font-bold">Pengurusan</h4></button>
-                <button onclick="openUnit('Kurikulum')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-book-open text-3xl text-emerald-400 mb-4"></i><h4 class="font-bold">Kurikulum</h4></button>
-                <button onclick="openUnit('Kokurikulum')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-running text-3xl text-amber-400 mb-4"></i><h4 class="font-bold">Kokurikulum</h4></button>
-                <button onclick="openUnit('Prasekolah')" class="p-8 glass rounded-3xl card-hover"><i class="fas fa-child text-3xl text-purple-400 mb-4"></i><h4 class="font-bold">Prasekolah</h4></button>
+                <button onclick="openUnit('Pengurusan')" class="p-8 glass rounded-3xl card-glow transition-all"><i class="fas fa-briefcase text-4xl text-blue-400 mb-6"></i><h4 class="font-bold text-lg">Pengurusan</h4></button>
+                <button onclick="openUnit('Kurikulum')" class="p-8 glass rounded-3xl card-glow transition-all"><i class="fas fa-book-open text-4xl text-blue-400 mb-6"></i><h4 class="font-bold text-lg">Kurikulum</h4></button>
+                <button onclick="openUnit('Kokurikulum')" class="p-8 glass rounded-3xl card-glow transition-all"><i class="fas fa-running text-4xl text-blue-400 mb-6"></i><h4 class="font-bold text-lg">Kokurikulum</h4></button>
+                <button onclick="openUnit('Prasekolah')" class="p-8 glass rounded-3xl card-glow transition-all"><i class="fas fa-child text-4xl text-blue-400 mb-6"></i><h4 class="font-bold text-lg">Prasekolah</h4></button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                <div class="glass p-6 rounded-3xl text-center card-glow"><div class="text-4xl font-extrabold text-blue-400 mb-2 counter" data-target="78">0</div><div class="text-sm font-semibold uppercase tracking-wider opacity-70">Murid</div></div>
+                <div class="glass p-6 rounded-3xl text-center card-glow"><div class="text-4xl font-extrabold text-blue-400 mb-2 counter" data-target="13">0</div><div class="text-sm font-semibold uppercase tracking-wider opacity-70">Guru</div></div>
+                <div class="glass p-6 rounded-3xl text-center card-glow"><div class="text-4xl font-extrabold text-blue-400 mb-2 counter" data-target="2">0</div><div class="text-sm font-semibold uppercase tracking-wider opacity-70">Staf</div></div>
+                <div class="glass p-6 rounded-3xl text-center card-glow"><div class="text-4xl font-extrabold text-blue-400 mb-2 counter" data-target="6">0</div><div class="text-sm font-semibold uppercase tracking-wider opacity-70">Kelas</div></div>
+            </div>
+
+            <div class="max-w-4xl mx-auto glass p-8 rounded-3xl border border-white/10">
+                <h3 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fas fa-calendar-alt text-blue-400"></i> Kalendar Aktiviti</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-blue-500/10 transition">
+                        <div class="bg-blue-600 p-3 rounded-lg"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div><p class="font-bold">Hari Guru</p><p class="text-sm text-slate-400">16 Mei 2026</p></div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-blue-500/10 transition">
+                        <div class="bg-purple-600 p-3 rounded-lg"><i class="fas fa-pen-nib"></i></div>
+                        <div><p class="font-bold">Peperiksaan</p><p class="text-sm text-slate-400">Jun 2026</p></div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-blue-500/10 transition">
+                        <div class="bg-green-600 p-3 rounded-lg"><i class="fas fa-users"></i></div>
+                        <div><p class="font-bold">Mesyuarat</p><p class="text-sm text-slate-400">Setiap bulan</p></div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/5 p-4 rounded-xl hover:bg-blue-500/10 transition">
+                        <div class="bg-orange-600 p-3 rounded-lg"><i class="fas fa-umbrella-beach"></i></div>
+                        <div><p class="font-bold">Cuti Sekolah</p><p class="text-sm text-slate-400">Rujuk Takwim</p></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Dashboard Staf (Selepas Login) -->
         <div id="section-staff" class="tab-content max-w-4xl mx-auto space-y-12">
-            <div class="text-center">
-                <h2 class="text-4xl font-bold mb-8">Dashboard Staf</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <button onclick="window.open('#', '_blank')" class="p-8 glass rounded-3xl text-left hover:border-blue-500/50 transition">
-                        <i class="fas fa-user-check text-3xl text-blue-400 mb-4"></i>
-                        <h3 class="text-xl font-bold">Sistem eHadir</h3>
-                    </button>
-                    <button onclick="window.open('#', '_blank')" class="p-8 glass rounded-3xl text-left hover:border-emerald-500/50 transition">
-                        <i class="fas fa-file-invoice text-3xl text-emerald-400 mb-4"></i>
-                        <h3 class="text-xl font-bold">Laporan eOPR</h3>
-                    </button>
-                </div>
-                <button onclick="logout()" class="mt-12 text-red-400 hover:text-red-300 font-semibold">Log Keluar</button>
+            <div class="text-center space-y-4">
+                <h2 class="text-4xl font-extrabold">Dashboard Staf</h2>
+                <p class="text-slate-400">Selamat kembali, sila pilih modul tugasan anda.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <button onclick="alert('Membuka Sistem eHadir...')" class="glass p-10 rounded-3xl border border-blue-500/20 hover:bg-blue-900/20 card-glow transition-all"><i class="fas fa-user-check text-5xl text-blue-400 mb-6"></i><h3 class="text-2xl font-bold mb-2">Sistem eHadir</h3><p class="text-slate-400">Rekod kehadiran staf & murid.</p></button>
+                <button onclick="alert('Membuka Sistem eOPR...')" class="glass p-10 rounded-3xl border border-blue-500/20 hover:bg-blue-900/20 card-glow transition-all"><i class="fas fa-file-invoice text-5xl text-blue-400 mb-6"></i><h3 class="text-2xl font-bold mb-2">Laporan eOPR</h3><p class="text-slate-400">Pengurusan data laporan operasional.</p></button>
             </div>
         </div>
 
-        <!-- Detail Section -->
         <div id="section-unit-detail" class="tab-content max-w-4xl mx-auto">
-            <button onclick="showSection('home')" class="mb-8 text-slate-400 hover:text-white flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-            <div class="glass p-10 rounded-3xl">
-                <div id="admin-panel" class="hidden mb-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex justify-between items-center">
-                    <span class="text-amber-400 font-bold flex items-center gap-2"><i class="fas fa-magic"></i> Mod Admin</span>
-                    <button onclick="saveChanges()" class="bg-amber-500 text-slate-900 font-bold px-6 py-2.5 rounded-xl">Simpan</button>
+            <button onclick="showSection('home')" class="mb-8 text-slate-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
+            <div class="glass p-12 rounded-3xl shadow-2xl border border-white/10">
+                <div id="admin-panel" class="hidden mb-8 p-6 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex justify-between items-center">
+                    <span class="text-blue-400 font-bold flex items-center gap-2"><i class="fas fa-magic"></i> Mod Admin Aktif</span>
+                    <button onclick="saveChanges()" class="bg-blue-600 hover:bg-blue-500 font-bold px-6 py-2.5 rounded-xl transition">Simpan Perubahan</button>
                 </div>
-                <h2 id="unit-title" class="text-4xl font-extrabold mb-6">Unit</h2>
-                <div id="sub-menu-area" class="flex flex-wrap gap-4 mb-8"></div>
-                <div id="content-area" class="text-slate-300 min-h-[300px]"></div>
+                <h2 id="unit-title" class="text-5xl font-extrabold mb-8 text-white tracking-tight">Unit</h2>
+                <div id="sub-menu-area" class="flex flex-wrap gap-4 mb-10"></div>
+                <div id="content-area" class="text-slate-300 text-lg leading-relaxed min-h-[300px]"></div>
             </div>
         </div>
 
-        <!-- Login Section -->
-        <div id="section-login" class="tab-content max-w-sm mx-auto glass p-10 rounded-3xl text-center shadow-2xl border border-white/10">
-            <h2 class="text-2xl font-bold mb-6">Log Masuk Staf</h2>
+        <div id="section-login" class="tab-content max-w-sm mx-auto glass p-12 rounded-3xl text-center shadow-2xl border border-white/10">
+            <h2 class="text-3xl font-bold mb-4">Log Masuk Staf</h2>
+            <p class="text-slate-400 mb-8">Akses dashboard eHadir & eOPR.</p>
             <div id="g_id_signin" class="flex justify-center"></div>
         </div>
     </main>
 
     <script>
+        let slideIndex = 0;
+        function autoSlide() {
+            const slides = document.querySelectorAll('.slide');
+            if(slides.length === 0) return;
+            slides.forEach(s => s.style.opacity = '0');
+            slideIndex = (slideIndex + 1) % slides.length;
+            slides[slideIndex].style.opacity = '1';
+        }
+        setInterval(autoSlide, 5000);
+
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const updateCount = () => {
+                    const c = +counter.innerText;
+                    const increment = target / 100;
+                    if(c < target) {
+                        counter.innerText = Math.ceil(c + increment);
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCount();
+            });
+        }
+        window.addEventListener('load', animateCounters);
+
         let db = JSON.parse(localStorage.getItem('skk_db')) || {
-            'Pengurusan': { subs: { 'Carta Organisasi': '...', 'Perutusan': '...' } },
-            'Kurikulum': { subs: { 'Utama': '...' } }
+            'Pengurusan': { subs: { 'Carta Organisasi': 'Sila edit kandungan carta organisasi di sini.', 'Perutusan Guru Besar': 'Sila edit perutusan guru besar di sini.', 'Takwim Sekolah': 'Sila edit takwim sekolah di sini.', 'Dasar & Peraturan': 'Sila edit dasar dan peraturan di sini.', 'Direktori Staf': 'Sila edit direktori staf di sini.' } },
+            'Kurikulum': { subs: { 'Utama': 'Kandungan Kurikulum...' } },
+            'Kokurikulum': { subs: { 'Utama': 'Kandungan Kokurikulum...' } },
+            'Prasekolah': { subs: { 'Utama': 'Kandungan Prasekolah...' } }
         };
+
         const authorized = ["admin@sk-krangan.edu.my", "su-kurikulum@moe-dl.edu.my"];
 
         function showSection(id) {
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
-            document.getElementById('section-' + id).classList.add('active');
+            const el = document.getElementById('section-' + id);
+            if(el) {
+                el.classList.add('active');
+                if(id === 'home') animateCounters();
+            }
         }
 
         function openUnit(unitName) {
             document.getElementById('unit-title').innerText = unitName;
+            const subArea = document.getElementById('sub-menu-area');
+            const contentArea = document.getElementById('content-area');
+            subArea.innerHTML = '';
+            contentArea.innerHTML = '<div class="text-slate-500 italic">Pilih sub-menu untuk melihat kandungan.</div>';
+            Object.keys(db[unitName].subs).forEach(sub => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white/5 border border-white/10 hover:bg-blue-500/20 px-6 py-3 rounded-xl font-semibold transition-all";
+                btn.innerText = sub;
+                btn.onclick = () => loadSubContent(unitName, sub);
+                subArea.appendChild(btn);
+            });
             showSection('unit-detail');
         }
 
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            location.reload();
+        function loadSubContent(unit, sub) {
+            const contentArea = document.getElementById('content-area');
+            contentArea.setAttribute('data-path', `${unit}|${sub}`);
+            contentArea.innerHTML = db[unit].subs[sub];
+        }
+
+        function saveChanges() {
+            const contentArea = document.getElementById('content-area');
+            if (!contentArea) return;
+            const path = contentArea.getAttribute('data-path');
+            if (!path) return;
+            const [unit, sub] = path.split('|');
+            db[unit].subs[sub] = contentArea.innerHTML;
+            localStorage.setItem('skk_db', JSON.stringify(db));
+            alert("Berjaya disimpan!");
         }
 
         window.onload = function () {
-            if(localStorage.getItem('isLoggedIn') === 'true') {
-                document.getElementById('nav-btn-login').innerText = "Dashboard Staf";
-                document.getElementById('nav-btn-login').onclick = () => showSection('staff');
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                document.getElementById('login-nav-btn').innerText = "Dashboard Staf";
+                document.getElementById('login-nav-btn').onclick = () => showSection('staff');
             }
-
-            google.accounts.id.initialize({
-                client_id: '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com',
-                callback: (res) => {
-                    const payload = JSON.parse(atob(res.credential.split('.')[1]));
-                    localStorage.setItem('isLoggedIn', 'true');
-                    if(authorized.includes(payload.email)) {
-                        document.getElementById('admin-panel').classList.remove('hidden');
-                        document.getElementById('content-area').contentEditable = "true";
+            if (typeof google !== 'undefined') {
+                google.accounts.id.initialize({
+                    client_id: '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com',
+                    callback: (res) => {
+                        const payload = JSON.parse(atob(res.credential.split('.')[1]));
+                        localStorage.setItem('isLoggedIn', 'true');
+                        document.getElementById('login-nav-btn').innerText = "Dashboard Staf";
+                        document.getElementById('login-nav-btn').onclick = () => showSection('staff');
+                        if(authorized.includes(payload.email)) {
+                            document.getElementById('admin-panel').classList.remove('hidden');
+                            document.getElementById('content-area').contentEditable = "true";
+                        }
+                        showSection('staff');
                     }
-                    showSection('staff');
-                    document.getElementById('nav-btn-login').innerText = "Dashboard Staf";
-                }
-            });
-            google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "filled_blue", size: "large" });
+                });
+                google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "filled_blue", size: "large" });
+            }
         };
     </script>
 </body>
