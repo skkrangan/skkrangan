@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem One Page Report (OPR) Digital - SK Krangan</title>
+  <title>Sistem One Page Report (OPR) Digital</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,10 +15,10 @@
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Cropper.js (Wajib untuk potong gambar) -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  
+  <!-- html2canvas & jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
     window.tailwind = window.tailwind || {};
@@ -36,55 +36,55 @@
   </script>
 
   <style>
-    /* Print specific constraints for perfect A4 generation using Browser Print */
+    /* FORMAT CETAKAN NATIVE (100% A4 TEPAT) */
     @media print {
       @page {
         size: A4 portrait;
-        margin: 0;
+        margin: 0mm !important;
       }
       body { 
         background: white !important; 
         margin: 0 !important; 
         padding: 0 !important; 
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important;
       }
-      /* Sembunyikan elemen UI semasa cetak */
       .no-print { display: none !important; }
       
-      /* Format Khas untuk Kad A4 */
       .print-container {
+        width: 210mm !important;
+        height: 297mm !important;
         box-shadow: none !important; 
-        margin: 0 !important; 
+        margin: 0 auto !important; 
         border: none !important;
-        width: 100% !important;
-        height: 100% !important;
-        position: absolute;
-        top: 0;
-        left: 0;
-        page-break-inside: avoid;
-        page-break-after: avoid;
-        transform: none !important;
+        page-break-inside: avoid; 
+        page-break-after: always;
+        transform: scale(1) !important;
       }
     }
 
-    /* Scrollbar styling for form */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* Vertical text handling - Fixed for PDF generation */
     .vertical-text-upright {
       writing-mode: vertical-rl;
-      transform: rotate(180deg);
+      transform: rotate(180deg); 
       white-space: nowrap; 
       letter-spacing: 1px;
     }
     
-    /* Triangle pointing UP shape */
     .clip-roof-up {
       clip-path: polygon(50% 0%, 100% 20%, 100% 100%, 0 100%, 0 20%);
+    }
+
+    /* Utiliti untuk 'Crop Pintar' - Sentiasa fokus tengah dan tutup penuh */
+    .image-crop-center {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
   </style>
 </head>
@@ -117,6 +117,7 @@
 
   <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative w-full">
     
+    <!-- LEFT PANEL: FORM -->
     <section class="no-print w-full lg:w-[45%] bg-white border-r border-slate-200 h-full overflow-y-auto p-6 pb-32 z-10 custom-scrollbar relative">
       <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur z-10">
         <div class="flex items-center gap-2 text-teal-600">
@@ -195,7 +196,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Foto Aktiviti (Maksimum 5 keping)</label>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Foto Aktiviti (Auto-Crop Tengah)</label>
           <div class="grid grid-cols-5 gap-2" id="image-uploaders-container">
             <!-- Uploaders injected by JS dynamically -->
           </div>
@@ -208,25 +209,29 @@
       </div>
     </section>
 
+    <!-- RIGHT PANEL: PREVIEW & CANVAS -->
     <section class="w-full lg:w-[55%] bg-slate-200/80 h-full overflow-y-auto p-4 lg:p-8 flex flex-col items-center custom-scrollbar relative">
       
       <!-- Toolbar Atas Kanvas -->
-      <div class="no-print w-full max-w-[595px] bg-white rounded-xl shadow-sm border border-slate-200 p-3 mb-6 flex gap-2 items-center justify-between sticky top-0 z-30">
+      <div class="no-print w-full max-w-[210mm] bg-white rounded-xl shadow-sm border border-slate-200 p-3 mb-6 flex gap-2 items-center justify-between sticky top-0 z-30">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
           <span class="text-xs font-bold text-slate-700">Previu Langsung (A4)</span>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-sm">
-            <i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF
+          <button onclick="downloadAsJPG()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i> Eksport JPG
+          </button>
+          <button onclick="downloadAsPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Simpan PDF
           </button>
         </div>
       </div>
 
-      <!-- OPR CARD: FIXED DIMENSION A4 (595px x 842px) -->
-      <div id="opr-card" class="print-container relative w-[595px] h-[842px] bg-white shadow-2xl rounded-sm border border-slate-200 overflow-hidden select-none px-7 py-8 flex flex-col shrink-0">
+      <!-- OPR CARD: FIXED DIMENSION A4 -->
+      <div id="opr-card" class="print-container relative w-[210mm] h-[297mm] bg-white shadow-2xl rounded-sm border border-slate-200 overflow-hidden select-none px-[12mm] py-[14mm] flex flex-col shrink-0">
         
-        <!-- LATAR BELAKANG KREATIF & ARTISTIK -->
+        <!-- LATAR BELAKANG KREATIF -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div id="art-glow-1" class="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 bg-pink-300"></div>
           <div id="art-glow-2" class="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-20 transition-colors duration-700 bg-rose-200"></div>
@@ -234,7 +239,6 @@
           <div id="art-floral-1" class="absolute -top-10 -right-16 w-96 h-96 opacity-20 transition-colors duration-700 text-pink-400">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-full h-full">
               <path d="M41.3,-58.5C54.8,-48.9,67.9,-39.8,75.9,-27.1C83.9,-14.4,86.8,1.9,81.6,15.6C76.4,29.3,63.1,40.4,50.1,51C37.1,61.6,24.4,71.7,9.3,75.1C-5.8,78.5,-23.4,75.2,-37.6,66.3C-51.8,57.4,-62.7,42.8,-69.9,26.8C-77.1,10.8,-80.6,-6.6,-75.2,-21.2C-69.8,-35.8,-55.5,-47.5,-41.2,-56.9C-26.9,-66.3,-13.4,-73.4,0.3,-73.8C14.1,-74.2,27.8,-68.1,41.3,-58.5Z" transform="translate(100 100)" fill="currentColor" opacity="0.15"/>
-              <path d="M34.8,-53.4C45.2,-43.3,53.8,-32,60.8,-18.9C67.8,-5.8,73.2,9.1,68.9,21C64.6,32.9,50.6,41.8,37.3,51.1C24,60.4,11.4,70.1,-2.4,73.4C-16.2,76.7,-31.2,73.6,-43.2,64.2C-55.2,54.8,-64.2,39.1,-69.3,22.4C-74.4,5.7,-75.6,-12,-69,-26C-62.4,-40,-48,-50.3,-33.9,-58.8C-19.8,-67.3,-6,-74.1,4.9,-80.3C15.8,-86.5,24.4,-63.5,34.8,-53.4Z" transform="translate(100 100)" stroke="currentColor" stroke-width="2" opacity="0.3"/>
               <circle cx="150" cy="50" r="30" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6"/>
             </svg>
           </div>
@@ -244,30 +248,26 @@
               <path d="M-20 180 Q 80 130 200 180" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
               <path d="M-20 160 Q 90 100 220 160" stroke="currentColor" stroke-width="1.5"/>
               <path d="M-20 140 Q 100 70 240 140" stroke="currentColor" stroke-width="1" stroke-dasharray="6 6"/>
-              <polygon points="50,120 100,50 150,120" stroke="currentColor" stroke-width="2" opacity="0.5"/>
-              <polygon points="70,110 100,70 130,110" fill="currentColor" opacity="0.2"/>
             </svg>
           </div>
-          
-          <div id="art-dots" class="absolute top-1/3 left-4 w-20 h-32 opacity-20 transition-colors duration-700 text-pink-400" style="background-image: radial-gradient(currentColor 2px, transparent 2px); background-size: 16px 16px;"></div>
         </div>
 
-        <!-- 1. HEADER -->
+        <!-- 1. HEADER (SK Krangan Logo & Info) -->
         <div class="relative z-10 flex justify-between items-center pb-3 border-b-2 border-slate-100">
           <div class="flex items-center gap-1.5">
-            <!-- Logo Sekolah (Tetap) -->
-            <div class="relative w-[95px] h-[100px] flex items-center justify-center shrink-0">
-              <img src="logo.png" alt="Logo SK Krangan" class="w-full h-full object-contain drop-shadow-md z-10" onerror="this.src='https://placehold.co/100x110/2563eb/ffffff?text=SK+Krangan'">
+            <!-- Logo Sekolah (Ditetapkan secara kekal & Terkunci) -->
+            <div class="relative w-[110px] h-[120px] flex items-center justify-center shrink-0">
+              <img id="view-logo" src="logo.png" alt="Logo Sekolah" class="w-full h-full object-contain drop-shadow-md z-10">
             </div>
             
-            <div class="flex flex-col justify-center gap-1.5 border-l-2 border-slate-200/80 pl-2.5 py-1 shrink-0">
-              <div class="flex items-center gap-1.5 text-[11px] text-slate-700 font-bold font-sans">
+            <div class="flex flex-col justify-center gap-1.5 border-l-2 border-slate-200/80 pl-3 py-1 shrink-0 ml-1">
+              <div class="flex items-center gap-2 text-[12px] text-slate-700 font-bold font-sans">
                 <div class="bg-rose-100 text-rose-600 p-1.5 rounded-full shadow-sm">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                 </div>
                 <span class="tracking-wide lowercase">ybb8240@moe.edu.my</span>
               </div>
-              <div class="flex items-center gap-1.5 text-[11px] text-slate-700 font-bold font-sans">
+              <div class="flex items-center gap-2 text-[12px] text-slate-700 font-bold font-sans">
                 <div class="bg-blue-100 text-blue-600 p-1.5 rounded-full shadow-sm">
                   <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                 </div>
@@ -277,88 +277,94 @@
           </div>
           
           <div class="text-right shrink-0">
-            <h1 class="font-montserrat font-black text-[26px] tracking-tight text-slate-800 flex items-baseline justify-end whitespace-nowrap">
-              ONE PAGE <span class="font-playfair italic text-teal-600 font-bold lowercase text-[34px] leading-none ml-1.5">Report</span>
+            <h1 class="font-montserrat font-black text-[30px] tracking-tight text-slate-800 flex items-baseline justify-end whitespace-nowrap">
+              ONE PAGE <span class="font-playfair italic text-teal-600 font-bold lowercase text-[38px] leading-none ml-1.5">Report</span>
             </h1>
-            <p id="view-school" class="font-bold text-[13px] tracking-wide text-slate-500 uppercase mt-0.5 whitespace-nowrap">NAMA SEKOLAH</p>
-            <div class="flex justify-end gap-1 mt-2">
+            <p id="view-school" class="font-bold text-[14px] tracking-widest text-slate-500 uppercase mt-0.5 whitespace-nowrap">NAMA SEKOLAH</p>
+            <div class="flex justify-end gap-1.5 mt-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span><span class="w-2.5 h-2.5 rounded-full bg-teal-400"></span><span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span><span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
             </div>
           </div>
         </div>
 
         <!-- 2. TWO COLUMN LAYOUT -->
-        <div class="relative z-10 flex-1 grid grid-cols-12 gap-5 mt-4">
+        <div class="relative z-10 flex-1 grid grid-cols-12 gap-6 mt-6">
           
-          <!-- LEFT COLUMN -->
-          <div class="col-span-4 flex flex-col justify-start gap-3.5 pt-1">
+          <!-- LEFT COLUMN (Kotak-kotak Kecil) -->
+          <div class="col-span-4 flex flex-col justify-start gap-4 pt-1">
             <div id="badge-year-container" class="bg-emerald-500 text-white pb-3 pt-6 px-2 text-center shadow-sm clip-roof-up transition-colors duration-300">
-              <span id="view-year" class="font-montserrat font-black text-2xl tracking-widest block mt-2">2026</span>
+              <span id="view-year" class="font-montserrat font-black text-[28px] tracking-widest block mt-2">2026</span>
             </div>
 
             <div class="-mt-2 flex-1 flex flex-col">
-              <div class="bg-indigo-900 text-white text-[10px] font-bold tracking-widest uppercase py-1 px-2 rounded-t-md text-center shadow-sm shrink-0">TAJUK / PROGRAM</div>
-              <div id="bg-block-title" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-2.5 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[70px]">
-                <p id="view-title" class="font-montserrat font-bold text-slate-800 text-[11px] leading-relaxed">Pertandingan Projek Mini Buku...</p>
+              <div class="bg-indigo-900 text-white text-[11px] font-bold tracking-widest uppercase py-1.5 px-2 rounded-t-md text-center shadow-sm shrink-0">TAJUK / PROGRAM</div>
+              <div id="bg-block-title" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-3 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[80px]">
+                <p id="view-title" class="font-montserrat font-bold text-slate-800 text-[12px] leading-relaxed">Pertandingan Projek Mini Buku...</p>
               </div>
             </div>
 
             <div class="flex-1 flex flex-col">
-              <div class="bg-indigo-900 text-white text-[10px] font-bold tracking-widest uppercase py-1 px-2 rounded-t-md text-center shadow-sm shrink-0">TARIKH/MASA/TEMPAT</div>
-              <div id="bg-block-datetime" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-2.5 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[70px]">
-                <p id="view-datetime" class="text-[11px] font-semibold text-slate-700 leading-relaxed whitespace-pre-line">2 - 4 Februari 2026</p>
+              <div class="bg-indigo-900 text-white text-[11px] font-bold tracking-widest uppercase py-1.5 px-2 rounded-t-md text-center shadow-sm shrink-0">TARIKH/MASA/TEMPAT</div>
+              <div id="bg-block-datetime" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-3 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[80px]">
+                <p id="view-datetime" class="text-[12px] font-semibold text-slate-700 leading-relaxed whitespace-pre-line">2 - 4 Februari 2026</p>
               </div>
             </div>
 
             <div class="flex-1 flex flex-col">
-              <div class="bg-indigo-900 text-white text-[10px] font-bold tracking-widest uppercase py-1 px-2 rounded-t-md text-center shadow-sm shrink-0">SASARAN</div>
-              <div id="bg-block-target" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-2.5 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[50px]">
-                <p id="view-target" class="text-[11px] font-semibold text-slate-700 leading-relaxed">Semua Murid</p>
+              <div class="bg-indigo-900 text-white text-[11px] font-bold tracking-widest uppercase py-1.5 px-2 rounded-t-md text-center shadow-sm shrink-0">SASARAN</div>
+              <div id="bg-block-target" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-3 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[60px]">
+                <p id="view-target" class="text-[12px] font-semibold text-slate-700 leading-relaxed">Semua Murid</p>
               </div>
             </div>
 
             <div class="flex-1 flex flex-col">
-              <div class="bg-indigo-900 text-white text-[10px] font-bold tracking-widest uppercase py-1 px-2 rounded-t-md text-center shadow-sm shrink-0">KRA</div>
-              <div id="bg-block-kra" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-2.5 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[60px]">
-                <p id="view-kra" class="text-[11px] font-semibold text-slate-700 leading-relaxed whitespace-pre-line">Kemenjadian Murid</p>
+              <div class="bg-indigo-900 text-white text-[11px] font-bold tracking-widest uppercase py-1.5 px-2 rounded-t-md text-center shadow-sm shrink-0">KRA</div>
+              <div id="bg-block-kra" class="bg-emerald-50 border-l-4 border-emerald-500 rounded-b-md rounded-tr-sm p-3 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[70px]">
+                <p id="view-kra" class="text-[12px] font-semibold text-slate-700 leading-relaxed whitespace-pre-line">Kemenjadian Murid</p>
               </div>
             </div>
           </div>
 
-          <!-- RIGHT COLUMN -->
-          <div class="col-span-8 flex flex-col pb-2 pl-1 pr-8 relative h-full">
+          <!-- RIGHT COLUMN (Gambar & Objektif) -->
+          <div class="col-span-8 flex flex-col pb-2 pl-1 pr-6 relative h-full">
+            
+            <!-- Bahagian Gambar yang Telah Diselaraskan Ketinggiannya (h-[350px]) -->
             <div class="w-full bg-slate-100 border-2 border-slate-200 shrink-0 z-10 overflow-hidden rounded-sm">
-              <div id="view-photo-grid" class="w-full h-[270px] transition-all duration-300">
+              <div id="view-photo-grid" class="w-full h-[350px]">
                 <div class="w-full h-full flex items-center justify-center text-slate-400 bg-white">
-                  <span class="text-xs">Sila muat naik foto aktiviti...</span>
+                  <span class="text-sm">Sila muat naik foto aktiviti...</span>
                 </div>
               </div>
             </div>
 
-            <div class="mt-4 flex-grow flex flex-col">
-              <h3 class="font-montserrat font-bold text-[13px] tracking-wide text-indigo-900 border-b-2 border-slate-200 pb-1 mb-3 uppercase shrink-0">
+            <!-- Bahagian Objektif yang Telah Diselaraskan Saiz Fon & Margin -->
+            <div class="mt-8 flex flex-col">
+              <h3 class="font-montserrat font-bold text-[14px] tracking-wide text-indigo-900 border-b-2 border-slate-200 pb-1.5 mb-4 uppercase shrink-0">
                 OBJEKTIF / BUTIRAN PROGRAM
               </h3>
-              <div class="border-l-[3px] border-gray-400 ml-1.5 pl-3 py-1 flex-grow flex flex-col justify-center">
-                <ol id="view-objectives" class="space-y-3 text-[12px] leading-[1.6] text-slate-800 text-justify">
+              <div class="border-l-[3px] border-gray-400 ml-2 pl-4 py-1">
+                <!-- Saiz fon di sini 13px untuk penglihatan A4 yang kemas -->
+                <ol id="view-objectives" class="space-y-3.5 text-[13px] leading-relaxed text-slate-800 text-justify">
                   <!-- JS populated -->
                 </ol>
               </div>
             </div>
 
-            <div class="mt-4 pt-4 border-t border-slate-200 flex justify-between shrink-0">
+            <!-- Footer Name (Akan di tolak ke paling bawah kotak A4) -->
+            <div class="mt-auto pt-6 border-t border-slate-200 flex justify-between shrink-0">
               <div class="text-left w-3/4 pr-4 border-r border-slate-100">
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-6">Disediakan oleh :</p>
-                <div class="border-b border-dashed border-slate-400 w-full mb-1"></div>
-                <p id="view-author" class="font-montserrat font-bold text-[11px] leading-[1.3] text-slate-800 uppercase tracking-wide break-words">AIMUNI ATHIRAH</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Disediakan oleh :</p>
+                <div class="border-b border-dashed border-slate-400 w-full mb-1.5"></div>
+                <!-- Membuang truncate supaya nama boleh muat penuh -->
+                <p id="view-author" class="font-montserrat font-bold text-[13px] text-slate-800 uppercase tracking-wide">AIMUNI ATHIRAH</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 3. DECORATIVE RIGHT SIDE -->
-        <div id="view-side-banner" class="absolute right-0 bottom-0 w-[42px] flex flex-col items-center justify-center py-6 px-1 border-l border-t rounded-tl-lg shadow-sm transition-colors duration-300 bg-pink-100/95 border-pink-200 z-20">
-          <span id="view-side-text" class="vertical-text-upright font-montserrat font-bold text-[12px] uppercase transition-colors duration-300 text-pink-600">
+        <!-- 3. DECORATIVE RIGHT SIDE (Vertical Ribbon) -->
+        <div id="view-side-banner" class="absolute right-0 bottom-0 w-[45px] flex flex-col items-center justify-center py-8 px-1 border-l border-t rounded-tl-xl shadow-sm transition-colors duration-300 bg-pink-100/95 border-pink-200 z-20">
+          <span id="view-side-text" class="vertical-text-upright font-montserrat font-bold text-[13px] uppercase transition-colors duration-300 text-pink-600 tracking-wider">
             PRASEKOLAH
           </span>
         </div>
@@ -367,7 +373,7 @@
   </main>
 
   <!-- Custom Confirm Modal -->
-  <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity no-print">
+  <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
     <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 border border-slate-100">
       <h3 class="text-lg font-bold text-slate-800 mb-2">Kosongkan Borang?</h3>
       <p class="text-sm text-slate-500 mb-6">Tindakan ini akan memadam semua teks dan gambar yang telah diisi. Adakah anda pasti?</p>
@@ -378,30 +384,7 @@
     </div>
   </div>
 
-  <!-- CROP MODAL (Fungsi Wajib yang Tertinggal Sebelum Ini) -->
-  <div id="crop-modal" class="fixed inset-0 bg-slate-900/90 z-[60] hidden flex flex-col items-center justify-center p-4 sm:p-6 no-print backdrop-blur-sm">
-    <div class="bg-white rounded-xl shadow-2xl overflow-hidden w-full max-w-2xl flex flex-col max-h-full">
-      <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-        <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="crop" class="w-5 h-5 text-teal-600"></i> Potong Gambar (Crop)</h3>
-        <button onclick="cancelCrop()" class="text-slate-400 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-      <div class="flex-1 bg-slate-200 w-full h-[50vh] min-h-[300px] relative overflow-hidden p-2 flex items-center justify-center">
-        <img id="crop-image" src="" alt="Gambar untuk dipotong" class="max-w-full max-h-full block">
-      </div>
-      <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center gap-3">
-        <p class="text-xs text-slate-500 hidden sm:block">Tarik kotak grid untuk memfokus pada bahagian gambar.</p>
-        <div class="flex gap-2 w-full sm:w-auto">
-          <button onclick="cancelCrop()" class="flex-1 sm:flex-none px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
-          <button onclick="confirmCrop()" class="flex-1 sm:flex-none px-4 py-2 text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2">
-            <i data-lucide="check" class="w-4 h-4"></i> Potong & Simpan
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="no-print fixed bottom-6 right-6 transform translate-y-10 opacity-0 pointer-events-none bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 z-[70]">
+  <div id="toast" class="no-print fixed bottom-6 right-6 transform translate-y-10 opacity-0 pointer-events-none bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 z-50">
     <div class="bg-emerald-500 text-white p-1 rounded-full"><i data-lucide="check" class="w-4 h-4"></i></div>
     <span id="toast-message">Mesej</span>
   </div>
@@ -424,9 +407,6 @@
       photos: [] 
     };
 
-    let cropperInstance = null;
-    let currentCropIndex = null;
-
     const unitThemes = {
       'PRASEKOLAH': { badgeBg: 'bg-pink-500', blockBg: 'bg-pink-50', blockBorder: 'border-pink-500', ribbonBg: 'bg-pink-100/95', ribbonBorder: 'border-pink-200', textAccent: 'text-pink-600', artGlow1: 'bg-pink-300', artGlow2: 'bg-rose-200', artFloral: 'text-pink-400' },
       'HAL EHWAL MURID': { badgeBg: 'bg-sky-500', blockBg: 'bg-sky-50', blockBorder: 'border-sky-500', ribbonBg: 'bg-sky-100/95', ribbonBorder: 'border-sky-200', textAccent: 'text-sky-600', artGlow1: 'bg-sky-300', artGlow2: 'bg-blue-200', artFloral: 'text-sky-400' },
@@ -437,29 +417,33 @@
 
     window.onload = function() {
       const uploaderContainer = document.getElementById('image-uploaders-container');
-      let html = '';
-      for(let i = 0; i < 5; i++) {
-        html += `
-          <div class="relative group aspect-square border-2 border-dashed border-slate-300 hover:border-teal-500 rounded-lg overflow-hidden transition-all bg-slate-50 flex flex-col justify-center items-center cursor-pointer">
-            <input type="file" id="file-input-${i}" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event, ${i})">
-            <div id="img-placeholder-${i}" class="flex flex-col items-center justify-center p-1 text-center absolute inset-0 z-0">
-              <svg class="w-5 h-5 text-slate-300 group-hover:text-teal-500 mb-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-              <span class="text-[9px] text-slate-400 font-bold">Foto ${i+1}</span>
+      if (uploaderContainer) {
+        let html = '';
+        for(let i = 0; i < 5; i++) {
+          html += `
+            <div class="relative group aspect-square border-2 border-dashed border-slate-300 hover:border-teal-500 rounded-lg overflow-hidden transition-all bg-slate-50 flex flex-col justify-center items-center cursor-pointer">
+              <input type="file" id="file-input-${i}" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="handleImageUpload(event, ${i})">
+              <div id="img-placeholder-${i}" class="flex flex-col items-center justify-center p-1 text-center absolute inset-0 z-0">
+                <svg class="w-5 h-5 text-slate-300 group-hover:text-teal-500 mb-0.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span class="text-[9px] text-slate-400 font-bold">Foto ${i+1}</span>
+              </div>
+              <img id="img-preview-${i}" class="hidden w-full h-full object-cover relative z-0">
+              <button onclick="removeImage(${i}, event)" class="hidden absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-0.5 rounded-full shadow z-20" title="Buang">
+                <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
             </div>
-            <img id="img-preview-${i}" class="hidden w-full h-full object-cover relative z-0">
-            <button onclick="removeImage(${i}, event)" class="hidden absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-0.5 rounded-full shadow z-20" title="Buang">
-              <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
-          </div>
-        `;
+          `;
+        }
+        uploaderContainer.innerHTML = html;
       }
-      uploaderContainer.innerHTML = html;
       lucide.createIcons();
       loadTemplate(); 
     };
 
     function renderObjectivesForm() {
       const container = document.getElementById('objectives-container');
+      if(!container) return;
+      
       container.innerHTML = '';
       state.objectives.forEach((obj, idx) => {
         container.innerHTML += `
@@ -489,7 +473,7 @@
     }
 
     function autoFillDate(event) {
-      const dateVal = event.target.value;
+      const dateVal = event?.target?.value;
       if(!dateVal) return;
       
       const d = new Date(dateVal);
@@ -500,6 +484,8 @@
       const dayString = days[d.getDay()];
       
       const ta = document.getElementById('input-datetime');
+      if(!ta) return;
+      
       const lines = ta.value.split('\n');
       
       if(lines.length > 1) {
@@ -513,11 +499,12 @@
     }
 
     function addKRA(event) {
-      const select = event.target;
-      if(select.value === "") return;
+      const select = event?.target;
+      if(!select || select.value === "") return;
       
       const val = select.options[select.selectedIndex].text;
       const ta = document.getElementById('input-kra');
+      if(!ta) return;
       
       if (ta.value.trim() === '') ta.value = val;
       else if (!ta.value.includes(val)) ta.value += '\n' + val;
@@ -527,71 +514,22 @@
     }
 
     function handleImageUpload(event, index) {
-      const file = event.target.files[0];
+      const file = event?.target?.files[0];
       if (!file) return;
-      
       const reader = new FileReader();
       reader.onload = function(e) {
-        currentCropIndex = index;
-        const cropModal = document.getElementById('crop-modal');
-        const cropImage = document.getElementById('crop-image');
-        
-        cropImage.src = e.target.result;
-        cropModal.classList.remove('hidden');
-        
-        if (cropperInstance) cropperInstance.destroy();
-        
-        // Memulakan tetapan potongan gambar
-        cropperInstance = new Cropper(cropImage, {
-          viewMode: 1,
-          dragMode: 'move',
-          autoCropArea: 0.9,
-          restore: false,
-          guides: true,
-          center: true,
-          highlight: false,
-          cropBoxMovable: true,
-          cropBoxResizable: true,
-          toggleDragModeOnDblclick: true,
-        });
-        
-        // Reset input supaya fail sama boleh dipilih lagi jika perlu
-        document.getElementById(`file-input-${index}`).value = ''; 
+        state.photos[index] = e.target.result;
+        refreshUploaderBox(index, e.target.result);
+        updatePreview();
       };
       reader.readAsDataURL(file);
-    }
-
-    function cancelCrop() {
-      document.getElementById('crop-modal').classList.add('hidden');
-      if (cropperInstance) {
-        cropperInstance.destroy();
-        cropperInstance = null;
-      }
-      currentCropIndex = null;
-    }
-
-    function confirmCrop() {
-      if (!cropperInstance) return;
-      
-      const canvas = cropperInstance.getCroppedCanvas({
-        maxWidth: 1200,
-        maxHeight: 1200
-      });
-      
-      const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      
-      state.photos[currentCropIndex] = croppedDataUrl;
-      refreshUploaderBox(currentCropIndex, croppedDataUrl);
-      updatePreview();
-      
-      cancelCrop();
-      showToast('Gambar telah dipotong dan dimuat naik.');
     }
 
     function removeImage(index, event) {
       event.preventDefault();
       state.photos[index] = null;
-      document.getElementById(`file-input-${index}`).value = '';
+      const fileInput = document.getElementById(`file-input-${index}`);
+      if(fileInput) fileInput.value = '';
       refreshUploaderBox(index, null);
       updatePreview();
     }
@@ -599,23 +537,27 @@
     function refreshUploaderBox(index, src) {
       const preview = document.getElementById(`img-preview-${index}`);
       const placeholder = document.getElementById(`img-placeholder-${index}`);
+      if(!placeholder || !preview) return;
       const removeBtn = placeholder.parentElement.querySelector('button');
 
       if(src) {
         preview.src = src;
         preview.classList.remove('hidden');
         placeholder.classList.add('hidden');
-        removeBtn.classList.remove('hidden');
+        if(removeBtn) removeBtn.classList.remove('hidden');
       } else {
         preview.src = '';
         preview.classList.add('hidden');
         placeholder.classList.remove('hidden');
-        removeBtn.classList.add('hidden');
+        if(removeBtn) removeBtn.classList.add('hidden');
       }
     }
 
+    // FUNGSI RENDER GRID GAMBAR DENGAN CROP PINTAR (image-crop-center)
     function renderPhotoGrid() {
       const grid = document.getElementById('view-photo-grid');
+      if(!grid) return;
+      
       const activePhotos = state.photos.filter(p => p !== null && p !== undefined && p !== '');
 
       if (activePhotos.length === 0) {
@@ -626,7 +568,8 @@
       let html = '';
       const total = activePhotos.length;
       
-      const imgClass = "w-full h-full object-cover block";
+      // Kelas penting di sini: image-crop-center akan fokus automatik ke tengah gambar dan tutup ruang
+      const imgClass = "image-crop-center block";
       const wrapClass = "overflow-hidden w-full h-full bg-slate-100";
 
       if (total === 1) {
@@ -669,84 +612,107 @@
     }
 
     function updatePreview() {
-      state.school = document.getElementById('input-school').value;
-      state.year = document.getElementById('input-year').value;
-      state.title = document.getElementById('input-title').value;
-      state.datetime = document.getElementById('input-datetime').value;
-      state.target = document.getElementById('input-target').value;
-      state.sideText = document.getElementById('input-side').value;
-      state.kra = document.getElementById('input-kra').value;
-      state.author = document.getElementById('input-author').value;
+      const inputSchool = document.getElementById('input-school');
+      const inputYear = document.getElementById('input-year');
+      const inputTitle = document.getElementById('input-title');
+      const inputDatetime = document.getElementById('input-datetime');
+      const inputTarget = document.getElementById('input-target');
+      const inputSide = document.getElementById('input-side');
+      const inputKra = document.getElementById('input-kra');
+      const inputAuthor = document.getElementById('input-author');
 
-      document.getElementById('view-school').innerText = state.school || 'NAMA SEKOLAH';
-      document.getElementById('view-year').innerText = state.year || '----';
-      document.getElementById('view-title').innerText = state.title || '-';
-      document.getElementById('view-datetime').innerHTML = state.datetime.replace(/\n/g, '<br>') || '-';
-      document.getElementById('view-target').innerText = state.target || '-';
-      document.getElementById('view-side-text').innerText = state.sideText || '';
-      document.getElementById('view-kra').innerHTML = state.kra.replace(/\n/g, '<br>') || '-';
-      document.getElementById('view-author').innerText = state.author || '-';
+      if(inputSchool) state.school = inputSchool.value;
+      if(inputYear) state.year = inputYear.value;
+      if(inputTitle) state.title = inputTitle.value;
+      if(inputDatetime) state.datetime = inputDatetime.value;
+      if(inputTarget) state.target = inputTarget.value;
+      if(inputSide) state.sideText = inputSide.value;
+      if(inputKra) state.kra = inputKra.value;
+      if(inputAuthor) state.author = inputAuthor.value;
+
+      const viewSchool = document.getElementById('view-school');
+      const viewYear = document.getElementById('view-year');
+      const viewTitle = document.getElementById('view-title');
+      const viewDatetime = document.getElementById('view-datetime');
+      const viewTarget = document.getElementById('view-target');
+      const viewSideText = document.getElementById('view-side-text');
+      const viewKra = document.getElementById('view-kra');
+      const viewAuthor = document.getElementById('view-author');
+
+      if(viewSchool) viewSchool.innerText = state.school || 'NAMA SEKOLAH';
+      if(viewYear) viewYear.innerText = state.year || '----';
+      if(viewTitle) viewTitle.innerText = state.title || '-';
+      if(viewDatetime) viewDatetime.innerHTML = state.datetime.replace(/\n/g, '<br>') || '-';
+      if(viewTarget) viewTarget.innerText = state.target || '-';
+      if(viewSideText) viewSideText.innerText = state.sideText || '';
+      if(viewKra) viewKra.innerHTML = state.kra.replace(/\n/g, '<br>') || '-';
+      if(viewAuthor) viewAuthor.innerText = state.author || '-';
 
       const objList = document.getElementById('view-objectives');
-      objList.innerHTML = '';
-      const validObjs = state.objectives.filter(o => o.trim() !== '');
-      
-      let totalChars = validObjs.join('').length;
-      const photoGrid = document.getElementById('view-photo-grid');
-      
-      if (validObjs.length >= 5 || totalChars > 450) {
-        objList.className = "space-y-1.5 text-[9.5px] leading-[1.4] text-slate-800 text-justify";
-        photoGrid.className = "w-full h-[190px] transition-all duration-300";
-      } else if (validObjs.length >= 3 || totalChars > 250) {
-        objList.className = "space-y-2 text-[11px] leading-[1.5] text-slate-800 text-justify";
-        photoGrid.className = "w-full h-[230px] transition-all duration-300";
-      } else {
-        objList.className = "space-y-3 text-[12px] leading-[1.6] text-slate-800 text-justify";
-        photoGrid.className = "w-full h-[270px] transition-all duration-300"; 
+      if(objList) {
+        objList.innerHTML = '';
+        const validObjs = state.objectives.filter(o => o.trim() !== '');
+        if (validObjs.length > 0) {
+          validObjs.forEach((obj, idx) => {
+            objList.innerHTML += `<li class="relative pl-5"><span class="absolute left-0 top-0 text-slate-500 font-bold">${idx+1}.</span> ${obj}</li>`;
+          });
+        } else {
+          objList.innerHTML = `<li class="text-slate-400 italic">Tiada objektif dimasukkan...</li>`;
+        }
       }
 
-      if (validObjs.length > 0) {
-        validObjs.forEach((obj, idx) => {
-          objList.innerHTML += `<li class="relative pl-4"><span class="absolute left-0 top-0 text-slate-500 font-bold">${idx+1}.</span> ${obj}</li>`;
-        });
-      } else {
-        objList.innerHTML = `<li class="text-slate-400 italic">Tiada objektif dimasukkan...</li>`;
-      }
-
-      const rawSideVal = document.getElementById('input-side').value;
+      const rawSideVal = state.sideText;
       const conf = unitThemes[rawSideVal] || unitThemes['PRASEKOLAH'];
       
-      document.getElementById('badge-year-container').className = `text-white pb-3 pt-6 px-2 text-center shadow-sm clip-roof-up transition-colors duration-300 ${conf.badgeBg}`;
+      const badgeYear = document.getElementById('badge-year-container');
+      if(badgeYear) badgeYear.className = `text-white pb-3 pt-6 px-2 text-center shadow-sm clip-roof-up transition-colors duration-300 ${conf.badgeBg}`;
+      
       ['bg-block-title', 'bg-block-datetime', 'bg-block-target', 'bg-block-kra'].forEach(id => {
-        document.getElementById(id).className = `${conf.blockBg} border-l-4 ${conf.blockBorder} rounded-b-md rounded-tr-sm p-2.5 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[60px]`;
+        const block = document.getElementById(id);
+        if(block) block.className = `${conf.blockBg} border-l-4 ${conf.blockBorder} rounded-b-md rounded-tr-sm p-2.5 flex-1 flex items-center justify-center text-center transition-colors duration-300 min-h-[70px]`;
       });
       
-      document.getElementById('view-side-banner').className = `absolute right-0 bottom-0 w-[42px] flex flex-col items-center justify-center py-6 px-1 border-l border-t rounded-tl-lg shadow-sm transition-colors duration-300 ${conf.ribbonBg} ${conf.ribbonBorder} z-20`;
-      document.getElementById('view-side-text').className = `vertical-text-upright font-montserrat font-bold text-[12px] uppercase transition-colors duration-300 ${conf.textAccent}`;
+      const sideBanner = document.getElementById('view-side-banner');
+      if(sideBanner) sideBanner.className = `absolute right-0 bottom-0 w-[45px] flex flex-col items-center justify-center py-8 px-1 border-l border-t rounded-tl-xl shadow-sm transition-colors duration-300 ${conf.ribbonBg} ${conf.ribbonBorder} z-20`;
+      
+      if(viewSideText) viewSideText.className = `vertical-text-upright font-montserrat font-bold text-[13px] uppercase transition-colors duration-300 ${conf.textAccent} tracking-wider`;
 
-      document.getElementById('art-glow-1').className = `absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 ${conf.artGlow1}`;
-      document.getElementById('art-glow-2').className = `absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-20 transition-colors duration-700 ${conf.artGlow2}`;
-      document.getElementById('art-floral-1').className = `absolute -top-10 -right-16 w-96 h-96 opacity-20 transition-colors duration-700 ${conf.artFloral}`;
-      document.getElementById('art-floral-2').className = `absolute bottom-5 -left-16 w-80 h-80 opacity-[0.15] transition-colors duration-700 ${conf.artFloral}`;
-      document.getElementById('art-dots').className = `absolute top-1/3 left-4 w-20 h-32 opacity-20 transition-colors duration-700 ${conf.artFloral}`;
+      const glow1 = document.getElementById('art-glow-1');
+      const glow2 = document.getElementById('art-glow-2');
+      const floral1 = document.getElementById('art-floral-1');
+      const floral2 = document.getElementById('art-floral-2');
+      const dots = document.getElementById('art-dots');
+
+      if(glow1) glow1.className = `absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 ${conf.artGlow1}`;
+      if(glow2) glow2.className = `absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-20 transition-colors duration-700 ${conf.artGlow2}`;
+      if(floral1) floral1.className = `absolute -top-10 -right-16 w-96 h-96 opacity-20 transition-colors duration-700 ${conf.artFloral}`;
+      if(floral2) floral2.className = `absolute bottom-5 -left-16 w-80 h-80 opacity-[0.15] transition-colors duration-700 ${conf.artFloral}`;
+      if(dots) dots.className = `absolute top-1/3 left-4 w-20 h-32 opacity-20 transition-colors duration-700 ${conf.artFloral}`;
 
       renderPhotoGrid();
     }
 
     function triggerClearForm() {
-      document.getElementById('custom-confirm-modal').classList.remove('hidden');
+      const modal = document.getElementById('custom-confirm-modal');
+      if(modal) modal.classList.remove('hidden');
     }
     
     function cancelClearForm() {
-      document.getElementById('custom-confirm-modal').classList.add('hidden');
+      const modal = document.getElementById('custom-confirm-modal');
+      if(modal) modal.classList.add('hidden');
     }
 
     function confirmClearForm() {
-      document.getElementById('custom-confirm-modal').classList.add('hidden');
+      const modal = document.getElementById('custom-confirm-modal');
+      if(modal) modal.classList.add('hidden');
       
       document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
-      document.getElementById('input-year').value = '2026';
-      document.getElementById('input-side').value = 'PRASEKOLAH';
+      
+      const inputYear = document.getElementById('input-year');
+      if(inputYear) inputYear.value = '2026';
+      
+      const inputSide = document.getElementById('input-side');
+      if(inputSide) inputSide.value = 'PRASEKOLAH';
       
       state.objectives = [''];
       state.photos = [];
@@ -758,34 +724,107 @@
     }
 
     function loadTemplate() {
-      document.getElementById('input-school').value = 'Sekolah Kebangsaan Krangan';
-      state.photos = [
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400"><rect width="100%" height="100%" fill="%23c4b5fd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="%234c1d95">FOTO 1</text></svg>',
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400"><rect width="100%" height="100%" fill="%23fbcfe8"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="%239d174d">FOTO 2</text></svg>',
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="%23fef08a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="%23854d0e">FOTO 3</text></svg>',
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="%23a7f3d0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="%23065f46">FOTO 4</text></svg>',
-        'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="%2393c5fd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="%231e3a8a">FOTO 5</text></svg>'
-      ];
+      const inputSchool = document.getElementById('input-school');
+      if(inputSchool) inputSchool.value = 'Sekolah Kebangsaan Krangan';
       
-      document.getElementById('input-title').value = state.title;
-      document.getElementById('input-datetime').value = state.datetime;
-      document.getElementById('input-target').value = state.target;
-      document.getElementById('input-kra').value = state.kra;
-      document.getElementById('input-author').value = state.author;
-      document.getElementById('input-side').value = 'PRASEKOLAH';
+      state.photos = [];
+      for(let i=0; i<5; i++) refreshUploaderBox(i, null);
       
-      state.photos.forEach((src, i) => refreshUploaderBox(i, src));
+      const inputTitle = document.getElementById('input-title');
+      if(inputTitle) inputTitle.value = state.title;
+      
+      const inputDatetime = document.getElementById('input-datetime');
+      if(inputDatetime) inputDatetime.value = state.datetime;
+      
+      const inputTarget = document.getElementById('input-target');
+      if(inputTarget) inputTarget.value = state.target;
+      
+      const inputKra = document.getElementById('input-kra');
+      if(inputKra) inputKra.value = state.kra;
+      
+      const inputAuthor = document.getElementById('input-author');
+      if(inputAuthor) inputAuthor.value = state.author;
+      
+      const inputSide = document.getElementById('input-side');
+      if(inputSide) inputSide.value = 'PRASEKOLAH';
+      
       renderObjectivesForm();
       updatePreview();
       showToast('Templat prasekolah dimuatkan.');
     }
 
+    function toggleDecorationsForExport(hide) {
+      const elements = [
+        document.getElementById('art-glow-1'),
+        document.getElementById('art-glow-2'),
+        document.getElementById('art-floral-1'),
+        document.getElementById('art-floral-2'),
+        document.getElementById('art-dots')
+      ];
+      elements.forEach(el => { 
+        if(el) el.style.opacity = hide ? '0' : ''; 
+      });
+    }
+
+    async function getCanvas() {
+      const card = document.getElementById('opr-card');
+      if (!card) return null;
+      
+      toggleDecorationsForExport(true); 
+      await document.fonts.ready; 
+      
+      try {
+        const canvas = await html2canvas(card, {
+          scale: 2, 
+          useCORS: true, 
+          allowTaint: false, 
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        return canvas;
+      } catch (error) {
+        console.error("Ralat rendering Canvas:", error);
+        return null;
+      } finally {
+        toggleDecorationsForExport(false); 
+      }
+    }
+
+    async function downloadAsJPG() {
+      showToast('Menjana imej JPG, sila tunggu...', 'bg-indigo-600');
+      try {
+        const canvas = await getCanvas();
+        if (!canvas) throw new Error("Gagal menjana Canvas");
+
+        const link = document.createElement('a');
+        link.download = `OPR_${state.year}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+        showToast('Gambar berjaya dimuat turun!');
+      } catch(err) {
+        console.error(err);
+        showToast('Ralat Keselamatan (CORS). Guna butang Simpan PDF untuk lebih stabil.', 'bg-red-500');
+      }
+    }
+
+    function downloadAsPDF() {
+      showToast('Membuka tetingkap cetakan. Sila pilih "Save as PDF".', 'bg-emerald-600');
+      setTimeout(() => {
+        window.print();
+      }, 800);
+    }
+
     function showToast(msg, bg = 'bg-slate-900') {
       const t = document.getElementById('toast');
-      t.className = `no-print fixed bottom-6 right-6 flex items-center gap-3 px-5 py-3 rounded-xl shadow-xl transition-all duration-300 z-[70] text-white font-bold text-xs ${bg}`;
-      document.getElementById('toast-message').innerText = msg;
+      if(!t) return;
+      
+      t.className = `no-print fixed bottom-6 right-6 flex items-center gap-3 px-5 py-3 rounded-xl shadow-xl transition-all duration-300 z-[100] text-white font-bold text-xs ${bg}`;
+      
+      const toastMessage = document.getElementById('toast-message');
+      if(toastMessage) toastMessage.innerText = msg;
+      
       t.classList.remove('opacity-0', 'translate-y-10');
-      setTimeout(() => t.classList.add('opacity-0', 'translate-y-10'), 3000);
+      setTimeout(() => t.classList.add('opacity-0', 'translate-y-10'), 4000);
     }
   </script>
 </body>
