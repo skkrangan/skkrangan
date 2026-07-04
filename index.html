@@ -9,39 +9,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- KOD CSS ASAL SKK -->
     <style>
         body { font-family: 'Inter', sans-serif; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        @media print { body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; } .no-print { display: none !important; } .print-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <nav class="bg-slate-900 text-white p-4">
+    <!-- NAVIGASI UTAMA PORTAL -->
+    <nav class="bg-slate-900 text-white p-4 no-print shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold">Portal SKK Rangan</h1>
             <div id="nav-menu">
                 <button onclick="showSection('home')" class="px-4 py-2 hover:bg-slate-700 rounded">Utama</button>
-                <button id="nav-skk" onclick="showSection('skk')" class="px-4 py-2 hover:bg-slate-700 rounded hidden">Sistem Keberadaan</button>
+                <button id="nav-staff-area" onclick="showSection('staff-dashboard')" class="px-4 py-2 hover:bg-slate-700 rounded hidden">Dashboard Staf</button>
                 <button id="login-btn" onclick="showSection('login')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded">Log Masuk Staf</button>
             </div>
         </div>
     </nav>
 
     <main id="app-container" class="container mx-auto p-4">
+        <!-- LAMAN UTAMA -->
         <div id="section-home" class="tab-content active p-8 bg-white rounded-xl shadow">
             <h2 class="text-3xl font-bold">Selamat Datang ke Portal Bersepadu</h2>
-            <p class="mt-4 text-slate-600">Sila log masuk menggunakan akaun DELIMA untuk mengakses Sistem Keberadaan.</p>
+            <p class="mt-4 text-slate-600">Sila log masuk menggunakan akaun DELIMA untuk akses sistem.</p>
         </div>
 
-        <div id="section-login" class="tab-content p-8 bg-white rounded-xl shadow">
+        <!-- LAMAN LOGIN -->
+        <div id="section-login" class="tab-content p-8 bg-white rounded-xl shadow text-center">
             <h2 class="text-2xl font-bold mb-4">Log Masuk Staf (DELIMA)</h2>
-            <div id="g_id_signin" class="g_id_signin" data-type="standard"></div>
+            <div id="g_id_signin" class="flex justify-center" data-type="standard"></div>
         </div>
 
-        <div id="section-skk" class="tab-content p-4">
-            <div id="skk-wrapper">
-                <!-- Kod asal sistem SKK anda dimuatkan secara dinamik di sini -->
+        <!-- DASHBOARD STAF (SUB-MENU) -->
+        <div id="section-staff-dashboard" class="tab-content">
+            <div class="flex gap-4 mb-6">
+                <button onclick="loadSKK()" class="px-4 py-2 bg-slate-800 text-white rounded-lg">Sistem Keberadaan</button>
+                <button onclick="loadOPR()" class="px-4 py-2 bg-slate-800 text-white rounded-lg">Laporan OPR</button>
+            </div>
+            
+            <div id="staff-content-area" class="p-4 bg-white rounded-xl shadow">
+                <!-- Kandungan Sistem akan dimuatkan di sini -->
+                <p>Sila pilih menu di atas.</p>
             </div>
         </div>
     </main>
@@ -49,14 +62,13 @@
     <script>
         const CLIENT_ID = '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com';
 
-        // Navigasi
+        // 1. FUNGSI NAVIGASI
         function showSection(id) {
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
             document.getElementById('section-' + id).classList.add('active');
-            if(id === 'skk') initSKKSystem();
         }
 
-        // Google Login
+        // 2. INTEGRASI GOOGLE LOGIN
         window.onload = function () {
             google.accounts.id.initialize({
                 client_id: CLIENT_ID,
@@ -65,33 +77,39 @@
                     if(payload.email.endsWith('@moe-dl.edu.my')) {
                         document.getElementById('login-btn').innerText = "Log Keluar";
                         document.getElementById('login-btn').onclick = () => location.reload();
-                        document.getElementById('nav-skk').classList.remove('hidden');
-                        showSection('skk');
+                        document.getElementById('nav-staff-area').classList.remove('hidden');
+                        showSection('staff-dashboard');
                     } else {
-                        alert("Akses ditolak: Sila gunakan akaun DELIMA (@moe-dl.edu.my).");
+                        alert("Akses ditolak: Sila gunakan akaun DELIMA.");
                     }
                 }
             });
             google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "outline", size: "large" });
         };
 
-        // Integrasi Kod SKK Asal
-        function initSKKSystem() {
-            if (document.getElementById('skk-wrapper').innerHTML !== "") return;
-            
-            // Di sini anda boleh masukkan struktur HTML asal sistem SKK anda
-            document.getElementById('skk-wrapper').innerHTML = `
-                <div class="bg-white p-6 rounded-xl shadow">
+        // 3. FUNGSI LOAD SISTEM KEBERADAAN (SKK)
+        function loadSKK() {
+            document.getElementById('staff-content-area').innerHTML = `
+                <!-- TAMPAL KANDUNGAN KOD ASAL ANDA DI SINI -->
+                <div id="skk-container-main">
                     <h2 class="text-2xl font-bold mb-4">Sistem Keberadaan Staf</h2>
-                    <!-- Panggil fungsi asal sistem SKK di sini -->
-                    <p>Sistem berjaya dimuatkan. Pastikan fungsi asal anda (seperti updateClock, renderDashboard) telah dipanggil di sini.</p>
+                    <p>Sistem ini telah digabungkan.</p>
                 </div>
             `;
-            
-            // Panggil fungsi asal sistem SKK (pastikan fungsi-fungsi ini wujud dalam skrip anda)
+            // Panggil fungsi asal anda dari kod Untitled.txt
             if(typeof updateClock === 'function') updateClock();
             if(typeof renderDashboard === 'function') renderDashboard();
             if(typeof initChart === 'function') initChart();
+        }
+
+        // 4. FUNGSI LOAD LAPORAN OPR
+        function loadOPR() {
+            document.getElementById('staff-content-area').innerHTML = `
+                <div class="p-6 bg-white rounded-xl shadow">
+                    <h2 class="text-2xl font-bold mb-4">Laporan OPR</h2>
+                    <p>Halaman ini sedang dalam pembinaan untuk integrasi laporan OPR.</p>
+                </div>
+            `;
         }
     </script>
 </body>
