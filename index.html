@@ -29,15 +29,9 @@
         @keyframes move { from { transform: translate(-10%, -10%); } to { transform: translate(20%, 20%); } }
 
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-
-        /* FIX #1: Guna animation fadeIn, bukan opacity transition dari display:none */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        .tab-content { display: none; opacity: 0; transition: all 0.5s ease; }
+        .tab-content.active { display: block; opacity: 1; }
+        
         .card-glow:hover { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
         
         [contenteditable="true"]:focus { 
@@ -142,148 +136,15 @@
                 <p class="text-slate-400">Selamat kembali, sila pilih modul tugasan anda.</p>
             </div>
             <div class="grid md:grid-cols-2 gap-8">
-                <button onclick="showSection('ehadir')" class="glass p-10 rounded-3xl border border-blue-500/20 hover:bg-blue-900/20 card-glow transition-all"><i class="fas fa-user-check text-5xl text-blue-400 mb-6"></i><h3 class="text-2xl font-bold mb-2">Sistem eHadir</h3><p class="text-slate-400">Rekod kehadiran staf & murid.</p></button>
-                <button onclick="showSection('eopr')" class="glass p-10 rounded-3xl border border-blue-500/20 hover:bg-blue-900/20 card-glow transition-all"><i class="fas fa-file-invoice text-5xl text-blue-400 mb-6"></i><h3 class="text-2xl font-bold mb-2">Laporan eOPR</h3><p class="text-slate-400">Pengurusan data laporan operasional.</p></button>
-            </div>
-        </div>
-
-        <!-- ═══════════════ SISTEM eHADIR ═══════════════ -->
-        <div id="section-ehadir" class="tab-content max-w-4xl mx-auto space-y-8">
-            <div class="flex items-center gap-4">
-                <button onclick="showSection('staff')" class="text-slate-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-                <h2 class="text-3xl font-extrabold">Sistem eHadir</h2>
-            </div>
-
-            <!-- Tarikh & Kelas -->
-            <div class="glass p-6 rounded-3xl border border-white/10 flex flex-wrap gap-4 items-end">
-                <div>
-                    <label class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 block">Tarikh</label>
-                    <input type="date" id="hadir-tarikh" class="bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-blue-400">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 block">Kelas</label>
-                    <select id="hadir-kelas" class="bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-blue-400">
-                        <option value="Tahun 1">Tahun 1</option>
-                        <option value="Tahun 2">Tahun 2</option>
-                        <option value="Tahun 3">Tahun 3</option>
-                        <option value="Tahun 4">Tahun 4</option>
-                        <option value="Tahun 5">Tahun 5</option>
-                        <option value="Tahun 6">Tahun 6</option>
-                    </select>
-                </div>
-                <button onclick="loadHadir()" class="bg-blue-600 hover:bg-blue-500 px-6 py-2.5 rounded-xl font-bold transition"><i class="fas fa-search mr-2"></i>Muatkan</button>
-                <button onclick="simpanHadir()" class="bg-green-600 hover:bg-green-500 px-6 py-2.5 rounded-xl font-bold transition"><i class="fas fa-save mr-2"></i>Simpan Kehadiran</button>
-            </div>
-
-            <!-- Statistik hari ini -->
-            <div class="grid grid-cols-3 gap-4">
-                <div class="glass p-5 rounded-2xl text-center border border-white/10">
-                    <div id="hadir-stat-hadir" class="text-3xl font-extrabold text-green-400">-</div>
-                    <div class="text-xs uppercase tracking-wider text-slate-400 mt-1">Hadir</div>
-                </div>
-                <div class="glass p-5 rounded-2xl text-center border border-white/10">
-                    <div id="hadir-stat-tidak" class="text-3xl font-extrabold text-red-400">-</div>
-                    <div class="text-xs uppercase tracking-wider text-slate-400 mt-1">Tidak Hadir</div>
-                </div>
-                <div class="glass p-5 rounded-2xl text-center border border-white/10">
-                    <div id="hadir-stat-mc" class="text-3xl font-extrabold text-yellow-400">-</div>
-                    <div class="text-xs uppercase tracking-wider text-slate-400 mt-1">MC / Cuti</div>
-                </div>
-            </div>
-
-            <!-- Senarai murid -->
-            <div class="glass p-6 rounded-3xl border border-white/10">
-                <h3 class="font-bold text-lg mb-4 text-blue-400"><i class="fas fa-list mr-2"></i>Senarai Murid</h3>
-                <div id="hadir-list" class="space-y-3"></div>
-            </div>
-
-            <!-- Log kehadiran lepas -->
-            <div class="glass p-6 rounded-3xl border border-white/10">
-                <h3 class="font-bold text-lg mb-4 text-blue-400"><i class="fas fa-history mr-2"></i>Log Kehadiran Terkini</h3>
-                <div id="hadir-log" class="space-y-2 text-sm"></div>
-            </div>
-        </div>
-
-        <!-- ═══════════════ SISTEM eOPR ═══════════════ -->
-        <div id="section-eopr" class="tab-content max-w-4xl mx-auto space-y-8">
-            <div class="flex items-center gap-4">
-                <button onclick="showSection('staff')" class="text-slate-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-                <h2 class="text-3xl font-extrabold">Laporan eOPR</h2>
-            </div>
-
-            <!-- Form OPR -->
-            <div class="glass p-8 rounded-3xl border border-white/10 space-y-6">
-                <h3 class="font-bold text-xl text-blue-400"><i class="fas fa-file-alt mr-2"></i>Borang Laporan Operasional Bulanan</h3>
-
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Bulan / Tahun</label>
-                        <input type="month" id="opr-bulan" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-blue-400">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Nama Pelapor</label>
-                        <input type="text" id="opr-nama" placeholder="Nama penuh" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Jawatan</label>
-                    <select id="opr-jawatan" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-blue-400">
-                        <option value="">-- Pilih Jawatan --</option>
-                        <option>Guru Besar</option>
-                        <option>Penolong Kanan 1</option>
-                        <option>Penolong Kanan HEM</option>
-                        <option>Penolong Kanan Kokurikulum</option>
-                        <option>Guru Biasa</option>
-                        <option>Guru Prasekolah</option>
-                        <option>Staf Sokongan</option>
-                    </select>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Jumlah Kehadiran Murid (%)</label>
-                        <input type="number" id="opr-kehadiran" min="0" max="100" placeholder="Contoh: 92" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Bilangan Aktiviti Dijalankan</label>
-                        <input type="number" id="opr-aktiviti" min="0" placeholder="Contoh: 5" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Pencapaian / Pemerhatian Bulan Ini</label>
-                    <textarea id="opr-pencapaian" rows="4" placeholder="Terangkan pencapaian, aktiviti atau isu yang berlaku dalam bulan ini..." class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
-                </div>
-
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Isu / Cabaran</label>
-                    <textarea id="opr-isu" rows="3" placeholder="Senaraikan isu atau cabaran yang dihadapi..." class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
-                </div>
-
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Tindakan Susulan</label>
-                    <textarea id="opr-tindakan" rows="3" placeholder="Apakah tindakan yang akan diambil bulan hadapan?" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 resize-none"></textarea>
-                </div>
-
-                <button onclick="hantarOPR()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-3.5 rounded-2xl transition text-lg"><i class="fas fa-paper-plane mr-2"></i>Hantar Laporan</button>
-            </div>
-
-            <!-- Sejarah laporan -->
-            <div class="glass p-6 rounded-3xl border border-white/10">
-                <h3 class="font-bold text-lg mb-4 text-blue-400"><i class="fas fa-archive mr-2"></i>Sejarah Laporan Dihantar</h3>
-                <div id="opr-sejarah" class="space-y-3"></div>
+                <button onclick="alert('Membuka Sistem eHadir...')" class="glass p-10 rounded-3xl border border-blue-500/20 hover:bg-blue-900/20 card-glow transition-all"><i class="fas fa-user-check text-5xl text-blue-400 mb-6"></i><h3 class="text-2xl font-bold mb-2">Sistem eHadir</h3><p class="text-slate-400">Rekod kehadiran staf & murid.</p></button>
+                <button onclick="alert('Membuka Sistem eOPR...')" class="glass p-10 rounded-3xl border border-blue-500/20 hover:bg-blue-900/20 card-glow transition-all"><i class="fas fa-file-invoice text-5xl text-blue-400 mb-6"></i><h3 class="text-2xl font-bold mb-2">Laporan eOPR</h3><p class="text-slate-400">Pengurusan data laporan operasional.</p></button>
             </div>
         </div>
 
         <div id="section-unit-detail" class="tab-content max-w-4xl mx-auto">
             <button onclick="showSection('home')" class="mb-8 text-slate-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
             <div class="glass p-12 rounded-3xl shadow-2xl border border-white/10">
-                <!--
-                    FIX #5: Buang class "flex" dari HTML — konflik dengan Tailwind "hidden" (display:none !important).
-                    Flex akan diset melalui style.display='flex' dalam JavaScript apabila panel perlu ditunjukkan.
-                -->
-                <div id="admin-panel" class="hidden mb-8 p-6 bg-blue-500/10 border border-blue-500/20 rounded-2xl justify-between items-center">
+                <div id="admin-panel" class="hidden mb-8 p-6 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex justify-between items-center">
                     <span class="text-blue-400 font-bold flex items-center gap-2"><i class="fas fa-magic"></i> Mod Admin Aktif</span>
                     <button onclick="saveChanges()" class="bg-blue-600 hover:bg-blue-500 font-bold px-6 py-2.5 rounded-xl transition">Simpan Perubahan</button>
                 </div>
@@ -301,199 +162,24 @@
     </main>
 
     <script>
-        // ─────────────────────────────────────────
-        // DATA eHADIR
-        // ─────────────────────────────────────────
-        const muridPerKelas = {
-            'Tahun 1': ['Ahmad Firdaus','Nurul Ain','Muhammad Haziq','Siti Fatimah','Razif Haikal','Amirah Qistina','Hafiz Zamri','Nur Izzah'],
-            'Tahun 2': ['Danial Asyraf','Farah Nabilah','Irfan Zulkifli','Liyana Sofea','Mikail Hassan','Nadia Husna','Syafiq Azlan','Zara Batrisyia'],
-            'Tahun 3': ['Ariff Syazwan','Balkis Nadhira','Faris Eiman','Hana Maisarah','Izzat Farhan','Jannah Qurratu','Khalid Rayyan','Lailatul Badriah'],
-            'Tahun 4': ['Ammar Hakim','Batrisyia Nur','Farhan Ismail','Huzaifah Ali','Iman Najihah','Jasmin Sofiya','Khalish Rayyan','Latifah Zahra'],
-            'Tahun 5': ['Azri Imran','Bukhary Nabil','Fariq Ramadhan','Hana Sofia','Iqbal Hakimi','Jasper Aziz','Kamil Farhan','Leya Nasuha'],
-            'Tahun 6': ['Anis Nabila','Burhan Zikry','Eryna Delisha','Hafizuddin','Izzah Kamila','Jana Rasyidah','Khairy Faris','Luqmanul Hakim']
-        };
-
-        let hadirDb = JSON.parse(localStorage.getItem('skk_hadir')) || {};
-
-        function initHadirTarikh() {
-            const input = document.getElementById('hadir-tarikh');
-            const today = new Date().toISOString().split('T')[0];
-            input.value = today;
-        }
-
-        function loadHadir() {
-            const tarikh = document.getElementById('hadir-tarikh').value;
-            const kelas  = document.getElementById('hadir-kelas').value;
-            const list   = document.getElementById('hadir-list');
-            const key    = tarikh + '|' + kelas;
-            const saved  = hadirDb[key] || {};
-            const murid  = muridPerKelas[kelas] || [];
-
-            list.innerHTML = '';
-            murid.forEach(function(nama) {
-                const status = saved[nama] || 'hadir';
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between bg-white/5 px-5 py-3 rounded-xl';
-                div.innerHTML =
-                    '<span class="font-semibold">' + nama + '</span>' +
-                    '<div class="flex gap-2">' +
-                        '<button onclick="setHadir(this,\'hadir\'  )" class="hadir-btn px-4 py-1.5 rounded-lg text-sm font-bold border transition ' + (status==='hadir'   ? 'bg-green-600  border-green-500  text-white' : 'border-white/20 text-slate-400 hover:border-green-500') + '">Hadir</button>' +
-                        '<button onclick="setHadir(this,\'tidak\'  )" class="hadir-btn px-4 py-1.5 rounded-lg text-sm font-bold border transition ' + (status==='tidak'   ? 'bg-red-600    border-red-500    text-white' : 'border-white/20 text-slate-400 hover:border-red-500') + '">T/Hadir</button>' +
-                        '<button onclick="setHadir(this,\'mc\'     )" class="hadir-btn px-4 py-1.5 rounded-lg text-sm font-bold border transition ' + (status==='mc'      ? 'bg-yellow-600 border-yellow-500 text-white' : 'border-white/20 text-slate-400 hover:border-yellow-500') + '">MC/Cuti</button>' +
-                    '</div>';
-                div.querySelector('[onclick*="hadir"]').setAttribute('data-nama', nama);
-                div.querySelectorAll('.hadir-btn').forEach(function(btn) { btn.setAttribute('data-nama', nama); });
-                list.appendChild(div);
-            });
-            updateHadirStat();
-        }
-
-        function setHadir(btn, status) {
-            const nama  = btn.getAttribute('data-nama');
-            const row   = btn.closest('div.flex');
-            row.querySelectorAll('.hadir-btn').forEach(function(b) {
-                b.className = 'hadir-btn px-4 py-1.5 rounded-lg text-sm font-bold border transition border-white/20 text-slate-400';
-            });
-            const colors = { hadir: 'bg-green-600 border-green-500 text-white', tidak: 'bg-red-600 border-red-500 text-white', mc: 'bg-yellow-600 border-yellow-500 text-white' };
-            btn.className = 'hadir-btn px-4 py-1.5 rounded-lg text-sm font-bold border transition ' + colors[status];
-            btn.closest('div.flex').setAttribute('data-status-' + nama, status);
-            updateHadirStat();
-        }
-
-        function updateHadirStat() {
-            const rows   = document.querySelectorAll('#hadir-list > div');
-            let h = 0, t = 0, mc = 0;
-            rows.forEach(function(row) {
-                const active = row.querySelector('.bg-green-600, .bg-red-600, .bg-yellow-600');
-                if (!active) { h++; return; }
-                if (active.classList.contains('bg-green-600'))  h++;
-                else if (active.classList.contains('bg-red-600')) t++;
-                else mc++;
-            });
-            document.getElementById('hadir-stat-hadir').innerText = h;
-            document.getElementById('hadir-stat-tidak').innerText = t;
-            document.getElementById('hadir-stat-mc').innerText    = mc;
-        }
-
-        function simpanHadir() {
-            const tarikh = document.getElementById('hadir-tarikh').value;
-            const kelas  = document.getElementById('hadir-kelas').value;
-            const key    = tarikh + '|' + kelas;
-            const murid  = muridPerKelas[kelas] || [];
-            const data   = {};
-
-            document.querySelectorAll('#hadir-list > div').forEach(function(row, i) {
-                const nama   = murid[i];
-                const active = row.querySelector('.bg-green-600, .bg-red-600, .bg-yellow-600');
-                data[nama]   = !active ? 'hadir' : (active.classList.contains('bg-green-600') ? 'hadir' : active.classList.contains('bg-red-600') ? 'tidak' : 'mc');
-            });
-
-            hadirDb[key] = data;
-            localStorage.setItem('skk_hadir', JSON.stringify(hadirDb));
-            renderHadirLog();
-            alert('Kehadiran ' + kelas + ' tarikh ' + tarikh + ' berjaya disimpan!');
-        }
-
-        function renderHadirLog() {
-            const log = document.getElementById('hadir-log');
-            const keys = Object.keys(hadirDb).reverse().slice(0, 10);
-            if (keys.length === 0) { log.innerHTML = '<p class="text-slate-500 italic">Tiada rekod lagi.</p>'; return; }
-            log.innerHTML = keys.map(function(k) {
-                const [tarikh, kelas] = k.split('|');
-                const data = hadirDb[k];
-                const h  = Object.values(data).filter(function(v) { return v === 'hadir'; }).length;
-                const t  = Object.values(data).filter(function(v) { return v === 'tidak'; }).length;
-                const mc = Object.values(data).filter(function(v) { return v === 'mc'; }).length;
-                return '<div class="flex items-center justify-between bg-white/5 px-4 py-3 rounded-xl">' +
-                    '<div><span class="font-bold">' + kelas + '</span> <span class="text-slate-400 text-xs ml-2">' + tarikh + '</span></div>' +
-                    '<div class="flex gap-3 text-sm"><span class="text-green-400">' + h + ' Hadir</span><span class="text-red-400">' + t + ' T/Hadir</span><span class="text-yellow-400">' + mc + ' MC</span></div>' +
-                    '</div>';
-            }).join('');
-        }
-
-        // ─────────────────────────────────────────
-        // DATA eOPR
-        // ─────────────────────────────────────────
-        let oprDb = JSON.parse(localStorage.getItem('skk_opr')) || [];
-
-        function hantarOPR() {
-            const bulan      = document.getElementById('opr-bulan').value;
-            const nama       = document.getElementById('opr-nama').value.trim();
-            const jawatan    = document.getElementById('opr-jawatan').value;
-            const kehadiran  = document.getElementById('opr-kehadiran').value;
-            const aktiviti   = document.getElementById('opr-aktiviti').value;
-            const pencapaian = document.getElementById('opr-pencapaian').value.trim();
-            const isu        = document.getElementById('opr-isu').value.trim();
-            const tindakan   = document.getElementById('opr-tindakan').value.trim();
-
-            if (!bulan || !nama || !jawatan || !pencapaian) {
-                alert('Sila lengkapkan semua medan yang wajib diisi (Bulan, Nama, Jawatan, Pencapaian).');
-                return;
-            }
-
-            const laporan = { id: Date.now(), tarikh: new Date().toLocaleString('ms-MY'), bulan, nama, jawatan, kehadiran, aktiviti, pencapaian, isu, tindakan };
-            oprDb.unshift(laporan);
-            localStorage.setItem('skk_opr', JSON.stringify(oprDb));
-            renderOPRSejarah();
-
-            // Clear form
-            ['opr-nama','opr-kehadiran','opr-aktiviti','opr-pencapaian','opr-isu','opr-tindakan'].forEach(function(id) {
-                document.getElementById(id).value = '';
-            });
-
-            alert('Laporan OPR berjaya dihantar dan disimpan!');
-        }
-
-        function renderOPRSejarah() {
-            const div = document.getElementById('opr-sejarah');
-            if (oprDb.length === 0) { div.innerHTML = '<p class="text-slate-500 italic">Tiada laporan dihantar lagi.</p>'; return; }
-            div.innerHTML = oprDb.map(function(r) {
-                return '<div class="bg-white/5 p-5 rounded-2xl border border-white/10">' +
-                    '<div class="flex justify-between items-start mb-3">' +
-                        '<div>' +
-                            '<span class="font-bold text-blue-400">' + r.bulan + '</span>' +
-                            '<span class="text-slate-400 text-sm ml-3">oleh ' + r.nama + ' (' + r.jawatan + ')</span>' +
-                        '</div>' +
-                        '<span class="text-xs text-slate-500">' + r.tarikh + '</span>' +
-                    '</div>' +
-                    '<p class="text-sm text-slate-300 mb-2"><strong class="text-slate-400">Pencapaian:</strong> ' + r.pencapaian + '</p>' +
-                    (r.isu ? '<p class="text-sm text-slate-300 mb-2"><strong class="text-slate-400">Isu:</strong> ' + r.isu + '</p>' : '') +
-                    (r.kehadiran ? '<div class="flex gap-4 mt-3 text-sm"><span class="text-green-400"><i class="fas fa-users mr-1"></i>' + r.kehadiran + '% Kehadiran</span><span class="text-blue-400"><i class="fas fa-calendar-check mr-1"></i>' + r.aktiviti + ' Aktiviti</span></div>' : '') +
-                    '</div>';
-            }).join('');
-        }
-        // ─────────────────────────────────────────
-        // SLIDESHOW
-        // FIX #3: Jejak slideIndex dengan betul supaya slide pertama termasuk dalam kitaran.
-        //         Asal: semua slide di-set opacity 0, kemudian slideIndex++ — menyebabkan
-        //         slide pertama tidak pernah muncul semula dalam kitaran.
-        // ─────────────────────────────────────────
         let slideIndex = 0;
-
         function autoSlide() {
             const slides = document.querySelectorAll('.slide');
-            if (slides.length === 0) return;
-            slides[slideIndex].style.opacity = '0';        // sembunyikan slide semasa sahaja
-            slideIndex = (slideIndex + 1) % slides.length; // ke slide seterusnya
-            slides[slideIndex].style.opacity = '1';        // tunjukkan slide baru
+            if(slides.length === 0) return;
+            slides.forEach(s => s.style.opacity = '0');
+            slideIndex = (slideIndex + 1) % slides.length;
+            slides[slideIndex].style.opacity = '1';
         }
-
         setInterval(autoSlide, 5000);
 
-        // ─────────────────────────────────────────
-        // COUNTER ANIMATION
-        // FIX #6: Reset counter ke '0' setiap kali animateCounters() dipanggil.
-        //         Asal: counter terus tambah dari nilai semasa bila dipanggil semula.
-        // ─────────────────────────────────────────
         function animateCounters() {
             const counters = document.querySelectorAll('.counter');
             counters.forEach(counter => {
-                counter.innerText = '0'; // reset ke 0 sebelum animate
                 const target = +counter.getAttribute('data-target');
                 const updateCount = () => {
                     const c = +counter.innerText;
                     const increment = target / 100;
-                    if (c < target) {
+                    if(c < target) {
                         counter.innerText = Math.ceil(c + increment);
                         setTimeout(updateCount, 20);
                     } else {
@@ -503,57 +189,45 @@
                 updateCount();
             });
         }
+        window.addEventListener('load', animateCounters);
 
-        // ─────────────────────────────────────────
-        // DATA
-        // ─────────────────────────────────────────
         let db = JSON.parse(localStorage.getItem('skk_db')) || {
             'Pengurusan': { subs: { 'Carta Organisasi': 'Sila edit kandungan carta organisasi di sini.', 'Perutusan Guru Besar': 'Sila edit perutusan guru besar di sini.', 'Takwim Sekolah': 'Sila edit takwim sekolah di sini.', 'Dasar & Peraturan': 'Sila edit dasar dan peraturan di sini.', 'Direktori Staf': 'Sila edit direktori staf di sini.' } },
-            'Kurikulum':   { subs: { 'Utama': 'Kandungan Kurikulum...' } },
+            'Kurikulum': { subs: { 'Utama': 'Kandungan Kurikulum...' } },
             'Kokurikulum': { subs: { 'Utama': 'Kandungan Kokurikulum...' } },
-            'Prasekolah':  { subs: { 'Utama': 'Kandungan Prasekolah...' } }
+            'Prasekolah': { subs: { 'Utama': 'Kandungan Prasekolah...' } }
         };
 
         const authorized = ["admin@sk-krangan.edu.my", "su-kurikulum@moe-dl.edu.my"];
 
-        // ─────────────────────────────────────────
-        // NAVIGATION
-        // ─────────────────────────────────────────
         function showSection(id) {
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
             const el = document.getElementById('section-' + id);
-            if (el) {
+            if(el) {
                 el.classList.add('active');
-                if (id === 'home')   animateCounters();
-                if (id === 'ehadir') { initHadirTarikh(); loadHadir(); renderHadirLog(); }
-                if (id === 'eopr')   renderOPRSejarah();
+                if(id === 'home') animateCounters();
             }
         }
 
-        // ─────────────────────────────────────────
-        // UNIT & CONTENT
-        // ─────────────────────────────────────────
         function openUnit(unitName) {
             document.getElementById('unit-title').innerText = unitName;
-            const subArea     = document.getElementById('sub-menu-area');
+            const subArea = document.getElementById('sub-menu-area');
             const contentArea = document.getElementById('content-area');
             subArea.innerHTML = '';
             contentArea.innerHTML = '<div class="text-slate-500 italic">Pilih sub-menu untuk melihat kandungan.</div>';
-
             Object.keys(db[unitName].subs).forEach(sub => {
                 const btn = document.createElement('button');
                 btn.className = "bg-white/5 border border-white/10 hover:bg-blue-500/20 px-6 py-3 rounded-xl font-semibold transition-all";
                 btn.innerText = sub;
-                btn.onclick   = () => loadSubContent(unitName, sub);
+                btn.onclick = () => loadSubContent(unitName, sub);
                 subArea.appendChild(btn);
             });
-
             showSection('unit-detail');
         }
 
         function loadSubContent(unit, sub) {
             const contentArea = document.getElementById('content-area');
-            contentArea.setAttribute('data-path', unit + '|' + sub);
+            contentArea.setAttribute('data-path', `${unit}|${sub}`);
             contentArea.innerHTML = db[unit].subs[sub];
         }
 
@@ -568,63 +242,29 @@
             alert("Berjaya disimpan!");
         }
 
-        // ─────────────────────────────────────────
-        // WINDOW LOAD
-        // FIX #2: Semua kod 'load' digabungkan ke dalam SATU addEventListener('load').
-        //         Asal: window.onload = {} telah OVERRIDE window.addEventListener('load', animateCounters)
-        //         menyebabkan animateCounters tidak dipanggil semasa load pertama.
-        // ─────────────────────────────────────────
-        window.addEventListener('load', function () {
-
-            // Jalankan counter animasi pada muat pertama
-            animateCounters();
-            renderHadirLog();
-            renderOPRSejarah();
-
-            // Semak sesi login yang tersimpan
+        window.onload = function () {
             if (localStorage.getItem('isLoggedIn') === 'true') {
-                const navBtn = document.getElementById('login-nav-btn');
-                navBtn.innerText = "Dashboard Staf";
-                navBtn.onclick   = () => showSection('staff');
+                document.getElementById('login-nav-btn').innerText = "Dashboard Staf";
+                document.getElementById('login-nav-btn').onclick = () => showSection('staff');
             }
-
-            // Mulakan Google Sign-In jika library telah dimuatkan
             if (typeof google !== 'undefined') {
                 google.accounts.id.initialize({
                     client_id: '719350946455-5hcl5t5nm61e6c208bfd8tnf703jaefh.apps.googleusercontent.com',
-                    callback: function (res) {
-                        // NOTA KESELAMATAN (#4): Pengesahan email ini berlaku di client-side sahaja.
-                        // JWT payload boleh dilihat oleh sesiapa. Untuk keselamatan penuh,
-                        // hantar res.credential ke server backend untuk disahkan dengan Google API.
+                    callback: (res) => {
                         const payload = JSON.parse(atob(res.credential.split('.')[1]));
-
                         localStorage.setItem('isLoggedIn', 'true');
-
-                        const navBtn = document.getElementById('login-nav-btn');
-                        navBtn.innerText = "Dashboard Staf";
-                        navBtn.onclick   = () => showSection('staff');
-
-                        // FIX #5: Gunakan style.display = 'flex' secara explicit.
-                        // classList.remove('hidden') tidak mencukupi kerana Tailwind 'hidden'
-                        // menggunakan display:none !important — ia akan override class 'flex'.
-                        if (authorized.includes(payload.email)) {
-                            const adminPanel = document.getElementById('admin-panel');
-                            adminPanel.classList.remove('hidden');
-                            adminPanel.style.display = 'flex'; // set flex secara explicit
-
+                        document.getElementById('login-nav-btn').innerText = "Dashboard Staf";
+                        document.getElementById('login-nav-btn').onclick = () => showSection('staff');
+                        if(authorized.includes(payload.email)) {
+                            document.getElementById('admin-panel').classList.remove('hidden');
                             document.getElementById('content-area').contentEditable = "true";
                         }
-
                         showSection('staff');
                     }
                 });
-
-                google.accounts.id.renderButton(
-                    document.getElementById("g_id_signin"),
-                    { theme: "filled_blue", size: "large" }
-                );
+                google.accounts.id.renderButton(document.getElementById("g_id_signin"), { theme: "filled_blue", size: "large" });
             }
-        });
+        };
     </script>
 </body>
 </html>
