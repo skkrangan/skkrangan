@@ -533,6 +533,22 @@
     </div>
   </div>
 
+  <!-- ============ MODUL: URUS STAF ============ -->
+  <div id="section-staf" class="tab-content max-w-5xl mx-auto px-5 sm:px-8 py-10">
+    <button onclick="showModule('picker')" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-ink-soft hover:text-ink"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Papan Pemuka</button>
+    <div class="glass rounded-3xl p-8">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-display font-semibold text-2xl text-ink">Urus Staf</h2>
+        <button onclick="addNewStaffCard()" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-navy hover:bg-navy-deep px-4 py-2.5 rounded-full transition-all">
+          <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Tambah Staf Baharu
+        </button>
+      </div>
+      <p class="text-sm text-ink-soft mb-6">Tambah staf baharu atau kemas kini akses staf sedia ada. Perubahan disimpan ke storan dikongsi dan staf boleh terus log masuk (guna emel DELIMA sebenar mereka) selepas disimpan &mdash; tiada PIN atau langkah tambahan diperlukan.</p>
+      <p id="staf-status-note" class="text-xs text-ink-faint mb-4"></p>
+      <div id="staf-list" class="space-y-4"></div>
+    </div>
+  </div>
+
   <!-- ============ MODUL: EHADIR (disisipkan) ============ -->
   <div id="section-ehadir" class="tab-content w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 relative">
             
@@ -1243,17 +1259,179 @@ let staffData = [
   { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.jpg' },
   { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.jpg' },
   { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.jpg' },
-  { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.izzati@moe-dl.edu.my',       cmsUnits: [] },
+  { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.izzati@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-izzati.webp' },
   { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.jpg' },
   { id: 16, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
   { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
   { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.jpg' },
   { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
-  { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [] },
+  { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-syuhada.webp' },
   { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
   { id: 15, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.ajek@moe-dl.edu.my',         cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
   { id: 17, name: 'SK Krangan (Akaun Pentadbir)',        position: 'Akaun Pentadbir Sistem Sekolah',               status: 'Di Sekolah', delimaEmail: 'sekolah-8173@moe-dl.edu.my',             cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Pentadbir Sistem', canViewAttendanceDashboard: true, excludeFromAttendance: true }
 ];
+
+/* =====================================================================
+   URUS STAF - Fasa 5: staf disimpan di Google Sheet (bukan dalam kod),
+   supaya boleh ditambah/dikemas kini melalui borang "Urus Staf" tanpa
+   sesiapa perlu edit fail ini secara terus. Senarai `staffData` di atas
+   kekal sebagai SANDARAN (fallback) jika rangkaian/CMS_SCRIPT_URL gagal.
+   ===================================================================== */
+let staffSyncedFromBackend = false;
+async function syncStaffFromBackend(){
+  if(!CMS_SCRIPT_URL || CMS_SCRIPT_URL.includes('PLACEHOLDER')) return;
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=staf');
+    if(!res.ok) return;
+    const remote = await res.json();
+    if(Array.isArray(remote) && remote.length){
+      staffData.length = 0;
+      remote.forEach(s => staffData.push(s));
+      staffSyncedFromBackend = true;
+    }
+  }catch(e){ /* senyap - kekal guna senarai sandaran (fallback) dalam kod */ }
+}
+
+function emptyStaffRecord(){
+  return { id: 0, name:'', position:'', delimaEmail:'', cmsUnits:[], cmsRoleLabel:'', canViewAttendanceDashboard:false, excludeFromAttendance:false, photo:'' };
+}
+
+function addNewStaffCard(){
+  staffData.unshift(emptyStaffRecord());
+  renderStaffManagementList();
+  const firstInput = document.querySelector('#staf-list input');
+  if(firstInput) firstInput.focus();
+}
+
+const CMS_UNIT_OPTIONS = ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'];
+
+function renderStaffManagementList(){
+  const box = document.getElementById('staf-list');
+  const note = document.getElementById('staf-status-note');
+  if(!box) return;
+  if(note) note.innerText = staffSyncedFromBackend ? '' : 'Menyemak senarai staf terkini...';
+
+  box.innerHTML = staffData.map((s, idx) => `
+    <div class="bg-mist rounded-2xl p-5 border border-line" id="staf-card-${idx}">
+      <div class="grid sm:grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Nama Penuh</label>
+          <input type="text" id="staf-${idx}-name" value="${(s.name||'').replace(/"/g,'&quot;')}" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Jawatan</label>
+          <input type="text" id="staf-${idx}-position" value="${(s.position||'').replace(/"/g,'&quot;')}" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Emel DELIMA <span class="text-rose-500">(wajib betul - guna emel sebenar staf)</span></label>
+          <input type="email" id="staf-${idx}-email" value="${(s.delimaEmail||'').replace(/"/g,'&quot;')}" placeholder="g-XXXXXXXX@moe-dl.edu.my" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Label Peranan <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
+          <input type="text" id="staf-${idx}-rolelabel" value="${(s.cmsRoleLabel||'').replace(/"/g,'&quot;')}" placeholder="cth. Penyelaras Digital" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Nama Fail Gambar <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
+          <input type="text" id="staf-${idx}-photo" value="${(s.photo||'').replace(/"/g,'&quot;')}" placeholder="staf-namastaf.jpg" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1.5">Akses CMS Unit</label>
+        <div class="flex flex-wrap gap-3">
+          ${CMS_UNIT_OPTIONS.map(u => `
+            <label class="inline-flex items-center gap-1.5 text-xs text-ink cursor-pointer">
+              <input type="checkbox" id="staf-${idx}-unit-${u.replace(/\s+/g,'')}" ${s.cmsUnits && s.cmsUnits.includes(u) ? 'checked' : ''} class="rounded border-line text-navy focus:ring-navy">
+              ${u}
+            </label>`).join('')}
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-ink cursor-pointer">
+          <input type="checkbox" id="staf-${idx}-admin" ${s.canViewAttendanceDashboard ? 'checked' : ''} class="rounded border-line text-navy focus:ring-navy">
+          Akses Admin (papar Rekod/Laporan/Log Audit + Urus Staf)
+        </label>
+        <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-ink cursor-pointer">
+          <input type="checkbox" id="staf-${idx}-exclude" ${s.excludeFromAttendance ? 'checked' : ''} class="rounded border-line text-navy focus:ring-navy">
+          Kecualikan daripada eHadir (cth. akaun sistem)
+        </label>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="saveStaffCard(${idx})" class="text-xs font-bold text-white bg-navy hover:bg-navy-deep px-4 py-2 rounded-full transition-all inline-flex items-center gap-1.5">
+          <i data-lucide="save" class="w-3.5 h-3.5"></i> ${s.id ? 'Simpan Perubahan' : 'Tambah Staf Ini'}
+        </button>
+        ${s.id ? `<button onclick="deleteStaffCard(${idx})" class="text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-full transition-all inline-flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Padam Staf
+        </button>` : `<button onclick="staffData.splice(${idx},1); renderStaffManagementList();" class="text-xs font-bold text-ink-faint hover:text-ink px-4 py-2">Batal</button>`}
+        <span id="staf-${idx}-status" class="text-xs text-ink-faint"></span>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+async function saveStaffCard(idx){
+  const s = staffData[idx];
+  const statusEl = document.getElementById(`staf-${idx}-status`);
+  const name = document.getElementById(`staf-${idx}-name`).value.trim();
+  const email = document.getElementById(`staf-${idx}-email`).value.trim();
+  if(!name || !email){
+    if(statusEl){ statusEl.innerText = 'Nama dan Emel DELIMA wajib diisi.'; statusEl.className = 'text-xs text-rose-600'; }
+    return;
+  }
+  const cmsUnits = CMS_UNIT_OPTIONS.filter(u => {
+    const el = document.getElementById(`staf-${idx}-unit-${u.replace(/\s+/g,'')}`);
+    return el && el.checked;
+  });
+  const payload = {
+    action: 'savestaf',
+    id: s.id || 0,
+    name, email,
+    delimaEmail: email,
+    position: document.getElementById(`staf-${idx}-position`).value.trim(),
+    cmsRoleLabel: document.getElementById(`staf-${idx}-rolelabel`).value.trim(),
+    photo: document.getElementById(`staf-${idx}-photo`).value.trim(),
+    cmsUnits: cmsUnits,
+    canViewAttendanceDashboard: document.getElementById(`staf-${idx}-admin`).checked,
+    excludeFromAttendance: document.getElementById(`staf-${idx}-exclude`).checked,
+    editor: currentUser ? currentUser.name : ''
+  };
+  if(statusEl){ statusEl.innerText = 'Menyimpan...'; statusEl.className = 'text-xs text-ink-faint'; }
+  if(!CMS_SCRIPT_URL || CMS_SCRIPT_URL.includes('PLACEHOLDER')){
+    if(statusEl){ statusEl.innerText = 'Storan dikongsi belum disediakan.'; statusEl.className = 'text-xs text-rose-600'; }
+    return;
+  }
+  try{
+    const res = await fetch(CMS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data && data.success){
+      Object.assign(s, { name, position: payload.position, delimaEmail: email, cmsUnits, cmsRoleLabel: payload.cmsRoleLabel, canViewAttendanceDashboard: payload.canViewAttendanceDashboard, excludeFromAttendance: payload.excludeFromAttendance, photo: payload.photo, id: data.id || s.id });
+      if(statusEl){ statusEl.innerText = 'Disimpan ✓'; statusEl.className = 'text-xs text-emerald-600 font-semibold'; }
+      renderStaffManagementList();
+    } else {
+      if(statusEl){ statusEl.innerText = 'Gagal simpan: ' + (data.error || 'ralat tidak diketahui'); statusEl.className = 'text-xs text-rose-600'; }
+    }
+  }catch(e){
+    if(statusEl){ statusEl.innerText = 'Ralat sambungan. Cuba lagi.'; statusEl.className = 'text-xs text-rose-600'; }
+  }
+}
+
+async function deleteStaffCard(idx){
+  const s = staffData[idx];
+  if(!confirm(`Padam staf "${s.name}"? Tindakan ini tak boleh dibuat asal.`)) return;
+  try{
+    await fetch(CMS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'deletestaf', id: s.id })
+    });
+  }catch(e){ /* teruskan padam tempatan walaupun rangkaian gagal - senyap */ }
+  staffData.splice(idx, 1);
+  renderStaffManagementList();
+}
 
 const ALLOWED_DELIMA_DOMAINS = ['moe-dl.edu.my', 'moe.gov.my'];
 // Pengecualian khas - emel INDIVIDU (bukan domain DELIMA) yang diluluskan secara khusus oleh Guru Besar.
@@ -1374,6 +1552,16 @@ function renderModuleGrid(){
       <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Laporan eOPR</h3>
       <p class="relative text-sm text-ink-soft">Jana laporan One Page Report.</p>
     </button>`;
+  if(currentUser.canViewAttendanceDashboard){
+    idx++;
+    cards += `
+      <button onclick="showModule('staf')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden">
+        <i data-lucide="users" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+        <div class="relative w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center mb-5"><i data-lucide="users" class="w-6 h-6 text-emerald-700"></i></div>
+        <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Urus Staf</h3>
+        <p class="relative text-sm text-ink-soft">Tambah/kemas kini staf & akses sistem.</p>
+      </button>`;
+  }
   grid.innerHTML = cards;
   if(typeof lucide !== 'undefined') lucide.createIcons();
   document.querySelectorAll('.module-card').forEach(card => {
@@ -1392,6 +1580,7 @@ function showModule(id){
   if(target) target.classList.add('active');
   document.body.style.overflow = (id === 'eopr') ? 'hidden' : '';
   if(id === 'cms') renderCmsTabs();
+  if(id === 'staf') renderStaffManagementList();
 }
 
 /* =====================================================================
@@ -2444,6 +2633,7 @@ async function saveCmsContent(){
    ===================================================================== */
 window.onload = function(){
   lucide.createIcons();
+  syncStaffFromBackend();
 
   if(typeof google !== 'undefined'){
     google.accounts.id.initialize({
