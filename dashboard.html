@@ -41,6 +41,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
@@ -1235,23 +1236,23 @@ if(pf){
    Emel DELIMA di bawah masih PLACEHOLDER - tukar ke emel sebenar staf.
    ===================================================================== */
 let staffData = [
-  { id: 1,  name: 'Stanley anak Ngawah',                position: 'Guru Besar',                                   pin: '1111', status: 'Di Sekolah', delimaEmail: 'g-85307134@moe-dl.edu.my',    cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], canViewAttendanceDashboard: true, photo: 'staf-stanley.jpg' },
-  { id: 2,  name: 'Dick Lester anak Bakir',              position: 'Guru Penolong Kanan Kurikulum',                pin: '2222', status: 'Di Sekolah', delimaEmail: 'g-21307380@moe-dl.edu.my',   cmsUnits: ['Kurikulum'], canViewAttendanceDashboard: true, photo: 'staf-dick.jpg' },
-  { id: 3,  name: 'Amir bin Ngatiman',                   position: 'Guru Penolong Kanan Hal Ehwal Murid',          pin: '3333', status: 'Di Sekolah', delimaEmail: 'g-29307435@moe-dl.edu.my',         cmsUnits: ['Hal Ehwal Murid'], canViewAttendanceDashboard: true, photo: 'staf-amir.jpg' },
-  { id: 4,  name: 'Mohammad Fadzly bin Noor Azman',      position: 'Guru Penolong Kanan Kokurikulum',              pin: '4444', status: 'Di Sekolah', delimaEmail: 'g-71295196@moe-dl.edu.my',       cmsUnits: ['Kokurikulum'], canViewAttendanceDashboard: true, photo: 'staf-fadzly.jpg' },
-  { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                pin: '5555', status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.jpg' },
-  { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                pin: '6666', status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.jpg' },
-  { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                pin: '7777', status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.jpg' },
-  { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                pin: '8888', status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.izzati@moe-dl.edu.my',       cmsUnits: [] },
-  { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                pin: '9999', status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.jpg' },
-  { id: 16, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                pin: '3939', status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
-  { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                pin: '1212', status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
-  { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                pin: '2323', status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.jpg' },
-  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                pin: '1711', status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
-  { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                pin: '4545', status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [] },
-  { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              pin: '5656', status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
-  { id: 15, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         pin: '6767', status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.ajek@moe-dl.edu.my',         cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
-  { id: 17, name: 'SK Krangan (Akaun Pentadbir)',        position: 'Akaun Pentadbir Sistem Sekolah',               pin: '7000', status: 'Di Sekolah', delimaEmail: 'sekolah-8173@moe-dl.edu.my',             cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Pentadbir Sistem', canViewAttendanceDashboard: true, excludeFromAttendance: true }
+  { id: 1,  name: 'Stanley anak Ngawah',                position: 'Guru Besar',                                   status: 'Di Sekolah', delimaEmail: 'g-85307134@moe-dl.edu.my',    cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], canViewAttendanceDashboard: true, photo: 'staf-stanley.jpg' },
+  { id: 2,  name: 'Dick Lester anak Bakir',              position: 'Guru Penolong Kanan Kurikulum',                status: 'Di Sekolah', delimaEmail: 'g-21307380@moe-dl.edu.my',   cmsUnits: ['Kurikulum'], canViewAttendanceDashboard: true, photo: 'staf-dick.jpg' },
+  { id: 3,  name: 'Amir bin Ngatiman',                   position: 'Guru Penolong Kanan Hal Ehwal Murid',          status: 'Di Sekolah', delimaEmail: 'g-29307435@moe-dl.edu.my',         cmsUnits: ['Hal Ehwal Murid'], canViewAttendanceDashboard: true, photo: 'staf-amir.jpg' },
+  { id: 4,  name: 'Mohammad Fadzly bin Noor Azman',      position: 'Guru Penolong Kanan Kokurikulum',              status: 'Di Sekolah', delimaEmail: 'g-71295196@moe-dl.edu.my',       cmsUnits: ['Kokurikulum'], canViewAttendanceDashboard: true, photo: 'staf-fadzly.jpg' },
+  { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.jpg' },
+  { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.jpg' },
+  { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.jpg' },
+  { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.izzati@moe-dl.edu.my',       cmsUnits: [] },
+  { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.jpg' },
+  { id: 16, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
+  { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
+  { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.jpg' },
+  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
+  { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [] },
+  { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
+  { id: 15, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.ajek@moe-dl.edu.my',         cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
+  { id: 17, name: 'SK Krangan (Akaun Pentadbir)',        position: 'Akaun Pentadbir Sistem Sekolah',               status: 'Di Sekolah', delimaEmail: 'sekolah-8173@moe-dl.edu.my',             cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Pentadbir Sistem', canViewAttendanceDashboard: true, excludeFromAttendance: true }
 ];
 
 const ALLOWED_DELIMA_DOMAINS = ['moe-dl.edu.my', 'moe.gov.my'];
@@ -3914,10 +3915,30 @@ window.onload = function(){
     async function getCanvas() {
       const card = document.getElementById('opr-card');
       if (!card) return null;
-      
-      toggleDecorationsForExport(true); 
-      await document.fonts.ready; 
-      
+
+      // Tunggu fon siap dimuat, tapi maksimum 4 saat sahaja - elak eksport
+      // tergantung selamanya jika rangkaian fon lambat/gagal.
+      await Promise.race([document.fonts.ready, new Promise(res => setTimeout(res, 4000))]);
+
+      // KAEDAH 1 (utama): html-to-image - guna enjin pelayar sendiri untuk render,
+      // jadi hasil eksport TEPAT sama macam previu (termasuk clip-path bentuk
+      // "bumbung" 2026, fon, kesan glow/blur) yang html2canvas tak mampu render.
+      if (typeof htmlToImage !== 'undefined') {
+        try {
+          const canvas = await htmlToImage.toCanvas(card, {
+            pixelRatio: 2,
+            backgroundColor: '#ffffff',
+            cacheBust: true
+          });
+          if (canvas && canvas.width > 0) return canvas;
+        } catch (error) {
+          console.warn('html-to-image gagal, cuba fallback html2canvas:', error);
+        }
+      }
+
+      // KAEDAH 2 (fallback): html2canvas - kurang tepat (clip-path/blur tak disokong,
+      // jadi hiasan disorok sementara), tapi lebih toleran terhadap isu imej CORS.
+      toggleDecorationsForExport(true);
       try {
         const canvas = await html2canvas(card, {
           scale: 2, 
