@@ -315,7 +315,6 @@
                 <input type="date" id="cms-galeri-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                 <input type="text" id="cms-galeri-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               </div>
-              <input type="url" id="cms-galeri-fb" placeholder="Pautan Facebook (pilihan - biarkan kosong jika auto-terbit FB dah aktif, sistem isi sendiri)" class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
               <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
@@ -541,7 +540,6 @@
                 <input type="date" id="hp-galeri-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                 <input type="text" id="hp-galeri-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               </div>
-              <input type="url" id="hp-galeri-fb" placeholder="Pautan Facebook (pilihan - biarkan kosong jika auto-terbit FB dah aktif, sistem isi sendiri)" class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta (Tiada Butang Simpan Berasingan)</p>
               <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
@@ -2440,7 +2438,6 @@ async function uploadCmsGaleriPhotos(event){
   const namaProgram = document.getElementById('cms-galeri-program').value.trim();
   const tarikh = document.getElementById('cms-galeri-tarikh').value;
   const tempat = document.getElementById('cms-galeri-tempat').value.trim();
-  const facebookUrl = document.getElementById('cms-galeri-fb').value.trim();
 
   if(!namaProgram){
     showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
@@ -2459,7 +2456,7 @@ async function uploadCmsGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, facebookUrl: facebookUrl, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       await new Promise(r => setTimeout(r, 400));
@@ -2517,7 +2514,6 @@ async function uploadHpGaleriPhotos(event){
   const namaProgram = document.getElementById('hp-galeri-program').value.trim();
   const tarikh = document.getElementById('hp-galeri-tarikh').value;
   const tempat = document.getElementById('hp-galeri-tempat').value.trim();
-  const facebookUrl = document.getElementById('hp-galeri-fb').value.trim();
 
   if(!namaProgram){
     showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
@@ -2536,7 +2532,7 @@ async function uploadHpGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, facebookUrl: facebookUrl, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       // Jeda kecil antara setiap muat naik supaya tak bebankan backend serentak semasa upload pukal.
