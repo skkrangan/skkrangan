@@ -1750,12 +1750,18 @@ async function aiAssist(fieldId, contextLabel){
   }
   const originalBtnHtml = btn ? btn.innerHTML : '';
   if(btn){ btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Menjana...'; lucide.createIcons(); }
+  // Had masa 25 saat - kalau AI/rangkaian tersekat, beritahu terus (bukan
+  // "stuck" senyap tanpa had, terutama berguna di rangkaian sekolah perlahan).
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
   try{
     const res = await fetch(AI_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'aiGenerate', context: contextLabel, roughText: roughText })
+      body: JSON.stringify({ action: 'aiGenerate', context: contextLabel, roughText: roughText }),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     const data = await res.json();
     if(data && data.text){
       const box = document.getElementById('ai-suggestion-' + fieldId);
@@ -1768,7 +1774,12 @@ async function aiAssist(fieldId, contextLabel){
       aiToastAny((data && data.error) || 'AI gagal menjana teks. Cuba lagi.', 'error');
     }
   }catch(e){
-    aiToastAny('Ralat sambungan ke AI. Semak skrip AI Proxy sudah di-deploy dengan betul.', 'error');
+    clearTimeout(timeoutId);
+    if(e.name === 'AbortError'){
+      aiToastAny('AI mengambil masa terlalu lama (>25 saat) - kemungkinan rangkaian perlahan. Cuba lagi.', 'error');
+    } else {
+      aiToastAny('Ralat sambungan ke AI. Semak skrip AI Proxy sudah di-deploy dengan betul.', 'error');
+    }
   }finally{
     if(btn){ btn.disabled = false; btn.innerHTML = originalBtnHtml; lucide.createIcons(); }
   }
