@@ -315,6 +315,7 @@
                 <input type="date" id="cms-galeri-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                 <input type="text" id="cms-galeri-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               </div>
+              <input type="url" id="cms-galeri-fb" placeholder="Pautan Facebook (pilihan - biarkan kosong jika auto-terbit FB dah aktif, sistem isi sendiri)" class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
               <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
@@ -540,6 +541,7 @@
                 <input type="date" id="hp-galeri-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                 <input type="text" id="hp-galeri-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               </div>
+              <input type="url" id="hp-galeri-fb" placeholder="Pautan Facebook (pilihan - biarkan kosong jika auto-terbit FB dah aktif, sistem isi sendiri)" class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta (Tiada Butang Simpan Berasingan)</p>
               <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
                 <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
@@ -2438,6 +2440,7 @@ async function uploadCmsGaleriPhotos(event){
   const namaProgram = document.getElementById('cms-galeri-program').value.trim();
   const tarikh = document.getElementById('cms-galeri-tarikh').value;
   const tempat = document.getElementById('cms-galeri-tempat').value.trim();
+  const facebookUrl = document.getElementById('cms-galeri-fb').value.trim();
 
   if(!namaProgram){
     showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
@@ -2456,7 +2459,7 @@ async function uploadCmsGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, facebookUrl: facebookUrl, editor: currentUser.name })
       });
       uploaded++;
       await new Promise(r => setTimeout(r, 400));
@@ -2514,6 +2517,7 @@ async function uploadHpGaleriPhotos(event){
   const namaProgram = document.getElementById('hp-galeri-program').value.trim();
   const tarikh = document.getElementById('hp-galeri-tarikh').value;
   const tempat = document.getElementById('hp-galeri-tempat').value.trim();
+  const facebookUrl = document.getElementById('hp-galeri-fb').value.trim();
 
   if(!namaProgram){
     showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
@@ -2532,7 +2536,7 @@ async function uploadHpGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, facebookUrl: facebookUrl, editor: currentUser.name })
       });
       uploaded++;
       // Jeda kecil antara setiap muat naik supaya tak bebankan backend serentak semasa upload pukal.
@@ -2854,6 +2858,12 @@ window.onload = function(){
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
         const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi', 'Luar Pejabat : Urusan Peribadi'];
+        // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
+        // Penyelaras Digital sahaja - staf lain (termasuk GB/GPK) cuma boleh
+        // hantar status untuk hari semasa sahaja.
+        function canUseMultiDay_(){
+            return !!(currentUser && currentUser.cmsRoleLabel === 'Penyelaras Digital');
+        }
         let allRecords = [];
         let summaryChartInstance = null;
         let activeGraphFilterStatus = null;
@@ -2948,7 +2958,7 @@ window.onload = function(){
 
                 const enddateWrap = document.getElementById(`enddate-wrap-${staffId}`);
                 if (enddateWrap) {
-                    const eligible = MULTI_DAY_ELIGIBLE_STATUSES.includes(statusText);
+                    const eligible = MULTI_DAY_ELIGIBLE_STATUSES.includes(statusText) && canUseMultiDay_();
                     enddateWrap.classList.toggle('hidden', !eligible);
                     if (!eligible) {
                         const enddateInput = document.getElementById(`enddate-input-${staffId}`);
@@ -3066,7 +3076,7 @@ window.onload = function(){
                             <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Catatan <span class="normal-case font-medium text-slate-400">(pilihan)</span></label>
                             <textarea id="note-input-${s.id}" rows="2" placeholder="Cth: Mesyuarat di PPD Serian..." class="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-400 dark:placeholder-slate-600 resize-none"></textarea>
                         </div>
-                        <div id="enddate-wrap-${s.id}" class="${MULTI_DAY_ELIGIBLE_STATUSES.includes(s.status) ? '' : 'hidden'}">
+                        <div id="enddate-wrap-${s.id}" class="${(MULTI_DAY_ELIGIBLE_STATUSES.includes(s.status) && canUseMultiDay_()) ? '' : 'hidden'}">
                             <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Tarikh Akhir <span class="normal-case font-medium text-slate-400">(Pilihan bagi urusan melebihi satu hari)</span></label>
                             <input type="date" id="enddate-input-${s.id}" min="${getTodayIsoDate_()}" class="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500">
                             <p class="text-[10px] text-slate-400 mt-1">Isi jika status ini berterusan lebih daripada 1 hari (cth. kursus seminggu). Biar kosong jika untuk hari ini sahaja.</p>
