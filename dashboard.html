@@ -678,7 +678,9 @@
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Peribadi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Luar Pejabat : Urusan Peribadi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-peribadi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Cuti Rehat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat Khas')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span> Cuti Rehat Khas</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat-khas">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Sakit')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Cuti Sakit</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-sakit">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Tanpa Rekod')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-slate-500"></span> Cuti Tanpa Rekod</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-tanpa-rekod">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti : Lain-lain')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-400"></span> Cuti : Lain-lain</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-lain">0</span></div>
                                     </div>
                                 </div>
@@ -2838,7 +2840,9 @@ window.onload = function(){
             'Luar Pejabat : Urusan Rasmi': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
             'Luar Pejabat : Urusan Peribadi': { bg: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400', icon: 'fa-user-clock', badge: 'bg-yellow-50 dark:bg-yellow-950/40' },
             'Cuti Rehat': { bg: 'bg-rose-600', text: 'text-rose-700 dark:text-rose-300', icon: 'fa-umbrella-beach', badge: 'bg-rose-100 dark:bg-rose-950/40' },
+            'Cuti Rehat Khas': { bg: 'bg-fuchsia-500', text: 'text-fuchsia-700 dark:text-fuchsia-300', icon: 'fa-star', badge: 'bg-fuchsia-100 dark:bg-fuchsia-950/40' },
             'Cuti Sakit': { bg: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400', icon: 'fa-house-medical', badge: 'bg-rose-50 dark:bg-rose-900/40' },
+            'Cuti Tanpa Rekod': { bg: 'bg-slate-500', text: 'text-slate-700 dark:text-slate-300', icon: 'fa-file-circle-question', badge: 'bg-slate-100 dark:bg-slate-800/60' },
             'Cuti : Lain-lain': { bg: 'bg-rose-400', text: 'text-rose-600 dark:text-rose-400', icon: 'fa-house-medical-flag', badge: 'bg-pink-50 dark:bg-pink-950/40' }
         };
 
@@ -2849,7 +2853,7 @@ window.onload = function(){
 
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
-        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Sakit', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi', 'Luar Pejabat : Urusan Peribadi'];
+        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi', 'Luar Pejabat : Urusan Peribadi'];
         let allRecords = [];
         let summaryChartInstance = null;
         let activeGraphFilterStatus = null;
@@ -3249,7 +3253,7 @@ window.onload = function(){
         function updateLocalStats() {
             const todayMap = getTodayStatusMap_();
             let school = 0, outside = 0, leave = 0;
-            let countSchool = 0, countSchoolMesy = 0, countWfh = 0, countOutsideRasmi = 0, countOutsidePeribadi = 0, countCutiRehat = 0, countCutiSakit = 0, countCutiLain = 0, countBelumKemasKini = 0;
+            let countSchool = 0, countSchoolMesy = 0, countWfh = 0, countOutsideRasmi = 0, countOutsidePeribadi = 0, countCutiRehat = 0, countCutiRehatKhas = 0, countCutiSakit = 0, countCutiTanpaRekod = 0, countCutiLain = 0, countBelumKemasKini = 0;
 
             const belumKemasKiniList = [];
             staffData.filter(s => !s.excludeFromAttendance).forEach(s => {
@@ -3260,7 +3264,9 @@ window.onload = function(){
                 else if (status === 'Luar Pejabat : Urusan Rasmi') { outside++; countOutsideRasmi++; }
                 else if (status === 'Luar Pejabat : Urusan Peribadi') { outside++; countOutsidePeribadi++; }
                 else if (status === 'Cuti Rehat') { leave++; countCutiRehat++; }
+                else if (status === 'Cuti Rehat Khas') { leave++; countCutiRehatKhas++; }
                 else if (status === 'Cuti Sakit') { leave++; countCutiSakit++; }
+                else if (status === 'Cuti Tanpa Rekod') { leave++; countCutiTanpaRekod++; }
                 else if (status === 'Cuti : Lain-lain') { leave++; countCutiLain++; }
                 else { countBelumKemasKini++; belumKemasKiniList.push(s); }
             });
@@ -3283,7 +3289,9 @@ window.onload = function(){
                 document.getElementById('stat-outside-rasmi').innerText = countOutsideRasmi;
                 document.getElementById('stat-outside-peribadi').innerText = countOutsidePeribadi;
                 document.getElementById('stat-cuti-rehat').innerText = countCutiRehat;
+                document.getElementById('stat-cuti-rehat-khas').innerText = countCutiRehatKhas;
                 document.getElementById('stat-cuti-sakit').innerText = countCutiSakit;
+                document.getElementById('stat-cuti-tanpa-rekod').innerText = countCutiTanpaRekod;
                 document.getElementById('stat-cuti-lain').innerText = countCutiLain;
             }
             const eBelum = document.getElementById('stat-belum-kemaskini');
@@ -3292,7 +3300,7 @@ window.onload = function(){
             renderBelumKemasKiniList_(belumKemasKiniList);
 
             if (summaryChartInstance) {
-                summaryChartInstance.data.datasets[0].data = [countSchool, countSchoolMesy, countOutsideRasmi, countOutsidePeribadi, countCutiRehat, countCutiSakit, countCutiLain];
+                summaryChartInstance.data.datasets[0].data = [countSchool, countSchoolMesy, countOutsideRasmi, countOutsidePeribadi, countCutiRehat, countCutiRehatKhas, countCutiSakit, countCutiTanpaRekod, countCutiLain];
                 summaryChartInstance.update();
             }
             renderStatusNameTable(activeGraphFilterStatus, todayMap);
@@ -3639,7 +3647,7 @@ window.onload = function(){
                 totalSubmittedDays++;
                 if (log.status === 'Di Sekolah' || log.status === 'Di Sekolah : Mesyuarat/Bengkel') totalSchoolDays++;
                 else if (log.status === 'Luar Pejabat : Urusan Rasmi') totalRasmiDays++;
-                else if (log.status === 'Cuti Rehat' || log.status === 'Cuti Sakit' || log.status === 'Cuti : Lain-lain') totalLeaveDays++;
+                else if (log.status === 'Cuti Rehat' || log.status === 'Cuti Rehat Khas' || log.status === 'Cuti Sakit' || log.status === 'Cuti Tanpa Rekod' || log.status === 'Cuti : Lain-lain') totalLeaveDays++;
             });
             const attendanceRate = totalSubmittedDays > 0 ? Math.round((totalSchoolDays / totalSubmittedDays) * 100) : 0;
             const summaryBox = document.getElementById('report-analytics-summary');
@@ -3696,11 +3704,11 @@ window.onload = function(){
                 summaryChartInstance = new Chart(ctx.getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: ['Di Sekolah', 'Mesyuarat/Bengkel', 'Urusan Rasmi', 'Urusan Peribadi', 'Cuti Rehat', 'Cuti Sakit', 'Cuti Lain'],
+                        labels: ['Di Sekolah', 'Mesyuarat/Bengkel', 'Urusan Rasmi', 'Urusan Peribadi', 'Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti Lain'],
                         datasets: [{
                             label: 'Bilangan Staf',
-                            data: [0, 0, 0, 0, 0, 0, 0],
-                            backgroundColor: ['#10b981', '#34d399', '#f59e0b', '#fbbf24', '#e11d48', '#f43f5e', '#fb7185'],
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: ['#10b981', '#34d399', '#f59e0b', '#fbbf24', '#e11d48', '#d946ef', '#f43f5e', '#64748b', '#fb7185'],
                             borderWidth: 0,
                             borderRadius: 10,
                             barThickness: 24,
@@ -3714,7 +3722,7 @@ window.onload = function(){
                         onClick: (event, elements) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const statusMapping = ['Di Sekolah','Di Sekolah : Mesyuarat/Bengkel','Luar Pejabat : Urusan Rasmi','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Sakit','Cuti : Lain-lain'];
+                                const statusMapping = ['Di Sekolah','Di Sekolah : Mesyuarat/Bengkel','Luar Pejabat : Urusan Rasmi','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
                                 filterByStatusName(statusMapping[index]);
                             }
                         },
