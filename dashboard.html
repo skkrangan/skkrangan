@@ -887,6 +887,9 @@
       <button onclick="loadTemplate()" class="bg-gold/20 hover:bg-gold/30 border border-gold/40 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2">
         <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Templat Asal
       </button>
+      <button onclick="openDrafListModal()" class="bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2">
+        <i data-lucide="folder-open" class="w-4 h-4"></i> Draf Saya
+      </button>
       <button onclick="triggerClearForm()" class="bg-slate-700/30 hover:bg-slate-700/50 border border-slate-500/40 text-slate-200 text-sm font-semibold px-3 py-2 rounded-lg transition-all" title="Kosongkan Borang">
         Kosongkan
       </button>
@@ -1002,6 +1005,9 @@
           <span class="text-xs font-bold text-slate-700">Pratonton Langsung (A4)</span>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="saveDraf()" id="btn-save-draf" class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i> Simpan Draf
+          </button>
           <button onclick="saveReportToPortal()" id="btn-save-portal" class="bg-cyan-600 hover:bg-cyan-700 text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
             <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> Simpan ke Portal
           </button>
@@ -1166,6 +1172,20 @@
       <div class="flex justify-end gap-3">
         <button onclick="cancelClearForm()" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">Batal</button>
         <button onclick="confirmClearForm()" class="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors shadow-sm">Ya, Kosongkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Draf Saya Modal -->
+  <div id="draf-list-modal" class="fixed inset-0 bg-slate-900/40 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full mx-4 border border-slate-100 max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-lg font-bold text-slate-800">Draf Saya</h3>
+        <button onclick="closeDrafListModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">Draf disimpan tempatan untuk akaun anda sahaja. Nota: gambar aktiviti <strong>tidak</strong> disimpan dalam draf - perlu dimuat naik semula bila sambung kerja.</p>
+      <div id="draf-list-body" class="overflow-y-auto space-y-2 flex-1">
+        <p class="text-sm text-slate-400 italic text-center py-6">Memuatkan draf...</p>
       </div>
     </div>
   </div>
@@ -4308,6 +4328,143 @@ function updatePreview() {
       'KURIKULUM': 'Kurikulum',
       'PENTADBIRAN': 'Pentadbiran'
     };
+
+    /* ===== Draf eOPR ===== */
+    let currentDrafId = 0; // 0 = draf baharu (belum pernah disimpan)
+
+    async function saveDraf(){
+      if(!isCmsBackendConfigured()){
+        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Penyelaras Digital.', 'bg-amber-500');
+        return;
+      }
+      const btn = document.getElementById('btn-save-draf');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Menyimpan...`;
+      lucide.createIcons();
+      try{
+        // Nota: gambar (state.photos) SENGAJA tidak disertakan dalam draf -
+        // saiz base64 gambar terlalu besar untuk disimpan berulang kali ke
+        // Sheet. SU perlu muat naik semula gambar bila sambung draf.
+        const draftData = {
+          year: state.year, title: state.title, datetime: state.datetime,
+          target: state.target, sideText: state.sideText, kra: state.kra,
+          author: state.author, objectives: state.objectives
+        };
+        const res = await fetch(CMS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'simpandraf',
+            id: currentDrafId,
+            editorEmail: (currentUser && currentUser.delimaEmail) || '',
+            editorName: (currentUser && currentUser.name) || '',
+            title: state.title || 'Draf Tanpa Tajuk',
+            dataJson: JSON.stringify(draftData)
+          })
+        });
+        const data = await res.json();
+        if(data && data.success){
+          currentDrafId = data.id;
+          showToastOPR('Draf disimpan ✓ (boleh sambung kerja lain kali melalui "Draf Saya")', 'bg-amber-600');
+        } else {
+          showToastOPR('Gagal simpan draf: ' + ((data && data.error) || 'ralat tidak diketahui'), 'bg-rose-600');
+        }
+      }catch(e){
+        showToastOPR('Ralat sambungan semasa simpan draf.', 'bg-rose-600');
+      }finally{
+        btn.disabled = false; btn.innerHTML = originalHtml; lucide.createIcons();
+      }
+    }
+
+    async function openDrafListModal(){
+      const modal = document.getElementById('draf-list-modal');
+      const body = document.getElementById('draf-list-body');
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+      body.innerHTML = `<p class="text-sm text-slate-400 italic text-center py-6">Memuatkan draf...</p>`;
+      if(!isCmsBackendConfigured()){
+        body.innerHTML = `<p class="text-sm text-rose-500 text-center py-6">Storan dikongsi belum disediakan.</p>`;
+        return;
+      }
+      try{
+        const email = (currentUser && currentUser.delimaEmail) || '';
+        const res = await fetch(CMS_SCRIPT_URL + '?action=senaraidraf&email=' + encodeURIComponent(email));
+        const drafts = await res.json();
+        renderDrafList(Array.isArray(drafts) ? drafts : []);
+      }catch(e){
+        body.innerHTML = `<p class="text-sm text-rose-500 text-center py-6">Gagal muatkan senarai draf.</p>`;
+      }
+    }
+    function closeDrafListModal(){
+      const modal = document.getElementById('draf-list-modal');
+      modal.classList.add('hidden'); modal.classList.remove('flex');
+    }
+    function renderDrafList(drafts){
+      const body = document.getElementById('draf-list-body');
+      if(!drafts.length){
+        body.innerHTML = `<p class="text-sm text-slate-400 italic text-center py-6">Tiada draf disimpan lagi.</p>`;
+        return;
+      }
+      body.innerHTML = drafts.map(d => {
+        const savedDate = d.savedDate ? new Date(d.savedDate).toLocaleString('ms-MY') : '';
+        return `
+        <div class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 rounded-lg px-3 py-2.5 transition-all">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-slate-800 truncate">${(d.title || 'Draf Tanpa Tajuk').replace(/</g,'&lt;')}</p>
+            <p class="text-[11px] text-slate-400">${savedDate}</p>
+          </div>
+          <button onclick='loadDrafIntoForm(${d.id}, ${JSON.stringify(d.dataJson)})' class="shrink-0 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg">Buka</button>
+          <button onclick="deleteDraf(${d.id})" class="shrink-0 text-rose-500 hover:text-rose-700 p-1.5"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+    function loadDrafIntoForm(id, dataJsonStr){
+      try{
+        const d = JSON.parse(dataJsonStr);
+        state.year = d.year || state.year;
+        state.title = d.title || '';
+        state.datetime = d.datetime || '';
+        state.target = d.target || '';
+        state.sideText = d.sideText || state.sideText;
+        state.kra = d.kra || '';
+        state.author = d.author || '';
+        state.objectives = (d.objectives && d.objectives.length) ? d.objectives : [''];
+        state.photos = [];
+        currentDrafId = id;
+
+        document.getElementById('input-year').value = state.year;
+        document.getElementById('input-title').value = state.title;
+        document.getElementById('input-datetime').value = state.datetime;
+        document.getElementById('input-target').value = state.target;
+        document.getElementById('input-side').value = state.sideText;
+        document.getElementById('input-kra').value = state.kra;
+        document.getElementById('input-author').value = state.author;
+        if(typeof renderObjectivesForm === 'function') renderObjectivesForm();
+        for(let i = 0; i < 8; i++){ if(typeof refreshUploaderBox === 'function') refreshUploaderBox(i, null); }
+        if(typeof renderPhotoGrid === 'function') renderPhotoGrid();
+        if(typeof updatePreview === 'function') updatePreview();
+
+        closeDrafListModal();
+        showToastOPR('Draf dibuka. Sila muat naik semula gambar aktiviti jika perlu.', 'bg-indigo-600');
+      }catch(e){
+        showToastOPR('Gagal buka draf ini (data rosak).', 'bg-rose-600');
+      }
+    }
+    async function deleteDraf(id){
+      if(!confirm('Padam draf ini? Tindakan ini tak boleh dibuat asal.')) return;
+      try{
+        await fetch(CMS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'padamdraf', id: id })
+        });
+        showToastOPR('Draf dipadam.', 'bg-slate-700');
+        openDrafListModal();
+      }catch(e){
+        showToastOPR('Gagal padam draf.', 'bg-rose-600');
+      }
+    }
 
     async function saveReportToPortal() {
       if(!isCmsBackendConfigured()){
