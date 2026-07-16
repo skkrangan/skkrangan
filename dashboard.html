@@ -1259,7 +1259,7 @@ let staffData = [
   { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.jpg' },
   { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.jpg' },
   { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.jpg' },
-  { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.izzati@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-izzati.webp' },
+  { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-44425413@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-izzati.webp' },
   { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.jpg' },
   { id: 16, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
   { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
@@ -1267,7 +1267,7 @@ let staffData = [
   { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
   { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-syuhada.webp' },
   { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
-  { id: 15, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.ajek@moe-dl.edu.my',         cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
+  { id: 15, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'ajeksumping140@gmail.com',               cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
   { id: 17, name: 'SK Krangan (Akaun Pentadbir)',        position: 'Akaun Pentadbir Sistem Sekolah',               status: 'Di Sekolah', delimaEmail: 'sekolah-8173@moe-dl.edu.my',             cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Pentadbir Sistem', canViewAttendanceDashboard: true, excludeFromAttendance: true }
 ];
 
@@ -1285,8 +1285,19 @@ async function syncStaffFromBackend(){
     if(!res.ok) return;
     const remote = await res.json();
     if(Array.isArray(remote) && remote.length){
+      // GABUNG (bukan gantikan terus): rekod dari Sheet mengatasi rekod
+      // sandaran (fallback) dengan ID sama. Staf yang BELUM PERNAH disimpan
+      // melalui borang Urus Staf (jadi belum wujud dalam Sheet) kekal guna
+      // rekod sandaran dalam kod ini - supaya tiada staf "hilang" daripada
+      // senarai secara tak sengaja sebelum semua staf dipindah ke Sheet.
+      const remoteIds = new Set(remote.map(s => Number(s.id)));
+      const merged = remote.slice();
+      staffData.forEach(fallback => {
+        if(!remoteIds.has(Number(fallback.id))) merged.push(fallback);
+      });
+      merged.sort((a, b) => Number(a.id) - Number(b.id));
       staffData.length = 0;
-      remote.forEach(s => staffData.push(s));
+      merged.forEach(s => staffData.push(s));
       staffSyncedFromBackend = true;
     }
   }catch(e){ /* senyap - kekal guna senarai sandaran (fallback) dalam kod */ }
