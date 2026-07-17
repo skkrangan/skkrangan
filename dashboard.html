@@ -249,19 +249,10 @@
               </div>
               <div>
                 <label class="text-xs font-bold uppercase tracking-wider text-ink-soft block mb-1.5">Program &amp; Aktiviti Sepanjang Tahun</label>
-                <p class="text-[11px] text-ink-faint mb-2">Apa yang dijalankan secara berkala.</p>
-                <textarea id="cms-field-program" oninput="updateCmsContentPreview()" rows="3" class="w-full bg-mist border border-line rounded-2xl p-4 text-sm leading-relaxed text-ink focus:ring-2 focus:ring-navy focus:outline-none"></textarea>
-                <div class="mt-2">
-                  <button id="ai-btn-cms-field-program" onclick="aiAssist('cms-field-program','Bahagian Program & Aktiviti Sepanjang Tahun unit sekolah')" class="text-[11px] font-bold text-navy hover:text-navy-deep bg-navy-50 hover:bg-navy-100 px-3 py-1.5 rounded-full transition-all inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3 h-3"></i> Bantu Tulis dengan AI</button>
-                  <div id="ai-suggestion-cms-field-program" class="hidden mt-2 bg-navy-50 border border-navy-100 rounded-xl p-3">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-navy mb-1">Cadangan AI</p>
-                    <p class="ai-suggestion-text text-xs text-ink-soft leading-relaxed whitespace-pre-line"></p>
-                    <div class="flex gap-2 mt-2">
-                      <button onclick="acceptAiSuggestion('cms-field-program')" class="text-[11px] font-bold text-white bg-navy hover:bg-navy-deep px-3 py-1.5 rounded-full">Guna Cadangan Ini</button>
-                      <button onclick="dismissAiSuggestion('cms-field-program')" class="text-[11px] font-bold text-ink-soft hover:text-ink px-3 py-1.5">Buang</button>
-                    </div>
-                  </div>
-                </div>
+                <p class="text-[11px] text-ink-faint mb-2">Senaraikan program/aktiviti unit sepanjang tahun berserta tarikh/bulan.</p>
+                <div id="cms-program-rows" class="space-y-2 mb-2"></div>
+                <button type="button" onclick="addProgramRow()" class="text-[11px] font-bold text-navy hover:text-navy-deep bg-mist hover:bg-navy-50 px-3 py-1.5 rounded-full transition-all inline-flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-3 h-3"></i> Tambah Program</button>
+                <textarea id="cms-field-program" class="hidden"></textarea>
               </div>
               <div>
                 <label class="text-xs font-bold uppercase tracking-wider text-ink-soft block mb-1.5">Fokus Semasa <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
@@ -1829,6 +1820,53 @@ function aiToastAny(msg, type){
   else if(typeof showToastOPR === 'function') showToastOPR(msg, type === 'error' ? 'bg-rose-600' : 'bg-slate-900');
 }
 
+/* ===== Program & Aktiviti Sepanjang Tahun (senarai berstruktur: Tarikh + Nama) =====
+   Disimpan dalam textarea tersembunyi #cms-field-program guna format
+   "Tarikh::Nama" setiap baris (serasi ke belakang - baris tanpa "::" dianggap
+   Nama sahaja, untuk kandungan lama yang masih teks bebas). */
+let programState = [];
+function renderProgramRows(){
+  const box = document.getElementById('cms-program-rows');
+  if(!box) return;
+  if(!programState.length){
+    box.innerHTML = `<p class="text-xs text-ink-faint italic">Tiada program lagi. Klik "Tambah Program" untuk mula.</p>`;
+    return;
+  }
+  box.innerHTML = programState.map((p, idx) => `
+    <div class="flex flex-wrap gap-2 items-center">
+      <input type="text" value="${(p.tarikh||'').replace(/"/g,'&quot;')}" oninput="programState[${idx}].tarikh=this.value; syncProgramStateToTextarea()" placeholder="Tarikh/Bulan (cth. Mac 2026)" class="w-full sm:w-40 shrink-0 bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+      <input type="text" value="${(p.nama||'').replace(/"/g,'&quot;')}" oninput="programState[${idx}].nama=this.value; syncProgramStateToTextarea()" placeholder="Nama Program/Aktiviti" class="flex-1 min-w-[150px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+      <button onclick="removeProgramRow(${idx})" class="text-rose-500 hover:text-rose-700 p-1.5 shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    </div>`).join('');
+  lucide.createIcons();
+}
+function addProgramRow(){
+  programState.push({ tarikh:'', nama:'' });
+  renderProgramRows();
+}
+function removeProgramRow(idx){
+  programState.splice(idx,1);
+  renderProgramRows();
+  syncProgramStateToTextarea();
+}
+function syncProgramStateToTextarea(){
+  const text = programState
+    .filter(p => p.nama && p.nama.trim() !== '')
+    .map(p => (p.tarikh && p.tarikh.trim() !== '') ? `${p.tarikh.trim()}::${p.nama.trim()}` : p.nama.trim())
+    .join('\n');
+  const el = document.getElementById('cms-field-program');
+  if(el) el.value = text;
+  updateCmsContentPreview();
+}
+function parseProgramTextToState(text){
+  if(!text || !text.trim()) return [];
+  return text.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+    const idx = line.indexOf('::');
+    if(idx > -1) return { tarikh: line.slice(0, idx).trim(), nama: line.slice(idx + 2).trim() };
+    return { tarikh: '', nama: line };
+  });
+}
+
 function fillCmsFields(unit, text){
   const hasRealContent = typeof text === 'string' && text.trim() !== '';
   const parsed = hasRealContent ? parseContentSections(text) : { pengenalan:'', objektif:'', program:'', fokus:'' };
@@ -1846,6 +1884,8 @@ function fillCmsFields(unit, text){
   if(statusNote){
     statusNote.classList.toggle('hidden', hasRealContent);
   }
+  programState = parseProgramTextToState(parsed.program || '');
+  renderProgramRows();
   updateCmsContentPreview();
 }
 
@@ -1854,22 +1894,32 @@ function fillCmsFields(unit, text){
 function updateCmsContentPreview(){
   const box = document.getElementById('cms-content-preview');
   if(!box) return;
+  const programText = (document.getElementById('cms-field-program').value || '').trim();
   const sections = [
-    ['PENGENALAN', (document.getElementById('cms-field-pengenalan').value || '').trim()],
-    ['OBJEKTIF UTAMA', (document.getElementById('cms-field-objektif').value || '').trim()],
-    ['PROGRAM & AKTIVITI SEPANJANG TAHUN', (document.getElementById('cms-field-program').value || '').trim()],
-    ['FOKUS SEMASA', (document.getElementById('cms-field-fokus').value || '').trim()]
+    ['PENGENALAN', (document.getElementById('cms-field-pengenalan').value || '').trim(), 'text'],
+    ['OBJEKTIF UTAMA', (document.getElementById('cms-field-objektif').value || '').trim(), 'text'],
+    ['PROGRAM & AKTIVITI SEPANJANG TAHUN', programText, 'program'],
+    ['FOKUS SEMASA', (document.getElementById('cms-field-fokus').value || '').trim(), 'text']
   ];
   const filled = sections.filter(([,v]) => v !== '');
   if(!filled.length){
     box.innerHTML = '<p class="text-ink-faint italic">Previu akan terpapar di sini bila anda mula menaip...</p>';
     return;
   }
-  box.innerHTML = filled.map(([label, val]) => `
+  box.innerHTML = filled.map(([label, val, type]) => {
+    let body;
+    if(type === 'program'){
+      const rows = parseProgramTextToState(val);
+      body = `<ul class="space-y-1.5 list-none">${rows.map(p => `<li class="flex gap-2"><span class="text-gold font-bold shrink-0">${p.tarikh ? p.tarikh.replace(/</g,'&lt;') : '&bull;'}</span><span>${p.nama.replace(/</g,'&lt;')}</span></li>`).join('')}</ul>`;
+    } else {
+      body = `<p>${val.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p>`;
+    }
+    return `
     <div class="mb-4 last:mb-0">
       <p class="text-xs font-bold uppercase tracking-wider text-gold mb-1">${label}</p>
-      <p>${val.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p>
-    </div>`).join('');
+      ${body}
+    </div>`;
+  }).join('');
 }
 
 async function selectCmsUnit(unit){
