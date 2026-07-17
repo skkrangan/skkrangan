@@ -910,7 +910,7 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tajuk / Nama Program</label>
-          <textarea id="input-title" oninput="updatePreview()" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+          <textarea id="input-title" oninput="updatePreview()" rows="2" autocomplete="off" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
           <div class="mt-2">
             <button id="ai-btn-input-title" onclick="aiAssist('input-title','Tajuk rasmi program/aktiviti sekolah')" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full transition-all inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3 h-3"></i> Bantu Tulis dengan AI</button>
             <div id="ai-suggestion-input-title" class="hidden mt-2 bg-indigo-50 border border-indigo-100 rounded-xl p-3">
@@ -929,13 +929,13 @@
             <span>Tarikh / Masa / Tempat</span>
             <input type="date" id="input-date-picker" onchange="autoFillDate(event)" class="text-[10px] border border-slate-300 rounded px-1.5 py-0.5 text-indigo-700 focus:outline-none bg-indigo-50 cursor-pointer" title="Pilih Tarikh">
           </label>
-          <textarea id="input-datetime" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+          <textarea id="input-datetime" oninput="updatePreview()" rows="3" autocomplete="off" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Sasaran Program</label>
-            <textarea id="input-target" oninput="updatePreview()" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+            <textarea id="input-target" oninput="updatePreview()" rows="2" autocomplete="off" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Label Unit</label>
@@ -963,7 +963,7 @@
               <option value="Teras 7: Meningkatkan Kecekapan Tadbir Urus dan Sistem Penyampaian">Teras 7: Kecekapan Tadbir Urus</option>
             </select>
           </label>
-          <textarea id="input-kra" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+          <textarea id="input-kra" oninput="updatePreview()" rows="3" autocomplete="off" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
         </div>
 
         <div>
@@ -985,7 +985,7 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Disediakan Oleh</label>
-          <input type="text" id="input-author" oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
+          <input type="text" id="input-author" oninput="updatePreview()" autocomplete="off" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
         </div>
       </div>
     </section>
@@ -3412,7 +3412,11 @@ window.onload = function(){
             (allRecords || []).forEach(r => {
                 if (r.date !== today) return;
                 if (r.name && r.name.includes('Sariah binti Mos')) return;
-                const staff = r.id ? staffData.find(s => String(s.id) === String(r.id)) : staffData.find(s => s.name === r.name);
+                // Utamakan padanan ikut NAMA (lebih stabil) berbanding ID - ID staf
+                // pernah tersasar disebabkan isu penjanaan ID automatik terdahulu,
+                // jadi padanan ikut ID sahaja boleh salah kaitkan rekod ke staf lain.
+                const staff = (r.name && staffData.find(s => s.name === r.name))
+                    || (r.id ? staffData.find(s => String(s.id) === String(r.id)) : null);
                 if (staff) map[staff.id] = r.status;
             });
             return map;
@@ -3425,7 +3429,8 @@ window.onload = function(){
             (allRecords || []).forEach(r => {
                 if (r.date !== today) return;
                 if (r.name && r.name.includes('Sariah binti Mos')) return;
-                const staff = r.id ? staffData.find(s => String(s.id) === String(r.id)) : staffData.find(s => s.name === r.name);
+                const staff = (r.name && staffData.find(s => s.name === r.name))
+                    || (r.id ? staffData.find(s => String(s.id) === String(r.id)) : null);
                 if (staff) map[staff.id] = { status: r.status, note: r.note || '', time: r.time || '' };
             });
             return map;
