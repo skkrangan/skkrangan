@@ -1820,6 +1820,19 @@ function aiToastAny(msg, type){
   else if(typeof showToastOPR === 'function') showToastOPR(msg, type === 'error' ? 'bg-rose-600' : 'bg-slate-900');
 }
 
+// Format tarikh ISO (yyyy-MM-dd, dari input kalendar) -> Bahasa Melayu (cth. "15 Mac 2026").
+// Nilai bukan-ISO (kandungan lama sebelum ciri kalendar ini) dikembalikan macam asal.
+function formatTarikhMy(isoDate){
+  if(!isoDate) return '';
+  const bulanNames = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+  const parts = String(isoDate).split('-');
+  if(parts.length !== 3) return isoDate;
+  const [y,m,d] = parts;
+  const mIdx = parseInt(m,10) - 1;
+  if(isNaN(parseInt(d,10)) || !bulanNames[mIdx]) return isoDate;
+  return `${parseInt(d,10)} ${bulanNames[mIdx]} ${y}`;
+}
+
 /* ===== Program & Aktiviti Sepanjang Tahun (senarai berstruktur: Tarikh + Nama) =====
    Disimpan dalam textarea tersembunyi #cms-field-program guna format
    "Tarikh::Nama" setiap baris (serasi ke belakang - baris tanpa "::" dianggap
@@ -1834,7 +1847,7 @@ function renderProgramRows(){
   }
   box.innerHTML = programState.map((p, idx) => `
     <div class="flex flex-wrap gap-2 items-center">
-      <input type="text" value="${(p.tarikh||'').replace(/"/g,'&quot;')}" oninput="programState[${idx}].tarikh=this.value; syncProgramStateToTextarea()" placeholder="Tarikh/Bulan (cth. Mac 2026)" class="w-full sm:w-40 shrink-0 bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+      <input type="date" value="${(p.tarikh||'').replace(/"/g,'&quot;')}" oninput="programState[${idx}].tarikh=this.value; syncProgramStateToTextarea()" class="w-full sm:w-40 shrink-0 bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
       <input type="text" value="${(p.nama||'').replace(/"/g,'&quot;')}" oninput="programState[${idx}].nama=this.value; syncProgramStateToTextarea()" placeholder="Nama Program/Aktiviti" class="flex-1 min-w-[150px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
       <button onclick="removeProgramRow(${idx})" class="text-rose-500 hover:text-rose-700 p-1.5 shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
     </div>`).join('');
@@ -1910,7 +1923,7 @@ function updateCmsContentPreview(){
     let body;
     if(type === 'program'){
       const rows = parseProgramTextToState(val);
-      body = `<ul class="space-y-1.5 list-none">${rows.map(p => `<li class="flex gap-2"><span class="text-gold font-bold shrink-0">${p.tarikh ? p.tarikh.replace(/</g,'&lt;') : '&bull;'}</span><span>${p.nama.replace(/</g,'&lt;')}</span></li>`).join('')}</ul>`;
+      body = `<ul class="space-y-1.5 list-none">${rows.map(p => `<li class="flex gap-2"><span class="text-gold font-bold shrink-0">${p.tarikh ? formatTarikhMy(p.tarikh).replace(/</g,'&lt;') : '&bull;'}</span><span>${p.nama.replace(/</g,'&lt;')}</span></li>`).join('')}</ul>`;
     } else {
       body = `<p>${val.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</p>`;
     }
