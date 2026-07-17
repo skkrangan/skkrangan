@@ -943,13 +943,13 @@
             <span>KRA (Kawasan Hasil Utama)</span>
             <select onchange="addKRA(event)" class="text-[10px] border border-slate-300 rounded px-1.5 py-0.5 text-indigo-700 bg-indigo-50 focus:outline-none max-w-[140px] cursor-pointer">
               <option value="">+ Tambah KRA...</option>
-              <option value="Kemenjadian Murid">Kemenjadian Murid</option>
-              <option value="Pembelajaran Bermakna">Pembelajaran Bermakna</option>
-              <option value="Persekitaran Pembelajaran Berkesan">Persekitaran Pembelajaran Berkesan</option>
-              <option value="Sekolah Berkualiti">Sekolah Berkualiti</option>
-              <option value="Pemimpin Berkesan">Pemimpin Berkesan</option>
-              <option value="Guru Berkualiti">Guru Berkualiti</option>
-              <option value="Sokongan PIBG / Komuniti">Sokongan PIBG / Komuniti</option>
+              <option value="Teras 1: Memastikan Sistem Pendidikan Malaysia yang Terangkum, Dinamik dan Relevan">Teras 1: Sistem Pendidikan Terangkum, Dinamik &amp; Relevan</option>
+              <option value="Teras 2: Mengoptimumkan Potensi Setiap Murid Melalui Pengalaman Pembelajaran yang Bermakna untuk Menjadi Warganegara Global">Teras 2: Potensi Murid &amp; Pembelajaran Bermakna</option>
+              <option value="Teras 3: Mentransformasikan Pendidik agar Berkeupayaan Tinggi dan Berorientasikan Masa Hadapan">Teras 3: Transformasi Pendidik</option>
+              <option value="Teras 4: Memantapkan Prasarana Fizikal dan Digital di Semua Institusi Pendidikan KPM">Teras 4: Prasarana Fizikal &amp; Digital</option>
+              <option value="Teras 5: Mempergiat Sinergi antara Institusi Pendidikan KPM dengan Semua Pihak Berkepentingan">Teras 5: Sinergi Pihak Berkepentingan</option>
+              <option value="Teras 6: Membudayakan Kemampanan dalam Ekosistem Pendidikan">Teras 6: Kemampanan Ekosistem Pendidikan</option>
+              <option value="Teras 7: Meningkatkan Kecekapan Tadbir Urus dan Sistem Penyampaian">Teras 7: Kecekapan Tadbir Urus</option>
             </select>
           </label>
           <textarea id="input-kra" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Pilih KRA dari menu dropdown atau taip manual..."></textarea>
@@ -2731,6 +2731,38 @@ async function deleteHpGaleriPhoto(urlFoto){
 /* ===== Carta Organisasi Unit ===== */
 let cartaState = [];
 
+// Cache carian Carta Induk (Carta Organisasi Utama, Laman Utama) - dimuat sekali
+// sahaja secara "malas" (lazy), digunakan untuk auto-padan gambar bila nama
+// staf yang dimasukkan ke Carta Unit sepadan dengan nama dalam Carta Induk.
+let cartaIndukLookupCache = null;
+async function getCartaIndukLookup(){
+  if(cartaIndukLookupCache) return cartaIndukLookupCache;
+  if(!isCmsBackendConfigured()) return [];
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=cartautama');
+    if(res.ok){
+      const d = await res.json();
+      cartaIndukLookupCache = Array.isArray(d) ? d : [];
+    }
+  }catch(e){ /* senyap */ }
+  return cartaIndukLookupCache || [];
+}
+// Dipanggil bila SU tinggalkan (blur) kotak Nama dalam Carta Unit - kalau nama
+// sepadan dengan seseorang dalam Carta Induk DAN kotak ni belum ada gambar
+// sendiri, auto-guna gambar yang sama daripada Carta Induk.
+async function checkCartaUnitAutoPhoto(idx){
+  const m = cartaState[idx];
+  if(!m || m.urlFoto || !m.nama || !m.nama.trim()) return;
+  const lookup = await getCartaIndukLookup();
+  const target = m.nama.trim().toLowerCase();
+  const match = lookup.find(x => (x.nama || '').trim().toLowerCase() === target);
+  if(match && match.urlFoto && cartaState[idx] && !cartaState[idx].urlFoto){
+    cartaState[idx].urlFoto = match.urlFoto;
+    renderCartaRows();
+    showToast(`Gambar "${m.nama}" diambil automatik daripada Carta Induk.`, 'success');
+  }
+}
+
 function renderCartaRows(){
   const box = document.getElementById('cms-carta-rows');
   if(!box) return;
@@ -2749,7 +2781,7 @@ function renderCartaRows(){
         </label>
       </div>
       <div class="flex-1 flex flex-wrap gap-2 items-center">
-        <input type="text" value="${(m.nama||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].nama=this.value; updateCartaUnitPreview()" placeholder="Nama" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+        <input type="text" value="${(m.nama||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].nama=this.value; updateCartaUnitPreview()" onblur="checkCartaUnitAutoPhoto(${idx})" placeholder="Nama" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
         <input type="text" value="${(m.jawatan||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].jawatan=this.value; updateCartaUnitPreview()" placeholder="Jawatan" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
         <select onchange="cartaState[${idx}].tier=Number(this.value); updateCartaUnitPreview()" class="bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
           <option value="1" ${m.tier==1?'selected':''}>Tier 1 (Pengerusi)</option>
