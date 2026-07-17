@@ -2577,16 +2577,52 @@ function renderCartaRows(){
     return;
   }
   box.innerHTML = cartaState.map((m, idx) => `
-    <div class="flex flex-wrap gap-2 items-center">
-      <input type="text" value="${(m.nama||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].nama=this.value; updateCartaUnitPreview()" placeholder="Nama" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
-      <input type="text" value="${(m.jawatan||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].jawatan=this.value; updateCartaUnitPreview()" placeholder="Jawatan" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
-      <button onclick="removeCartaRow(${idx})" class="text-rose-500 hover:text-rose-700 p-1.5 shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center">
+      <div class="relative w-12 h-12 rounded-full overflow-hidden bg-white border border-line shrink-0 mx-auto xl:mx-0" style="background-image:url('${m.urlFoto||''}'); background-size:cover; background-position:center;">
+        ${!m.urlFoto ? '<div class="w-full h-full flex items-center justify-center text-ink-faint"><i data-lucide="user" class="w-5 h-5"></i></div>' : ''}
+        <label class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all">
+          <i data-lucide="camera" class="w-3.5 h-3.5 text-white"></i>
+          <input type="file" accept="image/*" class="hidden" onchange="uploadCartaUnitPhoto(${idx}, event)">
+        </label>
+      </div>
+      <div class="flex-1 flex flex-wrap gap-2 items-center">
+        <input type="text" value="${(m.nama||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].nama=this.value; updateCartaUnitPreview()" placeholder="Nama" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+        <input type="text" value="${(m.jawatan||'').replace(/"/g,'&quot;')}" oninput="cartaState[${idx}].jawatan=this.value; updateCartaUnitPreview()" placeholder="Jawatan" class="flex-1 min-w-[120px] bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+        <select onchange="cartaState[${idx}].tier=Number(this.value); updateCartaUnitPreview()" class="bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <option value="1" ${m.tier==1?'selected':''}>Tier 1 (Pengerusi)</option>
+          <option value="2" ${m.tier==2?'selected':''}>Tier 2 (Naib Pengerusi/Timbalan)</option>
+          <option value="3" ${(!m.tier||m.tier==3)?'selected':''}>Tier 3 (AJK/Lain-lain)</option>
+        </select>
+      </div>
+      <button onclick="removeCartaRow(${idx})" class="text-rose-500 hover:text-rose-700 p-1.5 shrink-0 self-center"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
     </div>
   `).join('');
   lucide.createIcons();
   updateCartaUnitPreview();
 }
-// Previu senarai Carta Organisasi unit - macam mana kad akan nampak di laman awam.
+function uploadCartaUnitPhoto(idx, event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e){
+    showToast('Memuat naik foto...', 'info');
+    try{
+      const res = await fetch(CMS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'uploadCartaUnitFoto', imageBase64: e.target.result })
+      });
+      const data = await res.json();
+      if(data && data.imageUrl){
+        cartaState[idx].urlFoto = data.imageUrl;
+        renderCartaRows();
+        showToast('Foto berjaya dimuat naik. Jangan lupa klik Simpan.', 'success');
+      }
+    }catch(err){ showToast('Gagal muat naik foto.', 'error'); }
+  };
+  reader.readAsDataURL(file);
+}
+// Previu senarai Carta Organisasi unit - berhierarki ikut Tier, sama gaya Carta Induk.
 function updateCartaUnitPreview(){
   const box = document.getElementById('cms-carta-preview');
   if(!box) return;
@@ -2595,15 +2631,26 @@ function updateCartaUnitPreview(){
     box.innerHTML = '<p class="text-xs text-ink-faint italic col-span-full">Previu senarai ahli akan terpapar di sini...</p>';
     return;
   }
-  box.innerHTML = valid.map(m => `
+  const tierLabel = t => t==1 ? 'Pengerusi' : (t==2 ? 'Naib Pengerusi/Timbalan' : 'AJK');
+  const cardHtml = m => `
     <div class="flex items-center gap-2 bg-mist rounded-xl px-3 py-2.5 border border-line">
-      <div class="w-8 h-8 rounded-full bg-navy-50 flex items-center justify-center shrink-0"><i data-lucide="user" class="w-3.5 h-3.5 text-navy"></i></div>
-      <div class="min-w-0"><p class="text-xs font-bold text-ink truncate">${m.nama}</p><p class="text-[11px] text-ink-soft truncate">${m.jawatan||''}</p></div>
-    </div>`).join('');
+      <div class="w-8 h-8 rounded-full bg-navy-50 flex items-center justify-center shrink-0 overflow-hidden" style="background-image:url('${m.urlFoto||''}'); background-size:cover; background-position:center;">
+        ${!m.urlFoto ? '<i data-lucide="user" class="w-3.5 h-3.5 text-navy"></i>' : ''}
+      </div>
+      <div class="min-w-0"><p class="text-xs font-bold text-ink truncate">${m.nama}</p><p class="text-[11px] text-ink-soft truncate">${m.jawatan || tierLabel(m.tier)}</p></div>
+    </div>`;
+  const t1 = valid.filter(m => (m.tier||3) == 1);
+  const t2 = valid.filter(m => (m.tier||3) == 2);
+  const t3 = valid.filter(m => (m.tier||3) == 3);
+  let html = '';
+  if(t1.length) html += `<div class="col-span-full">${t1.map(cardHtml).join('')}</div>`;
+  if(t2.length) html += t2.map(cardHtml).join('');
+  if(t3.length) html += `<div class="col-span-full grid sm:grid-cols-2 gap-2">${t3.map(cardHtml).join('')}</div>`;
+  box.innerHTML = html;
   lucide.createIcons();
 }
 function addCartaRow(){
-  cartaState.push({ nama:'', jawatan:'' });
+  cartaState.push({ nama:'', jawatan:'', tier:3, urlFoto:'' });
   renderCartaRows();
 }
 function removeCartaRow(idx){
@@ -2616,7 +2663,7 @@ async function loadCartaForUnit(unit){
     if(!res.ok) throw new Error();
     const all = await res.json();
     if(cmsActiveUnit === unit){
-      cartaState = Array.isArray(all) ? all.filter(m => m.unit === unit).map(m => ({ nama:m.nama, jawatan:m.jawatan })) : [];
+      cartaState = Array.isArray(all) ? all.filter(m => m.unit === unit).map(m => ({ nama:m.nama, jawatan:m.jawatan, tier:m.tier||3, urlFoto:m.urlFoto||'' })) : [];
       renderCartaRows();
     }
   }catch(e){ /* senyap - kekal senarai kosong jika rangkaian gagal */ }

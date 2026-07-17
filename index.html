@@ -475,7 +475,26 @@ async function fetchWeatherWidget(){
       <a href="${h.target}" onclick="toggleSearch()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-mist text-left">
         <span><span class="text-ink font-semibold text-base block">${h.label}</span><span class="text-ink-soft text-sm">${h.hint}</span></span>
         <i data-lucide="arrow-right" class="w-4 h-4 text-ink-faint"></i>
-      </a>`).join('') : `<p class="text-ink-soft text-base px-4 py-3">Tiada hasil untuk "${q}"</p>`; lucide.createIcons(); }  let orgChart = [ { name:'Stanley anak Ngawah', role:'Guru Besar', photo:'staf-stanley.jpg', tier:1 }, { name:'Dick Lester anak Bakir', role:'Guru Penolong Kanan Kurikulum', photo:'staf-dick.jpg', tier:2 }, { name:'Amir bin Ngatiman', role:'Guru Penolong Kanan Hal Ehwal Murid', photo:'staf-amir.jpg', tier:2 }, { name:'Mohammad Fadzly bin Noor Azman', role:'Guru Penolong Kanan Kokurikulum', photo:'staf-fadzly.jpg', tier:2 }, { name:'Angeline anak Michael Jawa', role:'Setiausaha Hal Ehwal Murid dan PIBG', photo:'staf-angeline.jpg', tier:3 }, { name:'Marina anak Luat', role:'Guru Data', photo:'staf-marina.jpg', tier:3 }, { name:'Jeanica May anak Kuyah', role:'Setiausaha Kurikulum', photo:'staf-jeanica.jpg', tier:3 }, { name:'Hadijah anak Ambun', role:'Guru Pemulihan', photo:'staf-hadijah.jpg', tier:3 }, { name:'Noor Izzati Abdullah', role:'Guru Prasekolah', photo:'staf-izzati.webp', tier:3 }, { name:'Siti Norhafizah binti Daud', role:'Guru NILAM', photo:'staf-siti.jpg', tier:3 }, { name:'Mohd Arfiq Rahimi bin Abdul Rahman', role:'Guru STEM', photo:'staf-arfiq.jpg', tier:3 }, { name:'Elnisia anak Guwel', role:'Guru Bimbingan dan Kaunseling (LD)', photo:'staf-elnisia.jpg', tier:3 }, { name:'Aimuni Athirah binti Latif', role:'Guru ICT', photo:'staf-aimuni.jpg', tier:3 }, { name:'Nur Syuhada binti Abdul Razak', role:'Setiausaha Kokurikulum', photo:'staf-syuhada.webp', tier:3 }, { name:'Liminang anak Sabang', role:'Pembantu Tadbir', photo:'staf-liminang.webp', tier:3 }, { name:'Ajek anak Sumping', role:'Pembantu Pengurusan Murid Prasekolah', photo:'staf-ajek.webp', tier:3 }, ]; function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12'; const nameSz = size === 'lg' ? 'text-lg' : 'text-base'; return `
+      </a>`).join('') : `<p class="text-ink-soft text-base px-4 py-3">Tiada hasil untuk "${q}"</p>`; lucide.createIcons(); }  let orgChart = [ { name:'Stanley anak Ngawah', role:'Guru Besar', photo:'staf-stanley.jpg', tier:1 }, { name:'Dick Lester anak Bakir', role:'Guru Penolong Kanan Kurikulum', photo:'staf-dick.jpg', tier:2 }, { name:'Amir bin Ngatiman', role:'Guru Penolong Kanan Hal Ehwal Murid', photo:'staf-amir.jpg', tier:2 }, { name:'Mohammad Fadzly bin Noor Azman', role:'Guru Penolong Kanan Kokurikulum', photo:'staf-fadzly.jpg', tier:2 }, { name:'Angeline anak Michael Jawa', role:'Setiausaha Hal Ehwal Murid dan PIBG', photo:'staf-angeline.jpg', tier:3 }, { name:'Marina anak Luat', role:'Guru Data', photo:'staf-marina.jpg', tier:3 }, { name:'Jeanica May anak Kuyah', role:'Setiausaha Kurikulum', photo:'staf-jeanica.jpg', tier:3 }, { name:'Hadijah anak Ambun', role:'Guru Pemulihan', photo:'staf-hadijah.jpg', tier:3 }, { name:'Noor Izzati Abdullah', role:'Guru Prasekolah', photo:'staf-izzati.webp', tier:3 }, { name:'Siti Norhafizah binti Daud', role:'Guru NILAM', photo:'staf-siti.jpg', tier:3 }, { name:'Mohd Arfiq Rahimi bin Abdul Rahman', role:'Guru STEM', photo:'staf-arfiq.jpg', tier:3 }, { name:'Elnisia anak Guwel', role:'Guru Bimbingan dan Kaunseling (LD)', photo:'staf-elnisia.jpg', tier:3 }, { name:'Aimuni Athirah binti Latif', role:'Guru ICT', photo:'staf-aimuni.jpg', tier:3 }, { name:'Nur Syuhada binti Abdul Razak', role:'Setiausaha Kokurikulum', photo:'staf-syuhada.webp', tier:3 }, { name:'Liminang anak Sabang', role:'Pembantu Tadbir', photo:'staf-liminang.webp', tier:3 }, { name:'Ajek anak Sumping', role:'Pembantu Pengurusan Murid Prasekolah', photo:'staf-ajek.webp', tier:3 }, ]; function renderTieredOrgList(members){
+  const t1 = members.filter(m => (m.tier||3) == 1);
+  const t2 = members.filter(m => (m.tier||3) == 2);
+  const t3 = members.filter(m => (m.tier||3) == 3);
+  if(!t1.length && !t2.length && !t3.length) return '';
+  let html = '';
+  if(t1.length){
+    html += `<div class="flex justify-center mb-2"><div class="w-full max-w-sm space-y-2">${t1.map(p => orgCard(p,'lg')).join('')}</div></div>`;
+    if(t2.length || t3.length) html += `<div class="w-px h-6 bg-line mx-auto mb-2"></div>`;
+  }
+  if(t2.length){
+    html += `<div class="max-w-3xl mx-auto grid sm:grid-cols-${Math.min(t2.length,3)} gap-4 mb-2">${t2.map(p => orgCard(p,'md')).join('')}</div>`;
+    if(t3.length) html += `<div class="w-px h-6 bg-line mx-auto mb-2"></div>`;
+  }
+  if(t3.length){
+    html += `<div class="max-w-4xl mx-auto grid sm:grid-cols-2 gap-3">${t3.map(p => orgCard(p,'md')).join('')}</div>`;
+  }
+  return html;
+}
+function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12'; const nameSz = size === 'lg' ? 'text-lg' : 'text-base'; return `
       <button onclick="openOrgModal('${p.name}','${p.role}','${p.photo || ''}')" class="soft-card rounded-2xl p-5 text-left inline-flex items-center gap-3.5 w-full h-full">
         <div class="${sz} rounded-full bg-navy-50 flex items-center justify-center shrink-0 overflow-hidden">
           ${p.photo ? `<img src="${p.photo}" alt="${p.name}" loading="lazy" decoding="async" class="w-full h-full object-cover">` : `<i data-lucide="user" class="w-5 h-5 text-navy"></i>`}
@@ -545,14 +564,7 @@ async function fetchWeatherWidget(){
               ${i.caption ? `<p class="text-sm text-ink-soft mt-1.5 truncate">${i.caption}</p>` : ''}
             </a>`).join('')}
         </div>` : ''}
-    `; observeLazyBg(document.getElementById('unit-tab-content')); const carta = unitCartaCache.filter(m => unitMatches(m.unit, name)); document.getElementById('unit-tab-carta').innerHTML = carta.length ? `
-      <div class="grid sm:grid-cols-2 gap-3">
-        ${carta.map(m => `
-          <div class="flex items-center gap-3 bg-mist rounded-2xl px-5 py-4 border border-line">
-            <div class="w-11 h-11 rounded-full bg-navy-50 flex items-center justify-center shrink-0"><i data-lucide="user" class="w-4.5 h-4.5 text-navy"></i></div>
-            <div class="min-w-0"><p class="text-lg text-ink font-bold truncate">${m.nama}</p><p class="text-sm text-ink-soft truncate mt-0.5">${m.jawatan || ''}</p></div>
-          </div>`).join('')}
-      </div>` : `<p class="text-center text-ink-faint text-base py-16">Carta organisasi bagi unit ini belum tersedia.</p>`; const minit = unitMinitCache.filter(m => unitMatches(m.unit, name)); document.getElementById('unit-tab-minit').innerHTML = minit.length ? `
+    `; observeLazyBg(document.getElementById('unit-tab-content')); const carta = unitCartaCache.filter(m => unitMatches(m.unit, name)).map(m => ({ name: m.nama, role: m.jawatan, tier: m.tier, photo: m.urlFoto })); document.getElementById('unit-tab-carta').innerHTML = carta.length ? renderTieredOrgList(carta) : `<p class="text-center text-ink-faint text-base py-16">Carta organisasi bagi unit ini belum tersedia.</p>`; lucide.createIcons(); const minit = unitMinitCache.filter(m => unitMatches(m.unit, name)); document.getElementById('unit-tab-minit').innerHTML = minit.length ? `
       <div class="space-y-2.5">
         ${minit.map(m => `
           <a href="${m.fileUrl}" target="_blank" rel="noopener" class="flex items-center gap-3 bg-mist hover:bg-navy-50 border border-line rounded-2xl px-5 py-4 transition-all">
