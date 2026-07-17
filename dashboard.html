@@ -215,6 +215,18 @@
           </div>
           <div class="grid lg:grid-cols-2 gap-6 lg:items-start">
             <div class="space-y-5 min-w-0">
+              <div class="bg-navy-50 rounded-2xl p-4 border border-navy-100 space-y-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-navy flex items-center gap-1.5"><i data-lucide="image" class="w-3.5 h-3.5"></i> Banner Hero Unit (pilihan)</p>
+                <div>
+                  <label class="text-[11px] font-bold text-ink-soft block mb-1">Tag Line Hero</label>
+                  <input type="text" id="cms-field-heroTagline" oninput="updateCmsContentPreview()" placeholder="Cth: Membangunkan Potensi Murid Melalui Sukan, Persatuan dan Badan Beruniform" class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+                </div>
+                <div>
+                  <label class="text-[11px] font-bold text-ink-soft block mb-1">Petikan Motivasi (dipaparkan di penghujung halaman unit)</label>
+                  <input type="text" id="cms-field-petikanMotivasi" oninput="updateCmsContentPreview()" placeholder="Cth: Kokurikulum Teras Kecemerlangan, Melahirkan Generasi Seimbang dan Berdaya Saing." class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+                </div>
+                <p class="text-[10px] text-ink-faint">Gambar banner diambil automatik daripada gambar pertama dalam "Gambar Unit" di bawah.</p>
+              </div>
               <div>
                 <label class="text-xs font-bold uppercase tracking-wider text-ink-soft block mb-1.5">Pengenalan</label>
                 <p class="text-[11px] text-ink-faint mb-2">Apa unit ini, siapa ketuai.</p>
@@ -899,7 +911,7 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tajuk / Nama Program</label>
-          <textarea id="input-title" oninput="updatePreview()" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: Pertandingan Projek Mini Buku..."></textarea>
+          <textarea id="input-title" oninput="updatePreview()" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
           <div class="mt-2">
             <button id="ai-btn-input-title" onclick="aiAssist('input-title','Tajuk rasmi program/aktiviti sekolah')" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full transition-all inline-flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3 h-3"></i> Bantu Tulis dengan AI</button>
             <div id="ai-suggestion-input-title" class="hidden mt-2 bg-indigo-50 border border-indigo-100 rounded-xl p-3">
@@ -918,13 +930,13 @@
             <span>Tarikh / Masa / Tempat</span>
             <input type="date" id="input-date-picker" onchange="autoFillDate(event)" class="text-[10px] border border-slate-300 rounded px-1.5 py-0.5 text-indigo-700 focus:outline-none bg-indigo-50 cursor-pointer" title="Pilih Tarikh">
           </label>
-          <textarea id="input-datetime" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: 2 Februari 2026&#10;Isnin&#10;Prasekolah Imaginative SK Krangan"></textarea>
+          <textarea id="input-datetime" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Sasaran Program</label>
-            <textarea id="input-target" oninput="updatePreview()" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: Semua Murid Prasekolah"></textarea>
+            <textarea id="input-target" oninput="updatePreview()" rows="2" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Label Unit</label>
@@ -952,7 +964,7 @@
               <option value="Teras 7: Meningkatkan Kecekapan Tadbir Urus dan Sistem Penyampaian">Teras 7: Kecekapan Tadbir Urus</option>
             </select>
           </label>
-          <textarea id="input-kra" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Pilih KRA dari menu dropdown atau taip manual..."></textarea>
+          <textarea id="input-kra" oninput="updatePreview()" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
         </div>
 
         <div>
@@ -974,7 +986,7 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Disediakan Oleh</label>
-          <input type="text" id="input-author" oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase" placeholder="Contoh: NAMA GURU">
+          <input type="text" id="input-author" oninput="updatePreview()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
         </div>
       </div>
     </section>
@@ -1286,14 +1298,14 @@ let staffData = [
   { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.jpg' },
   { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-44425413@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-izzati.webp' },
   { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.jpg' },
-  { id: 16, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
+  { id: 17, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
   { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
   { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.jpg' },
   { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
   { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-syuhada.webp' },
   { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
-  { id: 15, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'ajeksumping140@gmail.com',               cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
-  { id: 17, name: 'SK Krangan (Akaun Pentadbir)',        position: 'Akaun Pentadbir Sistem Sekolah',               status: 'Di Sekolah', delimaEmail: 'sekolah-8173@moe-dl.edu.my',             cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Pentadbir Sistem', canViewAttendanceDashboard: true, excludeFromAttendance: true }
+  { id: 16, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'ajeksumping140@gmail.com',               cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
+  { id: 18, name: 'SK Krangan (Akaun Pentadbir)',        position: 'Akaun Pentadbir Sistem Sekolah',               status: 'Di Sekolah', delimaEmail: 'sekolah-8173@moe-dl.edu.my',             cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Pentadbir Sistem', canViewAttendanceDashboard: true, excludeFromAttendance: true }
 ];
 
 /* =====================================================================
@@ -1714,6 +1726,8 @@ function renderCmsTabs(){
 }
 
 const CMS_SECTION_LABELS = {
+  heroTagline: 'TAGLINE HERO',
+  petikanMotivasi: 'PETIKAN MOTIVASI',
   pengenalan: 'PENGENALAN',
   objektif: 'OBJEKTIF UTAMA',
   program: 'PROGRAM & AKTIVITI SEPANJANG TAHUN',
@@ -1726,7 +1740,7 @@ function combineContentSections(fields){
   }).filter(Boolean).join('\n\n');
 }
 function parseContentSections(text){
-  const result = { pengenalan:'', objektif:'', program:'', fokus:'' };
+  const result = { heroTagline:'', petikanMotivasi:'', pengenalan:'', objektif:'', program:'', fokus:'' };
   if(!text || typeof text !== 'string') return result;
   const labelToKey = {}; Object.keys(CMS_SECTION_LABELS).forEach(k => labelToKey[CMS_SECTION_LABELS[k]] = k);
   const labelPattern = Object.values(CMS_SECTION_LABELS).join('|');
@@ -1949,9 +1963,9 @@ function acceptObjektifAiSuggestion(fieldId, idx){
 
 function fillCmsFields(unit, text){
   const hasRealContent = typeof text === 'string' && text.trim() !== '';
-  const parsed = hasRealContent ? parseContentSections(text) : { pengenalan:'', objektif:'', program:'', fokus:'' };
+  const parsed = hasRealContent ? parseContentSections(text) : { heroTagline:'', petikanMotivasi:'', pengenalan:'', objektif:'', program:'', fokus:'' };
   const guide = cmsFieldGuides[unit] || {};
-  const fieldKeys = ['pengenalan','objektif','program','fokus'];
+  const fieldKeys = ['heroTagline','petikanMotivasi','pengenalan','objektif','program','fokus'];
   fieldKeys.forEach(key => {
     const el = document.getElementById('cms-field-' + key);
     el.value = parsed[key] || '';
@@ -1979,6 +1993,8 @@ const CMS_OBJ_ICONS = ['target','star','award','trending-up','users','check-circ
 function updateCmsContentPreview(){
   const box = document.getElementById('cms-content-preview');
   if(!box) return;
+  const heroTagline = (document.getElementById('cms-field-heroTagline').value || '').trim();
+  const petikanMotivasi = (document.getElementById('cms-field-petikanMotivasi').value || '').trim();
   const programText = (document.getElementById('cms-field-program').value || '').trim();
   const sections = [
     ['PENGENALAN', (document.getElementById('cms-field-pengenalan').value || '').trim(), 'text'],
@@ -1987,11 +2003,21 @@ function updateCmsContentPreview(){
     ['FOKUS SEMASA', (document.getElementById('cms-field-fokus').value || '').trim(), 'text']
   ];
   const filled = sections.filter(([,v]) => v !== '');
-  if(!filled.length){
+  if(!filled.length && !heroTagline && !petikanMotivasi){
     box.innerHTML = '<p class="text-ink-faint italic">Previu akan terpapar di sini bila anda mula menaip...</p>';
     return;
   }
-  box.innerHTML = filled.map(([label, val, type]) => {
+  const heroPreview = heroTagline ? `
+    <div class="mb-3 bg-navy rounded-2xl p-4">
+      <p class="text-[9px] font-bold uppercase tracking-widest text-gold mb-1">Banner Hero</p>
+      <p class="text-white text-xs leading-snug">${heroTagline.replace(/</g,'&lt;')}</p>
+    </div>` : '';
+  const quotePreview = petikanMotivasi ? `
+    <div class="mt-3 bg-navy rounded-2xl px-4 py-3 flex items-center gap-2.5">
+      <i data-lucide="quote" class="w-4 h-4 text-gold shrink-0"></i>
+      <p class="text-white italic text-xs">"${petikanMotivasi.replace(/</g,'&lt;')}"</p>
+    </div>` : '';
+  box.innerHTML = heroPreview + filled.map(([label, val, type]) => {
     const icon = CMS_SECTION_ICONS[label] || 'file-text';
     const accent = CMS_SECTION_ACCENT[label];
     let body;
@@ -2031,7 +2057,7 @@ function updateCmsContentPreview(){
       </div>
       ${body}
     </div>`;
-  }).join('');
+  }).join('') + quotePreview;
   lucide.createIcons();
 }
 
@@ -2976,6 +3002,8 @@ async function uploadMinit(){
 async function saveCmsContent(){
   if(!cmsActiveUnit) return;
   const content = combineContentSections({
+    heroTagline: document.getElementById('cms-field-heroTagline').value,
+    petikanMotivasi: document.getElementById('cms-field-petikanMotivasi').value,
     pengenalan: document.getElementById('cms-field-pengenalan').value,
     objektif: document.getElementById('cms-field-objektif').value,
     program: document.getElementById('cms-field-program').value,
@@ -3998,13 +4026,16 @@ window.onload = function(){
     let state = {
       school: '',
       year: '2026',
-      title: ,
-      datetime: ,
-      target: ,
-      sideText: ,
-      kra: ,
-      author: ,
+      title: 'Pertandingan Projek Mini Buku Prasekolah Sepanjang 4 minggu Orientasi Prasekolah',
+      datetime: '2 - 4 Februari 2026\nIsnin, Selasa dan Rabu\nPrasekolah Imaginative SK Krangan',
+      target: 'Semua Murid Prasekolah Imaginative SK Krangan',
+      sideText: 'PRASEKOLAH',
+      kra: 'Kemenjadian Murid\nPembelajaran Bermakna\nPersekitaran Pembelajaran Berkesan',
+      author: 'AIMUNI ATHIRAH BINTI LATIF',
       objectives: [
+        'Meningkatkan kemahiran motor halus, melatih koordinasi mata dan tangan murid melalui aktiviti melipat, menggunting, dan mewarna dalam ruang yang kecil.',
+        'Memperkukuh literasi awal dengan membantu murid mengenal pasti huruf, suku kata, atau perkataan mudah yang ditulis di dalam buku tersebut.',
+        'Menggalakkan murid menceritakan semula kandungan "Mini Book" yang dihasilkan di hadapan rakan-rakan.'
       ],
       photos: [] 
     };
