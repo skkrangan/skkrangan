@@ -225,7 +225,6 @@
                   <label class="text-[11px] font-bold text-ink-soft block mb-1">Petikan Motivasi (dipaparkan di penghujung halaman unit)</label>
                   <input type="text" id="cms-field-petikanMotivasi" oninput="updateCmsContentPreview()" placeholder="Cth: Kokurikulum Teras Kecemerlangan, Melahirkan Generasi Seimbang dan Berdaya Saing." class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
                 </div>
-                <p class="text-[10px] text-ink-faint">Gambar banner diambil automatik daripada gambar pertama dalam "Gambar Unit" di bawah.</p>
               </div>
               <div>
                 <label class="text-xs font-bold uppercase tracking-wider text-ink-soft block mb-1.5">Pengenalan</label>
@@ -4023,9 +4022,9 @@ window.onload = function(){
 
 <script>
 
-    let state = {
-      school: '',
-      year: '2026',
+    // Templat contoh (rujukan) - dimuatkan HANYA bila SU klik butang "Templat Asal",
+    // BUKAN diisi automatik bila borang mula dibuka (borang mula KOSONG).
+    const SAMPLE_TEMPLATE = {
       title: 'Pertandingan Projek Mini Buku Prasekolah Sepanjang 4 minggu Orientasi Prasekolah',
       datetime: '2 - 4 Februari 2026\nIsnin, Selasa dan Rabu\nPrasekolah Imaginative SK Krangan',
       target: 'Semua Murid Prasekolah Imaginative SK Krangan',
@@ -4036,7 +4035,19 @@ window.onload = function(){
         'Meningkatkan kemahiran motor halus, melatih koordinasi mata dan tangan murid melalui aktiviti melipat, menggunting, dan mewarna dalam ruang yang kecil.',
         'Memperkukuh literasi awal dengan membantu murid mengenal pasti huruf, suku kata, atau perkataan mudah yang ditulis di dalam buku tersebut.',
         'Menggalakkan murid menceritakan semula kandungan "Mini Book" yang dihasilkan di hadapan rakan-rakan.'
-      ],
+      ]
+    };
+
+    let state = {
+      school: '',
+      year: '2026',
+      title: '',
+      datetime: '',
+      target: '',
+      sideText: 'PRASEKOLAH',
+      kra: '',
+      author: '',
+      objectives: [''],
       photos: [] 
     };
 
@@ -4499,6 +4510,13 @@ function updatePreview() {
     }
 
     function loadTemplate() {
+      state.title = SAMPLE_TEMPLATE.title;
+      state.datetime = SAMPLE_TEMPLATE.datetime;
+      state.target = SAMPLE_TEMPLATE.target;
+      state.sideText = SAMPLE_TEMPLATE.sideText;
+      state.kra = SAMPLE_TEMPLATE.kra;
+      state.author = SAMPLE_TEMPLATE.author;
+      state.objectives = SAMPLE_TEMPLATE.objectives.slice();
       state.photos = [];
       for(let i=0; i<5; i++) refreshUploaderBox(i, null);
       

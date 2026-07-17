@@ -343,15 +343,11 @@
 <div id="section-unit-detail" class="hidden fixed inset-0 z-50 bg-white overflow-y-auto">
 
   <div class="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-line">
-    <div class="max-w-4xl mx-auto px-5 sm:px-8 py-5 flex items-center justify-between gap-4">
+    <div class="max-w-4xl mx-auto px-5 sm:px-8 py-5 flex items-center gap-4">
       <button onclick="closeUnitPage()" class="flex items-center gap-2 text-ink-soft hover:text-ink font-bold text-base shrink-0">
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali
       </button>
-      <div class="text-center min-w-0">
-        <span class="text-[11px] font-bold uppercase tracking-widest text-gold">Unit Sekolah</span>
-        <h1 id="unit-page-title" class="font-display font-semibold text-xl sm:text-2xl text-ink truncate">-</h1>
-      </div>
-      <div class="w-16 shrink-0"></div>
+      <h1 id="unit-page-title" class="hidden">-</h1>
     </div>
     <div class="max-w-4xl mx-auto px-5 sm:px-8 pb-1 flex gap-1.5 sm:gap-2 overflow-x-auto">
       <button onclick="switchUnitPageTab('content')" id="unit-tab-btn-content" class="unit-page-tab-btn shrink-0 flex items-center gap-1.5 px-3.5 py-2.5 rounded-t-xl text-sm sm:text-base font-bold border-b-2 transition-all">
@@ -556,17 +552,14 @@ function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12';
       <button onclick="openUnitPage('${name}')" class="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-ink-soft hover:bg-mist hover:text-ink text-base font-semibold text-left">
         <i data-lucide="${defaultDb[name].icon}" class="w-4 h-4 text-navy shrink-0"></i> ${name}
       </button>`).join(''); const navUnitDropdown = document.getElementById('nav-unit-dropdown'); if(navUnitDropdown) navUnitDropdown.innerHTML = navDropdownHtml; const mobileUnitDropdown = document.getElementById('mobile-unit-dropdown'); if(mobileUnitDropdown){ mobileUnitDropdown.innerHTML = Object.keys(defaultDb).map(name => `
-        <button onclick="document.getElementById('mobile-menu').classList.add('hidden'); openUnitPage('${name}')" class="py-2 text-left text-sm text-ink-faint">&rarr; ${name}</button>`).join(''); } lucide.createIcons(); } let currentOpenUnit = null; let currentUnitTab = 'content'; const UNIT_TABS = ['content', 'carta', 'minit', 'reports']; function unitMatches(a, b){ return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase(); } function renderUnitPageContent(name){ const images = unitImagesCache.filter(i => unitMatches(i.unit, name)); const contentText = getUnitContent(name); const hero = extractHeroFields(contentText); const heroPhoto = images.length ? images[0].imageUrl : ''; const heroBox = document.getElementById('unit-hero-banner'); if(heroBox){ heroBox.innerHTML = `
+        <button onclick="document.getElementById('mobile-menu').classList.add('hidden'); openUnitPage('${name}')" class="py-2 text-left text-sm text-ink-faint">&rarr; ${name}</button>`).join(''); } lucide.createIcons(); } let currentOpenUnit = null; let currentUnitTab = 'content'; const UNIT_TABS = ['content', 'carta', 'minit', 'reports']; function unitMatches(a, b){ return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase(); } function renderUnitPageContent(name){ const images = unitImagesCache.filter(i => unitMatches(i.unit, name)); const contentText = getUnitContent(name); const hero = extractHeroFields(contentText); const heroBox = document.getElementById('unit-hero-banner'); if(heroBox){ heroBox.innerHTML = `
       <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0F2A4A,#16385E);">
         <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 80% 20%, white 1px, transparent 1px);background-size:22px 22px;"></div>
-        <div class="max-w-4xl mx-auto px-5 sm:px-8 py-10 sm:py-14 relative z-10 flex items-center gap-8">
-          <div class="flex-1 min-w-0">
-            <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Unit Sekolah</p>
-            <h2 class="font-display font-bold text-2xl sm:text-4xl text-white leading-tight mb-1">UNIT ${name.toUpperCase()}</h2>
-            <p class="font-display font-semibold text-base sm:text-xl text-white/70 mb-3">SEKOLAH KEBANGSAAN KRANGAN</p>
-            ${hero.tagline ? `<p class="text-white/85 text-sm sm:text-base max-w-md">${hero.tagline}</p>` : ''}
-          </div>
-          ${heroPhoto ? `<div class="hidden sm:block w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden shrink-0 border-4 border-white/10" style="background-image:url('${heroPhoto}');background-size:cover;background-position:center;"></div>` : ''}
+        <div class="max-w-4xl mx-auto px-5 sm:px-8 py-10 sm:py-14 relative z-10">
+          <p class="text-gold font-bold text-xs uppercase tracking-widest mb-2">Unit Sekolah</p>
+          <h2 class="font-display font-bold text-2xl sm:text-4xl text-white leading-tight mb-1">UNIT ${name.toUpperCase()}</h2>
+          <p class="font-display font-semibold text-base sm:text-xl text-white/70 mb-3">SEKOLAH KEBANGSAAN KRANGAN</p>
+          ${hero.tagline ? `<p class="text-white/85 text-sm sm:text-base max-w-md">${hero.tagline}</p>` : ''}
         </div>
       </div>`; } document.getElementById('unit-tab-content').innerHTML = `
       <div class="text-ink-soft leading-relaxed text-lg">${renderStructuredContent(contentText)}</div>
