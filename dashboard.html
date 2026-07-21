@@ -1598,6 +1598,7 @@ function renderModuleGrid(){
       <p class="relative text-sm text-ink-soft">Rekod kehadiran staf harian.</p>
     </button>`;
   idx++;
+  idx++;
   cards += `
     <button onclick="showModule('eopr')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden">
       <i data-lucide="file-text" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
@@ -2830,15 +2831,17 @@ function uploadCartaUnitPhoto(idx, event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadCartaUnitFoto', imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadcartaunitfoto', imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
         cartaState[idx].urlFoto = data.imageUrl;
         renderCartaRows();
         showToast('Foto berjaya dimuat naik. Jangan lupa klik Simpan.', 'success');
+      } else {
+        showToast('Gagal muat naik foto: ' + (data && data.error ? data.error : 'ralat tidak diketahui'), 'error');
       }
-    }catch(err){ showToast('Gagal muat naik foto.', 'error'); }
+    }catch(err){ showToast('Gagal muat naik foto. Semak sambungan internet.', 'error'); }
   };
   reader.readAsDataURL(file);
 }
