@@ -585,6 +585,30 @@
     </div>
   </div>
 
+  <!-- ============ MODUL: GALERI SEKOLAH (terbuka untuk semua staf) ============ -->
+  <div id="section-galeri" class="tab-content max-w-5xl mx-auto px-5 sm:px-8 py-10">
+    <button onclick="showModule('picker')" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-ink-soft hover:text-ink"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Papan Pemuka</button>
+    <div class="glass rounded-3xl p-8">
+      <h2 class="font-display font-semibold text-2xl text-ink mb-1">Galeri Sekolah</h2>
+      <p class="text-sm text-ink-soft mb-6">Muat naik gambar aktiviti/program untuk galeri sekolah di laman utama. Semua staf boleh sumbang foto di sini.</p>
+      <div id="galeri-standalone-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
+      <div class="bg-mist rounded-2xl p-5 space-y-3">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
+        <div class="grid sm:grid-cols-3 gap-2">
+          <input type="text" id="galeri-standalone-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <input type="date" id="galeri-standalone-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <input type="text" id="galeri-standalone-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
+        <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
+          <input type="file" accept="image/*" multiple class="hidden" onchange="uploadGaleriStandalone(event)">
+        </label>
+        <p id="galeri-standalone-progress" class="text-[11px] text-ink-faint hidden"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ MODUL: EHADIR (disisipkan) ============ -->
   <div id="section-ehadir" class="tab-content w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 relative">
             
@@ -1613,6 +1637,14 @@ function renderModuleGrid(){
   }
   idx++;
   cards += `
+    <button onclick="showModule('galeri')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+      <i data-lucide="images" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center mb-5"><i data-lucide="images" class="w-6 h-6 text-sky-700"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Galeri Sekolah</h3>
+      <p class="relative text-sm text-ink-soft">Muat naik gambar aktiviti untuk galeri sekolah.</p>
+    </button>`;
+  idx++;
+  cards += `
     <button onclick="showModule('ehadir')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
       <i data-lucide="user-check" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
       <div class="relative w-12 h-12 rounded-2xl bg-navy-50 flex items-center justify-center mb-5"><i data-lucide="user-check" class="w-6 h-6 text-navy"></i></div>
@@ -1657,6 +1689,7 @@ function showModule(id){
   document.body.style.overflow = (id === 'eopr') ? 'hidden' : '';
   if(id === 'cms') renderCmsTabs();
   if(id === 'staf') renderStaffManagementList();
+  if(id === 'galeri') loadGaleriSekolahStandalone();
 }
 
 /* =====================================================================
@@ -2771,8 +2804,75 @@ async function deleteHpGaleriPhoto(urlFoto){
       body: JSON.stringify({ action: 'deleteGaleri', urlFoto: urlFoto })
     });
     showToast('Foto galeri dipadam.', 'success');
-    setTimeout(() => { loadHpGaleri(); loadCmsGaleri(); }, 1000);
+    setTimeout(() => { loadHpGaleri(); loadCmsGaleri(); loadGaleriSekolahStandalone(); }, 1000);
   }catch(e){ showToast('Gagal padam foto galeri.', 'error'); }
+}
+
+/* ---- Galeri Sekolah (modul berdiri sendiri - terbuka untuk SEMUA staf) ---- */
+async function loadGaleriSekolahStandalone(){
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=galeri');
+    if(!res.ok) return;
+    const d = await res.json();
+    renderGaleriStandaloneGrid(Array.isArray(d) ? d : []);
+  }catch(e){ /* senyap */ }
+}
+function renderGaleriStandaloneGrid(photos){
+  const grid = document.getElementById('galeri-standalone-grid');
+  if(!grid) return;
+  if(!photos.length){
+    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto galeri dimuat naik lagi.</p>`;
+    return;
+  }
+  grid.innerHTML = photos.map(p => {
+    const label = [p.namaProgram, p.tempat].filter(Boolean).join(' &bull; ');
+    const fullInfo = [p.namaProgram, p.tarikh, p.tempat].filter(Boolean).join(' | ');
+    return `
+    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${fullInfo}">
+      ${label ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</div>` : ''}
+      <button onclick="deleteHpGaleriPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+        <i data-lucide="trash-2" class="w-3 h-3"></i>
+      </button>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+async function uploadGaleriStandalone(event){
+  const files = Array.from(event.target.files || []);
+  if(!files.length) return;
+
+  const namaProgram = document.getElementById('galeri-standalone-program').value.trim();
+  const tarikh = document.getElementById('galeri-standalone-tarikh').value;
+  const tempat = document.getElementById('galeri-standalone-tempat').value.trim();
+
+  if(!namaProgram){
+    showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
+    event.target.value = '';
+    return;
+  }
+
+  const progressEl = document.getElementById('galeri-standalone-progress');
+  progressEl.classList.remove('hidden');
+
+  let uploaded = 0;
+  for(const file of files){
+    progressEl.innerText = `Memuat naik ${uploaded + 1} / ${files.length}...`;
+    try{
+      const dataUrl = await readFileAsDataUrl_(file);
+      await fetch(CMS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+      });
+      uploaded++;
+      await new Promise(r => setTimeout(r, 400));
+    }catch(err){ /* teruskan ke fail seterusnya walaupun satu gagal */ }
+  }
+
+  progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
+  showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
+  event.target.value = '';
+  setTimeout(() => { progressEl.classList.add('hidden'); loadGaleriSekolahStandalone(); }, 1500);
 }
 
 
