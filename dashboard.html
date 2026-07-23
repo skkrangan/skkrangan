@@ -560,11 +560,16 @@
           <div>
             <h3 class="font-bold text-ink mb-1">Foto Hero (Slaid Halaman Utama)</h3>
             <p class="text-[11px] text-ink-faint mb-3">Foto yang beralih automatik di bahagian atas laman utama.</p>
-            <div id="hp-hero-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
-            <label class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all">
-              <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik Foto Hero
-              <input type="file" accept="image/*" class="hidden" onchange="uploadHpHeroPhoto(event)">
-            </label>
+            <p id="hp-hero-no-access" class="hidden text-xs text-ink-soft bg-mist rounded-xl px-4 py-3 flex items-center gap-2">
+              <i data-lucide="lock" class="w-3.5 h-3.5 shrink-0"></i> Hanya Guru Besar, GPK dan Guru ICT boleh urus Foto Hero.
+            </p>
+            <div id="hp-hero-controls">
+              <div id="hp-hero-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
+              <label class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik Foto Hero
+                <input type="file" accept="image/*" class="hidden" onchange="uploadHpHeroPhoto(event)">
+              </label>
+            </div>
           </div>
 
           <div class="border-t border-line"></div>
@@ -1373,7 +1378,7 @@ let staffData = [
   { id: 17, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
   { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
   { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.jpg' },
-  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
+  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Guru ICT', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
   { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-syuhada.webp' },
   { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
   { id: 16, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'ajeksumping140@gmail.com',               cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
@@ -1448,7 +1453,7 @@ function renderStaffManagementList(){
         </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Label Peranan <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
-          <input type="text" id="staf-${idx}-rolelabel" value="${(s.cmsRoleLabel||'').replace(/"/g,'&quot;')}" placeholder="cth. Penyelaras Digital" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <input type="text" id="staf-${idx}-rolelabel" value="${(s.cmsRoleLabel||'').replace(/"/g,'&quot;')}" placeholder="cth. Guru ICT" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
         </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Nama Fail Gambar <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
@@ -1597,10 +1602,10 @@ function handleGoogleCredential(response){
   }
 
   if(!isDelimaDomain(email)){
-    showLoginError(`Akaun "${email}" bukan akaun DELIMA yang sah, dan tidak ditemui dalam senarai staf berdaftar. Sila log masuk menggunakan akaun @moe-dl.edu.my/@moe.gov.my, atau hubungi Penyelaras Digital untuk daftarkan emel ini.`);
+    showLoginError(`Akaun "${email}" bukan akaun DELIMA yang sah, dan tidak ditemui dalam senarai staf berdaftar. Sila log masuk menggunakan akaun @moe-dl.edu.my/@moe.gov.my, atau hubungi Guru ICT untuk daftarkan emel ini.`);
     return;
   }
-  showLoginError(`Akaun DELIMA "${email}" sah, tetapi belum didaftarkan dalam sistem sekolah ini. Sila hubungi Penyelaras Digital.`);
+  showLoginError(`Akaun DELIMA "${email}" sah, tetapi belum didaftarkan dalam sistem sekolah ini. Sila hubungi Guru ICT.`);
 }
 
 function enterDashboard(){
@@ -2226,7 +2231,7 @@ function handleCmsImageChosen(event){
 async function uploadCmsImage(){
   if(!cmsActiveUnit) return;
   if(!isCmsBackendConfigured()){
-    showToast('Storan dikongsi belum disediakan lagi. Sila hubungi Penyelaras Digital.', 'error');
+    showToast('Storan dikongsi belum disediakan lagi. Sila hubungi Guru ICT.', 'error');
     return;
   }
   if(!cmsImageSelectedFile){
@@ -2687,8 +2692,24 @@ async function saveHpCartaUtama(){
   }catch(e){ showToast('Gagal simpan carta organisasi.', 'error'); }
 }
 
-/* ---- Foto Hero ---- */
+/* ---- Foto Hero: akses terhad kepada Guru Besar, GPK & Guru ICT ----
+   Semakan guna LabelPeranan (cmsRoleLabel) 'Guru ICT' pada rekod staf. */
+const HERO_MANAGER_ROLE_LABEL = 'Guru ICT';
+function canManageHeroPhotos(){
+  if(!currentUser) return false;
+  const pos = (currentUser.position || '').trim();
+  if(pos === 'Guru Besar') return true;
+  if(pos.indexOf('Guru Penolong Kanan') === 0) return true; // GPK (semua bidang)
+  if((currentUser.cmsRoleLabel || '').trim() === HERO_MANAGER_ROLE_LABEL) return true; // Guru ICT
+  return false;
+}
 async function loadHpHeroPhotos(){
+  const allowed = canManageHeroPhotos();
+  const controls = document.getElementById('hp-hero-controls');
+  const noAccess = document.getElementById('hp-hero-no-access');
+  if(controls) controls.classList.toggle('hidden', !allowed);
+  if(noAccess) noAccess.classList.toggle('hidden', allowed);
+  if(!allowed) return;
   try{
     const res = await fetch(CMS_SCRIPT_URL + '?action=fotohero');
     if(!res.ok) return;
@@ -2712,6 +2733,7 @@ function renderHpHeroGrid(photos){
   lucide.createIcons();
 }
 function uploadHpHeroPhoto(event){
+  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
@@ -2721,7 +2743,7 @@ function uploadHpHeroPhoto(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadFotoHero', imageBase64: e.target.result, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadFotoHero', imageBase64: e.target.result, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
       });
       showToast('Foto hero berjaya dimuat naik.', 'success');
       setTimeout(loadHpHeroPhotos, 1200);
@@ -2730,12 +2752,13 @@ function uploadHpHeroPhoto(event){
   reader.readAsDataURL(file);
 }
 async function deleteHpHeroPhoto(urlFoto){
+  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
   if(!confirm('Padam foto hero ini?')) return;
   try{
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteFotoHero', urlFoto: urlFoto })
+      body: JSON.stringify({ action: 'deleteFotoHero', urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
     });
     showToast('Foto hero dipadam.', 'success');
     setTimeout(loadHpHeroPhotos, 1000);
@@ -3345,10 +3368,10 @@ window.onload = function(){
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
         const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi', 'Luar Pejabat : Urusan Peribadi'];
         // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
-        // Penyelaras Digital sahaja - staf lain (termasuk GB/GPK) cuma boleh
+        // Guru ICT sahaja - staf lain (termasuk GB/GPK) cuma boleh
         // hantar status untuk hari semasa sahaja.
         function canUseMultiDay_(){
-            return !!(currentUser && currentUser.cmsRoleLabel === 'Penyelaras Digital');
+            return !!(currentUser && currentUser.cmsRoleLabel === 'Guru ICT');
         }
         let allRecords = [];
         let summaryChartInstance = null;
@@ -4862,7 +4885,7 @@ function updatePreview() {
 
     async function saveDraf(){
       if(!isCmsBackendConfigured()){
-        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Penyelaras Digital.', 'bg-amber-500');
+        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Guru ICT.', 'bg-amber-500');
         return;
       }
       const btn = document.getElementById('btn-save-draf');
@@ -4996,7 +5019,7 @@ function updatePreview() {
 
     async function saveReportToPortal() {
       if(!isCmsBackendConfigured()){
-        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Penyelaras Digital.', 'bg-amber-500');
+        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Guru ICT.', 'bg-amber-500');
         return;
       }
       const btn = document.getElementById('btn-save-portal');
