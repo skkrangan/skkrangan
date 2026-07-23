@@ -537,6 +537,25 @@
 
           <div class="border-t border-line"></div>
 
+          <!-- Pengumuman (jalur atas laman utama) -->
+          <div>
+            <h3 class="font-bold text-ink mb-1">Pengumuman Penting (Jalur Atas)</h3>
+            <p class="text-[11px] text-ink-faint mb-3">Papar di jalur navy paling atas laman utama. Bila tiada pengumuman aktif, jalur automatik papar acara Takwim terdekat.</p>
+            <div class="grid lg:grid-cols-2 gap-6 lg:items-start">
+              <div class="min-w-0">
+                <div id="hp-pengumuman-list" class="space-y-3"></div>
+                <button onclick="addHpPengumumanRow()" class="mt-2 text-xs font-bold text-navy hover:text-gold flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Tambah Pengumuman</button>
+                <div><button onclick="saveHpPengumuman()" class="mt-3 text-xs font-bold bg-navy text-white px-4 py-2 rounded-full hover:bg-navy-deep transition-all">Simpan Pengumuman</button></div>
+              </div>
+              <div class="lg:sticky lg:top-6 lg:self-start">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-2 flex items-center gap-1.5"><i data-lucide="eye" class="w-3 h-3"></i> Previu Jalur Atas</p>
+                <div id="hp-pengumuman-preview" class="space-y-2"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-line"></div>
+
           <!-- Carta Organisasi Utama -->
           <div>
             <h3 class="font-bold text-ink mb-1">Carta Organisasi Utama</h3>
@@ -2336,6 +2355,7 @@ async function deleteCmsReport(imageUrl){
    PANEL LAMAN UTAMA - Statistik, Profil, Takwim, Carta Utama, Foto Hero
    ============================================================ */
 let hpTakwimData = [];
+let hpPengumumanData = [];
 let hpCartaData = [];
 
 async function selectCmsHomepage(){
@@ -2350,6 +2370,7 @@ async function selectCmsHomepage(){
   loadHpStatistik();
   loadHpProfil();
   loadHpTakwim();
+  loadHpPengumuman();
   loadHpCartaUtama();
   loadHpHeroPhotos();
   loadHpGaleri();
@@ -2597,6 +2618,83 @@ async function saveHpTakwim(){
     });
     showToast('Takwim berjaya disimpan.', 'success');
   }catch(e){ showToast('Gagal simpan takwim.', 'error'); }
+}
+
+/* ---- Pengumuman Penting (jalur atas laman utama) ---- */
+async function loadHpPengumuman(){
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=pengumumansemua');
+    if(!res.ok) return;
+    const d = await res.json();
+    hpPengumumanData = Array.isArray(d) ? d : [];
+    renderHpPengumumanList();
+  }catch(e){ /* senyap */ }
+}
+function renderHpPengumumanList(){
+  const container = document.getElementById('hp-pengumuman-list');
+  if(!container) return;
+  if(!hpPengumumanData.length){
+    container.innerHTML = `<p class="text-xs text-ink-faint italic">Tiada pengumuman lagi. Klik "Tambah Pengumuman".</p>`;
+    updateHpPengumumanPreview();
+    return;
+  }
+  container.innerHTML = hpPengumumanData.map((it, idx) => `
+    <div class="bg-mist rounded-xl p-3 space-y-2">
+      <input type="text" value="${(it.tajuk||'').replace(/"/g,'&quot;')}" placeholder="Teks pengumuman (cth. Mesyuarat PIBG pada 5 Ogos)" oninput="hpPengumumanData[${idx}].tajuk=this.value; updateHpPengumumanPreview()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+      <div class="grid grid-cols-2 xl:grid-cols-[1fr_1fr_auto_auto_auto] gap-2 items-center">
+        <input type="date" value="${it.tarikhMula||''}" oninput="hpPengumumanData[${idx}].tarikhMula=this.value; updateHpPengumumanPreview()" title="Mula papar" class="bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        <input type="date" value="${it.tarikhTamat||''}" oninput="hpPengumumanData[${idx}].tarikhTamat=this.value; updateHpPengumumanPreview()" title="Luput selepas" class="bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        <input type="number" value="${it.keutamaan||0}" oninput="hpPengumumanData[${idx}].keutamaan=Number(this.value); updateHpPengumumanPreview()" title="Keutamaan (nombor lebih tinggi papar dulu)" class="w-16 bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-ink-soft px-1"><input type="checkbox" ${it.aktif !== false ? 'checked' : ''} onchange="hpPengumumanData[${idx}].aktif=this.checked; updateHpPengumumanPreview()" class="rounded border-line text-navy focus:ring-navy"> Aktif</label>
+        <button onclick="removeHpPengumumanRow(${idx})" class="text-rose-500 hover:text-rose-700 p-2 justify-self-end"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+  updateHpPengumumanPreview();
+}
+// Previu - tiru logik laman awam: pengumuman aktif & belum luput, keutamaan tertinggi dulu.
+function updateHpPengumumanPreview(){
+  const box = document.getElementById('hp-pengumuman-preview');
+  if(!box) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const valid = hpPengumumanData.filter(it => {
+    if(!it.tajuk || it.tajuk.trim() === '') return false;
+    if(it.aktif === false) return false;
+    const endDate = it.tarikhTamat || it.tarikhMula;
+    if(endDate && new Date(endDate + 'T23:59:59') < today) return false;
+    return true;
+  }).sort((a,b) => (b.keutamaan||0) - (a.keutamaan||0));
+  if(!valid.length){
+    box.innerHTML = '<p class="text-xs text-ink-faint italic">Tiada pengumuman aktif - jalur atas akan papar acara Takwim terdekat secara automatik.</p>';
+    return;
+  }
+  box.innerHTML = valid.map((it, i) => `
+    <div class="bg-navy rounded-xl px-4 py-3 flex items-center gap-2 ${i===0 ? '' : 'opacity-50'}">
+      <i data-lucide="megaphone" class="w-3.5 h-3.5 text-gold shrink-0"></i>
+      <span class="text-sm font-semibold text-white">${it.tajuk}</span>
+      ${i===0 ? '<span class="ml-auto text-[10px] font-bold text-gold uppercase">Papar</span>' : '<span class="ml-auto text-[10px] font-bold text-white/40 uppercase">Giliran</span>'}
+    </div>`).join('');
+  lucide.createIcons();
+}
+function addHpPengumumanRow(){
+  hpPengumumanData.push({ tajuk: '', tarikhMula: '', tarikhTamat: '', aktif: true, keutamaan: 0 });
+  renderHpPengumumanList();
+}
+function removeHpPengumumanRow(idx){
+  hpPengumumanData.splice(idx, 1);
+  renderHpPengumumanList();
+}
+async function saveHpPengumuman(){
+  showToast('Menyimpan pengumuman...', 'info');
+  try{
+    await fetch(CMS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'savePengumuman', items: hpPengumumanData, editor: currentUser.name })
+    });
+    showToast('Pengumuman berjaya disimpan.', 'success');
+  }catch(e){ showToast('Gagal simpan pengumuman.', 'error'); }
 }
 
 /* ---- Carta Organisasi Utama ---- */
