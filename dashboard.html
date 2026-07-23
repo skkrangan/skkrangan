@@ -565,10 +565,19 @@
             </p>
             <div id="hp-hero-controls">
               <div id="hp-hero-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
-              <label class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all">
-                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik Foto Hero
-                <input type="file" accept="image/*" class="hidden" onchange="uploadHpHeroPhoto(event)">
-              </label>
+              <div class="flex flex-wrap items-center gap-2 mb-3">
+                <label class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik Foto Hero
+                  <input type="file" accept="image/*" class="hidden" onchange="uploadHpHeroPhoto(event)">
+                </label>
+                <button type="button" onclick="toggleHpHeroGaleriPicker()" id="hp-hero-galeri-picker-btn" class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full transition-all">
+                  <i data-lucide="images" class="w-3.5 h-3.5"></i> Pilih dari Galeri Sekolah
+                </button>
+              </div>
+              <div id="hp-hero-galeri-picker" class="hidden bg-mist rounded-2xl p-4">
+                <p class="text-[11px] text-ink-faint mb-3">Tandakan (tick) foto Galeri Sekolah yang nak dipaparkan dalam slaid hero. Nyahtanda untuk buang daripada slaid.</p>
+                <div id="hp-hero-galeri-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+              </div>
             </div>
           </div>
 
@@ -2763,6 +2772,90 @@ async function deleteHpHeroPhoto(urlFoto){
     showToast('Foto hero dipadam.', 'success');
     setTimeout(loadHpHeroPhotos, 1000);
   }catch(e){ showToast('Gagal padam foto hero.', 'error'); }
+}
+
+/* ---- Foto Hero: pilih terus dari Galeri Sekolah (tick/nyahtick), tanpa muat naik semula ---- */
+let hpHeroGaleriPickerOpen = false;
+let hpHeroGaleriPhotosCache = [];
+let hpHeroUrlSet = new Set();
+
+function toggleHpHeroGaleriPicker(){
+  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
+  hpHeroGaleriPickerOpen = !hpHeroGaleriPickerOpen;
+  const box = document.getElementById('hp-hero-galeri-picker');
+  if(box) box.classList.toggle('hidden', !hpHeroGaleriPickerOpen);
+  if(hpHeroGaleriPickerOpen) loadHpHeroGaleriPicker();
+}
+
+async function loadHpHeroGaleriPicker(){
+  const grid = document.getElementById('hp-hero-galeri-grid');
+  if(!grid) return;
+  grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Memuatkan galeri...</p>`;
+  try{
+    const [galeriRes, heroRes] = await Promise.all([
+      fetch(CMS_SCRIPT_URL + '?action=galeri'),
+      fetch(CMS_SCRIPT_URL + '?action=fotohero')
+    ]);
+    const galeriPhotos = galeriRes.ok ? await galeriRes.json() : [];
+    const heroPhotos = heroRes.ok ? await heroRes.json() : [];
+    hpHeroGaleriPhotosCache = Array.isArray(galeriPhotos) ? galeriPhotos : [];
+    hpHeroUrlSet = new Set((Array.isArray(heroPhotos) ? heroPhotos : []).map(p => p.urlFoto));
+    renderHpHeroGaleriGrid();
+  }catch(e){ grid.innerHTML = `<p class="col-span-full text-xs text-rose-500 italic">Gagal memuatkan Galeri Sekolah.</p>`; }
+}
+
+function renderHpHeroGaleriGrid(){
+  const grid = document.getElementById('hp-hero-galeri-grid');
+  if(!grid) return;
+  if(!hpHeroGaleriPhotosCache.length){
+    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto dalam Galeri Sekolah lagi.</p>`;
+    return;
+  }
+  grid.innerHTML = hpHeroGaleriPhotosCache.map(p => {
+    const checked = hpHeroUrlSet.has(p.urlFoto);
+    const label = [p.namaProgram, p.tempat].filter(Boolean).join(' &bull; ');
+    const safeUrl = p.urlFoto.replace(/'/g, "\\'");
+    return `
+    <button type="button" onclick="toggleHpHeroFromGaleri('${safeUrl}')" class="relative aspect-square rounded-xl overflow-hidden border-2 ${checked ? 'border-navy' : 'border-line'} text-left transition-all" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${label}">
+      <span class="absolute inset-0 ${checked ? 'bg-navy/25' : 'bg-black/0 group-hover:bg-black/10'}"></span>
+      <span class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center border border-white/70 ${checked ? 'bg-navy text-white' : 'bg-white/70 text-transparent'}">
+        <i data-lucide="check" class="w-3 h-3"></i>
+      </span>
+      ${label ? `<span class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</span>` : ''}
+    </button>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+async function toggleHpHeroFromGaleri(urlFoto){
+  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
+  const alreadyIn = hpHeroUrlSet.has(urlFoto);
+  // Optimistik: kemas kini paparan dahulu, hantar permintaan pada masa sama
+  if(alreadyIn) hpHeroUrlSet.delete(urlFoto); else hpHeroUrlSet.add(urlFoto);
+  renderHpHeroGaleriGrid();
+  try{
+    if(alreadyIn){
+      await fetch(CMS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'deleteFotoHero', urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+      });
+      showToast('Foto dibuang dari slaid hero.', 'success');
+    } else {
+      await fetch(CMS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'addFotoHeroLink', urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+      });
+      showToast('Foto ditambah ke slaid hero.', 'success');
+    }
+    setTimeout(loadHpHeroPhotos, 900);
+  }catch(e){
+    // gagal - kembalikan status asal
+    if(alreadyIn) hpHeroUrlSet.add(urlFoto); else hpHeroUrlSet.delete(urlFoto);
+    renderHpHeroGaleriGrid();
+    showToast('Tindakan gagal, cuba lagi.', 'error');
+  }
 }
 
 /* ---- Galeri Sekolah (dikongsi semua unit - dipanggil dari tab Kandungan Unit) ---- */
