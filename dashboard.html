@@ -3363,9 +3363,9 @@ async function saveCmsContent(){
 /* =====================================================================
    PERMULAAN SISTEM
    ===================================================================== */
-window.onload = function(){
+window.onload = async function(){
   lucide.createIcons();
-  syncStaffFromBackend();
+  await syncStaffFromBackend(); // TUNGGU data staf terkini dari Sheet dahulu, elak currentUser terperangkap data lama
 
   if(typeof google !== 'undefined'){
     google.accounts.id.initialize({
@@ -3375,7 +3375,7 @@ window.onload = function(){
     google.accounts.id.renderButton(document.getElementById('g_id_signin'), { theme:'filled_blue', size:'large', shape:'pill', text:'signin_with' });
   }
 
-  // Cuba pulihkan sesi log masuk sebelumnya
+  // Cuba pulihkan sesi log masuk sebelumnya (staffData di atas ini dah pasti versi terkini)
   try{
     const session = JSON.parse(localStorage.getItem('dashboard_session'));
     if(session){
