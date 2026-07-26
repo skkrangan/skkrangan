@@ -1678,46 +1678,56 @@ function renderModuleGrid(){
   if(currentUser.cmsUnits && currentUser.cmsUnits.length > 0){
     idx++;
     cards += `
-      <button onclick="showModule('cms')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+      <button onclick="showModule('cms')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#C08A3E;">
         <i data-lucide="layout-template" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-        <div class="relative w-12 h-12 rounded-2xl bg-gold-soft flex items-center justify-center mb-5"><i data-lucide="layout-template" class="w-6 h-6 text-gold"></i></div>
+        <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F3E7D3;"><i data-lucide="layout-template" class="w-7 h-7" style="color:#C08A3E;"></i></div>
         <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kandungan Laman Web</h3>
-        <p class="relative text-sm text-ink-soft">Edit kandungan: ${currentUser.cmsUnits.join(', ')}</p>
+        <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#C08A3E;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#C08A3E;"></span></div>
+        <p class="relative text-sm text-ink-soft pr-10">Edit kandungan: ${currentUser.cmsUnits.join(', ')}</p>
+        <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
       </button>`;
   }
   idx++;
   cards += `
-    <button onclick="showModule('galeri')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+    <button onclick="showModule('galeri')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#2563EB;">
       <i data-lucide="images" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center mb-5"><i data-lucide="images" class="w-6 h-6 text-sky-700"></i></div>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#DBEAFE;"><i data-lucide="images" class="w-7 h-7" style="color:#2563EB;"></i></div>
       <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Galeri Sekolah</h3>
-      <p class="relative text-sm text-ink-soft">Muat naik gambar aktiviti untuk galeri sekolah.</p>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#2563EB;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#2563EB;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">Muat naik gambar aktiviti untuk galeri sekolah.</p>
+      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
     </button>`;
   idx++;
   cards += `
-    <button onclick="showModule('ehadir')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+    <button onclick="showModule('ehadir')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#4F46E5;">
       <i data-lucide="user-check" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-12 h-12 rounded-2xl bg-navy-50 flex items-center justify-center mb-5"><i data-lucide="user-check" class="w-6 h-6 text-navy"></i></div>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#E0E7FF;"><i data-lucide="user-check" class="w-7 h-7" style="color:#4F46E5;"></i></div>
       <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Sistem eHadir</h3>
-      <p class="relative text-sm text-ink-soft">Rekod kehadiran staf harian.</p>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#4F46E5;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#4F46E5;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">Rekod kehadiran staf harian.</p>
+      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
     </button>`;
   idx++;
   idx++;
   cards += `
-    <button onclick="showModule('eopr')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden">
+    <button onclick="showModule('eopr')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#A23B3B;">
       <i data-lucide="file-text" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-12 h-12 rounded-2xl bg-crimson-soft flex items-center justify-center mb-5"><i data-lucide="file-text" class="w-6 h-6 text-crimson"></i></div>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F5E1E1;"><i data-lucide="file-text" class="w-7 h-7" style="color:#A23B3B;"></i></div>
       <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Laporan eOPR</h3>
-      <p class="relative text-sm text-ink-soft">Jana laporan One Page Report.</p>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#A23B3B;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#A23B3B;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">Jana laporan One Page Report.</p>
+      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
     </button>`;
   if(currentUser.canViewAttendanceDashboard){
     idx++;
     cards += `
-      <button onclick="showModule('staf')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden">
+      <button onclick="showModule('staf')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#16A34A;">
         <i data-lucide="users" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-        <div class="relative w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center mb-5"><i data-lucide="users" class="w-6 h-6 text-emerald-700"></i></div>
+        <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#DCFCE7;"><i data-lucide="users" class="w-7 h-7" style="color:#16A34A;"></i></div>
         <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Urus Staf</h3>
-        <p class="relative text-sm text-ink-soft">Tambah/kemas kini staf & akses sistem.</p>
+        <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#16A34A;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#16A34A;"></span></div>
+        <p class="relative text-sm text-ink-soft pr-10">Tambah/kemas kini staf & akses sistem.</p>
+        <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
       </button>`;
   }
   grid.innerHTML = cards;
