@@ -1569,7 +1569,7 @@ async function deleteStaffCard(idx){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deletestaf', id: s.id })
+      body: JSON.stringify({ action: 'deletestaf', apiSecret: DASHBOARD_API_SECRET, id: s.id })
     });
   }catch(e){ /* teruskan padam tempatan walaupun rangkaian gagal - senyap */ }
   staffData.splice(idx, 1);
@@ -1760,6 +1760,9 @@ function showModule(id){
    keadaan tersebut, cuma tidak berkongsi merentasi peranti.
    ===================================================================== */
 const CMS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypJbiN7WhcGZvII2P21z5THtfMMOAi0FG33kD3Xmc-LYLlhUsKyBSVfZ4zoYD6y7JY/exec";
+// Kunci perkongsian ringkas - elak panggilan terus/rambang ke URL Apps Script oleh pihak luar.
+// Ini BUKAN keselamatan penuh (kod boleh dilihat di View Source), tapi menghalang kebanyakan cubaan tidak sengaja/automatik.
+const DASHBOARD_API_SECRET = "M6L1NmeZ_IaHsIJf6SQ-y98KSakyuaiJ";
 // Skrip AI Proxy berasingan (berdiri sendiri, akaun peribadi) - khusus untuk
 // ciri "Bantu Tulis dengan AI". Berasingan daripada CMS_SCRIPT_URL supaya tiada
 // konflik kebenaran dengan akaun DELIMA yang memiliki Sheet CMS.
@@ -1897,7 +1900,7 @@ async function aiAssist(fieldId, contextLabel){
     const res = await fetch(AI_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'aiGenerate', context: contextLabel, roughText: roughText }),
+      body: JSON.stringify({ action: 'aiGenerate', apiSecret: DASHBOARD_API_SECRET, context: contextLabel, roughText: roughText }),
       signal: controller.signal
     });
     clearTimeout(timeoutId);
@@ -2255,7 +2258,7 @@ async function deleteCmsReport(imageUrl){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteReport', imageUrl: imageUrl })
+      body: JSON.stringify({ action: 'deleteReport', apiSecret: DASHBOARD_API_SECRET, imageUrl: imageUrl })
     });
     showToast('Laporan berjaya dipadam.', 'success');
     setTimeout(() => loadCmsReports(cmsActiveUnit), 1000);
@@ -2333,7 +2336,7 @@ async function saveHpStatistik(){
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'saveStatistik',
+        action: 'saveStatistik', apiSecret: DASHBOARD_API_SECRET,
         murid: v('hp-stat-murid'), guru: v('hp-stat-guru'), staf: v('hp-stat-staf'), kelas: v('hp-stat-kelas'),
         muridLelaki: v('hp-stat-murid-lelaki'), muridPerempuan: v('hp-stat-murid-perempuan'),
         kelasPra: v('hp-stat-kelas-pra'), kelasTahun16: v('hp-stat-kelas-tahun16'),
@@ -2424,7 +2427,7 @@ function uploadFotoGuruBesar(event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadfotogurubesar', imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadfotogurubesar', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
@@ -2451,7 +2454,7 @@ async function saveHpProfil(){
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'saveProfil',
+        action: 'saveProfil', apiSecret: DASHBOARD_API_SECRET,
         visi: document.getElementById('hp-profil-visi').value,
         misi: document.getElementById('hp-profil-misi').value,
         moto: document.getElementById('hp-profil-moto').value,
@@ -2533,7 +2536,7 @@ async function saveHpTakwim(){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'saveTakwim', events: hpTakwimData, editor: currentUser.name })
+      body: JSON.stringify({ action: 'saveTakwim', apiSecret: DASHBOARD_API_SECRET, events: hpTakwimData, editor: currentUser.name })
     });
     showToast('Takwim berjaya disimpan.', 'success');
   }catch(e){ showToast('Gagal simpan takwim.', 'error'); }
@@ -2610,7 +2613,7 @@ async function saveHpPengumuman(){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'savePengumuman', items: hpPengumumanData, editor: currentUser.name })
+      body: JSON.stringify({ action: 'savePengumuman', apiSecret: DASHBOARD_API_SECRET, items: hpPengumumanData, editor: currentUser.name })
     });
     showToast('Pengumuman berjaya disimpan.', 'success');
   }catch(e){ showToast('Gagal simpan pengumuman.', 'error'); }
@@ -2694,7 +2697,7 @@ function uploadHpCartaPhoto(idx, event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadCartaUtamaFoto', imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadCartaUtamaFoto', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
@@ -2712,7 +2715,7 @@ async function saveHpCartaUtama(){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'saveCartaUtama', members: hpCartaData, editor: currentUser.name })
+      body: JSON.stringify({ action: 'saveCartaUtama', apiSecret: DASHBOARD_API_SECRET, members: hpCartaData, editor: currentUser.name })
     });
     showToast('Carta organisasi berjaya disimpan.', 'success');
   }catch(e){ showToast('Gagal simpan carta organisasi.', 'error'); }
@@ -2769,7 +2772,7 @@ function uploadHpHeroPhoto(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadFotoHero', imageBase64: e.target.result, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+        body: JSON.stringify({ action: 'uploadFotoHero', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
       });
       showToast('Foto hero berjaya dimuat naik.', 'success');
       setTimeout(loadHpHeroPhotos, 1200);
@@ -2784,7 +2787,7 @@ async function deleteHpHeroPhoto(urlFoto){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteFotoHero', urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+      body: JSON.stringify({ action: 'deleteFotoHero', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
     });
     showToast('Foto hero dipadam.', 'success');
     setTimeout(loadHpHeroPhotos, 1000);
@@ -2855,14 +2858,14 @@ async function toggleHpHeroFromGaleri(urlFoto){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'deleteFotoHero', urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+        body: JSON.stringify({ action: 'deleteFotoHero', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
       });
       showToast('Foto dibuang dari slaid hero.', 'success');
     } else {
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'addFotoHeroLink', urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+        body: JSON.stringify({ action: 'addFotoHeroLink', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
       });
       showToast('Foto ditambah ke slaid hero.', 'success');
     }
@@ -2929,7 +2932,7 @@ async function uploadCmsGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       await new Promise(r => setTimeout(r, 400));
@@ -3005,7 +3008,7 @@ async function uploadHpGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       // Jeda kecil antara setiap muat naik supaya tak bebankan backend serentak semasa upload pukal.
@@ -3024,7 +3027,7 @@ async function deleteHpGaleriPhoto(urlFoto){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteGaleri', urlFoto: urlFoto })
+      body: JSON.stringify({ action: 'deleteGaleri', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto })
     });
     showToast('Foto galeri dipadam.', 'success');
     setTimeout(() => { loadHpGaleri(); loadCmsGaleri(); loadGaleriSekolahStandalone(); }, 1000);
@@ -3085,7 +3088,7 @@ async function uploadGaleriStandalone(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       await new Promise(r => setTimeout(r, 400));
@@ -3176,7 +3179,7 @@ function uploadCartaUnitPhoto(idx, event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadcartaunitfoto', imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadcartaunitfoto', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
@@ -3248,7 +3251,7 @@ async function saveCartaUnit(){
     await fetch(CMS_SCRIPT_URL, {
       method:'POST', mode:'no-cors',
       headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ action:'saveCarta', unit: cmsActiveUnit, members: cartaState.filter(m=>m.nama && m.nama.trim()!==''), editor: currentUser.name })
+      body: JSON.stringify({ action:'saveCarta', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, members: cartaState.filter(m=>m.nama && m.nama.trim()!==''), editor: currentUser.name })
     });
     status.innerText = 'Disimpan ' + new Date().toLocaleTimeString('ms-MY');
     showToast('Carta Organisasi berjaya dikemas kini!', 'success');
@@ -3292,7 +3295,7 @@ async function deleteCmsMinit(fileUrl){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteMinit', fileUrl: fileUrl })
+      body: JSON.stringify({ action: 'deleteMinit', apiSecret: DASHBOARD_API_SECRET, fileUrl: fileUrl })
     });
     showToast('Minit mesyuarat berjaya dipadam.', 'success');
     setTimeout(() => loadMinitForUnit(cmsActiveUnit), 1000);
@@ -3328,7 +3331,7 @@ async function uploadMinit(){
       await fetch(CMS_SCRIPT_URL, {
         method:'POST', mode:'no-cors',
         headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ action:'uploadMinit', unit: cmsActiveUnit, title: title, meetingDate: meetingDate, fileBase64: reader.result, editor: currentUser.name })
+        body: JSON.stringify({ action:'uploadMinit', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, title: title, meetingDate: meetingDate, fileBase64: reader.result, editor: currentUser.name })
       });
       status.innerText = '';
       showToast('Minit Mesyuarat berjaya dimuat naik!', 'success');
@@ -3822,7 +3825,7 @@ window.onload = async function(){
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'cancel', id: currentUser.id, date: dateStr })
+                    body: JSON.stringify({ action: 'cancel', apiSecret: DASHBOARD_API_SECRET, id: currentUser.id, date: dateStr })
                 });
                 showToast(`Tarikh ${dateStr} dibatalkan.`, 'success');
                 setTimeout(async () => { await fetchRecordsQuietly(); }, 800);
@@ -5016,7 +5019,7 @@ function updatePreview() {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            action: 'simpandraf',
+            action: 'simpandraf', apiSecret: DASHBOARD_API_SECRET,
             id: currentDrafId,
             editorEmail: (currentUser && currentUser.delimaEmail) || '',
             editorName: (currentUser && currentUser.name) || '',
@@ -5118,7 +5121,7 @@ function updatePreview() {
         await fetch(CMS_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'padamdraf', id: id })
+          body: JSON.stringify({ action: 'padamdraf', apiSecret: DASHBOARD_API_SECRET, id: id })
         });
         showToastOPR('Draf dipadam.', 'bg-slate-700');
         openDrafListModal();
@@ -5148,7 +5151,7 @@ function updatePreview() {
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            action: 'saveReport',
+            action: 'saveReport', apiSecret: DASHBOARD_API_SECRET,
             unit: unitForPortal,
             title: state.title,
             programDate: (state.datetime || '').split('\n')[0] || '',
