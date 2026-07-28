@@ -400,6 +400,7 @@
   <div class="max-w-4xl w-full">
     <img id="galeri-lightbox-img" src="" alt="Galeri" loading="lazy" decoding="async" class="w-full max-h-[80vh] object-contain rounded-2xl">
     <p id="galeri-lightbox-caption" class="text-white/80 text-center mt-4 text-base"></p>
+    <p id="galeri-lightbox-hint" class="text-white/50 text-center mt-1.5 text-sm items-center justify-center gap-1.5" style="display:none;"><i data-lucide="move-horizontal" class="w-3.5 h-3.5"></i> Guna anak panah &lsaquo; &rsaquo; untuk lihat foto lain dalam album ini</p>
   </div>
 </div>
 
@@ -465,8 +466,11 @@
       <button onclick="switchUnitPageTab('minit')" id="unit-tab-btn-minit" class="unit-page-tab-btn shrink-0 flex items-center gap-1.5 px-3.5 py-2.5 rounded-t-xl text-sm sm:text-base font-bold border-b-2 transition-all">
         <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Minit Mesyuarat
       </button>
+      <button onclick="switchUnitPageTab('galeri')" id="unit-tab-btn-galeri" class="unit-page-tab-btn shrink-0 flex items-center gap-1.5 px-3.5 py-2.5 rounded-t-xl text-sm sm:text-base font-bold border-b-2 transition-all">
+        <i data-lucide="images" class="w-3.5 h-3.5"></i> Galeri Aktiviti
+      </button>
       <button onclick="switchUnitPageTab('reports')" id="unit-tab-btn-reports" class="unit-page-tab-btn shrink-0 flex items-center gap-1.5 px-3.5 py-2.5 rounded-t-xl text-sm sm:text-base font-bold border-b-2 transition-all">
-        <i data-lucide="image" class="w-3.5 h-3.5"></i> Laporan Aktiviti
+        <i data-lucide="image" class="w-3.5 h-3.5"></i> Laporan OPR
       </button>
     </div>
   </div>
@@ -477,6 +481,7 @@
     <div id="unit-tab-content" class="unit-page-tab-content"></div>
     <div id="unit-tab-carta" class="unit-page-tab-content hidden"></div>
     <div id="unit-tab-minit" class="unit-page-tab-content hidden"></div>
+    <div id="unit-tab-galeri" class="unit-page-tab-content hidden"></div>
     <div id="unit-tab-reports" class="unit-page-tab-content hidden"></div>
   </div>
 </div>
@@ -679,8 +684,8 @@ function groupUnitImages(images){
   images.forEach((img, idx) => {
     const key = (img.caption || '').trim();
     const mapKey = key === '' ? ('__tunggal__' + idx) : key;
-    if(!groupsMap.has(mapKey)){ groupsMap.set(mapKey, { namaProgram: key, tempat: '', photos: [] }); order.push(mapKey); }
-    groupsMap.get(mapKey).photos.push({ urlFoto: img.imageUrl, tarikh: '', tempat: '' });
+    if(!groupsMap.has(mapKey)){ groupsMap.set(mapKey, { namaProgram: key, tempat: img.tempat || '', photos: [] }); order.push(mapKey); }
+    groupsMap.get(mapKey).photos.push({ urlFoto: img.imageUrl, tarikh: img.tarikhProgram || '', tempat: img.tempat || '' });
   });
   return order.map(k => groupsMap.get(k));
 }
@@ -736,6 +741,8 @@ function renderGaleriLightboxPhoto(){
   const prevBtn = document.getElementById('galeri-lightbox-prev'); const nextBtn = document.getElementById('galeri-lightbox-next');
   if(prevBtn) prevBtn.style.display = showNav ? 'flex' : 'none';
   if(nextBtn) nextBtn.style.display = showNav ? 'flex' : 'none';
+  const hintEl = document.getElementById('galeri-lightbox-hint');
+  if(hintEl) hintEl.style.display = showNav ? 'flex' : 'none';
   lucide.createIcons();
 }
 function galeriLightboxPrev(event){ if(event) event.stopPropagation(); const group = galeriGroups[currentGaleriGroupIdx]; if(!group) return; currentGaleriPhotoIdx = (currentGaleriPhotoIdx - 1 + group.photos.length) % group.photos.length; renderGaleriLightboxPhoto(); }
@@ -749,7 +756,7 @@ function closeGaleriLightbox(event){ if(event && event.target.closest('img')) re
       <button onclick="openUnitPage('${name}')" class="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-ink-soft hover:bg-mist hover:text-ink text-base font-semibold text-left">
         <i data-lucide="${defaultDb[name].icon}" class="w-4 h-4 text-navy shrink-0"></i> ${name}
       </button>`).join(''); const navUnitDropdown = document.getElementById('nav-unit-dropdown'); if(navUnitDropdown) navUnitDropdown.innerHTML = navDropdownHtml; const mobileUnitDropdown = document.getElementById('mobile-unit-dropdown'); if(mobileUnitDropdown){ mobileUnitDropdown.innerHTML = Object.keys(defaultDb).map(name => `
-        <button onclick="document.getElementById('mobile-menu').classList.add('hidden'); openUnitPage('${name}')" class="py-2 text-left text-base text-ink-faint">&rarr; ${name}</button>`).join(''); } lucide.createIcons(); } let currentOpenUnit = null; let currentUnitTab = 'content'; const UNIT_TABS = ['content', 'carta', 'minit', 'reports']; function unitMatches(a, b){ return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase(); } function renderUnitPageContent(name){ const images = unitImagesCache.filter(i => unitMatches(i.unit, name)); const contentText = getUnitContent(name); const hero = extractHeroFields(contentText); const heroBox = document.getElementById('unit-hero-banner'); if(heroBox){ heroBox.innerHTML = `
+        <button onclick="document.getElementById('mobile-menu').classList.add('hidden'); openUnitPage('${name}')" class="py-2 text-left text-base text-ink-faint">&rarr; ${name}</button>`).join(''); } lucide.createIcons(); } let currentOpenUnit = null; let currentUnitTab = 'content'; const UNIT_TABS = ['content', 'carta', 'minit', 'galeri', 'reports']; function unitMatches(a, b){ return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase(); } function renderUnitPageContent(name){ const images = unitImagesCache.filter(i => unitMatches(i.unit, name)); const contentText = getUnitContent(name); const hero = extractHeroFields(contentText); const heroBox = document.getElementById('unit-hero-banner'); if(heroBox){ heroBox.innerHTML = `
       <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0F2A4A,#16385E);">
         <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 80% 20%, white 1px, transparent 1px);background-size:22px 22px;"></div>
         <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 sm:py-14 relative z-10">
@@ -760,8 +767,14 @@ function closeGaleriLightbox(event){ if(event && event.target.closest('img')) re
         </div>
       </div>`; } document.getElementById('unit-tab-content').innerHTML = `
       <div class="text-ink-soft leading-relaxed text-lg sm:text-xl">${renderStructuredContent(contentText)}</div>
-      ${images.length ? `
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-8">
+      ${hero.quote ? `
+        <div class="mt-6 bg-navy rounded-2xl px-6 py-5 flex items-center gap-4">
+          <i data-lucide="quote" class="w-7 h-7 sm:w-8 sm:h-8 text-gold shrink-0"></i>
+          <p class="text-white italic text-base sm:text-lg leading-snug">"${hero.quote}"</p>
+        </div>` : ''}
+    `; observeLazyBg(document.getElementById('unit-tab-content'));
+    document.getElementById('unit-tab-galeri').innerHTML = images.length ? `
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
           ${groupUnitImages(images).map((g, gi) => {
             const cover = g.photos[0]; const isAlbum = g.photos.length > 1;
             return `
@@ -773,13 +786,8 @@ function closeGaleriLightbox(event){ if(event && event.target.closest('img')) re
               ${g.namaProgram ? `<p class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-navy-deep/85 to-transparent text-white text-xs px-2 py-2 pt-5 truncate text-left">${g.namaProgram}</p>` : ''}
             </button>`;
           }).join('')}
-        </div>` : ''}
-      ${hero.quote ? `
-        <div class="mt-6 bg-navy rounded-2xl px-6 py-5 flex items-center gap-4">
-          <i data-lucide="quote" class="w-7 h-7 sm:w-8 sm:h-8 text-gold shrink-0"></i>
-          <p class="text-white italic text-base sm:text-lg leading-snug">"${hero.quote}"</p>
-        </div>` : ''}
-    `; observeLazyBg(document.getElementById('unit-tab-content')); lucide.createIcons(); const carta = unitCartaCache.filter(m => unitMatches(m.unit, name)).map(m => ({ name: m.nama, role: m.jawatan, tier: m.tier, photo: m.urlFoto })); document.getElementById('unit-tab-carta').innerHTML = carta.length ? renderTieredOrgList(carta) : `<p class="text-center text-ink-faint text-base py-16">Carta organisasi bagi unit ini belum tersedia.</p>`; lucide.createIcons(); const minit = unitMinitCache.filter(m => unitMatches(m.unit, name)); document.getElementById('unit-tab-minit').innerHTML = minit.length ? `
+        </div>` : `<p class="text-center text-ink-faint text-base py-16">Galeri aktiviti bagi unit ini belum tersedia.</p>`;
+    observeLazyBg(document.getElementById('unit-tab-galeri')); lucide.createIcons(); const carta = unitCartaCache.filter(m => unitMatches(m.unit, name)).map(m => ({ name: m.nama, role: m.jawatan, tier: m.tier, photo: m.urlFoto })); document.getElementById('unit-tab-carta').innerHTML = carta.length ? renderTieredOrgList(carta) : `<p class="text-center text-ink-faint text-base py-16">Carta organisasi bagi unit ini belum tersedia.</p>`; lucide.createIcons(); const minit = unitMinitCache.filter(m => unitMatches(m.unit, name)); document.getElementById('unit-tab-minit').innerHTML = minit.length ? `
       <div class="space-y-2.5">
         ${minit.map(m => `
           <a href="${m.fileUrl}" target="_blank" rel="noopener" class="flex items-center gap-3 bg-mist hover:bg-navy-50 border border-line rounded-2xl px-5 py-4 transition-all">
