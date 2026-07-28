@@ -142,9 +142,9 @@
   <div id="mobile-menu" class="hidden lg:hidden border-t border-line px-5 py-4 flex flex-col gap-1 text-base font-semibold text-ink-soft">
     <a href="#utama" class="py-2">Utama</a>
     <a href="#profil" class="py-2">Profil Sekolah</a>
-    <a href="#kata-aluan-gb-section" class="py-2 pl-4 text-sm text-ink-faint">&rarr; Kata Alu-aluan Guru Besar</a>
-    <a href="#profil-ringkasan" class="py-2 pl-4 text-sm text-ink-faint">&rarr; Ringkasan, Visi &amp; Misi</a>
-    <a href="#carta" class="py-2 pl-4 text-sm text-ink-faint">&rarr; Carta Organisasi</a>
+    <a href="#kata-aluan-gb-section" class="py-2 pl-4 text-base text-ink-faint">&rarr; Kata Alu-aluan Guru Besar</a>
+    <a href="#profil-ringkasan" class="py-2 pl-4 text-base text-ink-faint">&rarr; Ringkasan, Visi &amp; Misi</a>
+    <a href="#carta" class="py-2 pl-4 text-base text-ink-faint">&rarr; Carta Organisasi</a>
     <a href="#unit" class="py-2">Unit</a>
     <div id="mobile-unit-dropdown" class="pl-4 flex flex-col"></div>
     <a href="#kalendar" class="py-2">Takwim Sekolah</a>
@@ -204,36 +204,44 @@
 
 <!-- ============ STATISTIK ============ -->
 <section class="max-w-[1400px] mx-auto px-5 sm:px-8 pt-12 pb-24">
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-5 reveal-stagger">
-    <div class="soft-card rounded-2xl p-7 border-b-4" style="border-bottom-color:#2563EB;">
-      <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:#EEF2FF;">
-        <i data-lucide="users" class="w-7 h-7" style="color:#2563EB;"></i>
+  <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5 reveal-stagger">
+    <div class="soft-card rounded-2xl p-5 border-b-4 relative overflow-hidden" style="border-bottom-color:#2563EB; background:linear-gradient(160deg,#EEF2FF 0%,#FFFFFF 55%);">
+      <div class="absolute top-4 right-4 w-16 h-10 pointer-events-none" style="background-image:radial-gradient(#2563EB2E 1.5px, transparent 1.5px);background-size:9px 9px;"></div>
+      <i data-lucide="users" class="absolute -bottom-4 -right-4 w-24 h-24 pointer-events-none" style="color:#2563EB; opacity:0.09;"></i>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#DBEAFE;">
+        <i data-lucide="users" class="w-5 h-5" style="color:#2563EB;"></i>
       </div>
-      <div id="stat-murid" class="counter font-display font-semibold text-5xl mb-1" style="color:#2563EB;" data-target="76">0</div>
-      <div class="text-sm font-bold uppercase tracking-wider text-ink-faint mb-2">Murid</div>
-      <p id="stat-murid-breakdown" class="text-xs text-ink-faint">Lelaki: 41 | Perempuan: 35</p>
+      <div id="stat-murid" class="relative counter font-display font-semibold text-4xl mb-1" style="color:#2563EB;" data-target="76">0</div>
+      <div class="relative text-base font-bold uppercase tracking-wider text-ink mb-2">Murid</div>
+      <p id="stat-murid-breakdown" class="relative text-sm text-ink-soft">Lelaki: 41 | Perempuan: 35</p>
     </div>
-    <div class="soft-card rounded-2xl p-7 border-b-4" style="border-bottom-color:#16A34A;">
-      <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:#ECFDF3;">
-        <i data-lucide="graduation-cap" class="w-7 h-7" style="color:#16A34A;"></i>
+    <div class="soft-card rounded-2xl p-5 border-b-4 relative overflow-hidden" style="border-bottom-color:#16A34A; background:linear-gradient(160deg,#ECFDF3 0%,#FFFFFF 55%);">
+      <div class="absolute top-4 right-4 w-16 h-10 pointer-events-none" style="background-image:radial-gradient(#16A34A2E 1.5px, transparent 1.5px);background-size:9px 9px;"></div>
+      <i data-lucide="graduation-cap" class="absolute -bottom-4 -right-4 w-24 h-24 pointer-events-none" style="color:#16A34A; opacity:0.09;"></i>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#ECFDF3;">
+        <i data-lucide="graduation-cap" class="w-5 h-5" style="color:#16A34A;"></i>
       </div>
-      <div id="stat-guru" class="counter font-display font-semibold text-5xl mb-1" style="color:#16A34A;" data-target="13">0</div>
-      <div class="text-sm font-bold uppercase tracking-wider text-ink-faint mb-2">Guru</div>
+      <div id="stat-guru" class="relative counter font-display font-semibold text-4xl mb-1" style="color:#16A34A;" data-target="13">0</div>
+      <div class="relative text-base font-bold uppercase tracking-wider text-ink mb-2">Guru</div>
     </div>
-    <div class="soft-card rounded-2xl p-7 border-b-4" style="border-bottom-color:#7C3AED;">
-      <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:#F3EEFE;">
-        <i data-lucide="briefcase" class="w-7 h-7" style="color:#7C3AED;"></i>
+    <div class="soft-card rounded-2xl p-5 border-b-4 relative overflow-hidden" style="border-bottom-color:#7C3AED; background:linear-gradient(160deg,#F3EEFE 0%,#FFFFFF 55%);">
+      <div class="absolute top-4 right-4 w-16 h-10 pointer-events-none" style="background-image:radial-gradient(#7C3AED2E 1.5px, transparent 1.5px);background-size:9px 9px;"></div>
+      <i data-lucide="briefcase" class="absolute -bottom-4 -right-4 w-24 h-24 pointer-events-none" style="color:#7C3AED; opacity:0.09;"></i>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#F3EEFE;">
+        <i data-lucide="briefcase" class="w-5 h-5" style="color:#7C3AED;"></i>
       </div>
-      <div id="stat-staf" class="counter font-display font-semibold text-5xl mb-1" style="color:#7C3AED;" data-target="2">0</div>
-      <div class="text-sm font-bold uppercase tracking-wider text-ink-faint mb-2">Staf</div>
+      <div id="stat-staf" class="relative counter font-display font-semibold text-4xl mb-1" style="color:#7C3AED;" data-target="2">0</div>
+      <div class="relative text-base font-bold uppercase tracking-wider text-ink mb-2">Staf</div>
     </div>
-    <div class="soft-card rounded-2xl p-7 border-b-4" style="border-bottom-color:#EA7A1E;">
-      <div class="w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background:#FEF3E8;">
-        <i data-lucide="school" class="w-7 h-7" style="color:#EA7A1E;"></i>
+    <div class="soft-card rounded-2xl p-5 border-b-4 relative overflow-hidden" style="border-bottom-color:#EA7A1E; background:linear-gradient(160deg,#FEF3E8 0%,#FFFFFF 55%);">
+      <div class="absolute top-4 right-4 w-16 h-10 pointer-events-none" style="background-image:radial-gradient(#EA7A1E2E 1.5px, transparent 1.5px);background-size:9px 9px;"></div>
+      <i data-lucide="school" class="absolute -bottom-4 -right-4 w-24 h-24 pointer-events-none" style="color:#EA7A1E; opacity:0.09;"></i>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#FEF3E8;">
+        <i data-lucide="school" class="w-5 h-5" style="color:#EA7A1E;"></i>
       </div>
-      <div id="stat-kelas" class="counter font-display font-semibold text-5xl mb-1" style="color:#EA7A1E;" data-target="6">0</div>
-      <div class="text-sm font-bold uppercase tracking-wider text-ink-faint mb-2">Kelas</div>
-      <p id="stat-kelas-breakdown" class="text-xs text-ink-faint">Pra Sekolah: 1 | Tahun 1-6: 6</p>
+      <div id="stat-kelas" class="relative counter font-display font-semibold text-4xl mb-1" style="color:#EA7A1E;" data-target="6">0</div>
+      <div class="relative text-base font-bold uppercase tracking-wider text-ink mb-2">Kelas</div>
+      <p id="stat-kelas-breakdown" class="relative text-sm text-ink-soft">Pra Sekolah: 1 | Tahun 1-6: 6</p>
     </div>
   </div>
 </section>
@@ -251,7 +259,7 @@
       <div class="p-8 sm:p-12 pb-10 sm:pb-14 order-2 sm:order-1">
         <h3 class="font-display font-bold text-2xl sm:text-4xl text-navy leading-tight mb-4">KATA ALU-ALUAN<br>GURU BESAR</h3>
         <div class="inline-block bg-navy text-white font-bold text-sm sm:text-base uppercase tracking-wide px-5 py-2 rounded-lg mb-6">SK KRANGAN</div>
-        <div id="kata-aluan-gb-text" class="text-ink-soft leading-relaxed text-sm sm:text-base text-center space-y-4">
+        <div id="kata-aluan-gb-text" class="text-ink-soft leading-relaxed text-base sm:text-lg text-center space-y-4">
           <p>Salam sejahtera dan salam Malaysia MADANI. Selamat datang ke Portal Digital Sekolah Kebangsaan Krangan.</p>
           <p>Sekolah Kebangsaan Krangan komited melahirkan generasi murid yang cemerlang dalam akademik, kukuh sahsiah, serta seimbang dari aspek jasmani, emosi, rohani dan intelek. Portal digital ini diwujudkan sebagai medium perkongsian maklumat terkini mengenai aktiviti dan pencapaian sekolah kepada semua warga sekolah dan orang ramai.</p>
           <p>Saya merakamkan penghargaan kepada semua guru, staf, ibu bapa dan murid atas komitmen dan kerjasama yang diberikan. Marilah kita terus berganding bahu membina kecemerlangan pendidikan demi masa depan anak-anak kita.</p>
@@ -267,29 +275,63 @@
   </div>
 
   <div id="profil-ringkasan" class="grid sm:grid-cols-2 gap-6 reveal-stagger">
-    <div class="soft-card rounded-2xl p-9">
-      <i data-lucide="compass" class="w-7 h-7 text-navy mb-4"></i>
-      <h3 class="font-display font-semibold text-2xl mb-2 text-ink">Visi</h3>
-      <p id="profil-visi" class="text-ink-soft leading-relaxed">Memartabatkan pendidikan menjulang kejayaan ke arah kemenjadian murid.</p>
+    <div class="soft-card rounded-2xl p-6 relative overflow-hidden border-l-4" style="border-left-color:#2563EB;">
+      <div class="absolute top-6 right-6 w-24 h-16 pointer-events-none" style="background-image:radial-gradient(#2563EB33 1.5px, transparent 1.5px);background-size:10px 10px;"></div>
+      <svg class="absolute -bottom-2 -right-2 w-40 h-40 pointer-events-none" viewBox="0 0 160 160" fill="none">
+        <path d="M160 160V60C130 90 90 130 40 160H160Z" fill="#2563EB" opacity="0.10"/>
+        <path d="M160 160V90C140 115 110 140 80 160H160Z" fill="#2563EB" opacity="0.14"/>
+      </svg>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#DBEAFE;">
+        <i data-lucide="compass" class="w-6 h-6" style="color:#2563EB;"></i>
+      </div>
+      <h3 class="relative font-display font-bold text-2xl mb-1.5 text-ink">Visi</h3>
+      <div class="relative h-0.5 w-10 mb-3" style="background:#2563EB;"></div>
+      <p id="profil-visi" class="relative text-lg text-ink-soft leading-relaxed">"Memartabatkan Pendidikan Menjulang Kejayaan Ke Arah Kemenjadian Murid"</p>
     </div>
-    <div class="soft-card rounded-2xl p-9">
-      <i data-lucide="target" class="w-7 h-7 text-gold mb-4"></i>
-      <h3 class="font-display font-semibold text-2xl mb-2 text-ink">Misi</h3>
-      <p id="profil-misi" class="text-ink-soft leading-relaxed">SK Krangan cemerlang dalam pendidikan, menggilap potensi individu, memperkasakan modal insan, memantapkan pengurusan.</p>
+    <div class="soft-card rounded-2xl p-6 relative overflow-hidden border-l-4" style="border-left-color:#C08A3E;">
+      <div class="absolute top-6 right-6 w-24 h-16 pointer-events-none" style="background-image:radial-gradient(#C08A3E33 1.5px, transparent 1.5px);background-size:10px 10px;"></div>
+      <svg class="absolute -bottom-2 -right-2 w-40 h-40 pointer-events-none" viewBox="0 0 160 160" fill="none">
+        <path d="M160 160V60C130 90 90 130 40 160H160Z" fill="#C08A3E" opacity="0.10"/>
+        <path d="M160 160V90C140 115 110 140 80 160H160Z" fill="#C08A3E" opacity="0.14"/>
+      </svg>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#F3E7D3;">
+        <i data-lucide="target" class="w-6 h-6" style="color:#C08A3E;"></i>
+      </div>
+      <h3 class="relative font-display font-bold text-2xl mb-1.5 text-ink">Misi</h3>
+      <div class="relative h-0.5 w-10 mb-3" style="background:#C08A3E;"></div>
+      <p id="profil-misi" class="relative text-lg text-ink-soft leading-relaxed">"SK Krangan Cemerlang Dalam Pendidikan Menggilap Potensi Individu Memperkasakan Modal Insan Memantapkan Pengurusan"</p>
     </div>
-    <div class="soft-card rounded-2xl p-9">
-      <i data-lucide="flag" class="w-7 h-7 text-crimson mb-4"></i>
-      <h3 class="font-display font-semibold text-2xl mb-2 text-ink">Moto Sekolah</h3>
-      <p id="profil-moto" class="text-ink-soft leading-relaxed">Moving Together Flying High, Krangan Excellent!</p>
+    <div class="soft-card rounded-2xl p-6 relative overflow-hidden border-l-4" style="border-left-color:#A23B3B;">
+      <div class="absolute top-6 right-6 w-24 h-16 pointer-events-none" style="background-image:radial-gradient(#A23B3B33 1.5px, transparent 1.5px);background-size:10px 10px;"></div>
+      <svg class="absolute -bottom-2 -right-2 w-40 h-40 pointer-events-none" viewBox="0 0 160 160" fill="none">
+        <path d="M160 160V60C130 90 90 130 40 160H160Z" fill="#A23B3B" opacity="0.10"/>
+        <path d="M160 160V90C140 115 110 140 80 160H160Z" fill="#A23B3B" opacity="0.14"/>
+      </svg>
+      <div class="relative w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background:#F5E1E1;">
+        <i data-lucide="flag" class="w-6 h-6" style="color:#A23B3B;"></i>
+      </div>
+      <h3 class="relative font-display font-bold text-2xl mb-1.5 text-ink">Moto Sekolah</h3>
+      <div class="relative h-0.5 w-10 mb-3" style="background:#A23B3B;"></div>
+      <p id="profil-moto" class="relative text-lg text-ink-soft leading-relaxed">"Moving Together Flying High, Krangan Excellent!"</p>
     </div>
-    <div class="soft-card rounded-2xl p-9">
-      <i data-lucide="info" class="w-7 h-7 text-navy mb-4"></i>
-      <h3 class="font-display font-semibold text-2xl mb-3 text-ink">Maklumat Asas</h3>
-      <dl class="text-base text-ink-soft space-y-1.5">
-        <div class="flex gap-2"><dt class="font-semibold text-ink shrink-0">Nama:</dt><dd id="profil-nama">Sekolah Kebangsaan Krangan</dd></div>
-        <div class="flex gap-2"><dt class="font-semibold text-ink shrink-0">Kod Sekolah:</dt><dd id="profil-kod">YBB8240</dd></div>
-        <div class="flex gap-2"><dt class="font-semibold text-ink shrink-0">Alamat:</dt><dd id="profil-alamat">Jalan Krangan-Balai Ringin, 94700 Serian, Sarawak</dd></div>
-        <div class="flex gap-2"><dt class="font-semibold text-ink shrink-0">Emel:</dt><dd id="profil-emel">ybb8240@moe.edu.my</dd></div>
+    <div class="soft-card rounded-2xl p-6 relative overflow-hidden border-l-4" style="border-left-color:#1B3A6B;">
+      <div class="absolute top-6 right-6 w-24 h-16 pointer-events-none" style="background-image:radial-gradient(#1B3A6B33 1.5px, transparent 1.5px);background-size:10px 10px;"></div>
+      <svg class="absolute -bottom-2 -right-2 w-40 h-40 pointer-events-none" viewBox="0 0 160 160" fill="none">
+        <path d="M160 160V60C130 90 90 130 40 160H160Z" fill="#1B3A6B" opacity="0.10"/>
+        <path d="M160 160V90C140 115 110 140 80 160H160Z" fill="#1B3A6B" opacity="0.14"/>
+      </svg>
+      <div class="relative flex items-center gap-3 mb-3">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style="background:#DCE3F7;">
+          <i data-lucide="info" class="w-6 h-6" style="color:#1B3A6B;"></i>
+        </div>
+        <h3 class="font-display font-bold text-2xl text-ink">Maklumat Asas</h3>
+      </div>
+      <div class="relative h-0.5 w-10 mb-4" style="background:#1B3A6B;"></div>
+      <dl class="relative text-lg text-ink-soft">
+        <div class="flex items-center gap-3 py-2.5 border-b border-line"><i data-lucide="user" class="w-4 h-4 text-navy shrink-0"></i><dt class="font-semibold text-ink w-28 shrink-0">Nama</dt><dd id="profil-nama" class="flex-1">Sekolah Kebangsaan Krangan</dd></div>
+        <div class="flex items-center gap-3 py-2.5 border-b border-line"><i data-lucide="id-card" class="w-4 h-4 text-navy shrink-0"></i><dt class="font-semibold text-ink w-28 shrink-0">Kod Sekolah</dt><dd id="profil-kod" class="flex-1">YBB8240</dd></div>
+        <div class="flex items-center gap-3 py-2.5 border-b border-line"><i data-lucide="map-pin" class="w-4 h-4 text-navy shrink-0"></i><dt class="font-semibold text-ink w-28 shrink-0">Alamat</dt><dd id="profil-alamat" class="flex-1">Jalan Krangan-Balai Ringin, 94700 Serian, Sarawak</dd></div>
+        <div class="flex items-center gap-3 py-2.5"><i data-lucide="mail" class="w-4 h-4 text-navy shrink-0"></i><dt class="font-semibold text-ink w-28 shrink-0">Emel</dt><dd id="profil-emel" class="flex-1">ybb8240@moe.edu.my</dd></div>
       </dl>
     </div>
   </div>
@@ -509,6 +551,14 @@ initHeroSlideshow();  (() => { const ls = document.getElementById('loading-scree
         <span><span class="text-ink font-semibold text-base block">${h.label}</span><span class="text-ink-soft text-sm">${h.hint}</span></span>
         <i data-lucide="arrow-right" class="w-4 h-4 text-ink-faint"></i>
       </a>`).join('') : `<p class="text-ink-soft text-base px-4 py-3">Tiada hasil untuk "${q}"</p>`; lucide.createIcons(); }  let orgChart = [ { name:'Stanley anak Ngawah', role:'Guru Besar', photo:'staf-stanley.jpg', tier:1 }, { name:'Dick Lester anak Bakir', role:'Guru Penolong Kanan Kurikulum', photo:'staf-dick.jpg', tier:2 }, { name:'Amir bin Ngatiman', role:'Guru Penolong Kanan Hal Ehwal Murid', photo:'staf-amir.jpg', tier:2 }, { name:'Mohammad Fadzly bin Noor Azman', role:'Guru Penolong Kanan Kokurikulum', photo:'staf-fadzly.jpg', tier:2 }, { name:'Angeline anak Michael Jawa', role:'Setiausaha Hal Ehwal Murid dan PIBG', photo:'staf-angeline.jpg', tier:3 }, { name:'Marina anak Luat', role:'Guru Data', photo:'staf-marina.jpg', tier:3 }, { name:'Jeanica May anak Kuyah', role:'Setiausaha Kurikulum', photo:'staf-jeanica.jpg', tier:3 }, { name:'Hadijah anak Ambun', role:'Guru Pemulihan', photo:'staf-hadijah.jpg', tier:3 }, { name:'Noor Izzati Abdullah', role:'Guru Prasekolah', photo:'staf-izzati.webp', tier:3 }, { name:'Siti Norhafizah binti Daud', role:'Guru NILAM', photo:'staf-siti.jpg', tier:3 }, { name:'Mohd Arfiq Rahimi bin Abdul Rahman', role:'Guru STEM', photo:'staf-arfiq.jpg', tier:3 }, { name:'Elnisia anak Guwel', role:'Guru Bimbingan dan Kaunseling (LD)', photo:'staf-elnisia.jpg', tier:3 }, { name:'Aimuni Athirah binti Latif', role:'Guru ICT', photo:'staf-aimuni.jpg', tier:3 }, { name:'Nur Syuhada binti Abdul Razak', role:'Setiausaha Kokurikulum', photo:'staf-syuhada.webp', tier:3 }, { name:'Liminang anak Sabang', role:'Pembantu Tadbir', photo:'staf-liminang.webp', tier:3 }, { name:'Ajek anak Sumping', role:'Pembantu Pengurusan Murid Prasekolah', photo:'staf-ajek.webp', tier:3 }, ]; function renderTieredOrgList(members){
+  // Buang rekod pendua (nama + jawatan sama) - selamat walaupun ada data berulang di Sheet
+  const seen = new Set();
+  members = members.filter(m => {
+    const key = (m.name || '').trim().toLowerCase() + '|' + (m.role || '').trim().toLowerCase();
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   const t1 = members.filter(m => (m.tier||3) == 1);
   const t2 = members.filter(m => (m.tier||3) == 2);
   const t3 = members.filter(m => (m.tier||3) == 3);
@@ -527,12 +577,12 @@ initHeroSlideshow();  (() => { const ls = document.getElementById('loading-scree
   }
   return html;
 }
-function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12'; const nameSz = size === 'lg' ? 'text-lg' : 'text-base'; return `
+function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12'; const nameSz = size === 'lg' ? 'text-xl' : 'text-lg'; return `
       <button onclick="openOrgModal('${p.name}','${p.role}','${p.photo || ''}')" class="soft-card rounded-2xl p-5 text-left inline-flex items-center gap-3.5 w-full h-full">
         <div class="${sz} rounded-full bg-navy-50 flex items-center justify-center shrink-0 overflow-hidden">
           ${p.photo ? `<img src="${p.photo}" alt="${p.name}" loading="lazy" decoding="async" class="w-full h-full object-cover">` : `<i data-lucide="user" class="w-5 h-5 text-navy"></i>`}
         </div>
-        <div class="min-w-0"><p class="font-display font-semibold text-ink ${nameSz} leading-snug">${p.name}</p><p class="text-sm text-gold font-bold mt-0.5">${p.role}</p></div>
+        <div class="min-w-0"><p class="font-display font-semibold text-ink ${nameSz} leading-snug">${p.name}</p><p class="text-base text-gold font-bold mt-0.5">${p.role}</p></div>
       </button>`; } function renderOrgChart(){ const gb = orgChart.filter(p => p.tier === 1); const gpk = orgChart.filter(p => p.tier === 2); const staf = orgChart.filter(p => p.tier === 3); const html = `
       <!-- Tahap 1: Guru Besar -->
       <div class="flex justify-center mb-1">
@@ -582,7 +632,7 @@ function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12';
         return `
           <div class="soft-card rounded-2xl p-5 flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center shrink-0"><i data-lucide="calendar-days" class="text-navy w-5 h-5"></i></div>
-            <div class="flex-1"><p class="font-bold text-ink">${ev.nama}</p><p class="text-base text-ink-soft">${dateRangeText}</p></div>
+            <div class="flex-1"><p class="text-lg font-bold text-ink">${ev.nama}</p><p class="text-base text-ink-soft">${dateRangeText}</p></div>
             ${isUjian ? `
             <div class="text-right shrink-0 pl-2">
               <p class="font-display font-semibold text-3xl text-navy leading-none">${dayLabel}</p>
@@ -682,7 +732,7 @@ function closeGaleriLightbox(event){ if(event && event.target.closest('img')) re
       <button onclick="openUnitPage('${name}')" class="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-ink-soft hover:bg-mist hover:text-ink text-base font-semibold text-left">
         <i data-lucide="${defaultDb[name].icon}" class="w-4 h-4 text-navy shrink-0"></i> ${name}
       </button>`).join(''); const navUnitDropdown = document.getElementById('nav-unit-dropdown'); if(navUnitDropdown) navUnitDropdown.innerHTML = navDropdownHtml; const mobileUnitDropdown = document.getElementById('mobile-unit-dropdown'); if(mobileUnitDropdown){ mobileUnitDropdown.innerHTML = Object.keys(defaultDb).map(name => `
-        <button onclick="document.getElementById('mobile-menu').classList.add('hidden'); openUnitPage('${name}')" class="py-2 text-left text-sm text-ink-faint">&rarr; ${name}</button>`).join(''); } lucide.createIcons(); } let currentOpenUnit = null; let currentUnitTab = 'content'; const UNIT_TABS = ['content', 'carta', 'minit', 'reports']; function unitMatches(a, b){ return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase(); } function renderUnitPageContent(name){ const contentText = getUnitContent(name); const hero = extractHeroFields(contentText); const heroBox = document.getElementById('unit-hero-banner'); if(heroBox){ heroBox.innerHTML = `
+        <button onclick="document.getElementById('mobile-menu').classList.add('hidden'); openUnitPage('${name}')" class="py-2 text-left text-base text-ink-faint">&rarr; ${name}</button>`).join(''); } lucide.createIcons(); } let currentOpenUnit = null; let currentUnitTab = 'content'; const UNIT_TABS = ['content', 'carta', 'minit', 'reports']; function unitMatches(a, b){ return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase(); } function renderUnitPageContent(name){ const contentText = getUnitContent(name); const hero = extractHeroFields(contentText); const heroBox = document.getElementById('unit-hero-banner'); if(heroBox){ heroBox.innerHTML = `
       <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0F2A4A,#16385E);">
         <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 80% 20%, white 1px, transparent 1px);background-size:22px 22px;"></div>
         <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-10 sm:py-14 relative z-10">
