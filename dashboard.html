@@ -206,6 +206,9 @@
           <button onclick="selectCmsHomepage()" id="cms-tab-lamanutama" class="text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0">
             <i data-lucide="home" class="w-4 h-4"></i> Laman Utama
           </button>
+          <button onclick="selectCmsGaleriTab()" id="cms-tab-galeri" class="text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0">
+            <i data-lucide="images" class="w-4 h-4"></i> Galeri Sekolah
+          </button>
           <div class="flex gap-2" id="cms-unit-tabs"></div>
         </div>
         <div id="cms-unit-panel">
@@ -291,28 +294,24 @@
           </div>
           </div>
 
-          <!-- ===== Galeri Sekolah (dikongsi semua unit) ===== -->
+          <!-- ===== Galeri Aktiviti Unit ===== -->
           <div class="mt-6 bg-white border border-line rounded-2xl p-6">
             <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="images" class="w-4 h-4 text-navy"></i>
-              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Galeri Sekolah <span class="text-ink-faint normal-case font-normal">(dikongsi semua unit)</span></h3>
+              <i data-lucide="image" class="w-4 h-4 text-navy"></i>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Galeri Aktiviti Unit <span class="text-ink-faint normal-case font-normal">(khusus unit ini sahaja)</span></h3>
             </div>
-            <p class="text-[11px] text-ink-faint mb-3">Foto yang dimuat naik di sini terus masuk ke Galeri Sekolah bersama di laman utama - sumbang foto program/aktiviti unit awak di sini.</p>
-            <div id="cms-galeri-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
-            <div class="bg-mist rounded-2xl p-4 space-y-3">
-              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
-              <div class="grid sm:grid-cols-3 gap-2">
-                <input type="text" id="cms-galeri-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-                <input type="date" id="cms-galeri-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-                <input type="text" id="cms-galeri-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-              </div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
-              <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
-                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
-                <input type="file" accept="image/*" multiple class="hidden" onchange="uploadCmsGaleriPhotos(event)">
+            <p class="text-[11px] text-ink-faint mb-3">Foto aktiviti/program khusus unit ini - dipaparkan pada halaman awam unit berkenaan sahaja (bukan Galeri Sekolah pusat).</p>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
+              <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-bold text-navy hover:text-navy-deep bg-mist hover:bg-navy-50 px-3 py-2.5 rounded-lg transition-all shrink-0">
+                <i data-lucide="image-plus" class="w-3.5 h-3.5"></i> <span id="cms-image-file-label">Pilih Gambar</span>
+                <input id="cms-image-file-input" type="file" accept="image/*" class="hidden" onchange="handleCmsImageChosen(event)">
               </label>
-              <p id="cms-galeri-progress" class="text-[11px] text-ink-faint hidden"></p>
+              <input id="cms-image-caption" type="text" placeholder="Kapsyen gambar (pilihan)" class="flex-1 bg-mist border border-line rounded-lg px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-sky focus:outline-none">
+              <button onclick="uploadCmsImage()" class="shrink-0 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-lg transition-all inline-flex items-center justify-center gap-1.5">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik
+              </button>
             </div>
+            <div id="cms-image-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
           </div>
 
           <!-- ===== Carta Organisasi Unit ===== -->
@@ -615,6 +614,28 @@
           </div>
 
         </div>
+
+        <!-- ===== PANEL GALERI SEKOLAH (berasingan - boleh diakses semua staf) ===== -->
+        <div class="hidden" id="cms-galeri-panel">
+          <h3 class="font-bold text-ink mb-1">Galeri Sekolah</h3>
+          <p class="text-[11px] text-ink-faint mb-3">Koleksi foto aktiviti/kemudahan sekolah dipaparkan di menu "Galeri Sekolah" laman utama. Semua staf boleh sumbang foto di sini.</p>
+          <div id="cms-galeri-tab-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
+
+          <div class="bg-mist rounded-2xl p-4 space-y-3">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
+            <div class="grid sm:grid-cols-3 gap-2">
+              <input type="text" id="cms-galeri-tab-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+              <input type="date" id="cms-galeri-tab-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+              <input type="text" id="cms-galeri-tab-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+            </div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta (Tiada Butang Simpan Berasingan)</p>
+            <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
+              <input type="file" accept="image/*" multiple class="hidden" onchange="uploadCmsGaleriTabPhotos(event)">
+            </label>
+            <p id="cms-galeri-tab-progress" class="text-[11px] text-ink-faint hidden"></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -632,30 +653,6 @@
       <p class="text-sm text-ink-soft mb-6">Tambah staf baharu atau kemas kini akses staf sedia ada. Perubahan disimpan ke storan dikongsi dan staf boleh terus log masuk (guna emel DELIMA sebenar mereka) selepas disimpan &mdash; tiada PIN atau langkah tambahan diperlukan.</p>
       <p id="staf-status-note" class="text-xs text-ink-faint mb-4"></p>
       <div id="staf-list" class="space-y-4"></div>
-    </div>
-  </div>
-
-  <!-- ============ MODUL: GALERI SEKOLAH (terbuka untuk semua staf) ============ -->
-  <div id="section-galeri" class="tab-content max-w-[1400px] mx-auto px-5 sm:px-8 py-10">
-    <button onclick="showModule('picker')" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-ink-soft hover:text-ink"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Papan Pemuka</button>
-    <div class="glass rounded-3xl p-8">
-      <h2 class="font-display font-semibold text-2xl text-ink mb-1">Galeri Sekolah</h2>
-      <p class="text-sm text-ink-soft mb-6">Muat naik gambar aktiviti/program untuk galeri sekolah di laman utama. Semua staf boleh sumbang foto di sini.</p>
-      <div id="galeri-standalone-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
-      <div class="bg-mist rounded-2xl p-5 space-y-3">
-        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
-        <div class="grid sm:grid-cols-3 gap-2">
-          <input type="text" id="galeri-standalone-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-          <input type="date" id="galeri-standalone-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-          <input type="text" id="galeri-standalone-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-        </div>
-        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
-        <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
-          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
-          <input type="file" accept="image/*" multiple class="hidden" onchange="uploadGaleriStandalone(event)">
-        </label>
-        <p id="galeri-standalone-progress" class="text-[11px] text-ink-faint hidden"></p>
-      </div>
     </div>
   </div>
 
@@ -1675,26 +1672,14 @@ function renderModuleGrid(){
   const grid = document.getElementById('module-grid');
   let cards = '';
   let idx = 0;
-  if(currentUser.cmsUnits && currentUser.cmsUnits.length > 0){
-    idx++;
-    cards += `
-      <button onclick="showModule('cms')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#C08A3E;">
-        <i data-lucide="layout-template" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-        <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F3E7D3;"><i data-lucide="layout-template" class="w-7 h-7" style="color:#C08A3E;"></i></div>
-        <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kandungan Laman Web</h3>
-        <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#C08A3E;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#C08A3E;"></span></div>
-        <p class="relative text-sm text-ink-soft pr-10">Edit kandungan: ${currentUser.cmsUnits.join(', ')}</p>
-        <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
-      </button>`;
-  }
   idx++;
   cards += `
-    <button onclick="showModule('galeri')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#2563EB;">
-      <i data-lucide="images" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#DBEAFE;"><i data-lucide="images" class="w-7 h-7" style="color:#2563EB;"></i></div>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Galeri Sekolah</h3>
-      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#2563EB;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#2563EB;"></span></div>
-      <p class="relative text-sm text-ink-soft pr-10">Muat naik gambar aktiviti untuk galeri sekolah.</p>
+    <button onclick="showModule('cms')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#C08A3E;">
+      <i data-lucide="layout-template" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F3E7D3;"><i data-lucide="layout-template" class="w-7 h-7" style="color:#C08A3E;"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kandungan Laman Web</h3>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#C08A3E;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#C08A3E;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">${(currentUser.cmsUnits && currentUser.cmsUnits.length) ? 'Edit kandungan: ' + currentUser.cmsUnits.join(', ') + ', dan Galeri Sekolah.' : 'Muat naik gambar untuk Galeri Sekolah.'}</p>
       <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
     </button>`;
   idx++;
@@ -1749,7 +1734,6 @@ function showModule(id){
   document.body.style.overflow = (id === 'eopr') ? 'hidden' : '';
   if(id === 'cms') renderCmsTabs();
   if(id === 'staf') renderStaffManagementList();
-  if(id === 'galeri') loadGaleriSekolahStandalone();
 }
 
 /* =====================================================================
@@ -1841,6 +1825,7 @@ function renderCmsTabs(){
     <button onclick="selectCmsUnit('${unit}')" id="cms-tab-${unit.replace(/\s+/g,'')}" class="text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all shrink-0">${unit}</button>
   `).join('');
   if(currentUser.cmsUnits.length) selectCmsUnit(currentUser.cmsUnits[0]);
+  else selectCmsGaleriTab();
 }
 
 const CMS_SECTION_LABELS = {
@@ -2183,8 +2168,11 @@ async function selectCmsUnit(unit){
   cmsActiveUnit = unit;
   document.getElementById('cms-unit-panel').classList.remove('hidden');
   document.getElementById('cms-homepage-panel').classList.add('hidden');
+  document.getElementById('cms-galeri-panel').classList.add('hidden');
   const lamanUtamaTab = document.getElementById('cms-tab-lamanutama');
   if(lamanUtamaTab) lamanUtamaTab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
+  const galeriTab = document.getElementById('cms-tab-galeri');
+  if(galeriTab) galeriTab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
 
   currentUser.cmsUnits.forEach(u => {
     const tab = document.getElementById('cms-tab-' + u.replace(/\s+/g,''));
@@ -2202,6 +2190,7 @@ async function selectCmsUnit(unit){
   renderCartaRows([]);
   renderMinitList([]);
   renderCmsReportGrid([]);
+  renderCmsImageGrid([]);
 
   if(isCmsBackendConfigured()){
     const remote = await fetchCmsDbRemote();
@@ -2217,7 +2206,7 @@ async function selectCmsUnit(unit){
     loadCartaForUnit(unit);
     loadMinitForUnit(unit);
     loadCmsReports(unit);
-    loadCmsGaleri();
+    loadCmsImages(unit);
   }
 }
 
@@ -2270,14 +2259,41 @@ async function deleteCmsReport(imageUrl){
 /* ============================================================
    PANEL LAMAN UTAMA - Statistik, Profil, Takwim, Carta Utama, Foto Hero
    ============================================================ */
+/* ---- Bantuan generik: drag-and-drop untuk susun semula senarai ----
+   Panggil selepas render setiap kali. containerEl = bekas ibu, selector = elemen yang boleh diseret
+   (mesti ada atribut data-drag-idx="N"), onReordered(fromIdx, toIdx) = callback bila item dilepas. */
+function initDragReorder(containerEl, selector, onReordered){
+  if(!containerEl) return;
+  let fromIdx = null;
+  containerEl.querySelectorAll(selector).forEach(el => {
+    el.setAttribute('draggable', 'true');
+    el.addEventListener('dragstart', () => {
+      fromIdx = Number(el.getAttribute('data-drag-idx'));
+      el.classList.add('opacity-40');
+    });
+    el.addEventListener('dragend', () => { el.classList.remove('opacity-40'); });
+    el.addEventListener('dragover', e => { e.preventDefault(); });
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      const toIdx = Number(el.getAttribute('data-drag-idx'));
+      if(fromIdx === null || fromIdx === toIdx) return;
+      onReordered(fromIdx, toIdx);
+      fromIdx = null;
+    });
+  });
+}
+
 let hpTakwimData = [];
+let hpHeroPhotosCache = [];
 let hpPengumumanData = [];
 let hpCartaData = [];
 
 async function selectCmsHomepage(){
   document.getElementById('cms-unit-panel').classList.add('hidden');
+  document.getElementById('cms-galeri-panel').classList.add('hidden');
   document.getElementById('cms-homepage-panel').classList.remove('hidden');
   document.getElementById('cms-tab-lamanutama').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-gradient-to-r from-blue to-cyan text-white flex items-center gap-2 shrink-0';
+  document.getElementById('cms-tab-galeri').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
   currentUser.cmsUnits.forEach(u => {
     const tab = document.getElementById('cms-tab-' + u.replace(/\s+/g,''));
     if(tab) tab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 shrink-0';
@@ -2290,6 +2306,20 @@ async function selectCmsHomepage(){
   loadHpCartaUtama();
   loadHpHeroPhotos();
   loadHpGaleri();
+}
+
+async function selectCmsGaleriTab(){
+  document.getElementById('cms-unit-panel').classList.add('hidden');
+  document.getElementById('cms-homepage-panel').classList.add('hidden');
+  document.getElementById('cms-galeri-panel').classList.remove('hidden');
+  document.getElementById('cms-tab-galeri').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-gradient-to-r from-blue to-cyan text-white flex items-center gap-2 shrink-0';
+  document.getElementById('cms-tab-lamanutama').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
+  currentUser.cmsUnits.forEach(u => {
+    const tab = document.getElementById('cms-tab-' + u.replace(/\s+/g,''));
+    if(tab) tab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 shrink-0';
+  });
+
+  loadCmsGaleriTab();
 }
 
 /* ---- Statistik ---- */
@@ -2637,7 +2667,8 @@ function renderHpCartaList(){
     return;
   }
   container.innerHTML = hpCartaData.map((m, idx) => `
-    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center">
+    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center" data-drag-idx="${idx}">
+      <i data-lucide="grip-vertical" class="w-4 h-4 text-ink-faint cursor-grab shrink-0 hidden xl:block" title="Seret untuk susun semula"></i>
       <div class="relative w-14 h-14 rounded-full overflow-hidden bg-white border border-line shrink-0 mx-auto sm:mx-0" style="background-image:url('${m.urlFoto||''}'); background-size:cover; background-position:center;">
         ${!m.urlFoto ? '<div class="w-full h-full flex items-center justify-center text-ink-faint"><i data-lucide="user" class="w-5 h-5"></i></div>' : ''}
         <label class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all">
@@ -2659,6 +2690,11 @@ function renderHpCartaList(){
   `).join('');
   lucide.createIcons();
   updateHpCartaUtamaPreview();
+  initDragReorder(container, '[data-drag-idx]', (fromIdx, toIdx) => {
+    const [moved] = hpCartaData.splice(fromIdx, 1);
+    hpCartaData.splice(toIdx, 0, moved);
+    renderHpCartaList();
+  });
 }
 // Previu Carta Organisasi Utama - macam mana kad hierarki akan nampak di laman utama.
 function updateHpCartaUtamaPreview(){
@@ -2752,14 +2788,29 @@ function renderHpHeroGrid(photos){
     grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto hero dimuat naik lagi.</p>`;
     return;
   }
-  grid.innerHTML = photos.map(p => `
-    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;">
+  hpHeroPhotosCache = photos;
+  grid.innerHTML = photos.map((p, idx) => `
+    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line cursor-grab" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" data-drag-idx="${idx}">
+      <div class="absolute top-1 left-1 w-5 h-5 rounded-full bg-slate-900/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all pointer-events-none"><i data-lucide="grip-vertical" class="w-3 h-3 text-white"></i></div>
       <button onclick="deleteHpHeroPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
         <i data-lucide="trash-2" class="w-3 h-3"></i>
       </button>
     </div>
   `).join('');
   lucide.createIcons();
+  initDragReorder(grid, '[data-drag-idx]', async (fromIdx, toIdx) => {
+    const [moved] = hpHeroPhotosCache.splice(fromIdx, 1);
+    hpHeroPhotosCache.splice(toIdx, 0, moved);
+    renderHpHeroGrid(hpHeroPhotosCache);
+    try{
+      await fetch(CMS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reorderFotoHero', apiSecret: DASHBOARD_API_SECRET, urutan: hpHeroPhotosCache.map(p => p.urlFoto), editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+      });
+      showToast('Susunan Foto Hero disimpan.', 'success');
+    }catch(e){ showToast('Gagal simpan susunan. Cuba lagi.', 'error'); }
+  });
 }
 function uploadHpHeroPhoto(event){
   if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
@@ -2878,71 +2929,90 @@ async function toggleHpHeroFromGaleri(urlFoto){
   }
 }
 
-/* ---- Galeri Sekolah (dikongsi semua unit - dipanggil dari tab Kandungan Unit) ---- */
-async function loadCmsGaleri(){
-  try{
-    const res = await fetch(CMS_SCRIPT_URL + '?action=galeri');
-    if(!res.ok) return;
-    const d = await res.json();
-    renderCmsGaleriGrid(Array.isArray(d) ? d : []);
-  }catch(e){ /* senyap */ }
-}
-function renderCmsGaleriGrid(photos){
-  const grid = document.getElementById('cms-galeri-grid');
+/* ---- Galeri Aktiviti Unit (khusus unit ini sahaja - dipanggil dari tab Kandungan Unit) ---- */
+function renderCmsImageGrid(images){
+  const grid = document.getElementById('cms-image-grid');
   if(!grid) return;
-  if(!photos.length){
-    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto galeri dimuat naik lagi.</p>`;
+  if(!images.length){
+    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada gambar dimuat naik lagi untuk unit ini.</p>`;
     return;
   }
-  grid.innerHTML = photos.map(p => {
-    const label = [p.namaProgram, p.tempat].filter(Boolean).join(' &bull; ');
-    const fullInfo = [p.namaProgram, p.tarikh, p.tempat].filter(Boolean).join(' | ');
-    return `
-    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${fullInfo}">
-      ${label ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</div>` : ''}
-      <button onclick="deleteHpGaleriPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+  grid.innerHTML = images.map(img => `
+    <div class="relative group">
+      <a href="${img.imageUrl}" target="_blank" rel="noopener" class="block aspect-square rounded-xl overflow-hidden border border-line hover:border-sky transition-all bg-mist" style="background-image:url('${img.imageUrl}'); background-size:cover; background-position:center;" title="Buka saiz penuh"></a>
+      <button onclick="deleteCmsImage('${img.imageUrl}')" title="Padam gambar" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
         <i data-lucide="trash-2" class="w-3 h-3"></i>
       </button>
-    </div>`;
-  }).join('');
+      ${img.caption ? `<p class="text-[10px] text-ink-faint mt-1 truncate" title="${img.caption.replace(/"/g,'&quot;')}">${img.caption}</p>` : ''}
+    </div>
+  `).join('');
   lucide.createIcons();
 }
-async function uploadCmsGaleriPhotos(event){
-  const files = Array.from(event.target.files || []);
-  if(!files.length) return;
 
-  const namaProgram = document.getElementById('cms-galeri-program').value.trim();
-  const tarikh = document.getElementById('cms-galeri-tarikh').value;
-  const tempat = document.getElementById('cms-galeri-tempat').value.trim();
+async function loadCmsImages(unit){
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=images');
+    if(!res.ok) throw new Error();
+    const all = await res.json();
+    if(cmsActiveUnit === unit){
+      renderCmsImageGrid(Array.isArray(all) ? all.filter(img => img.unit === unit) : []);
+    }
+  }catch(e){ /* senyap - gambar sedia ada takkan papar jika rangkaian gagal */ }
+}
 
-  if(!namaProgram){
-    showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
-    event.target.value = '';
+let cmsImageSelectedFile = null;
+function handleCmsImageChosen(event){
+  cmsImageSelectedFile = event.target.files[0] || null;
+  document.getElementById('cms-image-file-label').innerText = cmsImageSelectedFile ? cmsImageSelectedFile.name : 'Pilih Gambar';
+}
+
+async function uploadCmsImage(){
+  if(!cmsActiveUnit) return;
+  if(!isCmsBackendConfigured()){
+    showToast('Storan dikongsi belum disediakan lagi. Sila hubungi Guru ICT.', 'error');
     return;
   }
-
-  const progressEl = document.getElementById('cms-galeri-progress');
-  progressEl.classList.remove('hidden');
-
-  let uploaded = 0;
-  for(const file of files){
-    progressEl.innerText = `Memuat naik ${uploaded + 1} / ${files.length}...`;
+  if(!cmsImageSelectedFile){
+    showToast('Sila pilih gambar dahulu.', 'error');
+    return;
+  }
+  const caption = document.getElementById('cms-image-caption').value.trim();
+  showToast('Memuat naik gambar...', 'info');
+  const reader = new FileReader();
+  reader.onload = async () => {
     try{
-      const dataUrl = await readFileAsDataUrl_(file);
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'uploadImage', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, imageBase64: reader.result, caption: caption, editor: currentUser.name })
       });
-      uploaded++;
-      await new Promise(r => setTimeout(r, 400));
-    }catch(err){ /* teruskan ke fail seterusnya walaupun satu gagal */ }
-  }
+      showToast('Gambar berjaya dimuat naik!', 'success');
+      document.getElementById('cms-image-caption').value = '';
+      document.getElementById('cms-image-file-input').value = '';
+      document.getElementById('cms-image-file-label').innerText = 'Pilih Gambar';
+      cmsImageSelectedFile = null;
+      setTimeout(() => loadCmsImages(cmsActiveUnit), 1200);
+    }catch(err){
+      showToast('Gagal muat naik gambar. Sila cuba semula.', 'error');
+    }
+  };
+  reader.readAsDataURL(cmsImageSelectedFile);
+}
 
-  progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
-  showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
-  event.target.value = '';
-  setTimeout(() => { progressEl.classList.add('hidden'); loadCmsGaleri(); }, 1500);
+async function deleteCmsImage(imageUrl){
+  if(!confirm('Padam gambar ini? Tindakan ini tidak boleh diundur.')) return;
+  showToast('Memadam gambar...', 'info');
+  try{
+    await fetch(CMS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'deleteImage', apiSecret: DASHBOARD_API_SECRET, imageUrl: imageUrl })
+    });
+    showToast('Gambar berjaya dipadam.', 'success');
+    setTimeout(() => loadCmsImages(cmsActiveUnit), 1000);
+  }catch(e){
+    showToast('Gagal padam gambar.', 'error');
+  }
 }
 
 /* ---- Galeri Sekolah ---- */
@@ -3019,7 +3089,7 @@ async function uploadHpGaleriPhotos(event){
   progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
   showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
   event.target.value = '';
-  setTimeout(() => { progressEl.classList.add('hidden'); loadHpGaleri(); }, 1500);
+  setTimeout(() => { progressEl.classList.add('hidden'); loadHpGaleri(); loadCmsGaleriTab(); }, 1500);
 }
 async function deleteHpGaleriPhoto(urlFoto){
   if(!confirm('Padam foto galeri ini?')) return;
@@ -3030,21 +3100,23 @@ async function deleteHpGaleriPhoto(urlFoto){
       body: JSON.stringify({ action: 'deleteGaleri', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto })
     });
     showToast('Foto galeri dipadam.', 'success');
-    setTimeout(() => { loadHpGaleri(); loadCmsGaleri(); loadGaleriSekolahStandalone(); }, 1000);
+    setTimeout(() => { loadHpGaleri(); loadCmsGaleriTab(); }, 1000);
   }catch(e){ showToast('Gagal padam foto galeri.', 'error'); }
 }
 
-/* ---- Galeri Sekolah (modul berdiri sendiri - terbuka untuk SEMUA staf) ---- */
-async function loadGaleriSekolahStandalone(){
+/* ---- Galeri Sekolah (tab berasingan - boleh diakses SEMUA staf) ---- */
+/* Guna endpoint backend yang sama (action=galeri) - kongsi data sama dengan panel Laman Utama,
+   cuma ID elemen berbeza supaya dua UI ni boleh wujud serentak tanpa berlanggar. */
+async function loadCmsGaleriTab(){
   try{
     const res = await fetch(CMS_SCRIPT_URL + '?action=galeri');
     if(!res.ok) return;
     const d = await res.json();
-    renderGaleriStandaloneGrid(Array.isArray(d) ? d : []);
+    renderCmsGaleriTabGrid(Array.isArray(d) ? d : []);
   }catch(e){ /* senyap */ }
 }
-function renderGaleriStandaloneGrid(photos){
-  const grid = document.getElementById('galeri-standalone-grid');
+function renderCmsGaleriTabGrid(photos){
+  const grid = document.getElementById('cms-galeri-tab-grid');
   if(!grid) return;
   if(!photos.length){
     grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto galeri dimuat naik lagi.</p>`;
@@ -3056,20 +3128,20 @@ function renderGaleriStandaloneGrid(photos){
     return `
     <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${fullInfo}">
       ${label ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</div>` : ''}
-      <button onclick="deleteHpGaleriPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+      <button onclick="deleteCmsGaleriTabPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
         <i data-lucide="trash-2" class="w-3 h-3"></i>
       </button>
     </div>`;
   }).join('');
   lucide.createIcons();
 }
-async function uploadGaleriStandalone(event){
+async function uploadCmsGaleriTabPhotos(event){
   const files = Array.from(event.target.files || []);
   if(!files.length) return;
 
-  const namaProgram = document.getElementById('galeri-standalone-program').value.trim();
-  const tarikh = document.getElementById('galeri-standalone-tarikh').value;
-  const tempat = document.getElementById('galeri-standalone-tempat').value.trim();
+  const namaProgram = document.getElementById('cms-galeri-tab-program').value.trim();
+  const tarikh = document.getElementById('cms-galeri-tab-tarikh').value;
+  const tempat = document.getElementById('cms-galeri-tab-tempat').value.trim();
 
   if(!namaProgram){
     showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
@@ -3077,7 +3149,7 @@ async function uploadGaleriStandalone(event){
     return;
   }
 
-  const progressEl = document.getElementById('galeri-standalone-progress');
+  const progressEl = document.getElementById('cms-galeri-tab-progress');
   progressEl.classList.remove('hidden');
 
   let uploaded = 0;
@@ -3098,7 +3170,19 @@ async function uploadGaleriStandalone(event){
   progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
   showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
   event.target.value = '';
-  setTimeout(() => { progressEl.classList.add('hidden'); loadGaleriSekolahStandalone(); }, 1500);
+  setTimeout(() => { progressEl.classList.add('hidden'); loadCmsGaleriTab(); loadHpGaleri(); }, 1500);
+}
+async function deleteCmsGaleriTabPhoto(urlFoto){
+  if(!confirm('Padam foto galeri ini?')) return;
+  try{
+    await fetch(CMS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'deleteGaleri', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto })
+    });
+    showToast('Foto galeri dipadam.', 'success');
+    setTimeout(() => { loadCmsGaleriTab(); loadHpGaleri(); }, 1000);
+  }catch(e){ showToast('Gagal padam foto galeri.', 'error'); }
 }
 
 
@@ -3146,7 +3230,8 @@ function renderCartaRows(){
     return;
   }
   box.innerHTML = cartaState.map((m, idx) => `
-    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center">
+    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center" data-drag-idx="${idx}">
+      <i data-lucide="grip-vertical" class="w-4 h-4 text-ink-faint cursor-grab shrink-0 hidden xl:block" title="Seret untuk susun semula"></i>
       <div class="relative w-12 h-12 rounded-full overflow-hidden bg-white border border-line shrink-0 mx-auto xl:mx-0" style="background-image:url('${m.urlFoto||''}'); background-size:cover; background-position:center;">
         ${!m.urlFoto ? '<div class="w-full h-full flex items-center justify-center text-ink-faint"><i data-lucide="user" class="w-5 h-5"></i></div>' : ''}
         <label class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all">
@@ -3168,6 +3253,11 @@ function renderCartaRows(){
   `).join('');
   lucide.createIcons();
   updateCartaUnitPreview();
+  initDragReorder(box, '[data-drag-idx]', (fromIdx, toIdx) => {
+    const [moved] = cartaState.splice(fromIdx, 1);
+    cartaState.splice(toIdx, 0, moved);
+    renderCartaRows();
+  });
 }
 function uploadCartaUnitPhoto(idx, event){
   const file = event.target.files[0];
