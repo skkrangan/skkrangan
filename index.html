@@ -649,7 +649,9 @@ function orgCard(p, size){ const sz = size === 'lg' ? 'w-24 h-24' : 'w-20 h-20';
 function renderPengumumanTicker(items){
   const tickerWrap = document.getElementById('ticker-events-wrap');
   if(!tickerWrap) return;
-  if(items && items.length){
+  // Pengumuman disembunyikan pada laman awam (papar di Dashboard staf sahaja) - jalur ini
+  // sentiasa papar moto sekolah. Buang syarat "false &&" di bawah untuk aktifkan semula.
+  if(false && items && items.length){
     const list = items.slice(0, 3).map(p => ({ icon: 'megaphone', text: p.tajuk }));
     tickerWrap.innerHTML = list.map((item, i) => {
       const sep = i > 0 ? `<span class="hidden sm:inline text-white/30">&bull;</span>` : '';
