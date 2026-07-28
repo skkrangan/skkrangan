@@ -1523,6 +1523,7 @@ async function saveStaffCard(idx){
   });
   const payload = {
     action: 'savestaf',
+    apiSecret: DASHBOARD_API_SECRET,
     id: s.id || 0,
     name, email,
     delimaEmail: email,
