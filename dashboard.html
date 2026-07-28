@@ -301,17 +301,15 @@
               <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Galeri Aktiviti Unit <span class="text-ink-faint normal-case font-normal">(khusus unit ini sahaja)</span></h3>
             </div>
             <p class="text-[11px] text-ink-faint mb-3">Foto aktiviti/program khusus unit ini - dipaparkan pada halaman awam unit berkenaan sahaja (bukan Galeri Sekolah pusat).</p>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
-              <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-bold text-navy hover:text-navy-deep bg-mist hover:bg-navy-50 px-3 py-2.5 rounded-lg transition-all shrink-0">
-                <i data-lucide="image-plus" class="w-3.5 h-3.5"></i> <span id="cms-image-file-label">Pilih Gambar</span>
-                <input id="cms-image-file-input" type="file" accept="image/*" class="hidden" onchange="handleCmsImageChosen(event)">
+            <div id="cms-image-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4"></div>
+            <div class="bg-mist rounded-2xl p-4 space-y-3">
+              <input id="cms-image-caption" type="text" placeholder="Kapsyen gambar (pilihan - dikongsi untuk semua gambar yang dimuat naik sekali gus)" class="w-full bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-navy focus:outline-none">
+              <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
+                <input id="cms-image-file-input" type="file" accept="image/*" multiple class="hidden" onchange="uploadCmsImagePhotos(event)">
               </label>
-              <input id="cms-image-caption" type="text" placeholder="Kapsyen gambar (pilihan)" class="flex-1 bg-mist border border-line rounded-lg px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-sky focus:outline-none">
-              <button onclick="uploadCmsImage()" class="shrink-0 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-lg transition-all inline-flex items-center justify-center gap-1.5">
-                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik
-              </button>
+              <p id="cms-image-progress" class="text-[11px] text-ink-faint hidden"></p>
             </div>
-            <div id="cms-image-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
           </div>
 
           <!-- ===== Carta Organisasi Unit ===== -->
@@ -2960,43 +2958,39 @@ async function loadCmsImages(unit){
   }catch(e){ /* senyap - gambar sedia ada takkan papar jika rangkaian gagal */ }
 }
 
-let cmsImageSelectedFile = null;
-function handleCmsImageChosen(event){
-  cmsImageSelectedFile = event.target.files[0] || null;
-  document.getElementById('cms-image-file-label').innerText = cmsImageSelectedFile ? cmsImageSelectedFile.name : 'Pilih Gambar';
-}
-
-async function uploadCmsImage(){
+async function uploadCmsImagePhotos(event){
   if(!cmsActiveUnit) return;
   if(!isCmsBackendConfigured()){
     showToast('Storan dikongsi belum disediakan lagi. Sila hubungi Guru ICT.', 'error');
     return;
   }
-  if(!cmsImageSelectedFile){
-    showToast('Sila pilih gambar dahulu.', 'error');
-    return;
-  }
+  const files = Array.from(event.target.files || []);
+  if(!files.length) return;
+
   const caption = document.getElementById('cms-image-caption').value.trim();
-  showToast('Memuat naik gambar...', 'info');
-  const reader = new FileReader();
-  reader.onload = async () => {
+  const progressEl = document.getElementById('cms-image-progress');
+  progressEl.classList.remove('hidden');
+
+  let uploaded = 0;
+  for(const file of files){
+    progressEl.innerText = `Memuat naik ${uploaded + 1} / ${files.length}...`;
     try{
+      const dataUrl = await readFileAsDataUrl_(file);
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'uploadImage', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, imageBase64: reader.result, caption: caption, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadImage', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, imageBase64: dataUrl, caption: caption, editor: currentUser.name })
       });
-      showToast('Gambar berjaya dimuat naik!', 'success');
-      document.getElementById('cms-image-caption').value = '';
-      document.getElementById('cms-image-file-input').value = '';
-      document.getElementById('cms-image-file-label').innerText = 'Pilih Gambar';
-      cmsImageSelectedFile = null;
-      setTimeout(() => loadCmsImages(cmsActiveUnit), 1200);
-    }catch(err){
-      showToast('Gagal muat naik gambar. Sila cuba semula.', 'error');
-    }
-  };
-  reader.readAsDataURL(cmsImageSelectedFile);
+      uploaded++;
+      await new Promise(r => setTimeout(r, 400));
+    }catch(err){ /* teruskan ke fail seterusnya walaupun satu gagal */ }
+  }
+
+  progressEl.innerText = `Selesai! ${uploaded} / ${files.length} gambar berjaya dimuat naik.`;
+  showToast(`${uploaded} gambar berjaya dimuat naik.`, 'success');
+  document.getElementById('cms-image-caption').value = '';
+  event.target.value = '';
+  setTimeout(() => { progressEl.classList.add('hidden'); loadCmsImages(cmsActiveUnit); }, 1500);
 }
 
 async function deleteCmsImage(imageUrl){
@@ -3324,7 +3318,15 @@ async function loadCartaForUnit(unit){
     if(!res.ok) throw new Error();
     const all = await res.json();
     if(cmsActiveUnit === unit){
-      cartaState = Array.isArray(all) ? all.filter(m => m.unit === unit).map(m => ({ nama:m.nama, jawatan:m.jawatan, tier:m.tier||3, urlFoto:m.urlFoto||'' })) : [];
+      const filtered = Array.isArray(all) ? all.filter(m => m.unit === unit).map(m => ({ nama:m.nama, jawatan:m.jawatan, tier:m.tier||3, urlFoto:m.urlFoto||'' })) : [];
+      // Buang rekod pendua (nama + jawatan sama) - data lama mungkin ada baris berulang di Sheet
+      const seen = new Set();
+      cartaState = filtered.filter(m => {
+        const key = (m.nama||'').trim().toLowerCase() + '|' + (m.jawatan||'').trim().toLowerCase();
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
       renderCartaRows();
     }
   }catch(e){ /* senyap - kekal senarai kosong jika rangkaian gagal */ }
