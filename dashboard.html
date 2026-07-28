@@ -192,6 +192,7 @@
       <h2 class="font-display font-semibold text-3xl text-ink">Selamat kembali, <span id="welcome-name" class="text-navy">Staf</span> 👋</h2>
       <p class="text-ink-soft mt-1">Sila pilih sistem anda di bawah.</p>
     </div>
+    <div id="dashboard-pengumuman-box" class="hidden mb-8"></div>
     <div id="module-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </div>
 
@@ -1630,6 +1631,7 @@ function enterDashboard(){
   document.getElementById('user-role-label').innerText = currentUser.cmsRoleLabel || currentUser.position;
   renderModuleGrid();
   showModule('picker');
+  loadDashboardPengumuman();
 
   // "Kemas Kini Status" (borang peribadi) dipaparkan untuk SEMUA staf KECUALI akaun
   // yang ditanda excludeFromAttendance (cth. Akaun Pentadbir Sistem - bukan orang sebenar).
@@ -1664,6 +1666,26 @@ function signOutDashboard(){
   document.getElementById('dashboard-shell').classList.add('hidden');
   document.getElementById('login-gate').classList.remove('hidden');
   if(typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
+}
+
+// Papar pengumuman aktif (dari sistem Pengumuman sedia ada) atas Dashboard staf juga
+async function loadDashboardPengumuman(){
+  const box = document.getElementById('dashboard-pengumuman-box');
+  if(!box || !isCmsBackendConfigured()) return;
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=pengumuman');
+    if(!res.ok) return;
+    const items = await res.json();
+    if(!Array.isArray(items) || !items.length){ box.classList.add('hidden'); box.innerHTML = ''; return; }
+    box.innerHTML = items.slice(0, 3).map(p => `
+      <div class="bg-navy rounded-2xl px-5 py-4 flex items-start gap-3 mb-3 last:mb-0">
+        <i data-lucide="megaphone" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+        <p class="text-white text-sm font-semibold">${p.tajuk}</p>
+      </div>
+    `).join('');
+    box.classList.remove('hidden');
+    lucide.createIcons();
+  }catch(e){ /* senyap */ }
 }
 
 function renderModuleGrid(){
