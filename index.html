@@ -577,10 +577,10 @@ initHeroSlideshow();  (() => { const ls = document.getElementById('loading-scree
   }
   return html;
 }
-function orgCard(p, size){ const sz = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12'; const nameSz = size === 'lg' ? 'text-xl' : 'text-lg'; return `
-      <button onclick="openOrgModal('${p.name}','${p.role}','${p.photo || ''}')" class="soft-card rounded-2xl p-5 text-left inline-flex items-center gap-3.5 w-full h-full">
+function orgCard(p, size){ const sz = size === 'lg' ? 'w-24 h-24' : 'w-20 h-20'; const nameSz = size === 'lg' ? 'text-xl' : 'text-lg'; return `
+      <button onclick="openOrgModal('${p.name}','${p.role}','${p.photo || ''}')" class="soft-card rounded-2xl p-5 flex flex-col items-center text-center gap-3 w-full h-full">
         <div class="${sz} rounded-full bg-navy-50 flex items-center justify-center shrink-0 overflow-hidden">
-          ${p.photo ? `<img src="${p.photo}" alt="${p.name}" loading="lazy" decoding="async" class="w-full h-full object-cover">` : `<i data-lucide="user" class="w-5 h-5 text-navy"></i>`}
+          ${p.photo ? `<img src="${p.photo}" alt="${p.name}" loading="lazy" decoding="async" class="w-full h-full object-cover">` : `<i data-lucide="user" class="w-7 h-7 text-navy"></i>`}
         </div>
         <div class="min-w-0"><p class="font-display font-semibold text-ink ${nameSz} leading-snug">${p.name}</p><p class="text-base text-gold font-bold mt-0.5">${p.role}</p></div>
       </button>`; } function renderOrgChart(){ const gb = orgChart.filter(p => p.tier === 1); const gpk = orgChart.filter(p => p.tier === 2); const staf = orgChart.filter(p => p.tier === 3); const html = `
