@@ -767,9 +767,9 @@
                                     <div class="space-y-3 text-sm">
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Belum Kemas Kini')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-slate-400"></span> Belum Kemas Kini</span><span class="font-bold text-slate-950 dark:text-white" id="stat-belum-kemaskini">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Di Sekolah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Di Sekolah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school">0</span></div>
-                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Di Sekolah : Mesyuarat/Bengkel')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Di Sekolah : Mesyuarat/Bengkel</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school-mesy">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Mesyuarat/Bengkel/Taklimat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Mesyuarat/Bengkel/Taklimat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school-mesy">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Bekerja Dari Rumah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Bekerja Dari Rumah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-wfh">0</span></div>
-                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Peribadi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Luar Pejabat : Urusan Peribadi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-peribadi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Cuti Rehat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat Khas')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span> Cuti Rehat Khas</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat-khas">0</span></div>
@@ -3602,9 +3602,9 @@ window.onload = async function(){
 
         const statusDetails = {
             'Di Sekolah': { bg: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-300', icon: 'fa-school', badge: 'bg-emerald-100 dark:bg-emerald-950/40' },
-            'Di Sekolah : Mesyuarat/Bengkel': { bg: 'bg-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', icon: 'fa-chalkboard-user', badge: 'bg-teal-50 dark:bg-teal-950/40' },
+            'Mesyuarat/Bengkel/Taklimat': { bg: 'bg-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', icon: 'fa-chalkboard-user', badge: 'bg-teal-50 dark:bg-teal-950/40' },
             'Bekerja Dari Rumah': { bg: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-300', icon: 'fa-house-laptop', badge: 'bg-blue-100 dark:bg-blue-950/40' },
-            'Luar Pejabat : Urusan Rasmi': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
+            'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
             'Luar Pejabat : Urusan Peribadi': { bg: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400', icon: 'fa-user-clock', badge: 'bg-yellow-50 dark:bg-yellow-950/40' },
             'Cuti Rehat': { bg: 'bg-rose-600', text: 'text-rose-700 dark:text-rose-300', icon: 'fa-umbrella-beach', badge: 'bg-rose-100 dark:bg-rose-950/40' },
             'Cuti Rehat Khas': { bg: 'bg-fuchsia-500', text: 'text-fuchsia-700 dark:text-fuchsia-300', icon: 'fa-star', badge: 'bg-fuchsia-100 dark:bg-fuchsia-950/40' },
@@ -3620,7 +3620,7 @@ window.onload = async function(){
 
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
-        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi', 'Luar Pejabat : Urusan Peribadi'];
+        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring', 'Luar Pejabat : Urusan Peribadi'];
         // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
         // Guru ICT sahaja - staf lain (termasuk GB/GPK) cuma boleh
         // hantar status untuk hari semasa sahaja.
@@ -3718,6 +3718,13 @@ window.onload = async function(){
                     <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
                 `;
                 document.getElementById(`status-menu-${staffId}`).classList.add('hidden');
+
+                const noteLabel = document.getElementById(`note-label-${staffId}`);
+                if (noteLabel) {
+                    const isWajib = statusText === 'Cuti Tanpa Rekod';
+                    noteLabel.querySelector('span').innerText = isWajib ? '(wajib diisi)' : '(pilihan)';
+                    noteLabel.querySelector('span').className = isWajib ? 'normal-case font-bold text-rose-500' : 'normal-case font-medium text-slate-400';
+                }
 
                 const enddateWrap = document.getElementById(`enddate-wrap-${staffId}`);
                 if (enddateWrap) {
@@ -3836,7 +3843,7 @@ window.onload = async function(){
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Catatan <span class="normal-case font-medium text-slate-400">(pilihan)</span></label>
+                            <label id="note-label-${s.id}" class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Catatan <span class="${s.status === 'Cuti Tanpa Rekod' ? 'normal-case font-bold text-rose-500' : 'normal-case font-medium text-slate-400'}">${s.status === 'Cuti Tanpa Rekod' ? '(wajib diisi)' : '(pilihan)'}</span></label>
                             <textarea id="note-input-${s.id}" rows="2" placeholder="Cth: Mesyuarat di PPD Serian..." class="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-400 dark:placeholder-slate-600 resize-none"></textarea>
                         </div>
                         <div id="enddate-wrap-${s.id}" class="${(MULTI_DAY_ELIGIBLE_STATUSES.includes(s.status) && canUseMultiDay_()) ? '' : 'hidden'}">
@@ -4013,7 +4020,7 @@ window.onload = async function(){
             });
             let mySchoolDays = 0, myLeaveDays = 0;
             myMonthRecords.forEach(r => {
-                if(r.status === 'Di Sekolah' || r.status === 'Di Sekolah : Mesyuarat/Bengkel') mySchoolDays++;
+                if(r.status === 'Di Sekolah' || r.status === 'Mesyuarat/Bengkel/Taklimat') mySchoolDays++;
                 else myLeaveDays++;
             });
             const myRate = myMonthRecords.length > 0 ? Math.round((mySchoolDays / myMonthRecords.length) * 100) : 0;
@@ -4037,9 +4044,9 @@ window.onload = async function(){
             staffData.filter(s => !s.excludeFromAttendance).forEach(s => {
                 const status = todayMap[s.id] || 'Belum Kemas Kini';
                 if (status === 'Di Sekolah') { school++; countSchool++; }
-                else if (status === 'Di Sekolah : Mesyuarat/Bengkel') { school++; countSchoolMesy++; }
+                else if (status === 'Mesyuarat/Bengkel/Taklimat') { school++; countSchoolMesy++; }
                 else if (status === 'Bekerja Dari Rumah') { outside++; countWfh++; }
-                else if (status === 'Luar Pejabat : Urusan Rasmi') { outside++; countOutsideRasmi++; }
+                else if (status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring') { outside++; countOutsideRasmi++; }
                 else if (status === 'Luar Pejabat : Urusan Peribadi') { outside++; countOutsidePeribadi++; }
                 else if (status === 'Cuti Rehat') { leave++; countCutiRehat++; }
                 else if (status === 'Cuti Rehat Khas') { leave++; countCutiRehatKhas++; }
@@ -4128,7 +4135,14 @@ window.onload = async function(){
             const staffRecord = staffData.find(s => s.id === id);
             const staffPosition = staffRecord ? staffRecord.position : '';
             const originalText = btn.innerHTML;
-            
+
+            // Catatan WAJIB diisi untuk status "Cuti Tanpa Rekod"
+            if (selectedStatus === 'Cuti Tanpa Rekod' && !noteVal) {
+                showToast('Sila isi catatan sebelum hantar status "Cuti Tanpa Rekod".', 'error');
+                if (noteInput) noteInput.focus();
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Mengunci...`;
             btn.className = "w-full bg-slate-400 text-slate-700 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 cursor-not-allowed";
@@ -4423,8 +4437,8 @@ window.onload = async function(){
             let totalSchoolDays = 0, totalLeaveDays = 0, totalRasmiDays = 0, totalSubmittedDays = 0;
             monthlyData.forEach(log => {
                 totalSubmittedDays++;
-                if (log.status === 'Di Sekolah' || log.status === 'Di Sekolah : Mesyuarat/Bengkel') totalSchoolDays++;
-                else if (log.status === 'Luar Pejabat : Urusan Rasmi') totalRasmiDays++;
+                if (log.status === 'Di Sekolah' || log.status === 'Mesyuarat/Bengkel/Taklimat') totalSchoolDays++;
+                else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring') totalRasmiDays++;
                 else if (log.status === 'Cuti Rehat' || log.status === 'Cuti Rehat Khas' || log.status === 'Cuti Sakit' || log.status === 'Cuti Tanpa Rekod' || log.status === 'Cuti : Lain-lain') totalLeaveDays++;
             });
             const attendanceRate = totalSubmittedDays > 0 ? Math.round((totalSchoolDays / totalSubmittedDays) * 100) : 0;
@@ -4445,8 +4459,8 @@ window.onload = async function(){
 
                 staffLogs.forEach(log => {
                     if (log.status === 'Di Sekolah') countSchool++;
-                    else if (log.status === 'Di Sekolah : Mesyuarat/Bengkel') countMesy++;
-                    else if (log.status === 'Luar Pejabat : Urusan Rasmi') countLuarRasmi++;
+                    else if (log.status === 'Mesyuarat/Bengkel/Taklimat') countMesy++;
+                    else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring') countLuarRasmi++;
                     else if (log.status === 'Luar Pejabat : Urusan Peribadi') countLuarPeribadi++;
                     else if (log.status === 'Cuti Rehat') countCutiRehat++;
                     else countCutiSakitLain++; 
@@ -4500,7 +4514,7 @@ window.onload = async function(){
                         onClick: (event, elements) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const statusMapping = ['Di Sekolah','Di Sekolah : Mesyuarat/Bengkel','Luar Pejabat : Urusan Rasmi','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
+                                const statusMapping = ['Di Sekolah','Mesyuarat/Bengkel/Taklimat','Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
                                 filterByStatusName(statusMapping[index]);
                             }
                         },
