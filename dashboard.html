@@ -87,6 +87,10 @@
     #section-eopr.active { position: static !important; display: block !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
     #section-eopr.active main { display: block !important; height: auto !important; overflow: visible !important; }
     #section-eopr.active main > section:not(.no-print) { display: block !important; height: auto !important; overflow: visible !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    /* section-ehadir kini turut 'fixed' (supaya tutup header luar bila aktif) -
+       position:fixed akan ROSAKKAN cetakan (kandungan terpotong 1 muka surat
+       sahaja) melainkan ditukar kembali kepada aliran dokumen biasa semasa cetak. */
+    #section-ehadir.active { position: static !important; display: block !important; height: auto !important; min-height: 0 !important; overflow: visible !important; inset: auto !important; }
     @page opr-page { size: A4 portrait; margin: 0mm; }
     /* Laporan Bulanan eHadir kini ada 12 lajur (BIL + Nama + 10 status) - guna
        kertas LANDSKAP supaya semua lajur muat dengan selesa tanpa font mikroskopik. */
@@ -117,18 +121,33 @@
     table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; table-layout: fixed !important; }
     thead { display: table-header-group !important; } /* ulang tajuk lajur di setiap muka surat baharu */
     tr { page-break-inside: avoid !important; } /* elak baris terpotong separuh, tapi jadual BOLEH sambung ke muka surat 2 tanpa jurang kosong */
-    th, td { padding: 3px 4px !important; font-size: 8px !important; line-height: 1.15 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+    th, td { padding: 5px 6px !important; font-size: 10px !important; line-height: 1.3 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
     /* Isu jadual terpotong semasa cetak: pembalut "overflow-x-auto" cuma boleh
        diskrol pada skrin - semasa cetak, apa-apa kandungan yang perlu diskrol
        akan HILANG terus (bukan disusun semula/reflow). Paksa nampak semua. */
     .overflow-x-auto { overflow: visible !important; }
     #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
     #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
-    #print-area-monthly th:nth-child(n+3), #print-area-monthly td:nth-child(n+3) { width: 8.2% !important; }
+    /* Lajur "Urusan Rasmi" (kedudukan ke-6) dapat lebar EKSTRA sebab
+       perkataan "Jawatankuasa" (12 aksara) terlalu panjang untuk lebar
+       lajur seragam - lajur status lain dikecilkan sedikit untuk seimbangkan. */
+    #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
+    #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
     .signature-block { margin-top: 14px !important; padding-top: 6px !important; page-break-inside: avoid !important; }
     .signature-space { height: 45px !important; }
     @page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }
   }
+  /* ============================================================
+     PAPARAN SKRIN Laporan Bulanan - GAYA SAMA seperti @media print
+     di atas (lebar lajur, table-layout, saiz fon) supaya pratonton
+     di skrin biasa PADAN TEPAT dengan hasil cetak/PDF sebenar.
+     ============================================================ */
+  #print-area-monthly table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
+  #print-area-monthly th, #print-area-monthly td { padding: 5px 6px !important; font-size: 10px !important; line-height: 1.3 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+  #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
+  #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
+  #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
+  #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
   .vertical-text-upright{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
   .vertical-text-upright span{ display:block; }
   .clip-roof-up{ clip-path: polygon(50% 0%, 100% 20%, 100% 100%, 0 100%, 0 20%); }
@@ -692,9 +711,9 @@
   </div>
 
   <!-- ============ MODUL: EHADIR (disisipkan) ============ -->
-  <div id="section-ehadir" class="tab-content w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 relative">
+  <div id="section-ehadir" class="tab-content fixed inset-0 z-[60] bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-y-auto">
             
-            <header class="bg-slate-900 text-white shadow-xl border-b-4 border-gold no-print transition-all duration-300 rounded-t-3xl overflow-hidden">
+            <header class="bg-slate-900 text-white shadow-xl border-b-4 border-gold no-print transition-all duration-300 overflow-hidden">
                 <div class="max-w-[1400px] mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
                         <img src="logo.png" alt="Logo SK Krangan" class="h-16 w-auto object-contain drop-shadow transition-transform hover:scale-105" onerror="this.src='https://placehold.co/150x150/1e293b/ffffff?text=SK+Krangan'">
@@ -907,7 +926,7 @@
                         </div>
                     </div>
 
-                    <div id="print-area-monthly" class="print-area bg-white text-black p-8 border border-slate-200 shadow-lg rounded-2xl max-w-[1400px] mx-auto text-slate-900 transition-all hidden md:block">
+                    <div id="print-area-monthly" class="print-area bg-white text-black p-10 border border-slate-300 max-w-[1400px] mx-auto text-slate-900 transition-all hidden md:block">
                         <div class="school-header flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-5">
                             <div class="flex items-center gap-4">
                                 <img src="logo.png" alt="Logo SK Krangan" class="school-logo h-16 w-auto object-contain" onerror="this.src='https://placehold.co/150x150/1e293b/ffffff?text=SK+Krangan'">
@@ -929,7 +948,7 @@
                                 <thead>
                                     <tr id="monthly-report-table-head" class="bg-slate-100 border-b border-slate-300 text-slate-800 font-extrabold text-[9px] uppercase">
                                         <th class="p-2 border-r border-slate-300 text-center w-8">BIL</th>
-                                        <th class="p-2 border-r border-slate-300">Nama Pentadbir & Guru</th>
+                                        <th class="p-2 border-r border-slate-300">Nama Staf</th>
                                         <!-- Lajur status dijana secara dinamik oleh renderMonthlyReportHead() -
                                              terus daripada statusOptions supaya SENTIASA selari dengan
                                              senarai status sebenar (Ringkasan Keberadaan Staf), walaupun
@@ -1830,7 +1849,7 @@ function showModule(id){
   document.querySelectorAll('#dashboard-shell > .tab-content').forEach(el => el.classList.remove('active'));
   const target = document.getElementById('section-' + id);
   if(target) target.classList.add('active');
-  document.body.style.overflow = (id === 'eopr') ? 'hidden' : '';
+  document.body.style.overflow = (id === 'eopr' || id === 'ehadir') ? 'hidden' : '';
   if(id === 'cms') renderCmsTabs();
   if(id === 'staf') renderStaffManagementList();
 }
@@ -4485,12 +4504,17 @@ window.onload = async function(){
             if (!headRow) return;
             let html = `
                 <th class="p-2 border-r border-slate-300 text-center w-8">BIL</th>
-                <th class="p-2 border-r border-slate-300">Nama Pentadbir & Guru</th>`;
+                <th class="p-2 border-r border-slate-300">Nama Staf</th>`;
             statusOptions.forEach((status, i) => {
                 // Guna TEKS PENUH status (bukan singkatan) - kertas landskap sedia
                 // beri cukup ruang, teks akan bertindih baris (wrap) automatik.
+                // Titik pecah baris (<wbr>) diselit SELEPAS setiap garis miring untuk
+                // PAPARAN sahaja - pastikan perkataan pecah bersih di sempadan "/"
+                // (bukan terpotong tengah-tengah perkataan secara rawak). Nilai
+                // sebenar 'status' (guna untuk padanan data/rekod) TIDAK disentuh.
+                const labelPaparan = status.replace(/\//g, '/<wbr>');
                 const isLast = i === statusOptions.length - 1;
-                html += `<th class="p-1.5 ${isLast ? '' : 'border-r border-slate-300'} text-center leading-tight">${status}</th>`;
+                html += `<th class="p-1.5 ${isLast ? '' : 'border-r border-slate-300'} text-center leading-tight">${labelPaparan}</th>`;
             });
             headRow.innerHTML = html;
         }
