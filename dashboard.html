@@ -5459,11 +5459,30 @@ function updatePreview() {
       }
     }
 
-    function downloadAsPDF() {
-      showToastOPR('Membuka tetingkap cetakan. Sila pilih "Save as PDF".', 'bg-emerald-600');
+    async function downloadAsPDF() {
+      showToastOPR('Menyediakan laporan untuk cetakan...', 'bg-emerald-600');
+
+      // Tunggu fon siap dahulu (sama teknik macam getCanvas()) - elak teks
+      // "melompat"/salah saiz semasa cetak jika fon belum sempat dimuat.
+      await Promise.race([document.fonts.ready, new Promise(res => setTimeout(res, 4000))]);
+
+      // PENGUKUHAN PENCEGAHAN: mix-blend-mode + filter:blur() pada hiasan
+      // art-glow-1/2 tak sentiasa dicetak konsisten merentas semua pelayar
+      // (terutama Firefox/Safari versi lama), walaupun print-color-adjust:exact
+      // sudah ditetapkan. Guna semula fungsi sedia ada (dah terbukti berkesan
+      // untuk eksport JPG/html2canvas) untuk gantikan sementara dengan gradient
+      // biasa semasa cetak sahaja - pulih semula selepas siap.
+      toggleDecorationsForExport(true);
+
+      const pulihkanHiasan = () => toggleDecorationsForExport(false);
+      window.addEventListener('afterprint', pulihkanHiasan, { once: true });
+      // Sandaran - sesetengah pelayar (terutama mudah alih) tak lancarkan
+      // 'afterprint' dengan boleh dipercayai, jadi pulih juga selepas tempoh munasabah.
+      setTimeout(pulihkanHiasan, 15000);
+
       setTimeout(() => {
         window.print();
-      }, 800);
+      }, 300);
     }
 
     function showToastOPR(msg, bg = 'bg-slate-900') {
