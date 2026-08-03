@@ -4209,6 +4209,15 @@ window.onload = async function(){
                 const found = verifyData.some(r => String(r.id) === String(id) && r.date === today);
                 if (!found) {
                     showToast(`Amaran: Tidak dapat disahkan status ${staffName} tersimpan. Sila semak semula & hantar sekali lagi jika perlu.`, 'error');
+                } else {
+                    // PEMBAIKAN SENDIRI: rekod disahkan wujud di Sheet (mungkin lewat sedikit
+                    // daripada muat semula pertama di submitStatus()). Tarik & papar SEMULA
+                    // supaya lencana "Status Semasa" tak kekal tersasar/lapuk walaupun
+                    // muat semula pertama (500ms) berlaku sebelum Sheet selesai proses.
+                    await fetchRecordsQuietly();
+                    if (typeof renderDashboard === 'function' && !document.getElementById('tab-dashboard')?.classList.contains('hidden')) {
+                        renderDashboard();
+                    }
                 }
             } catch (e) { /* senyap - jangan ganggu staf dengan ralat rangkaian latar belakang */ }
         }
@@ -4270,7 +4279,10 @@ window.onload = async function(){
                 showToast(isMultiDay ? `Status ${staffName} dihantar untuk beberapa hari!` : `Status ${staffName} dihantar!`, 'success');
                 btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Berjaya!`;
                 btn.className = "w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2";
-                setTimeout(async () => { await fetchRecordsQuietly(); switchTab('dashboard'); }, 500);
+                // 1800ms (bukan 500ms) - beri lebih masa Google Sheets selesai proses
+                // tulisan sebelum tarik semula data, elak lencana "Status Semasa" tersasar
+                // lapuk (rekod belum sempat sampai) walaupun status sebenarnya dah tersimpan.
+                setTimeout(async () => { await fetchRecordsQuietly(); switchTab('dashboard'); }, 1800);
 
                 verifyStatusInBackground_(id, staffName);
             } catch (err) {
