@@ -149,6 +149,16 @@
 
     <div id="g_id_signin" class="flex justify-center mb-4"></div>
 
+    <!-- PRATONTON TEMPATAN: hanya dipaparkan bila fail dibuka melalui file:// atau
+         localhost (semak JS di bawah). TIDAK AKAN kelihatan/berfungsi di laman
+         sebenar (skkrangan.github.io) walaupun blok ini tertinggal tidak sengaja. -->
+    <div id="local-preview-wrap" class="hidden mt-2 mb-2">
+      <button onclick="masukPratontonTempatan()" class="w-full py-2.5 rounded-full border-2 border-dashed border-amber-400 text-amber-600 text-xs font-bold hover:bg-amber-50 transition-colors">
+        🧪 Pratonton Tempatan (Aimuni Athirah - Guru ICT)
+      </button>
+      <p class="text-[10px] text-amber-500 mt-1.5">Hanya untuk ujian tempatan - tak berfungsi di laman langsung.</p>
+    </div>
+
     <div id="login-error" class="hidden text-left bg-crimson-soft border border-crimson/20 text-crimson text-sm rounded-2xl p-4 mt-2 flex gap-3">
       <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5"></i>
       <span id="login-error-text"></span>
@@ -769,7 +779,7 @@
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Di Sekolah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Di Sekolah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Mesyuarat/Bengkel/Taklimat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Mesyuarat/Bengkel/Taklimat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school-mesy">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Bekerja Dari Rumah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Bekerja Dari Rumah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-wfh">0</span></div>
-                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Peribadi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Luar Pejabat : Urusan Peribadi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-peribadi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Cuti Rehat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat Khas')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span> Cuti Rehat Khas</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat-khas">0</span></div>
@@ -1082,6 +1092,11 @@
           <div class="grid grid-cols-5 gap-2" id="image-uploaders-container">
             <!-- Uploaders injected by JS dynamically -->
           </div>
+        </div>
+
+        <div id="photo-layout-picker-wrap" class="hidden">
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Susun Atur Foto</label>
+          <div id="photo-layout-picker" class="flex gap-2 flex-wrap"></div>
         </div>
 
         <div>
@@ -1630,6 +1645,33 @@ function handleGoogleCredential(response){
     return;
   }
   showLoginError(`Akaun DELIMA "${email}" sah, tetapi belum didaftarkan dalam sistem sekolah ini. Sila hubungi Guru ICT.`);
+}
+
+// ============================================================================
+// PRATONTON TEMPATAN (ujian sahaja) - HANYA aktif bila fail dibuka melalui
+// file:// atau localhost/127.0.0.1. Semakan ini berlaku semasa muat halaman;
+// pada domain sebenar (skkrangan.github.io atau mana-mana hosting langsung),
+// butang ini KEKAL TERSEMBUNYI dan fungsi di bawah tidak akan tercetus,
+// walaupun blok kod ini tertinggal tidak sengaja semasa deploy.
+// ============================================================================
+(function initLocalPreviewGate(){
+  const isLocal = location.protocol === 'file:' ||
+                   location.hostname === 'localhost' ||
+                   location.hostname === '127.0.0.1';
+  if (!isLocal) return; // JANGAN dedahkan butang di luar persekitaran tempatan
+  const wrap = document.getElementById('local-preview-wrap');
+  if (wrap) wrap.classList.remove('hidden');
+})();
+
+function masukPratontonTempatan(){
+  const isLocal = location.protocol === 'file:' ||
+                   location.hostname === 'localhost' ||
+                   location.hostname === '127.0.0.1';
+  if (!isLocal) return; // pengesahan berlapis - tolak jika bukan tempatan
+  const staff = findStaffByEmail('g-80575536@moe-dl.edu.my'); // Aimuni Athirah - Guru ICT
+  if (!staff){ showLoginError('Rekod staf pratonton tidak dijumpai.'); return; }
+  currentUser = staff;
+  enterDashboard();
 }
 
 function enterDashboard(){
@@ -3587,7 +3629,10 @@ window.onload = async function(){
       uploaderContainer.innerHTML = html;
   }
   lucide.createIcons();
-  loadTemplate();
+  // Borang bermula KOSONG (state.school dsb. sudah default '' ) - guru boleh klik
+  // butang "Templat Asal" secara manual jika mahu rujukan contoh pengisian.
+  renderObjectivesForm();
+  updatePreview();
 };
 </script>
 
@@ -3604,7 +3649,7 @@ window.onload = async function(){
             'Di Sekolah': { bg: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-300', icon: 'fa-school', badge: 'bg-emerald-100 dark:bg-emerald-950/40' },
             'Mesyuarat/Bengkel/Taklimat': { bg: 'bg-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', icon: 'fa-chalkboard-user', badge: 'bg-teal-50 dark:bg-teal-950/40' },
             'Bekerja Dari Rumah': { bg: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-300', icon: 'fa-house-laptop', badge: 'bg-blue-100 dark:bg-blue-950/40' },
-            'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
+            'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
             'Luar Pejabat : Urusan Peribadi': { bg: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400', icon: 'fa-user-clock', badge: 'bg-yellow-50 dark:bg-yellow-950/40' },
             'Cuti Rehat': { bg: 'bg-rose-600', text: 'text-rose-700 dark:text-rose-300', icon: 'fa-umbrella-beach', badge: 'bg-rose-100 dark:bg-rose-950/40' },
             'Cuti Rehat Khas': { bg: 'bg-fuchsia-500', text: 'text-fuchsia-700 dark:text-fuchsia-300', icon: 'fa-star', badge: 'bg-fuchsia-100 dark:bg-fuchsia-950/40' },
@@ -3620,7 +3665,7 @@ window.onload = async function(){
 
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
-        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring', 'Luar Pejabat : Urusan Peribadi'];
+        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing', 'Luar Pejabat : Urusan Peribadi'];
         // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
         // Guru ICT sahaja - staf lain (termasuk GB/GPK) cuma boleh
         // hantar status untuk hari semasa sahaja.
@@ -4046,7 +4091,7 @@ window.onload = async function(){
                 if (status === 'Di Sekolah') { school++; countSchool++; }
                 else if (status === 'Mesyuarat/Bengkel/Taklimat') { school++; countSchoolMesy++; }
                 else if (status === 'Bekerja Dari Rumah') { outside++; countWfh++; }
-                else if (status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring') { outside++; countOutsideRasmi++; }
+                else if (status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') { outside++; countOutsideRasmi++; }
                 else if (status === 'Luar Pejabat : Urusan Peribadi') { outside++; countOutsidePeribadi++; }
                 else if (status === 'Cuti Rehat') { leave++; countCutiRehat++; }
                 else if (status === 'Cuti Rehat Khas') { leave++; countCutiRehatKhas++; }
@@ -4438,7 +4483,7 @@ window.onload = async function(){
             monthlyData.forEach(log => {
                 totalSubmittedDays++;
                 if (log.status === 'Di Sekolah' || log.status === 'Mesyuarat/Bengkel/Taklimat') totalSchoolDays++;
-                else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring') totalRasmiDays++;
+                else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') totalRasmiDays++;
                 else if (log.status === 'Cuti Rehat' || log.status === 'Cuti Rehat Khas' || log.status === 'Cuti Sakit' || log.status === 'Cuti Tanpa Rekod' || log.status === 'Cuti : Lain-lain') totalLeaveDays++;
             });
             const attendanceRate = totalSubmittedDays > 0 ? Math.round((totalSchoolDays / totalSubmittedDays) * 100) : 0;
@@ -4460,7 +4505,7 @@ window.onload = async function(){
                 staffLogs.forEach(log => {
                     if (log.status === 'Di Sekolah') countSchool++;
                     else if (log.status === 'Mesyuarat/Bengkel/Taklimat') countMesy++;
-                    else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring') countLuarRasmi++;
+                    else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') countLuarRasmi++;
                     else if (log.status === 'Luar Pejabat : Urusan Peribadi') countLuarPeribadi++;
                     else if (log.status === 'Cuti Rehat') countCutiRehat++;
                     else countCutiSakitLain++; 
@@ -4514,7 +4559,7 @@ window.onload = async function(){
                         onClick: (event, elements) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const statusMapping = ['Di Sekolah','Mesyuarat/Bengkel/Taklimat','Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pembimbing/Guru Pengiring','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
+                                const statusMapping = ['Di Sekolah','Mesyuarat/Bengkel/Taklimat','Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
                                 filterByStatusName(statusMapping[index]);
                             }
                         },
@@ -4817,6 +4862,97 @@ window.onload = async function(){
     }
 
     // FUNGSI RENDER GRID GAMBAR DENGAN CROP PINTAR (guna background-image, serasi penuh dengan html2canvas)
+    // TEMPLAT SUSUN ATUR - setiap kiraan foto (2/3) ada >1 pilihan supaya guru
+    // boleh pilih sendiri ikut orientasi foto sebenar (landskap/potret/campuran).
+    // build(photoDiv, wrapClass) pulangkan HTML - photoDiv(n) & wrapClass disuntik semasa render.
+    const PHOTO_LAYOUT_TEMPLATES = {
+      2: [
+        { id: 'tindih', label: '⬍ Bertindan', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-rows-2 gap-1 bg-white border border-slate-100">
+            <div class="${wrapClass}">${photoDiv(0)}</div>
+            <div class="${wrapClass}">${photoDiv(1)}</div>
+          </div>` },
+        { id: 'sebelah', label: '⬌ Bersebelahan', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-cols-2 gap-1 bg-white border border-slate-100">
+            <div class="${wrapClass}">${photoDiv(0)}</div>
+            <div class="${wrapClass}">${photoDiv(1)}</div>
+          </div>` },
+      ],
+      3: [
+        { id: 'hero-kiri', label: '◧ Utama Kiri', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-cols-3 gap-1 bg-white border border-slate-100">
+            <div class="col-span-2 ${wrapClass}">${photoDiv(0)}</div>
+            <div class="grid grid-rows-2 gap-1">
+              <div class="${wrapClass}">${photoDiv(1)}</div>
+              <div class="${wrapClass}">${photoDiv(2)}</div>
+            </div>
+          </div>` },
+        { id: 'hero-atas', label: '⬒ Utama Atas', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-rows-3 gap-1 bg-white border border-slate-100">
+            <div class="row-span-2 ${wrapClass}">${photoDiv(0)}</div>
+            <div class="grid grid-cols-2 gap-1">
+              <div class="${wrapClass}">${photoDiv(1)}</div>
+              <div class="${wrapClass}">${photoDiv(2)}</div>
+            </div>
+          </div>` },
+        { id: 'sama-rata', label: '⬌ 3 Sama Rata', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-cols-3 gap-1 bg-white border border-slate-100">
+            <div class="${wrapClass}">${photoDiv(0)}</div>
+            <div class="${wrapClass}">${photoDiv(1)}</div>
+            <div class="${wrapClass}">${photoDiv(2)}</div>
+          </div>` },
+      ],
+      4: [
+        { id: 'grid-2x2', label: '⊞ Grid 2×2', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-cols-2 grid-rows-2 gap-1 bg-white border border-slate-100">
+            <div class="${wrapClass}">${photoDiv(0)}</div>
+            <div class="${wrapClass}">${photoDiv(1)}</div>
+            <div class="${wrapClass}">${photoDiv(2)}</div>
+            <div class="${wrapClass}">${photoDiv(3)}</div>
+          </div>` },
+        { id: 'baris', label: '⬌ 1 Baris', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-cols-4 gap-1 bg-white border border-slate-100">
+            <div class="${wrapClass}">${photoDiv(0)}</div>
+            <div class="${wrapClass}">${photoDiv(1)}</div>
+            <div class="${wrapClass}">${photoDiv(2)}</div>
+            <div class="${wrapClass}">${photoDiv(3)}</div>
+          </div>` },
+      ],
+      5: [
+        { id: 'default5', label: '⊞ Lalai', build: (photoDiv, wrapClass) => `
+          <div class="w-full h-full grid grid-cols-6 grid-rows-2 gap-1 bg-white border border-slate-100">
+             <div class="col-span-3 ${wrapClass}">${photoDiv(0)}</div>
+             <div class="col-span-3 ${wrapClass}">${photoDiv(1)}</div>
+             <div class="col-span-2 ${wrapClass}">${photoDiv(2)}</div>
+             <div class="col-span-2 ${wrapClass}">${photoDiv(3)}</div>
+             <div class="col-span-2 ${wrapClass}">${photoDiv(4)}</div>
+          </div>` },
+      ],
+    };
+
+    function pilihSusunAturFoto(total, layoutId){
+      if(!state.photoLayoutChoice) state.photoLayoutChoice = {};
+      state.photoLayoutChoice[total] = layoutId;
+      renderPhotoGrid();
+    }
+
+    function renderLayoutPicker(total){
+      const wrap = document.getElementById('photo-layout-picker-wrap');
+      const picker = document.getElementById('photo-layout-picker');
+      const opsi = PHOTO_LAYOUT_TEMPLATES[total];
+      if(!opsi || opsi.length <= 1){ wrap.classList.add('hidden'); return; }
+
+      if(!state.photoLayoutChoice) state.photoLayoutChoice = {};
+      const dipilih = state.photoLayoutChoice[total] || opsi[0].id;
+
+      wrap.classList.remove('hidden');
+      picker.innerHTML = opsi.map(o => `
+        <button type="button" onclick="pilihSusunAturFoto(${total}, '${o.id}')"
+          class="px-3 py-2 rounded-lg text-xs font-bold border transition-all ${o.id === dipilih ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-300 text-slate-600 hover:border-indigo-400'}">
+          ${o.label}
+        </button>`).join('');
+    }
+
     function renderPhotoGrid() {
       const grid = document.getElementById('view-photo-grid');
       if(!grid) return;
@@ -4834,55 +4970,31 @@ window.onload = async function(){
 
       if (activePhotos.length === 0) {
         grid.innerHTML = `<div class="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300 font-semibold text-xs border border-dashed border-slate-200">Tiada Foto Aktiviti Dimuat Naik</div>`;
+        document.getElementById('photo-layout-picker-wrap').classList.add('hidden');
         return;
       }
 
-      let html = '';
       const total = activePhotos.length;
-      
+
       // photoDiv: background-image + background-size:cover mengekalkan nisbah asal & serasi eksport html2canvas
       // (elak <img object-fit>, yang sering "pecah"/teregang semasa eksport JPG)
       // n = indeks dalam activePhotos (BUKAN indeks asal state.photos) - guna posFor(n) utk kedudukan tersimpan.
       const photoDiv = (n) => `<div class="w-full h-full bg-slate-100" style="background-image:url('${activePhotos[n]}'); background-size:cover; background-position:${posFor(n)};"></div>`;
       const wrapClass = "overflow-hidden w-full h-full bg-slate-100";
 
+      let html = '';
       if (total === 1) {
         html = `<div class="${wrapClass}">${photoDiv(0)}</div>`;
-      } 
-      else if (total === 2) {
-        html = `<div class="w-full h-full grid grid-cols-2 gap-1 bg-white border border-slate-100">
-                  <div class="${wrapClass}">${photoDiv(0)}</div>
-                  <div class="${wrapClass}">${photoDiv(1)}</div>
-                </div>`;
-      } 
-      else if (total === 3) {
-        html = `<div class="w-full h-full grid grid-cols-3 gap-1 bg-white border border-slate-100">
-                  <div class="${wrapClass}">${photoDiv(0)}</div>
-                  <div class="${wrapClass}">${photoDiv(1)}</div>
-                  <div class="${wrapClass}">${photoDiv(2)}</div>
-                </div>`;
-      } 
-      else if (total === 4) {
-        html = `<div class="w-full h-full grid grid-cols-2 grid-rows-2 gap-1 bg-white border border-slate-100">
-                  <div class="${wrapClass}">${photoDiv(0)}</div>
-                  <div class="${wrapClass}">${photoDiv(1)}</div>
-                  <div class="${wrapClass}">${photoDiv(2)}</div>
-                  <div class="${wrapClass}">${photoDiv(3)}</div>
-                </div>`;
-      } 
-      else if (total === 5) {
-        html = `
-          <div class="w-full h-full grid grid-cols-6 grid-rows-2 gap-1 bg-white border border-slate-100">
-             <div class="col-span-3 ${wrapClass}">${photoDiv(0)}</div>
-             <div class="col-span-3 ${wrapClass}">${photoDiv(1)}</div>
-             <div class="col-span-2 ${wrapClass}">${photoDiv(2)}</div>
-             <div class="col-span-2 ${wrapClass}">${photoDiv(3)}</div>
-             <div class="col-span-2 ${wrapClass}">${photoDiv(4)}</div>
-          </div>
-        `;
+      } else {
+        const opsi = PHOTO_LAYOUT_TEMPLATES[Math.min(total, 5)];
+        if(!state.photoLayoutChoice) state.photoLayoutChoice = {};
+        const dipilihId = state.photoLayoutChoice[total];
+        const templat = (opsi && (opsi.find(o => o.id === dipilihId) || opsi[0])) || null;
+        if (templat) html = templat.build(photoDiv, wrapClass);
       }
-      
+
       grid.innerHTML = html;
+      renderLayoutPicker(total);
     }
 
     // Auto-saiz fon: teks pendek -> fon besar, teks panjang -> fon kecil,
@@ -5084,6 +5196,8 @@ function updatePreview() {
       // tergantung selamanya jika rangkaian fon lambat/gagal.
       await Promise.race([document.fonts.ready, new Promise(res => setTimeout(res, 4000))]);
 
+      let canvasAsal = null;
+
       // KAEDAH 1 (utama): html-to-image - guna enjin pelayar sendiri untuk render,
       // jadi hasil eksport TEPAT sama macam previu (termasuk clip-path bentuk
       // "bumbung" 2026, fon, kesan glow/blur) yang html2canvas tak mampu render.
@@ -5094,7 +5208,7 @@ function updatePreview() {
             backgroundColor: '#ffffff',
             cacheBust: true
           });
-          if (canvas && canvas.width > 0) return canvas;
+          if (canvas && canvas.width > 0) canvasAsal = canvas;
         } catch (error) {
           console.warn('html-to-image gagal, cuba fallback html2canvas:', error);
         }
@@ -5102,22 +5216,40 @@ function updatePreview() {
 
       // KAEDAH 2 (fallback): html2canvas - kurang tepat (clip-path/blur tak disokong,
       // jadi hiasan disorok sementara), tapi lebih toleran terhadap isu imej CORS.
-      toggleDecorationsForExport(true);
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 2, 
-          useCORS: true, 
-          allowTaint: false, 
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        return canvas;
-      } catch (error) {
-        console.error("Ralat rendering Canvas:", error);
-        return null;
-      } finally {
-        toggleDecorationsForExport(false); 
+      if (!canvasAsal) {
+        toggleDecorationsForExport(true);
+        try {
+          canvasAsal = await html2canvas(card, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+        } catch (error) {
+          console.error("Ralat rendering Canvas:", error);
+          return null;
+        } finally {
+          toggleDecorationsForExport(false);
+        }
       }
+
+      if (!canvasAsal) return null;
+
+      // PEMBETULAN PENTING: pilihan backgroundColor perpustakaan di atas tidak selalu
+      // dikuatkuasakan sepenuhnya - jika kanvas ada sebarang piksel LUTSINAR, format
+      // JPEG (tiada saluran alfa) akan tukar piksel itu kepada HITAM secara automatik
+      // semasa toDataURL('image/jpeg'), bukan putih. Untuk jamin latar putih 100% tanpa
+      // bergantung semata pada tingkah laku perpustakaan, kita lukis dahulu segi empat
+      // putih penuh pada kanvas baharu, kemudian tindih kanvas asal di atasnya.
+      const canvasFinal = document.createElement('canvas');
+      canvasFinal.width = canvasAsal.width;
+      canvasFinal.height = canvasAsal.height;
+      const ctx = canvasFinal.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasFinal.width, canvasFinal.height);
+      ctx.drawImage(canvasAsal, 0, 0);
+      return canvasFinal;
     }
 
     async function downloadAsJPG() {
