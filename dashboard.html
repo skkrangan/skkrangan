@@ -88,6 +88,9 @@
     #section-eopr.active main { display: block !important; height: auto !important; overflow: visible !important; }
     #section-eopr.active main > section:not(.no-print) { display: block !important; height: auto !important; overflow: visible !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
     @page opr-page { size: A4 portrait; margin: 0mm; }
+    /* Laporan Bulanan eHadir kini ada 12 lajur (BIL + Nama + 10 status) - guna
+       kertas LANDSKAP supaya semua lajur muat dengan selesa tanpa font mikroskopik. */
+    @page monthly-page { size: A4 landscape; margin: 10mm; }
     .print-container {
       page: opr-page;
       -webkit-print-color-adjust: exact !important;
@@ -99,16 +102,30 @@
     body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
     .no-print { display: none !important; }
     .print-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-    #print-area-monthly { border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: 258mm !important; display: flex !important; flex-direction: column !important; }
+    #print-area-monthly {
+      page: monthly-page;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: auto !important; display: block !important;
+    }
     .school-header { margin-bottom: 5px !important; padding-bottom: 4px !important; }
     .school-logo { height: 44px !important; width: 44px !important; }
     .school-title { font-size: 12px !important; line-height: 1.15 !important; }
     .school-subtitle { font-size: 8px !important; }
     .report-title-section { margin-bottom: 5px !important; }
     .report-title-text { font-size: 10px !important; }
-    table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; page-break-inside: avoid !important; }
-    th, td { padding: 2px 5px !important; font-size: 8px !important; line-height: 1.05 !important; border: 1px solid black !important; }
-    .signature-block { margin-top: auto !important; padding-top: 6px !important; }
+    table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; table-layout: fixed !important; }
+    thead { display: table-header-group !important; } /* ulang tajuk lajur di setiap muka surat baharu */
+    tr { page-break-inside: avoid !important; } /* elak baris terpotong separuh, tapi jadual BOLEH sambung ke muka surat 2 tanpa jurang kosong */
+    th, td { padding: 3px 4px !important; font-size: 8px !important; line-height: 1.15 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+    /* Isu jadual terpotong semasa cetak: pembalut "overflow-x-auto" cuma boleh
+       diskrol pada skrin - semasa cetak, apa-apa kandungan yang perlu diskrol
+       akan HILANG terus (bukan disusun semula/reflow). Paksa nampak semua. */
+    .overflow-x-auto { overflow: visible !important; }
+    #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
+    #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
+    #print-area-monthly th:nth-child(n+3), #print-area-monthly td:nth-child(n+3) { width: 8.2% !important; }
+    .signature-block { margin-top: 14px !important; padding-top: 6px !important; page-break-inside: avoid !important; }
     .signature-space { height: 45px !important; }
     @page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }
   }
@@ -779,7 +796,7 @@
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Di Sekolah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Di Sekolah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Mesyuarat/Bengkel/Taklimat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Mesyuarat/Bengkel/Taklimat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school-mesy">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Bekerja Dari Rumah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Bekerja Dari Rumah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-wfh">0</span></div>
-                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Peribadi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Luar Pejabat : Urusan Peribadi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-peribadi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Cuti Rehat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat Khas')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span> Cuti Rehat Khas</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat-khas">0</span></div>
@@ -890,7 +907,7 @@
                         </div>
                     </div>
 
-                    <div id="print-area-monthly" class="print-area bg-white text-black p-8 border border-slate-200 shadow-lg rounded-2xl max-w-4xl mx-auto text-slate-900 transition-all hidden md:block">
+                    <div id="print-area-monthly" class="print-area bg-white text-black p-8 border border-slate-200 shadow-lg rounded-2xl max-w-[1400px] mx-auto text-slate-900 transition-all hidden md:block">
                         <div class="school-header flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-5">
                             <div class="flex items-center gap-4">
                                 <img src="logo.png" alt="Logo SK Krangan" class="school-logo h-16 w-auto object-contain" onerror="this.src='https://placehold.co/150x150/1e293b/ffffff?text=SK+Krangan'">
@@ -903,26 +920,24 @@
                             <div class="text-right text-[10px] text-slate-500 font-semibold uppercase"><div>Dokumen Rasmi</div><div class="text-slate-950 font-black text-xs" id="report-meta-month">Bulan: -</div></div>
                         </div>
                         <div class="report-title-section text-center mb-4">
-                            <h2 class="report-title-text text-sm font-black tracking-wide uppercase text-slate-950">LAPORAN BULANAN KEBERADAAN BARISAN PENTADBIR & GURU</h2>
+                            <h2 class="report-title-text text-sm font-black tracking-wide uppercase text-slate-950">LAPORAN BULANAN STAF SK KRANGAN</h2>
                             <p class="text-[10px] text-slate-500 mt-0.5 uppercase font-bold">Sesi Bulan: <span id="report-selected-label" class="underline">Julai 2026</span></p>
                         </div>
                         <div id="report-analytics-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4"></div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border border-slate-300 border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-100 border-b border-slate-300 text-slate-800 font-extrabold text-[9px] uppercase">
+                                    <tr id="monthly-report-table-head" class="bg-slate-100 border-b border-slate-300 text-slate-800 font-extrabold text-[9px] uppercase">
                                         <th class="p-2 border-r border-slate-300 text-center w-8">BIL</th>
                                         <th class="p-2 border-r border-slate-300">Nama Pentadbir & Guru</th>
-                                        <th class="p-2 border-r border-slate-300 text-center">Di Sekolah</th>
-                                        <th class="p-2 border-r border-slate-300 text-center">Mesyuarat/Bengkel</th>
-                                        <th class="p-2 border-r border-slate-300 text-center">Urusan Rasmi</th>
-                                        <th class="p-2 border-r border-slate-300 text-center">Urusan Peribadi</th>
-                                        <th class="p-2 border-r border-slate-300 text-center">Cuti Rehat</th>
-                                        <th class="p-2 text-center text-rose-600">Cuti Sakit / Lain</th>
+                                        <!-- Lajur status dijana secara dinamik oleh renderMonthlyReportHead() -
+                                             terus daripada statusOptions supaya SENTIASA selari dengan
+                                             senarai status sebenar (Ringkasan Keberadaan Staf), walaupun
+                                             status baharu ditambah/diubah pada masa hadapan. -->
                                     </tr>
                                 </thead>
                                 <tbody id="monthly-report-table-body" class="divide-y divide-slate-300 text-[10px] text-slate-900 font-medium">
-                                    <tr><td colspan="8" class="p-8 text-center text-slate-400 italic">Sila pilih bulan di bahagian atas dan tekan butang "Jana Laporan".</td></tr>
+                                    <tr><td colspan="12" class="p-8 text-center text-slate-400 italic">Sila pilih bulan di bahagian atas dan tekan butang "Jana Laporan".</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1447,7 +1462,19 @@ async function syncStaffFromBackend(){
       staffData.forEach(fallback => {
         if(!remoteIds.has(Number(fallback.id))) merged.push(fallback);
       });
-      merged.sort((a, b) => Number(a.id) - Number(b.id));
+      // Susun ikut kedudukan paparan khusus (STAFF_SORT_OVERRIDE, ditetapkan
+      // SELEPAS gabungan supaya terpakai tak kira rekod datang dari Sheet
+      // (remote) atau kod sandaran (fallback)), guna 'id' sebagai sandaran.
+      // PENTING: id staf TIDAK BOLEH diubah kerana ia dipadan terus dengan
+      // rekod dalam Google Sheets (CMS_SCRIPT_URL) - tukar id di sini sahaja
+      // (tanpa kemas kini Sheet) akan sebabkan rekod sama dikira sebagai
+      // "2 orang berlainan" semasa gabungan, jadi nama akan terpapar BERULANG.
+      const STAFF_SORT_OVERRIDE = { 17: 9.5 }; // Siti Norhafizah - papar sebelum Arfiq Rahimi (id:10)
+      merged.sort((a, b) => {
+        const posA = STAFF_SORT_OVERRIDE[Number(a.id)] ?? Number(a.id);
+        const posB = STAFF_SORT_OVERRIDE[Number(b.id)] ?? Number(b.id);
+        return posA - posB;
+      });
       staffData.length = 0;
       merged.forEach(s => staffData.push(s));
       staffSyncedFromBackend = true;
@@ -3649,7 +3676,7 @@ window.onload = async function(){
             'Di Sekolah': { bg: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-300', icon: 'fa-school', badge: 'bg-emerald-100 dark:bg-emerald-950/40' },
             'Mesyuarat/Bengkel/Taklimat': { bg: 'bg-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', icon: 'fa-chalkboard-user', badge: 'bg-teal-50 dark:bg-teal-950/40' },
             'Bekerja Dari Rumah': { bg: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-300', icon: 'fa-house-laptop', badge: 'bg-blue-100 dark:bg-blue-950/40' },
-            'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
+            'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
             'Luar Pejabat : Urusan Peribadi': { bg: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400', icon: 'fa-user-clock', badge: 'bg-yellow-50 dark:bg-yellow-950/40' },
             'Cuti Rehat': { bg: 'bg-rose-600', text: 'text-rose-700 dark:text-rose-300', icon: 'fa-umbrella-beach', badge: 'bg-rose-100 dark:bg-rose-950/40' },
             'Cuti Rehat Khas': { bg: 'bg-fuchsia-500', text: 'text-fuchsia-700 dark:text-fuchsia-300', icon: 'fa-star', badge: 'bg-fuchsia-100 dark:bg-fuchsia-950/40' },
@@ -3665,7 +3692,7 @@ window.onload = async function(){
 
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
-        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing', 'Luar Pejabat : Urusan Peribadi'];
+        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing', 'Luar Pejabat : Urusan Peribadi'];
         // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
         // Guru ICT sahaja - staf lain (termasuk GB/GPK) cuma boleh
         // hantar status untuk hari semasa sahaja.
@@ -4091,7 +4118,7 @@ window.onload = async function(){
                 if (status === 'Di Sekolah') { school++; countSchool++; }
                 else if (status === 'Mesyuarat/Bengkel/Taklimat') { school++; countSchoolMesy++; }
                 else if (status === 'Bekerja Dari Rumah') { outside++; countWfh++; }
-                else if (status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') { outside++; countOutsideRasmi++; }
+                else if (status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') { outside++; countOutsideRasmi++; }
                 else if (status === 'Luar Pejabat : Urusan Peribadi') { outside++; countOutsidePeribadi++; }
                 else if (status === 'Cuti Rehat') { leave++; countCutiRehat++; }
                 else if (status === 'Cuti Rehat Khas') { leave++; countCutiRehatKhas++; }
@@ -4453,6 +4480,21 @@ window.onload = async function(){
             showToast("Fail laporan CSV berjaya dimuat turun!", "success");
         }
 
+        function renderMonthlyReportHead() {
+            const headRow = document.getElementById('monthly-report-table-head');
+            if (!headRow) return;
+            let html = `
+                <th class="p-2 border-r border-slate-300 text-center w-8">BIL</th>
+                <th class="p-2 border-r border-slate-300">Nama Pentadbir & Guru</th>`;
+            statusOptions.forEach((status, i) => {
+                // Guna TEKS PENUH status (bukan singkatan) - kertas landskap sedia
+                // beri cukup ruang, teks akan bertindih baris (wrap) automatik.
+                const isLast = i === statusOptions.length - 1;
+                html += `<th class="p-1.5 ${isLast ? '' : 'border-r border-slate-300'} text-center leading-tight">${status}</th>`;
+            });
+            headRow.innerHTML = html;
+        }
+
         function generateMonthlyReport() {
             const selectMonth = document.getElementById('report-month').value;
             if (!selectMonth) return;
@@ -4463,10 +4505,13 @@ window.onload = async function(){
 
             document.getElementById('report-meta-month').innerText = `Bulan: ${selectedMonthName} ${yearFilter}`;
             document.getElementById('report-selected-label').innerText = `${selectedMonthName} ${yearFilter}`;
-            
+
+            renderMonthlyReportHead(); // jana lajur SEBELUM isi baris, supaya sentiasa terkini
+            const jumlahLajur = 2 + statusOptions.length;
+
             const tbody = document.getElementById('monthly-report-table-body');
             if (allRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
                 const summaryBoxEmpty = document.getElementById('report-analytics-summary');
                 if(summaryBoxEmpty) summaryBoxEmpty.innerHTML = '';
                 return;
@@ -4480,47 +4525,47 @@ window.onload = async function(){
 
             // ---- Ringkasan analitik keseluruhan (jumlah SEMUA staf bagi bulan ini) ----
             let totalSchoolDays = 0, totalLeaveDays = 0, totalRasmiDays = 0, totalSubmittedDays = 0;
+            const LEAVE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain'];
             monthlyData.forEach(log => {
                 totalSubmittedDays++;
                 if (log.status === 'Di Sekolah' || log.status === 'Mesyuarat/Bengkel/Taklimat') totalSchoolDays++;
-                else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') totalRasmiDays++;
-                else if (log.status === 'Cuti Rehat' || log.status === 'Cuti Rehat Khas' || log.status === 'Cuti Sakit' || log.status === 'Cuti Tanpa Rekod' || log.status === 'Cuti : Lain-lain') totalLeaveDays++;
+                else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') totalRasmiDays++;
+                else if (LEAVE_STATUSES.includes(log.status)) totalLeaveDays++;
             });
             const attendanceRate = totalSubmittedDays > 0 ? Math.round((totalSchoolDays / totalSubmittedDays) * 100) : 0;
             const summaryBox = document.getElementById('report-analytics-summary');
             if(summaryBox){
                 summaryBox.innerHTML = `
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-emerald-700">${totalSchoolDays}</p><p class="text-[8px] font-bold text-emerald-700 uppercase tracking-wide">Jumlah Hari Di Sekolah</p></div>
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-indigo-700">${attendanceRate}%</p><p class="text-[8px] font-bold text-indigo-700 uppercase tracking-wide">Purata Kehadiran</p></div>
-                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-amber-700">${totalRasmiDays}</p><p class="text-[8px] font-bold text-amber-700 uppercase tracking-wide">Jumlah Urusan Rasmi</p></div>
-                    <div class="bg-rose-50 border border-rose-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-rose-700">${totalLeaveDays}</p><p class="text-[8px] font-bold text-rose-700 uppercase tracking-wide">Jumlah Cuti</p></div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-emerald-700">${totalSchoolDays}</p><p class="text-[8px] font-bold text-emerald-700 uppercase tracking-wide">Jumlah Hari Di Sekolah<br>(Semua Staf)</p></div>
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-indigo-700">${attendanceRate}%</p><p class="text-[8px] font-bold text-indigo-700 uppercase tracking-wide">Purata Kehadiran<br>(Semua Staf)</p></div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-amber-700">${totalRasmiDays}</p><p class="text-[8px] font-bold text-amber-700 uppercase tracking-wide">Jumlah Urusan Rasmi<br>(Semua Staf)</p></div>
+                    <div class="bg-rose-50 border border-rose-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-rose-700">${totalLeaveDays}</p><p class="text-[8px] font-bold text-rose-700 uppercase tracking-wide">Jumlah Cuti<br>(Semua Staf)</p></div>
                 `;
             }
 
+            // Setiap status dapat lajur SENDIRI (kira terus daripada statusOptions,
+            // sepadan 1-ke-1 dengan senarai "Ringkasan Keberadaan Staf") - tiada
+            // status disatukan/disenyapkan dalam lajur "lain-lain" lagi.
             let reportHTML = '';
             staffData.filter(staff => !staff.excludeFromAttendance).forEach((staff, index) => {
                 const staffLogs = monthlyData.filter(r => r.name === staff.name);
-                let countSchool = 0, countMesy = 0, countLuarRasmi = 0, countLuarPeribadi = 0, countCutiRehat = 0, countCutiSakitLain = 0;
-
+                const kiraanIkutStatus = {};
+                statusOptions.forEach(s => { kiraanIkutStatus[s] = 0; });
                 staffLogs.forEach(log => {
-                    if (log.status === 'Di Sekolah') countSchool++;
-                    else if (log.status === 'Mesyuarat/Bengkel/Taklimat') countMesy++;
-                    else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') countLuarRasmi++;
-                    else if (log.status === 'Luar Pejabat : Urusan Peribadi') countLuarPeribadi++;
-                    else if (log.status === 'Cuti Rehat') countCutiRehat++;
-                    else countCutiSakitLain++; 
+                    if (kiraanIkutStatus.hasOwnProperty(log.status)) kiraanIkutStatus[log.status]++;
+                });
+
+                let selStatusCells = '';
+                statusOptions.forEach((status, i) => {
+                    const isLast = i === statusOptions.length - 1;
+                    selStatusCells += `<td class="p-2 ${isLast ? '' : 'border-r border-slate-300'} text-center font-bold text-slate-700">${kiraanIkutStatus[status]} hari</td>`;
                 });
 
                 reportHTML += `
                     <tr class="hover:bg-slate-50 border-b border-slate-300 transition-colors">
                         <td class="p-2 border-r border-slate-300 text-slate-500 font-bold text-center">${index + 1}</td>
                         <td class="p-2 border-r border-slate-300 font-black text-slate-900">${staff.name}<br><span class="text-[8px] text-indigo-600 uppercase font-bold tracking-wider">${staff.position}</span></td>
-                        <td class="p-2 border-r border-slate-300 text-center font-bold text-emerald-600">${countSchool} hari</td>
-                        <td class="p-2 border-r border-slate-300 text-center font-bold text-teal-600">${countMesy} hari</td>
-                        <td class="p-2 border-r border-slate-300 text-center font-bold text-amber-600">${countLuarRasmi} hari</td>
-                        <td class="p-2 border-r border-slate-300 text-center font-bold text-amber-500">${countLuarPeribadi} hari</td>
-                        <td class="p-2 border-r border-slate-300 text-center font-bold text-rose-600">${countCutiRehat} hari</td>
-                        <td class="p-2 text-center font-bold text-rose-500">${countCutiSakitLain} hari</td>
+                        ${selStatusCells}
                     </tr>
                 `;
             });
@@ -4559,7 +4604,7 @@ window.onload = async function(){
                         onClick: (event, elements) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const statusMapping = ['Di Sekolah','Mesyuarat/Bengkel/Taklimat','Luar Pejabat : Urusan Rasmi: Jawatankuasa/Pasukan/Peserta/Guru Pengiring/Guru Pembimbing','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
+                                const statusMapping = ['Di Sekolah','Mesyuarat/Bengkel/Taklimat','Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
                                 filterByStatusName(statusMapping[index]);
                             }
                         },
