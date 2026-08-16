@@ -148,6 +148,8 @@
   #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
   #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
   #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
+  #mobile-report-view summary::-webkit-details-marker{ display:none; }
+  #mobile-report-view details[open] summary i.fa-chevron-down{ transform:rotate(180deg); }
   .vertical-text-upright{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
   .vertical-text-upright span{ display:block; }
   .clip-roof-up{ clip-path: polygon(50% 0%, 100% 20%, 100% 100%, 0 100%, 0 20%); }
@@ -971,6 +973,12 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ================= PAPARAN TELEFON (kad menegak, bukan jadual melebar) =================
+                         Ditunjukkan HANYA pada skrin kecil (<768px) - jadual 12-lajur landskap di atas
+                         (#print-area-monthly) langsung tersembunyi pada telefon (hidden md:block), jadi
+                         guru yang buka Laporan Bulanan guna telefon nampak KOSONG tanpa bahagian ni. -->
+                    <div id="mobile-report-view" class="block md:hidden no-print space-y-3"></div>
                 </div>
 
                 <div id="tab-audit" class="ehadir-tab space-y-6 hidden no-print">
@@ -1167,7 +1175,15 @@
 
       <!-- OPR CARD: FIXED DIMENSION A4 -->
       <div id="opr-card" class="print-container relative w-[210mm] h-[297mm] bg-white shadow-2xl rounded-sm border border-slate-200 overflow-hidden select-none px-[12mm] py-[14mm] flex flex-col shrink-0">
-        
+
+        <!-- LAPISAN PUTIH PEPEJAL (bukan CSS bg-white sahaja) - jaminan tambahan
+             sebab sesetengah penghurai PDF ringkas (cth. pratonton WhatsApp) kadang
+             salah tafsir kawasan mix-blend-mode/filter:blur() sebagai lutsinar,
+             lalu papar hitam. Div kosong pepejal ni sentiasa jadi lapisan PALING
+             bawah (z-index paling rendah), jadi walau apa pun berlaku pada lapisan
+             hiasan di atasnya, ada piksel putih SEBENAR di belakang segalanya. -->
+        <div class="absolute inset-0 bg-white" style="z-index:-1;"></div>
+
         <!-- LATAR BELAKANG KREATIF -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div id="art-glow-1" class="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 bg-pink-300"></div>
@@ -1821,6 +1837,29 @@ function renderModuleGrid(){
       <p class="relative text-sm text-ink-soft pr-10">Jana laporan One Page Report.</p>
       <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
     </button>`;
+  idx++;
+  if(currentUser.canViewAttendanceDashboard){
+    cards += `
+    <a href="https://ictsk.github.io/PRESTASI-AKADEMIK/eprestasi.html" target="_blank" rel="noopener" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#7C3AED;">
+      <i data-lucide="graduation-cap" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#EDE4FB;"><i data-lucide="graduation-cap" class="w-7 h-7" style="color:#7C3AED;"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kad Prestasi Akademik</h3>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#7C3AED;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#7C3AED;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">Input markah peperiksaan &amp; analisis prestasi murid.</p>
+      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="external-link" class="w-4 h-4 text-white"></i></span>
+    </a>`;
+  } else {
+    cards += `
+    <div class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4 opacity-70 cursor-not-allowed" style="border-bottom-color:#94A3B8;" title="Akan dibuka tidak lama lagi">
+      <i data-lucide="graduation-cap" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F1F5F9;"><i data-lucide="graduation-cap" class="w-7 h-7" style="color:#94A3B8;"></i></div>
+      <span class="absolute top-6 right-6 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full" style="background:#F1F5F9; color:#64748B;">Akan Datang</span>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kad Prestasi Akademik</h3>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#94A3B8;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#94A3B8;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">Input markah peperiksaan &amp; analisis prestasi murid.</p>
+      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-slate-300 flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-white"></i></span>
+    </div>`;
+  }
   if(currentUser.canViewAttendanceDashboard){
     idx++;
     cards += `
@@ -3711,12 +3750,13 @@ window.onload = async function(){
 
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
-        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing', 'Luar Pejabat : Urusan Peribadi'];
-        // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
-        // Guru ICT sahaja - staf lain (termasuk GB/GPK) cuma boleh
-        // hantar status untuk hari semasa sahaja.
+        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit'];
+        // Kotak "Tarikh Akhir" (hantar status berbilang hari) kini dibuka untuk
+        // SEMUA staf - bukan Guru ICT sahaja. Sebab: mana-mana staf boleh perlukan
+        // penghantaran berbilang hari (cth. Cuti Sakit/MC beberapa hari, Cuti Rehat
+        // rentas minggu), bukan keperluan khusus Guru ICT sahaja.
         function canUseMultiDay_(){
-            return !!(currentUser && currentUser.cmsRoleLabel === 'Guru ICT');
+            return true;
         }
         let allRecords = [];
         let summaryChartInstance = null;
@@ -4077,8 +4117,16 @@ window.onload = async function(){
             if(!currentUser) return;
             const todayMap = getTodayStatusMap_();
             const todayRecordMap = getTodayRecordMap_();
-            const myStatus = todayMap[currentUser.id] || 'Belum Kemas Kini';
             const myTodayRecord = todayRecordMap[currentUser.id] || null;
+            // PEMBETULAN PENTING: ambil status TERUS daripada myTodayRecord (sumber
+            // yang sama digunakan untuk mesej "Status hari ini telah dikunci") apabila
+            // ia wujud - JANGAN bergantung pada todayMap secara berasingan. Sebelum
+            // ini, myStatus dan myTodayRecord datang daripada DUA panggilan/peta
+            // berasingan yang KADANG tak segerak (isu masa rangkaian/Sheets lambat
+            // proses), menyebabkan lencana "Status Semasa" papar "Belum Kemas Kini"
+            // walhal mesej kunci betul-betul tunjuk status sebenar (bug Cg Hadijah/
+            // Cg Marina). Guna satu sumber sahaja - mustahil berselisih lagi.
+            const myStatus = myTodayRecord ? myTodayRecord.status : (todayMap[currentUser.id] || 'Belum Kemas Kini');
 
             const grid = document.getElementById('staff-grid');
             if(grid){
@@ -4196,30 +4244,46 @@ window.onload = async function(){
                 </div>`;
         }
 
-        // Sahkan rekod tersimpan di LATAR BELAKANG (tidak menyekat UI/tidak membuat staf menunggu).
-        // Hanya beri amaran jika benar-benar tiada rekod dijumpai selepas beberapa saat.
-        async function verifyStatusInBackground_(id, staffName) {
-            await new Promise(r => setTimeout(r, 2000)); // beri masa cukup Sheet proses, secara senyap
-            try {
-                const verifyRes = await fetch(GOOGLE_SCRIPT_URL);
-                if (!verifyRes.ok) return;
-                const verifyData = await verifyRes.json();
-                if (!Array.isArray(verifyData)) return;
-                const today = getTodayDateStr_();
-                const found = verifyData.some(r => String(r.id) === String(id) && r.date === today);
-                if (!found) {
-                    showToast(`Amaran: Tidak dapat disahkan status ${staffName} tersimpan. Sila semak semula & hantar sekali lagi jika perlu.`, 'error');
-                } else {
-                    // PEMBAIKAN SENDIRI: rekod disahkan wujud di Sheet (mungkin lewat sedikit
-                    // daripada muat semula pertama di submitStatus()). Tarik & papar SEMULA
-                    // supaya lencana "Status Semasa" tak kekal tersasar/lapuk walaupun
-                    // muat semula pertama (500ms) berlaku sebelum Sheet selesai proses.
-                    await fetchRecordsQuietly();
-                    if (typeof renderDashboard === 'function' && !document.getElementById('tab-dashboard')?.classList.contains('hidden')) {
-                        renderDashboard();
+        // Sahkan rekod BETUL-BETUL tersimpan di Sheet - cuba BERULANG KALI (bukan
+        // sekali dengan tempoh tetap) sebab Google Sheets/Apps Script kadang ambil
+        // lebih daripada 2 saat untuk proses satu tulisan (terutama bila Sheet dah
+        // besar/banyak staf). Tunggu tetap sahaja (macam sebelum ini) terbukti TAK
+        // MENCUKUPI secara KONSISTEN, bukan cuma sekali-sekala - sebab itu bug ni
+        // "selalu" berlaku kepada staf (Cg Hadijah, Cg Marina), bukan nasib buruk.
+        //
+        // Strategi baharu: cuba semak setiap ~1.2 saat, sehingga 5 kali (~6 saat
+        // maksimum). Sebaik rekod disahkan wujud, TERUS papar dashboard (jangan
+        // tunggu percubaan seterusnya). Kalau langsung tak jumpa selepas semua
+        // percubaan, beri amaran JELAS kepada staf (bukan senyap sahaja) supaya
+        // mereka tahu perlu semak/hantar semula - lebih baik daripada staf fikir
+        // dah berjaya sedangkan sebenarnya tidak.
+        async function verifyStatusUntilConfirmed_(id, staffName) {
+            const today = getTodayDateStr_();
+            const MAX_PERCUBAAN = 5;
+            const JEDA_MS = 1200;
+
+            for (let cubaan = 1; cubaan <= MAX_PERCUBAAN; cubaan++) {
+                await new Promise(r => setTimeout(r, JEDA_MS));
+                try {
+                    const verifyRes = await fetch(GOOGLE_SCRIPT_URL);
+                    if (!verifyRes.ok) continue;
+                    const verifyData = await verifyRes.json();
+                    if (!Array.isArray(verifyData)) continue;
+
+                    const found = verifyData.some(r => String(r.id) === String(id) && r.date === today);
+                    if (found) {
+                        // Disahkan wujud - tarik rekod PENUH (allRecords) & papar SEKALI SAHAJA.
+                        await fetchRecordsQuietly();
+                        switchTab('dashboard');
+                        return; // BERHENTI - jangan cuba/papar lagi selepas ini
                     }
-                }
-            } catch (e) { /* senyap - jangan ganggu staf dengan ralat rangkaian latar belakang */ }
+                    // belum jumpa lagi - cuba sekali lagi pusingan seterusnya
+                } catch (e) { /* ralat rangkaian sekali-sekala - cuba lagi pusingan seterusnya */ }
+            }
+
+            // Semua percubaan habis, rekod masih tak dijumpai - beri amaran JELAS.
+            showToast(`Tidak dapat sahkan status ${staffName} tersimpan selepas beberapa percubaan. Sila SEMAK & HANTAR SEMULA untuk pastikan.`, 'error');
+            switchTab('dashboard'); // tetap papar dashboard supaya staf nampak keadaan sebenar (mungkin masih "Belum Kemas Kini")
         }
 
         async function submitStatus(id, staffName) {
@@ -4279,12 +4343,11 @@ window.onload = async function(){
                 showToast(isMultiDay ? `Status ${staffName} dihantar untuk beberapa hari!` : `Status ${staffName} dihantar!`, 'success');
                 btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Berjaya!`;
                 btn.className = "w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2";
-                // 1800ms (bukan 500ms) - beri lebih masa Google Sheets selesai proses
-                // tulisan sebelum tarik semula data, elak lencana "Status Semasa" tersasar
-                // lapuk (rekod belum sempat sampai) walaupun status sebenarnya dah tersimpan.
-                setTimeout(async () => { await fetchRecordsQuietly(); switchTab('dashboard'); }, 1800);
-
-                verifyStatusInBackground_(id, staffName);
+                // SATU laluan pengesahan sahaja (poll berulang sehingga disahkan) - bukan
+                // 2 pencetus berasingan (timer tetap + semakan latar belakang) yang boleh
+                // bertindih/berlumba antara satu sama lain, punca sebenar bug lencana status
+                // tersasar (Cg Hadijah/Cg Marina) walaupun rekod sebenarnya dah tersimpan.
+                verifyStatusUntilConfirmed_(id, staffName);
             } catch (err) {
                 let queue = JSON.parse(localStorage.getItem('sk_offline_queue')) || [];
                 queue.push({ id, name: staffName, position: staffPosition, status: selectedStatus, note: noteVal, endDate: endDateVal, date: new Date().toISOString().split('T')[0] });
@@ -4546,10 +4609,12 @@ window.onload = async function(){
             const jumlahLajur = 2 + statusOptions.length;
 
             const tbody = document.getElementById('monthly-report-table-body');
+            const mobileView = document.getElementById('mobile-report-view');
             if (allRecords.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
                 const summaryBoxEmpty = document.getElementById('report-analytics-summary');
                 if(summaryBoxEmpty) summaryBoxEmpty.innerHTML = '';
+                if(mobileView) mobileView.innerHTML = `<p class="text-center text-rose-600 font-semibold text-sm p-6">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</p>`;
                 return;
             }
 
@@ -4579,10 +4644,24 @@ window.onload = async function(){
                 `;
             }
 
+            // Ringkasan sama untuk paparan telefon (kad statistik atas kad staf)
+            const mobileSummaryHTML = `
+                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                    <p class="text-center font-black text-slate-900 text-sm uppercase mb-0.5">Laporan Bulanan Staf SK Krangan</p>
+                    <p class="text-center text-[11px] text-slate-500 font-semibold mb-3">Sesi Bulan: ${selectedMonthName} ${yearFilter}</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center"><p class="text-base font-black text-emerald-700">${totalSchoolDays}</p><p class="text-[8px] font-bold text-emerald-700 uppercase">Hari Di Sekolah</p></div>
+                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2 text-center"><p class="text-base font-black text-indigo-700">${attendanceRate}%</p><p class="text-[8px] font-bold text-indigo-700 uppercase">Purata Kehadiran</p></div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="text-base font-black text-amber-700">${totalRasmiDays}</p><p class="text-[8px] font-bold text-amber-700 uppercase">Urusan Rasmi</p></div>
+                        <div class="bg-rose-50 border border-rose-200 rounded-lg p-2 text-center"><p class="text-base font-black text-rose-700">${totalLeaveDays}</p><p class="text-[8px] font-bold text-rose-700 uppercase">Jumlah Cuti</p></div>
+                    </div>
+                </div>`;
+
             // Setiap status dapat lajur SENDIRI (kira terus daripada statusOptions,
             // sepadan 1-ke-1 dengan senarai "Ringkasan Keberadaan Staf") - tiada
             // status disatukan/disenyapkan dalam lajur "lain-lain" lagi.
             let reportHTML = '';
+            let mobileCardsHTML = '';
             staffData.filter(staff => !staff.excludeFromAttendance).forEach((staff, index) => {
                 const staffLogs = monthlyData.filter(r => r.name === staff.name);
                 const kiraanIkutStatus = {};
@@ -4592,9 +4671,17 @@ window.onload = async function(){
                 });
 
                 let selStatusCells = '';
+                let mobileRows = '';
                 statusOptions.forEach((status, i) => {
                     const isLast = i === statusOptions.length - 1;
-                    selStatusCells += `<td class="p-2 ${isLast ? '' : 'border-r border-slate-300'} text-center font-bold text-slate-700">${kiraanIkutStatus[status]} hari</td>`;
+                    const bil = kiraanIkutStatus[status];
+                    selStatusCells += `<td class="p-2 ${isLast ? '' : 'border-r border-slate-300'} text-center font-bold text-slate-700">${bil} hari</td>`;
+                    // Kad telefon: hanya sorot status yang ada nilai (>0 hari) supaya senang
+                    // imbas sekali pandang - status 0 hari kekal kelihatan tapi pudar.
+                    mobileRows += `<div class="flex justify-between items-center py-1.5 ${isLast ? '' : 'border-b border-slate-100'}">
+                        <span class="text-[11px] ${bil > 0 ? 'text-slate-700 font-semibold' : 'text-slate-400'}">${status}</span>
+                        <span class="text-[11px] font-black ${bil > 0 ? 'text-indigo-600' : 'text-slate-300'} shrink-0 ml-2">${bil} hari</span>
+                    </div>`;
                 });
 
                 reportHTML += `
@@ -4604,9 +4691,24 @@ window.onload = async function(){
                         ${selStatusCells}
                     </tr>
                 `;
+
+                mobileCardsHTML += `
+                    <details class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden" ${index === 0 ? 'open' : ''}>
+                        <summary class="p-4 cursor-pointer flex items-center justify-between gap-2 list-none">
+                            <div class="min-w-0">
+                                <p class="font-black text-slate-900 text-sm truncate">${index + 1}. ${staff.name}</p>
+                                <p class="text-[10px] text-indigo-600 uppercase font-bold tracking-wider truncate">${staff.position}</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-xs shrink-0 transition-transform"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-slate-100">
+                            ${mobileRows}
+                        </div>
+                    </details>`;
             });
 
             tbody.innerHTML = reportHTML;
+            if (mobileView) mobileView.innerHTML = mobileSummaryHTML + mobileCardsHTML;
         }
 
         function initChart() {
