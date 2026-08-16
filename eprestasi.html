@@ -242,9 +242,12 @@
         <p class="sub">Kad Prestasi Akademik SK Krangan · <span style="color:var(--gold); font-weight:700;">Mod Pratonton (tiada log masuk)</span></p>
       </div>
     </div>
-    <div id="user-chip">
-      <label class="field-label" style="margin:0; white-space:nowrap;">Nama Guru:</label>
-      <input type="text" id="input-nama-guru" placeholder="Cth: Cikgu Aimuni" style="width:160px; padding:6px 10px; border-radius:8px; border:1.5px solid var(--border); font-family:inherit; font-size:12px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <a href="dashboard.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; background:var(--navy); color:#fff; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap;">← Kembali ke Portal Staf</a>
+      <div id="user-chip">
+        <label class="field-label" style="margin:0; white-space:nowrap;">Nama Guru:</label>
+        <input type="text" id="input-nama-guru" placeholder="Cth: Cikgu Aimuni" style="width:160px; padding:6px 10px; border-radius:8px; border:1.5px solid var(--border); font-family:inherit; font-size:12px;">
+      </div>
     </div>
   </header>
 
@@ -405,6 +408,19 @@ window.onload = function(){
   isiTahunAkademik();
   const parammode = new URLSearchParams(window.location.search).get('mode');
   tukarMod(parammode === 'pbd' ? 'pbd' : 'peperiksaan');
+
+  // Nama guru diterima terus daripada Portal Staf (?guru=...) - kunci medan
+  // supaya tak perlu ditaip manual, dan elak guru tersalah taip/tukar nama
+  // orang lain secara tak sengaja.
+  const paramGuru = new URLSearchParams(window.location.search).get('guru');
+  if (paramGuru){
+    const inputGuru = document.getElementById('input-nama-guru');
+    inputGuru.value = paramGuru;
+    inputGuru.readOnly = true;
+    inputGuru.style.background = '#F1F5F9';
+    inputGuru.style.cursor = 'not-allowed';
+    inputGuru.title = 'Nama guru diambil terus daripada log masuk Portal Staf';
+  }
 };
 
 function isiTahunAkademik(){
