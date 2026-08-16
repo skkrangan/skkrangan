@@ -839,7 +839,7 @@ function renderKadRingkasPeperiksaan(d, targetId){
       lbl: 'Purata Asas (TOV)',
       nilaiUtama: asas ? asas.purata + '%' : '-',
       judulTooltip: '📍 <b>TOV = Markah Asas Murid</b>',
-      isiTooltip: 'Purata markah asas (Ujian Diagnostik Awal Tahun) semua murid, diambil sebelum sebarang intervensi pengajaran.',
+      isiTooltip: 'Purata markah <b>Ujian Akhir Tahun tahun sebelumnya</b> bagi semua murid — dijadikan titik permulaan (asas) untuk lihat perkembangan pencapaian pada tahun semasa.',
       formula: 'Jumlah markah TOV ÷ bilangan murid',
       contoh: asas ? `Contoh: ${asas.jumlahMarkah} ÷ ${asas.bilangan} = <b>${asas.purata}%</b>` : 'Tiada data TOV lagi.',
     }),
