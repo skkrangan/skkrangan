@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kad Prestasi Akademik SK Krangan — Input Markah</title>
+<title>ePrestasi Akademik SK Krangan — Input Markah</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -127,7 +127,7 @@
   #admin-import summary::-webkit-details-marker{ display:none; }
   .diag{ font-size:11px; color:var(--muted); margin-top:30px; text-align:center; }
 
-  /* ---------- Shell + Sidebar (selaras Dashboard Kad Prestasi Akademik) ---------- */
+  /* ---------- Shell + Sidebar (selaras Dashboard ePrestasi Akademik) ---------- */
   #shell{ display:flex; min-height:100vh; }
   #sidebar{
     width:236px; flex-shrink:0; background:var(--navy); color:#fff;
@@ -193,7 +193,7 @@
     <div class="side-brand">
       <div class="badge2">KAD</div>
       <div>
-        <h1>Kad Prestasi Akademik</h1>
+        <h1>ePrestasi Akademik</h1>
         <p>SK Krangan, Serian</p>
       </div>
     </div>
@@ -238,8 +238,8 @@
     <div class="brand">
       <div class="badge">SK</div>
       <div>
-        <h1>Kad Prestasi Akademik — Input Markah</h1>
-        <p class="sub">Kad Prestasi Akademik SK Krangan · <span style="color:var(--gold); font-weight:700;">Mod Pratonton (tiada log masuk)</span></p>
+        <h1>ePrestasi Akademik — Input Markah</h1>
+        <p class="sub">ePrestasi Akademik SK Krangan · <span style="color:var(--gold); font-weight:700;">Mod Pratonton (tiada log masuk)</span></p>
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
@@ -346,7 +346,7 @@
     <p id="draf-status" style="font-size:11.5px; color:var(--muted); margin-top:8px; text-align:right;"></p>
   </div>
 
-  <p class="diag">Kad Prestasi Akademik SK Krangan · <span id="diag-version"></span></p>
+  <p class="diag">ePrestasi Akademik SK Krangan · <span id="diag-version"></span></p>
 </div>
 
 <div id="toast"></div>
@@ -359,7 +359,7 @@ const EPRESTASI_CONFIG = {
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFhO1lMO--n0kCCpnQTBMzK6za4JxYHKpxyF6omTpyhsmQRfU7FZGwDA4LRW7KT_1Q/exec',
   API_SECRET: '', // Kosong buat masa ini — backend akan langkau semakan jika Script Properties tiada API_SECRET
   // GOOGLE_CLIENT_ID & DELIMA_DOMAIN dikeluarkan buat sementara (Mod Pratonton tanpa login).
-  // Akan diaktifkan semula apabila Kad Prestasi Akademik disatukan ke dashboard sedia ada.
+  // Akan diaktifkan semula apabila ePrestasi Akademik disatukan ke dashboard sedia ada.
 };
 
 // 4 lajur input markah serentak untuk mod Peperiksaan - guru isi kesemuanya
