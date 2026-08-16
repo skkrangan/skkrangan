@@ -94,6 +94,48 @@
   .kad-ringkas:hover .kr-tooltip{ display:block; }
   .kr-tooltip::before{ content:''; position:absolute; bottom:100%; left:16px; border:6px solid transparent; border-bottom-color:var(--navy-dark); }
 
+  /* ---------- Ringkasan Pencapaian Subjek (aliran TOV->Pertengahan->Akhir + ETR) ---------- */
+  .ringkasan-alir{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:8px 0; }
+  .alir-titik{ display:flex; flex-direction:column; align-items:center; min-width:80px; }
+  .alir-titik .alir-val{ font-size:24px; font-weight:800; font-family:'Fraunces', serif; }
+  .alir-titik .alir-lbl{ font-size:11px; color:var(--muted); font-weight:600; margin-top:2px; text-align:center; }
+  .alir-anak-panah{ font-size:20px; color:var(--border); font-weight:700; }
+  .alir-pemisah{ width:1px; height:44px; background:var(--border); margin:0 6px; }
+  .alir-nota{ display:flex; flex-direction:column; gap:6px; margin-left:auto; }
+  .alir-check{ font-size:12px; font-weight:700; padding:6px 12px; border-radius:10px; white-space:nowrap; }
+  .alir-check.positif{ background:#DCFCE7; color:#15803D; }
+  .alir-check.negatif{ background:#FEE2E2; color:#B91C1C; }
+  @media (max-width: 900px){ .ringkasan-alir{ justify-content:center; } .alir-nota{ margin-left:0; width:100%; } }
+
+  /* ---------- Grid bawah: Pencapaian Ikut Tahun + Rumusan Murid ---------- */
+  .grid-subjek-bawah{ display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:20px; align-items:start; }
+  @media (max-width: 1000px){ .grid-subjek-bawah{ grid-template-columns:1fr; } }
+
+  table.jadual-tahun, table.jadual-perhatian{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.jadual-tahun th, table.jadual-perhatian th{ text-align:left; padding:8px 10px; background:#F8FAFC; color:var(--muted); font-size:10.5px; text-transform:uppercase; font-weight:800; border-bottom:2px solid var(--border); }
+  table.jadual-tahun td, table.jadual-perhatian td{ padding:8px 10px; border-bottom:1px solid var(--border); }
+  table.jadual-tahun td.label, table.jadual-perhatian td.label{ font-weight:700; color:var(--navy); }
+  table.jadual-tahun tr.jumlah{ font-weight:800; background:#F8FAFC; }
+  table.jadual-tahun tr.jumlah td{ border-top:2px solid var(--border); }
+  .capai-tinggi{ color:#15803D; font-weight:800; }
+  .capai-sederhana{ color:#D97706; font-weight:800; }
+  .capai-rendah{ color:#DC2626; font-weight:800; }
+  .lencana-status{ display:inline-block; padding:3px 10px; border-radius:999px; background:#FEE2E2; color:#B91C1C; font-size:10.5px; font-weight:800; }
+
+  /* ---------- Header & filter Analisis Subjek (reka bentuk baharu) ---------- */
+  .section-subtitle{ font-size:12.5px; color:var(--muted); margin:-8px 0 16px; }
+  .filter-bar-subjek{ display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:20px; }
+  .filter-bar-subjek .fld{ display:flex; flex-direction:column; gap:5px; min-width:170px; }
+  .filter-bar-subjek .fld label{ font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--muted); letter-spacing:.03em; }
+  .filter-bar-subjek .fld select{ padding:9px 12px; border-radius:9px; border:1.5px solid var(--border); font-size:13px; background:#fff; }
+  .filter-bar-subjek .kemaskini-terakhir{ margin-left:auto; font-size:11.5px; color:var(--muted); white-space:nowrap; align-self:center; }
+
+  .tindakan-subjek{ display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+  .tindakan-subjek .btn-sekunder{ padding:11px 20px; border-radius:10px; border:1.5px solid var(--navy); background:#fff; color:var(--navy); font-weight:700; font-size:13px; cursor:pointer; }
+  .tindakan-subjek .btn-sekunder:hover{ background:#F5F6FA; }
+  .tindakan-subjek .btn-utama{ padding:11px 20px; border-radius:10px; border:none; background:var(--navy); color:#fff; font-weight:700; font-size:13px; cursor:pointer; }
+  .tindakan-subjek .btn-utama:hover{ background:var(--navy-dark); }
+
   .grid-2{ display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:16px; }
   @media (max-width: 980px){ .grid-2{ grid-template-columns:1fr; } }
 
@@ -179,9 +221,13 @@
         <p class="sub">Kad Prestasi Akademik SK Krangan, Serian</p>
       </div>
     </div>
+    <a href="dashboard.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; background:var(--navy); color:#fff; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap;">← Kembali ke Portal Staf</a>
   </header>
 
-  <div class="filter-bar">
+  <!-- Filter global lama (Tapis/Reset) disorok - khusus untuk halaman Analisis
+       Peperiksaan/PBD lama yang kini disorok daripada sidebar. Analisis Subjek
+       ada bar penapis sendiri (filter-bar-subjek) di bawah. -->
+  <div class="filter-bar" style="display:none;">
     <div class="fld"><label>Tahun Akademik</label><select id="f-tahunakademik"></select></div>
     <div class="fld"><label>Tahun</label><select id="f-tahun"><option value="">Semua Tahun</option></select></div>
     <div class="fld"><label>Kelas</label><select id="f-kelas"><option value="">Semua Kelas</option></select></div>
@@ -314,24 +360,28 @@
 
   <div id="anchor-subjek" class="page-section">
     <h2 class="section-title">📘 Analisis Subjek</h2>
+    <p class="section-subtitle">Ringkasan pencapaian keseluruhan subjek bagi semua tahun</p>
 
-    <div class="card-box">
-      <h2><span class="dot"></span>Ringkasan Semua Subjek</h2>
-      <div id="tbl-ringkasan-semua-subjek"><div class="empty-hint">Memuatkan...</div></div>
-    </div>
-
-    <div class="card-box">
-      <h2><span class="dot"></span>Perbandingan GPS Semua Subjek</h2>
-      <div style="position:relative; height:240px;"><canvas id="chart-perbandingan-subjek" role="img" aria-label="Carta bar perbandingan GPS semua subjek">Perbandingan GPS semua subjek.</canvas></div>
-    </div>
-
-    <div class="filter-bar">
-      <div class="fld" style="min-width:220px;"><label>Pilih Subjek untuk Analisis Lanjut</label><select id="subjek-sel-subjek"><option value="">Pilih Subjek...</option></select></div>
+    <div class="filter-bar-subjek">
+      <div class="fld"><label>Subjek</label><select id="subjek-sel-subjek"><option value="">Pilih Subjek...</option></select></div>
+      <div class="fld"><label>Peperiksaan</label><select id="subjek-sel-peperiksaan">
+        <option value="">Semua Peperiksaan</option>
+        <option value="Ujian Diagnostik (Awal Tahun / TOV)">Ujian Diagnostik (TOV)</option>
+        <option value="Peperiksaan Pertengahan Tahun">Ujian Pertengahan Tahun</option>
+        <option value="Peperiksaan Akhir Tahun">Ujian Akhir Tahun</option>
+      </select></div>
+      <div class="fld"><label>Kelas</label><select id="subjek-sel-kelas"><option value="">Semua Kelas</option></select></div>
       <div class="fld"><label>Tahun Akademik</label><select id="subjek-sel-tahunakademik"><option value="">Semua Tahun</option></select></div>
+      <div class="kemaskini-terakhir">📅 <span id="subjek-kemaskini-label">Kemaskini Terakhir: -</span></div>
+    </div>
+
+    <div class="tindakan-subjek">
+      <button class="btn-sekunder" id="btn-lihat-semua-murid">👥 Lihat Semua Murid</button>
+      <button class="btn-utama" id="btn-jana-laporan-panitia">📄 Jana Laporan Panitia</button>
     </div>
 
     <div id="subjek-detail-wrap">
-      <div class="empty-hint">Pilih subjek untuk lihat analisis lanjut (trend, prestasi ikut kelas, dll).</div>
+      <div class="empty-hint">Pilih subjek di atas untuk lihat analisis pencapaian.</div>
     </div>
   </div>
 
@@ -511,12 +561,33 @@ async function muatSenaraiFilter(){
   state.subjek.forEach(s=>{
     const o = document.createElement('option'); o.value = s.NamaSubjek; o.textContent = s.NamaSubjek; subjekSel.appendChild(o);
   });
+  const subjekSelKelas = document.getElementById('subjek-sel-kelas');
+  state.kelas.forEach(k=>{
+    const o = document.createElement('option'); o.value = k.NamaKelas; o.textContent = k.NamaKelas; subjekSelKelas.appendChild(o);
+  });
   const subjekSelTA = document.getElementById('subjek-sel-tahunakademik');
   for (let y = now; y >= now - 2; y--){
     const o = document.createElement('option'); o.value = y; o.textContent = y; subjekSelTA.appendChild(o);
   }
   subjekSel.addEventListener('change', muatAnalisisSubjek);
+  subjekSelKelas.addEventListener('change', muatAnalisisSubjek);
   subjekSelTA.addEventListener('change', muatAnalisisSubjek);
+  document.getElementById('subjek-sel-peperiksaan').addEventListener('change', muatAnalisisSubjek);
+
+  // Butang "Jana Laporan Panitia" & "Lihat Semua Murid" kini KEKAL kelihatan
+  // (bukan sebahagian templat dinamik) - wayar SEKALI sahaja di sini. Guna
+  // state.dataSubjekTerkini (disimpan oleh renderAnalisisSubjek setiap kali
+  // subjek dimuat) supaya sentiasa rujuk data TERKINI yang telah dipilih.
+  document.getElementById('btn-jana-laporan-panitia').addEventListener('click', () => {
+    if (!state.dataSubjekTerkini){
+      showToastEprestasi('Sila pilih Subjek dahulu sebelum jana Laporan Panitia.', 'error');
+      return;
+    }
+    janaLaporanPanitia(state.dataSubjekTerkini);
+  });
+  document.getElementById('btn-lihat-semua-murid').addEventListener('click', () => {
+    showToastEprestasi('Ciri "Lihat Semua Murid" akan disediakan tidak lama lagi.', 'info');
+  });
 
   /* ---------- Analisis Kelas: selektor ---------- */
   const kelasSel = document.getElementById('kelas-sel-kelas');
@@ -559,9 +630,10 @@ function muatAnalisisSubjek(){
     return;
   }
   const tahunAkademik = document.getElementById('subjek-sel-tahunakademik').value;
+  const kelas = document.getElementById('subjek-sel-kelas').value;
   wrap.innerHTML = '<div class="empty-hint">Memuatkan...</div>';
 
-  fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=analisisSubjek&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}`)
+  fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=analisisSubjek&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}&kelas=${encodeURIComponent(kelas)}`)
     .then(r=>r.json())
     .then(res=>{
       if (!res.ok || !res.data){ wrap.innerHTML = '<div class="empty-hint">Gagal memuatkan analisis subjek.</div>'; return; }
@@ -603,8 +675,9 @@ function render(d){
   renderTableMuridTP(d.senaraiMuridTP6, 'tbl-murid-tp6');
   renderTableTPSubjek(d.prestasiSubjek);
 
-  renderTableRingkasanSemuaSubjek(d.prestasiSubjek);
-  renderChartPerbandinganSubjek(d.prestasiSubjek);
+  // Ringkasan Semua Subjek + Perbandingan GPS Semua Subjek DIBUANG daripada
+  // Analisis Subjek (atas permintaan) - subjek kini dipilih terus dari dropdown
+  // filter di atas, tanpa jadual/carta GPS ringkasan sebagai langkah pertama.
 
   renderTableRingkasanSemuaKelas(d.ringkasanKelas);
   renderChartRankingKelas(d.ringkasanKelas);
@@ -637,9 +710,111 @@ function krFmt_(n){
   return Number.isInteger(n) ? String(n) : String(n);
 }
 
-function renderKadRingkasPeperiksaan(d){
+// Format nombor untuk paparan jadual/kad - '-' jika null
+function fmtPct_(n){ return n == null ? '-' : n + '%'; }
+
+function renderJadualPencapaianTahun(rows){
+  const wrap = document.getElementById('tbl-pencapaian-tahun');
+  if (!wrap) return;
+  if (!rows.length){ wrap.innerHTML = '<div class="empty-hint">Tiada data ikut tahun untuk subjek ini.</div>'; return; }
+
+  // Baris jumlah/purata keseluruhan (pemberat ikut bilangan murid setiap tahun)
+  const jumlahMurid = rows.reduce((s,r)=>s+r.bilMurid, 0);
+  const purataKeseluruhan = (key) => {
+    let jumlah = 0, bil = 0;
+    rows.forEach(r => { if (r[key] != null){ jumlah += r[key]*r.bilMurid; bil += r.bilMurid; } });
+    return bil ? Number((jumlah/bil).toFixed(1)) : null;
+  };
+
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;">
+    <table class="jadual-tahun">
+      <thead><tr>
+        <th>Tahun</th><th>Bil. Murid</th><th>Purata TOV</th><th>Purata ETR</th><th>Purata Pertengahan</th><th>Purata Akhir</th><th>% Capai ETR</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            <td class="label">Tahun ${r.tahun}</td>
+            <td>${r.bilMurid}</td>
+            <td>${fmtPct_(r.purataTov)}</td>
+            <td>${fmtPct_(r.purataEtr)}</td>
+            <td>${fmtPct_(r.purataPertengahan)}</td>
+            <td>${fmtPct_(r.purataAkhir)}</td>
+            <td class="capai-${r.peratusCapaiEtr != null && r.peratusCapaiEtr >= 75 ? 'tinggi' : (r.peratusCapaiEtr != null && r.peratusCapaiEtr >= 50 ? 'sederhana' : 'rendah')}">${fmtPct_(r.peratusCapaiEtr)}</td>
+          </tr>`).join('')}
+        <tr class="jumlah">
+          <td class="label">Jumlah / Purata</td>
+          <td>${jumlahMurid}</td>
+          <td>${fmtPct_(purataKeseluruhan('purataTov'))}</td>
+          <td>${fmtPct_(purataKeseluruhan('purataEtr'))}</td>
+          <td>${fmtPct_(purataKeseluruhan('purataPertengahan'))}</td>
+          <td>${fmtPct_(purataKeseluruhan('purataAkhir'))}</td>
+          <td>${fmtPct_(purataKeseluruhan('peratusCapaiEtr'))}</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>`;
+}
+
+function renderRumusanMurid(rm){
+  const legenda = document.getElementById('legenda-rumusan-murid');
+  const tengah = document.getElementById('rumusan-murid-tengah');
+  const tblWrap = document.getElementById('tbl-murid-perlu-perhatian');
+  if (!legenda || !tblWrap) return;
+
+  const jumlah = rm.jumlahMurid || 0;
+  const mencapai = rm.mencapaiEtr || { bil:0, peratus:null };
+  const meningkat = rm.meningkatBelumCapai || { bil:0, peratus:null };
+  const menurun = rm.menurunBawahTov || { bil:0, peratus:null };
+
+  tengah.innerHTML = `<span style="font-size:22px; font-weight:800; color:var(--navy);">${jumlah}</span><span style="font-size:10px; color:var(--muted);">Murid</span>`;
+
+  legenda.innerHTML = `
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#16A34A; flex-shrink:0;"></span><span style="flex:1;">Mencapai / Melebihi ETR</span><b>${mencapai.bil} murid (${fmtPct_(mencapai.peratus)})</b></div>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#D97706; flex-shrink:0;"></span><span style="flex:1;">Meningkat, Belum Capai ETR</span><b>${meningkat.bil} murid (${fmtPct_(meningkat.peratus)})</b></div>
+    <div style="display:flex; align-items:center; gap:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#DC2626; flex-shrink:0;"></span><span style="flex:1;">Menurun (Bawah TOV)</span><b>${menurun.bil} murid (${fmtPct_(menurun.peratus)})</b></div>
+  `;
+
+  if (state.charts.rumusanMurid) state.charts.rumusanMurid.destroy();
+  state.charts.rumusanMurid = new Chart(document.getElementById('chart-rumusan-murid'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Mencapai/Melebihi ETR', 'Meningkat, Belum Capai', 'Menurun (Bawah TOV)'],
+      datasets: [{ data: [mencapai.bil, meningkat.bil, menurun.bil], backgroundColor: ['#16A34A','#D97706','#DC2626'], borderWidth:0 }],
+    },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'72%', plugins:{ legend:{ display:false }, tooltip:{ enabled:true } } },
+  });
+
+  const senarai = rm.muridPerluPerhatian || [];
+  if (senarai.length === 0){
+    tblWrap.innerHTML = '';
+    return;
+  }
+  tblWrap.innerHTML = `
+    <p style="font-size:12px; font-weight:800; color:#DC2626; margin-bottom:8px;">⚠️ Murid Yang Perlu Perhatian</p>
+    <div style="overflow-x:auto;">
+    <table class="jadual-perhatian">
+      <thead><tr><th>Nama Murid</th><th>TOV</th><th>Akhir</th><th>ETR</th><th>Jurang</th><th>Status</th></tr></thead>
+      <tbody>
+        ${senarai.map(m => `
+          <tr>
+            <td class="label">${m.nama}</td>
+            <td>${fmtPct_(m.tov)}</td>
+            <td>${fmtPct_(m.akhir)}</td>
+            <td>${fmtPct_(m.etr)}</td>
+            <td>${m.jurang != null ? (m.jurang>0?'+':'') + m.jurang + '%' : '-'}</td>
+            <td><span class="lencana-status">${m.status}</span></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>`;
+}
+
+
+function renderKadRingkasPeperiksaan(d, targetId){
   const rp = d.ringkasanPeratusan || {};
-  const wrap = document.getElementById('stat-row-ringkas-peperiksaan');
+  const wrap = document.getElementById(targetId || 'stat-row-ringkas-peperiksaan');
   if (!wrap) return;
 
   const kad = (opt) => {
@@ -1119,58 +1294,140 @@ function renderChartPerbandinganSubjek(list){
 
 function renderAnalisisSubjek(d){
   const wrap = document.getElementById('subjek-detail-wrap');
+  const rp = d.ringkasanPeratusan || {};
+  const tov = rp.purataAsas ? rp.purataAsas.purata : null;
+  const tengah = rp.purataPertengahan ? rp.purataPertengahan.purata : null;
+  const akhir = rp.purataAkhir ? rp.purataAkhir.purata : null;
+  const sasaran = rp.purataSasaran ? rp.purataSasaran.purata : null;
+  const naikDrpTov = (tov != null && akhir != null) ? Number((akhir - tov).toFixed(1)) : null;
+  const bandingSasaran = (sasaran != null && akhir != null) ? Number((akhir - sasaran).toFixed(1)) : null;
+
   wrap.innerHTML = `
-    <div class="stat-row">
-      <div class="stat-card"><div class="icn" style="background:#F1EAFB;">🎓</div><div class="lbl">GPS Subjek</div><div class="val">${d.ringkasan.gps ?? '-'}</div></div>
-      <div class="stat-card"><div class="icn" style="background:#E4F5EC;">✅</div><div class="lbl">Peratus Lulus</div><div class="val">${d.ringkasan.peratusLulus != null ? d.ringkasan.peratusLulus+'%' : '-'}</div></div>
-      <div class="stat-card"><div class="icn" style="background:#E4F5EC;">🏆</div><div class="lbl">Bilangan A</div><div class="val">${d.ringkasan.bilA}</div></div>
-      <div class="stat-card"><div class="icn" style="background:#FBE9E7;">⚠️</div><div class="lbl">Bilangan Gagal</div><div class="val">${d.ringkasan.bilGagal}</div></div>
+    <div class="stat-row-ringkas" id="stat-row-ringkas-subjek"></div>
+
+    <div class="card-box">
+      <h2><span class="dot"></span>Ringkasan Pencapaian Subjek</h2>
+      <div class="ringkasan-alir">
+        <div class="alir-titik"><span class="alir-val" style="color:#2563EB;">${tov ?? '-'}${tov!=null?'%':''}</span><span class="alir-lbl">TOV (Asas)</span></div>
+        <div class="alir-anak-panah">→</div>
+        <div class="alir-titik"><span class="alir-val" style="color:#D97706;">${tengah ?? '-'}${tengah!=null?'%':''}</span><span class="alir-lbl">Pertengahan Tahun</span></div>
+        <div class="alir-anak-panah">→</div>
+        <div class="alir-titik"><span class="alir-val" style="color:#7C3AED;">${akhir ?? '-'}${akhir!=null?'%':''}</span><span class="alir-lbl">Akhir Tahun</span></div>
+        <div class="alir-pemisah"></div>
+        <div class="alir-titik"><span class="alir-val" style="color:#059669;">${sasaran ?? '-'}${sasaran!=null?'%':''}</span><span class="alir-lbl">Sasaran (ETR)</span></div>
+        <div class="alir-nota">
+          ${naikDrpTov != null ? `<div class="alir-check ${naikDrpTov >= 0 ? 'positif' : 'negatif'}">${naikDrpTov >= 0 ? '✅' : '⚠️'} ${naikDrpTov >= 0 ? 'Meningkat' : 'Menurun'} <b>${Math.abs(naikDrpTov)} mata</b> daripada TOV</div>` : ''}
+          ${bandingSasaran != null ? `<div class="alir-check ${bandingSasaran >= 0 ? 'positif' : 'negatif'}">${bandingSasaran >= 0 ? '✅' : '⚠️'} ${bandingSasaran >= 0 ? 'Melebihi' : 'Bawah'} sasaran ETR sebanyak <b>${Math.abs(bandingSasaran)} mata</b></div>` : ''}
+        </div>
+      </div>
     </div>
 
-    <div class="grid-2">
+    <div class="grid-subjek-bawah">
       <div class="card-box">
-        <h2><span class="dot"></span>Trend GPS — ${d.subjek}</h2>
-        <div style="position:relative; height:220px;"><canvas id="chart-trend-subjek"></canvas></div>
+        <h2><span class="dot"></span>Pencapaian Mengikut Tahun</h2>
+        <div id="tbl-pencapaian-tahun"></div>
+        <p style="font-size:11px; color:var(--muted); margin-top:10px;">ⓘ Nota: Data dikira berdasarkan markah yang telah dihantar oleh guru.</p>
       </div>
       <div class="card-box">
-        <h2><span class="dot"></span>Prestasi &amp; Perbandingan Antara Kelas</h2>
-        <div style="position:relative; height:220px;"><canvas id="chart-subjek-kelas"></canvas></div>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card-box">
-        <h2><span class="dot"></span>Analisis Item</h2>
-        <div class="empty-hint">Belum tersedia — sistem hanya merekod markah keseluruhan setiap murid, bukan markah peringkat soalan/item individu.</div>
-      </div>
-      <div class="card-box">
-        <h2><span class="dot"></span>Prestasi Mengikut Guru</h2>
-        <div class="empty-hint">Belum tersedia — sistem belum ada pemetaan guru↔subjek↔kelas. Boleh ditambah kemudian jika diperlukan.</div>
+        <h2><span class="dot"></span>Rumusan Murid</h2>
+        <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+          <div style="position:relative; width:150px; height:150px; flex-shrink:0;">
+            <canvas id="chart-rumusan-murid"></canvas>
+            <div id="rumusan-murid-tengah" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;"></div>
+          </div>
+          <div id="legenda-rumusan-murid" style="flex:1; min-width:180px; font-size:12.5px;"></div>
+        </div>
+        <div id="tbl-murid-perlu-perhatian" style="margin-top:16px;"></div>
       </div>
     </div>
   `;
 
-  if (state.charts.trendSubjek) state.charts.trendSubjek.destroy();
-  if (!d.trendGPS || d.trendGPS.length === 0){
-    document.getElementById('chart-trend-subjek').parentElement.innerHTML = '<div class="empty-hint">Belum cukup data merentas tahun akademik.</div>';
-  } else {
-    state.charts.trendSubjek = new Chart(document.getElementById('chart-trend-subjek'), {
-      type: 'line',
-      data: { labels: d.trendGPS.map(t=>t.tahunAkademik), datasets: [{ label:'GPS', data: d.trendGPS.map(t=>t.gps), borderColor:'#C08A3E', backgroundColor:'rgba(192,138,62,0.1)', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:'#C08A3E' }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ reverse:true, title:{ display:true, text:'GPS', font:{ size:10 } } } } }
-    });
-  }
+  renderKadRingkasPeperiksaan({ ringkasanPeratusan: d.ringkasanPeratusan }, 'stat-row-ringkas-subjek');
+  renderJadualPencapaianTahun(d.pencapaianMengikutTahun || []);
+  renderRumusanMurid(d.rumusanMurid || {});
 
-  if (state.charts.subjekKelas) state.charts.subjekKelas.destroy();
-  if (!d.prestasiKelas || d.prestasiKelas.length === 0){
-    document.getElementById('chart-subjek-kelas').parentElement.innerHTML = '<div class="empty-hint">Tiada data kelas untuk penapis ini.</div>';
-  } else {
-    state.charts.subjekKelas = new Chart(document.getElementById('chart-subjek-kelas'), {
-      type: 'bar',
-      data: { labels: d.prestasiKelas.map(k=>k.kelas), datasets: [{ label:'GPS', data: d.prestasiKelas.map(k=>k.gps), backgroundColor:'#2D6FBB', borderRadius:4, maxBarThickness:40 }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ reverse:true, title:{ display:true, text:'GPS', font:{ size:10 } } } } }
-    });
+  document.getElementById('subjek-kemaskini-label').textContent =
+    'Kemaskini Terakhir: ' + new Date().toLocaleString('ms-MY', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  state.dataSubjekTerkini = d; // simpan untuk butang kekal (Jana Laporan Panitia) di luar templat ni
+}
+
+// Toast ringkas (tiada bekas sedia ada dalam fail ini - cipta terus bila perlu)
+function showToastEprestasi(msg, jenis){
+  let t = document.getElementById('toast-eprestasi');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'toast-eprestasi';
+    t.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:999; padding:12px 20px; border-radius:12px; color:#fff; font-size:13px; font-weight:700; box-shadow:0 12px 28px rgba(0,0,0,.2); transition:all .3s; transform:translateY(20px); opacity:0;';
+    document.body.appendChild(t);
   }
+  t.style.background = jenis === 'error' ? '#DC2626' : (jenis === 'ok' ? '#16A34A' : '#1B3A6B');
+  t.textContent = msg;
+  requestAnimationFrame(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; });
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.transform = 'translateY(20px)'; t.style.opacity = '0'; }, 3500);
+}
+
+// Jana Laporan Panitia - ringkasan bercetak/muat turun bagi SUBJEK yang dipilih,
+// terus guna data yang sudah dimuat (tak perlu panggilan API baharu).
+function janaLaporanPanitia(d){
+  const rp = d.ringkasanPeratusan || {};
+  const tarikh = new Date().toLocaleDateString('ms-MY', { day:'numeric', month:'long', year:'numeric' });
+  const tetingkap = window.open('', '_blank');
+  if (!tetingkap){ showToastEprestasi('Sila benarkan tetingkap pop-up untuk jana laporan.', 'error'); return; }
+
+  const barisJadualTahun = (d.pencapaianMengikutTahun || []).map(r => `
+    <tr>
+      <td>Tahun ${r.tahun}</td><td>${r.bilMurid}</td>
+      <td>${r.purataTov ?? '-'}${r.purataTov!=null?'%':''}</td>
+      <td>${r.purataEtr ?? '-'}${r.purataEtr!=null?'%':''}</td>
+      <td>${r.purataPertengahan ?? '-'}${r.purataPertengahan!=null?'%':''}</td>
+      <td>${r.purataAkhir ?? '-'}${r.purataAkhir!=null?'%':''}</td>
+      <td>${r.peratusCapaiEtr ?? '-'}${r.peratusCapaiEtr!=null?'%':''}</td>
+    </tr>`).join('');
+
+  const rm = d.rumusanMurid || {};
+  const baisPerhatian = (rm.muridPerluPerhatian || []).map(m => `
+    <tr><td>${m.nama}</td><td>${m.tov ?? '-'}%</td><td>${m.akhir ?? '-'}%</td><td>${m.etr ?? '-'}%</td><td>${m.status}</td></tr>`).join('');
+
+  tetingkap.document.write(`
+    <!DOCTYPE html><html lang="ms"><head><meta charset="UTF-8">
+    <title>Laporan Panitia — ${d.subjek}</title>
+    <style>
+      body{ font-family:Arial, sans-serif; padding:30px; color:#1E2433; }
+      h1{ color:#1B3A6B; font-size:20px; margin-bottom:2px; }
+      p.sub{ color:#6B7280; font-size:12px; margin-top:0; }
+      table{ width:100%; border-collapse:collapse; margin:16px 0 26px; font-size:12px; }
+      th,td{ border:1px solid #E4E7EE; padding:7px 9px; text-align:left; }
+      th{ background:#F5F6FA; text-transform:uppercase; font-size:10px; color:#6B7280; }
+      .ringkasan-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:16px 0 26px; }
+      .kad{ border:1px solid #E4E7EE; border-radius:8px; padding:10px; text-align:center; }
+      .kad .val{ font-size:20px; font-weight:800; color:#1B3A6B; }
+      .kad .lbl{ font-size:9.5px; color:#6B7280; text-transform:uppercase; margin-top:4px; }
+      @media print{ button{ display:none; } }
+    </style></head><body>
+    <h1>Laporan Panitia — ${d.subjek}</h1>
+    <p class="sub">Kad Prestasi Akademik SK Krangan · Dijana pada ${tarikh}</p>
+
+    <div class="ringkasan-grid">
+      <div class="kad"><div class="val">${rp.purataAsas ? rp.purataAsas.purata+'%' : '-'}</div><div class="lbl">Purata Asas (TOV)</div></div>
+      <div class="kad"><div class="val">${rp.purataSasaran ? rp.purataSasaran.purata+'%' : '-'}</div><div class="lbl">Purata Sasaran (ETR)</div></div>
+      <div class="kad"><div class="val">${rp.purataPertengahan ? rp.purataPertengahan.purata+'%' : '-'}</div><div class="lbl">Purata Pertengahan</div></div>
+      <div class="kad"><div class="val">${rp.purataAkhir ? rp.purataAkhir.purata+'%' : '-'}</div><div class="lbl">Purata Akhir</div></div>
+      <div class="kad"><div class="val">${rp.pencapaianSasaran ? rp.pencapaianSasaran.bilCapai+'/'+rp.pencapaianSasaran.bilKeseluruhan : '-'}</div><div class="lbl">Mencapai Sasaran</div></div>
+    </div>
+
+    <h3>Pencapaian Mengikut Tahun</h3>
+    <table><thead><tr><th>Tahun</th><th>Bil. Murid</th><th>Purata TOV</th><th>Purata ETR</th><th>Purata Pertengahan</th><th>Purata Akhir</th><th>% Capai ETR</th></tr></thead>
+    <tbody>${barisJadualTahun || '<tr><td colspan="7">Tiada data.</td></tr>'}</tbody></table>
+
+    <h3>Murid Yang Perlu Perhatian</h3>
+    <table><thead><tr><th>Nama Murid</th><th>TOV</th><th>Akhir</th><th>ETR</th><th>Status</th></tr></thead>
+    <tbody>${baisPerhatian || '<tr><td colspan="5">Tiada murid dalam senarai perhatian.</td></tr>'}</tbody></table>
+
+    <button onclick="window.print()" style="margin-top:10px; padding:10px 20px; background:#1B3A6B; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">🖨️ Cetak / Simpan PDF</button>
+    </body></html>`);
+  tetingkap.document.close();
 }
 
 /* ============================================================
