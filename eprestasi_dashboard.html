@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Kad Prestasi Akademik | SK Krangan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root{
+    --navy:#1B3A6B; --navy-dark:#122748; --gold:#C08A3E; --crimson:#A23B3B;
+    --bg:#F5F6FA; --card:#FFFFFF; --ink:#1E2433; --muted:#6B7280; --border:#E4E7EE;
+    --ok:#1F8A5F; --warn:#D97706; --err:#C0392B;
+    --c-a:#1F8A5F; --c-b:#2D6FBB; --c-c:#C08A3E; --c-d:#D97706; --c-e:#B34747; --c-f:#A23B3B;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Plus Jakarta Sans', sans-serif; }
+  h1,h2,h3,.font-display{ font-family:'Fraunces', serif; }
+
+  #shell{ display:flex; min-height:100vh; }
+
+  /* ---------- Sidebar ---------- */
+  #sidebar{
+    width:236px; flex-shrink:0; background:var(--navy); color:#fff;
+    position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 14px 20px;
+  }
+  #sidebar .side-brand{ display:flex; align-items:center; gap:10px; padding:0 8px 18px; border-bottom:1px solid rgba(255,255,255,.12); margin-bottom:14px; }
+  #sidebar .side-brand .badge2{ width:38px; height:38px; border-radius:10px; background:var(--gold); color:var(--navy-dark); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; flex-shrink:0; }
+  #sidebar .side-brand h1{ font-size:14px; margin:0; color:#fff; line-height:1.25; }
+  #sidebar .side-brand p{ font-size:10px; margin:2px 0 0; color:rgba(255,255,255,.6); }
+
+  #sidebar .nav-section-lbl{ font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.4); padding:14px 10px 6px; }
+  #sidebar .nav-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; cursor:pointer;
+    font-size:12.5px; font-weight:600; color:rgba(255,255,255,.85); margin-bottom:2px; transition:.12s;
+  }
+  #sidebar .nav-item .ic{ width:16px; text-align:center; flex-shrink:0; font-size:13px; }
+  #sidebar .nav-item:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  #sidebar .nav-item.active{ background:var(--gold); color:var(--navy-dark); font-weight:800; }
+  #sidebar .nav-item.sub{ padding-left:26px; font-size:11.5px; color:rgba(255,255,255,.65); }
+  #sidebar .nav-item.sub .ic{ font-size:11px; }
+
+  #main{ flex:1; min-width:0; }
+  #wrap{ max-width:1200px; margin:0 auto; padding:22px 24px 70px; }
+
+  @media (max-width: 900px){
+    #shell{ flex-direction:column; }
+    #sidebar{ width:100%; height:auto; position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:4px; padding:12px; }
+    #sidebar .side-brand{ border:none; margin:0; padding:0 8px 0 0; }
+    #sidebar .nav-section-lbl{ display:none; }
+    #sidebar .nav-item{ padding:7px 10px; }
+  }
+
+  header.topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
+  header.topbar .brand{ display:flex; align-items:center; gap:12px; }
+  header.topbar .badge{ width:46px; height:46px; border-radius:12px; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; }
+  header.topbar h1{ font-size:21px; margin:0; color:var(--navy); }
+  header.topbar .sub{ font-size:12px; color:var(--muted); margin:2px 0 0; }
+
+  .filter-bar{ display:flex; gap:10px; flex-wrap:wrap; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:20px; align-items:end; }
+  .filter-bar .fld{ min-width:150px; }
+  .filter-bar label{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); display:block; margin-bottom:5px; }
+  .filter-bar select{ width:100%; padding:8px 10px; border-radius:9px; border:1.5px solid var(--border); font-family:inherit; font-size:13px; background:#fff; }
+  .filter-bar button{ padding:9px 18px; border-radius:9px; border:none; background:var(--navy); color:#fff; font-family:inherit; font-weight:700; font-size:12px; cursor:pointer; }
+  .filter-bar button.ghost{ background:transparent; border:1.5px solid var(--border); color:var(--muted); }
+
+  /* Stat cards */
+  .stat-row{ display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; margin-bottom:20px; }
+  @media (max-width: 1100px){ .stat-row{ grid-template-columns:repeat(3, 1fr); } }
+  @media (max-width: 640px){ .stat-row{ grid-template-columns:repeat(2, 1fr); } }
+  .stat-card{ background:var(--card); border-radius:14px; padding:14px; border:1px solid var(--border); display:flex; flex-direction:column; gap:6px; }
+  .stat-card .icn{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .stat-card .lbl{ font-size:10.5px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.02em; }
+  .stat-card .val{ font-size:22px; font-weight:800; color:var(--navy); font-family:'Fraunces', serif; }
+  .stat-card .val small{ font-size:12px; font-weight:600; color:var(--muted); }
+
+  /* ---------- Kad Ringkas Peperiksaan (Purata Peratusan + Tooltip Info) ---------- */
+  .stat-row-ringkas{ display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:18px; }
+  @media (max-width: 900px){ .stat-row-ringkas{ grid-template-columns:repeat(2, 1fr); } }
+  .kad-ringkas{ background:var(--card); border-radius:14px; padding:16px; border:1px solid var(--border); position:relative; }
+  .kad-ringkas .kr-lbl{ font-size:10.5px; color:var(--navy); font-weight:800; text-transform:uppercase; letter-spacing:.02em; display:flex; align-items:center; gap:5px; margin-bottom:6px; }
+  .kad-ringkas .kr-val{ font-size:26px; font-weight:800; color:var(--navy); font-family:'Fraunces', serif; }
+  .kad-ringkas .kr-val small{ font-size:13px; font-weight:600; color:var(--muted); }
+  .kr-info-btn{ width:16px; height:16px; border-radius:50%; background:var(--border); color:var(--muted); font-size:10px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; cursor:help; flex-shrink:0; }
+  .kr-info-btn:hover{ background:var(--gold); color:#fff; }
+  .kr-tooltip{
+    display:none; position:absolute; z-index:50; top:calc(100% + 8px); left:0; width:280px;
+    background:var(--navy-dark); color:#fff; border-radius:12px; padding:14px 16px; font-size:12px; line-height:1.55;
+    box-shadow:0 12px 28px rgba(0,0,0,.25);
+  }
+  .kr-tooltip b{ color:var(--gold); }
+  .kr-tooltip .kr-formula{ background:rgba(255,255,255,.08); border-radius:8px; padding:8px 10px; margin:6px 0; font-family:monospace; font-size:11.5px; }
+  .kad-ringkas:hover .kr-tooltip{ display:block; }
+  .kr-tooltip::before{ content:''; position:absolute; bottom:100%; left:16px; border:6px solid transparent; border-bottom-color:var(--navy-dark); }
+
+  .grid-2{ display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-bottom:16px; }
+  @media (max-width: 980px){ .grid-2{ grid-template-columns:1fr; } }
+
+  .card-box{ background:var(--card); border-radius:16px; padding:20px; border:1px solid var(--border); margin-bottom:16px; }
+  .card-box h2{ font-size:14px; color:var(--navy); margin:0 0 14px; display:flex; align-items:center; gap:8px; }
+  .card-box h2 .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block; }
+
+  table.rank-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.rank-table th{ text-align:left; color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.02em; padding:8px 6px; border-bottom:2px solid var(--border); }
+  table.rank-table td{ padding:8px 6px; border-bottom:1px solid var(--border); }
+  table.rank-table tr:last-child td{ border-bottom:none; }
+  .rank-num{ width:22px; height:22px; border-radius:50%; background:var(--bg); color:var(--muted); font-weight:800; font-size:11px; display:inline-flex; align-items:center; justify-content:center; }
+  .rank-num.top1{ background:#FEF3D6; color:#B8730E; }
+
+  .legend-row{ display:flex; flex-wrap:wrap; gap:10px 16px; font-size:11.5px; color:var(--muted); margin-bottom:8px; }
+  .legend-row .sw{ width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:4px; }
+
+  .empty-hint{ color:var(--muted); font-size:13px; padding:30px 10px; text-align:center; }
+  .badge-pill{ display:inline-block; padding:3px 9px; border-radius:999px; font-size:10.5px; font-weight:800; color:#fff; }
+
+  .activity-item{ display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .activity-item:last-child{ border-bottom:none; }
+  .activity-item .dot2{ width:7px; height:7px; border-radius:50%; background:var(--gold); margin-top:5px; flex-shrink:0; }
+  .activity-item .t{ color:var(--muted); font-size:11px; }
+
+  .diag{ text-align:center; font-size:11px; color:var(--muted); margin-top:24px; }
+
+  .section-title{ font-size:17px; color:var(--navy); margin:26px 0 12px; padding-top:10px; border-top:1px solid var(--border); }
+  .page-section{ display:none; }
+  .page-section.active{ display:block; }
+  .grid-3{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; }
+  label.field-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); display:block; margin-bottom:6px; }
+  #etr-editor input{ width:100%; padding:9px 10px; border-radius:9px; border:1.5px solid var(--border); font-family:inherit; font-size:13px; }
+  .upload-summary{ font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="sidebar">
+    <div class="side-brand">
+      <div class="badge2">KAD</div>
+      <div>
+        <h1>Kad Prestasi Akademik</h1>
+        <p>SK Krangan, Serian</p>
+      </div>
+    </div>
+
+    <!-- Dashboard/"top" disorok buat masa ini - fokus penuh kepada Input Markah. -->
+    <div class="nav-item active" data-target="top" style="display:none;"><span class="ic">🏠</span>Dashboard</div>
+    <div class="nav-item" data-href="eprestasi.html"><span class="ic">✏️</span>Input Markah</div>
+    <div class="nav-item sub" data-href="eprestasi.html?mode=peperiksaan"><span class="ic">1.</span>Peperiksaan</div>
+    <!-- PBD disorok buat masa ini - konsisten dengan eprestasi.html. -->
+    <div class="nav-item sub" data-href="eprestasi.html?mode=pbd" style="display:none;"><span class="ic">2.</span>PBD</div>
+
+    <div class="nav-section-lbl">Analisis Akademik</div>
+    <!-- Analisis Peperiksaan/PBD/Murid/Kelas disorok buat masa ini - Analisis Subjek dikekalkan. -->
+    <div class="nav-item" data-target="anchor-peperiksaan" style="display:none;"><span class="ic">📈</span>Analisis Peperiksaan</div>
+    <div class="nav-item" data-target="anchor-pbd" style="display:none;"><span class="ic">📊</span>Analisis PBD</div>
+    <div class="nav-item" data-target="anchor-murid" style="display:none;"><span class="ic">🧑‍🎓</span>Analisis Murid</div>
+    <div class="nav-item" data-target="anchor-subjek"><span class="ic">📘</span>Analisis Subjek</div>
+    <div class="nav-item" data-target="anchor-kelas" style="display:none;"><span class="ic">🏫</span>Analisis Kelas</div>
+
+    <!-- Bahagian Laporan disorok sepenuhnya buat masa ini. -->
+    <div class="nav-section-lbl" style="display:none;">Laporan</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">📄</span>Laporan Individu</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">👥</span>Laporan Kelas</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">🏫</span>Laporan Tingkatan</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">⬇️</span>Muat Turun (PDF/Excel)</div>
+
+    <div class="nav-section-lbl">Sistem</div>
+    <div class="nav-item" data-soon="1"><span class="ic">⚙️</span>Tetapan</div>
+    <div class="nav-item" data-soon="1"><span class="ic">👤</span>Pengguna</div>
+    <div class="nav-item" data-soon="1"><span class="ic">❓</span>Bantuan</div>
+  </nav>
+
+  <div id="main">
+<div id="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <div class="badge">SK</div>
+      <div>
+        <h1>Dashboard Kad Prestasi Akademik</h1>
+        <p class="sub">Kad Prestasi Akademik SK Krangan, Serian</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="fld"><label>Tahun Akademik</label><select id="f-tahunakademik"></select></div>
+    <div class="fld"><label>Tahun</label><select id="f-tahun"><option value="">Semua Tahun</option></select></div>
+    <div class="fld"><label>Kelas</label><select id="f-kelas"><option value="">Semua Kelas</option></select></div>
+    <div class="fld"><label>Subjek</label><select id="f-subjek"><option value="">Semua Subjek</option></select></div>
+    <button id="btn-tapis">Tapis</button>
+    <button class="ghost" id="btn-reset">Reset</button>
+  </div>
+
+  <div id="anchor-peperiksaan" class="page-section active">
+    <h2 class="section-title">📈 Analisis Peperiksaan</h2>
+
+    <div class="stat-row-ringkas" id="stat-row-ringkas-peperiksaan"></div>
+
+    <div class="stat-row" id="stat-row-peperiksaan"></div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Perbandingan GPS — TOV → AR1 → AR2 → AR3 → ETR</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-tovar" role="img" aria-label="Carta perbandingan GPS dari TOV ke AR1, AR2, AR3 dan ETR">Perbandingan GPS TOV, AR1, AR2, AR3, ETR.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Perbandingan % Lulus — TOV → AR1 → AR2 → AR3 → ETR</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-tovar-lulus" role="img" aria-label="Carta perbandingan peratus lulus dari TOV ke AR1, AR2, AR3 dan ETR">Perbandingan % Lulus TOV, AR1, AR2, AR3, ETR.</canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Trend Peratus Lulus Merentas Tahun</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-trend-lulus" role="img" aria-label="Carta garis trend peratus lulus merentas tahun akademik">Trend peratus lulus ikut tahun akademik.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Agihan Gred</h2>
+        <div id="legend-gred" class="legend-row"></div>
+        <div style="position:relative; height:230px;"><canvas id="chart-gred" role="img" aria-label="Carta agihan gred peperiksaan">Agihan gred peperiksaan A hingga F.</canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Analisis Markah Mengikut Julat</h2>
+        <div style="position:relative; height:230px;"><canvas id="chart-julat" role="img" aria-label="Carta bilangan markah mengikut julat 10 mata">Bilangan markah ikut julat 0-9 hingga 90-100.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Kedudukan Kelas</h2>
+        <div id="tbl-kedudukan-kelas"><div class="empty-hint">Memuatkan...</div></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box" id="anchor-subjek-ringkas">
+        <h2><span class="dot"></span>Kedudukan Mata Pelajaran</h2>
+        <div id="tbl-subjek"><div class="empty-hint">Memuatkan...</div></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Analisis Setiap Peperiksaan</h2>
+        <div id="tbl-setiap-peperiksaan"><div class="empty-hint">Memuatkan...</div></div>
+      </div>
+    </div>
+
+    <div class="card-box">
+      <h2><span class="dot"></span>Perbandingan Tahun Semasa vs Tahun Lepas</h2>
+      <div id="tbl-perbandingan-tahun"><div class="empty-hint">Pilih Tahun Akademik untuk lihat perbandingan.</div></div>
+    </div>
+  </div>
+
+  <div id="anchor-pbd" class="page-section">
+    <h2 class="section-title">📚 Analisis PBD</h2>
+
+    <div class="stat-row" id="stat-row-pbd"></div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Histogram Tahap Penguasaan (TP1–TP6)</h2>
+        <div style="position:relative; height:230px;"><canvas id="chart-tp-histogram" role="img" aria-label="Carta bilangan murid mengikut tahap penguasaan TP1 hingga TP6">Bilangan murid ikut TP1-TP6.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Carta Pai Tahap Penguasaan</h2>
+        <div id="legend-tp" class="legend-row"></div>
+        <div style="position:relative; height:210px;"><canvas id="chart-tp-pai" role="img" aria-label="Carta pai agihan tahap penguasaan">Agihan tahap penguasaan TP1-TP6.</canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Trend TP Merentas Tahun</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-trend-tp" role="img" aria-label="Carta garis trend purata TP merentas tahun akademik">Trend purata TP ikut tahun akademik.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Perbandingan TP Mengikut Kelas</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-tp-kelas" role="img" aria-label="Carta bar perbandingan purata TP mengikut kelas">Perbandingan purata TP mengikut kelas.</canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Senarai Murid TP1 (Belum Menguasai)</h2>
+        <div id="tbl-murid-tp1"><div class="empty-hint">Memuatkan...</div></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Senarai Murid TP6 (Cemerlang)</h2>
+        <div id="tbl-murid-tp6"><div class="empty-hint">Memuatkan...</div></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>TP Mengikut Mata Pelajaran</h2>
+        <div id="tbl-tp-subjek"><div class="empty-hint">Memuatkan...</div></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Analisis Standard Kandungan</h2>
+        <div class="empty-hint">Belum tersedia — sistem hanya merekod TP peringkat subjek keseluruhan, bukan peringkat Standard Kandungan (SK) individu. Perlukan struktur data tambahan untuk ciri ini.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="anchor-murid" class="page-section">
+    <h2 class="section-title">🧑‍🎓 Analisis Murid</h2>
+
+    <div class="filter-bar">
+      <div class="fld"><label>Kelas</label><select id="murid-sel-kelas"><option value="">Pilih Kelas...</option></select></div>
+      <div class="fld" style="min-width:220px;"><label>Murid</label><select id="murid-sel-murid"><option value="">Pilih Murid...</option></select></div>
+    </div>
+
+    <div id="murid-profil-wrap">
+      <div class="empty-hint">Pilih Kelas dan Murid untuk lihat profil individu.</div>
+    </div>
+  </div>
+
+  <div id="anchor-subjek" class="page-section">
+    <h2 class="section-title">📘 Analisis Subjek</h2>
+
+    <div class="card-box">
+      <h2><span class="dot"></span>Ringkasan Semua Subjek</h2>
+      <div id="tbl-ringkasan-semua-subjek"><div class="empty-hint">Memuatkan...</div></div>
+    </div>
+
+    <div class="card-box">
+      <h2><span class="dot"></span>Perbandingan GPS Semua Subjek</h2>
+      <div style="position:relative; height:240px;"><canvas id="chart-perbandingan-subjek" role="img" aria-label="Carta bar perbandingan GPS semua subjek">Perbandingan GPS semua subjek.</canvas></div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="fld" style="min-width:220px;"><label>Pilih Subjek untuk Analisis Lanjut</label><select id="subjek-sel-subjek"><option value="">Pilih Subjek...</option></select></div>
+      <div class="fld"><label>Tahun Akademik</label><select id="subjek-sel-tahunakademik"><option value="">Semua Tahun</option></select></div>
+    </div>
+
+    <div id="subjek-detail-wrap">
+      <div class="empty-hint">Pilih subjek untuk lihat analisis lanjut (trend, prestasi ikut kelas, dll).</div>
+    </div>
+  </div>
+
+  <div id="anchor-kelas" class="page-section">
+    <h2 class="section-title">🏫 Analisis Kelas</h2>
+
+    <div class="card-box">
+      <h2><span class="dot"></span>Ringkasan Semua Kelas</h2>
+      <div id="tbl-ringkasan-semua-kelas"><div class="empty-hint">Memuatkan...</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Ranking Kelas (GPS)</h2>
+        <div style="position:relative; height:230px;"><canvas id="chart-ranking-kelas" role="img" aria-label="Carta bar ranking kelas ikut GPS">Ranking kelas ikut GPS.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Perbandingan Purata TP Mengikut Kelas</h2>
+        <div style="position:relative; height:230px;"><canvas id="chart-perbandingan-tp-kelas" role="img" aria-label="Carta bar perbandingan purata TP mengikut kelas">Perbandingan purata TP mengikut kelas.</canvas></div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="fld" style="min-width:220px;"><label>Pilih Kelas untuk Analisis Lanjut</label><select id="kelas-sel-kelas"><option value="">Pilih Kelas...</option></select></div>
+      <div class="fld"><label>Tahun Akademik</label><select id="kelas-sel-tahunakademik"><option value="">Semua Tahun</option></select></div>
+    </div>
+
+    <div id="kelas-detail-wrap">
+      <div class="empty-hint">Pilih kelas untuk lihat analisis lanjut (radar subjek, trend pencapaian).</div>
+    </div>
+  </div>
+
+  <p class="diag" id="diag-version"></p>
+</div>
+
+<script>
+const EPRESTASI_CONFIG = {
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFhO1lMO--n0kCCpnQTBMzK6za4JxYHKpxyF6omTpyhsmQRfU7FZGwDA4LRW7KT_1Q/exec',
+};
+
+let state = { kelas: [], subjek: [], charts: {} };
+
+/* ---------- Navigasi Sidebar ---------- */
+document.querySelectorAll('#sidebar .nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    if (item.dataset.href){
+      window.location.href = item.dataset.href;
+      return;
+    }
+
+    document.querySelectorAll('#sidebar .nav-item').forEach(i=> i.classList.remove('active'));
+    item.classList.add('active');
+
+    if (item.dataset.soon){
+      tunjukToastSoon(item.textContent.trim());
+      return;
+    }
+
+    let target = item.dataset.target;
+    if (target === 'top') target = 'anchor-peperiksaan'; // "Dashboard" = paparan lalai
+
+    tukarTab(target);
+    window.scrollTo({ top:0, behavior:'smooth' });
+    document.getElementById('main')?.scrollTo({ top:0, behavior:'smooth' });
+  });
+});
+
+// Papar HANYA seksyen sasaran; sembunyikan seksyen analisis lain sepenuhnya.
+function tukarTab(idSasaran){
+  document.querySelectorAll('.page-section').forEach(sec=>{
+    sec.classList.toggle('active', sec.id === idSasaran);
+  });
+}
+
+function tunjukToastSoon(namaCiri){
+  let t = document.getElementById('toast-soon');
+  if (!t){
+    t = document.createElement('div');
+    t.id = 'toast-soon';
+    t.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1E2433; color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; z-index:1000; transition:.25s; opacity:0;';
+    document.body.appendChild(t);
+  }
+  t.textContent = `"${namaCiri}" akan datang dalam kemas kini seterusnya.`;
+  t.style.opacity = '1';
+  clearTimeout(tunjukToastSoon._tmr);
+  tunjukToastSoon._tmr = setTimeout(()=>{ t.style.opacity = '0'; }, 2600);
+}
+
+const GRED_WARNA = { A:'#1F8A5F', B:'#2D6FBB', C:'#C08A3E', D:'#D97706', E:'#B34747', F:'#A23B3B' };
+const GRED_LABEL = { A:'Cemerlang', B:'Baik', C:'Sederhana', D:'Lemah', E:'Sangat Lemah', F:'Gagal' };
+
+window.onload = async function(){
+  if (EPRESTASI_CONFIG.APPS_SCRIPT_URL.startsWith('PASTE_')){
+    document.getElementById('wrap').innerHTML = '<p style="color:#C0392B; padding:40px; text-align:center;">Konfigurasi belum lengkap: sila isi APPS_SCRIPT_URL dalam eprestasi_dashboard.html</p>';
+    return;
+  }
+
+  // Buka terus tab yang betul jika tiba dari pautan luar (cth: eprestasi.html#anchor-pbd)
+  const hashId = window.location.hash.replace('#', '');
+  if (hashId && document.getElementById(hashId)?.classList.contains('page-section')){
+    tukarTab(hashId);
+    document.querySelectorAll('#sidebar .nav-item').forEach(i=>{
+      i.classList.toggle('active', i.dataset.target === hashId);
+    });
+  }
+
+  await muatSenaraiFilter();
+  await muatDashboard();
+};
+
+async function muatSenaraiFilter(){
+  const [rKelas, rSubjek, rMurid, rVersi] = await Promise.all([
+    fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiKelas`).then(r=>r.json()),
+    fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiSubjek`).then(r=>r.json()),
+    fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiMurid`).then(r=>r.json()),
+    fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=versi`).then(r=>r.json()),
+  ]);
+  state.kelas = rKelas.data || [];
+  state.subjek = rSubjek.data || [];
+  state.murid = rMurid.data || [];
+  document.getElementById('diag-version').textContent = rVersi.scriptVersion ? `Kad Prestasi Akademik · Versi Backend: ${rVersi.scriptVersion}` : '';
+
+  const selTahun = document.getElementById('f-tahun');
+  [...new Set(state.kelas.map(k=>k.Tahun))].forEach(t=>{
+    const o = document.createElement('option'); o.value = t; o.textContent = t; selTahun.appendChild(o);
+  });
+  const selKelas = document.getElementById('f-kelas');
+  state.kelas.forEach(k=>{
+    const o = document.createElement('option'); o.value = k.NamaKelas; o.textContent = k.NamaKelas; selKelas.appendChild(o);
+  });
+  const selSubjek = document.getElementById('f-subjek');
+  state.subjek.forEach(s=>{
+    const o = document.createElement('option'); o.value = s.NamaSubjek; o.textContent = s.NamaSubjek; selSubjek.appendChild(o);
+  });
+  const selTA = document.getElementById('f-tahunakademik');
+  const now = new Date().getFullYear();
+  for (let y = now; y >= now - 2; y--){
+    const o = document.createElement('option'); o.value = y; o.textContent = y; selTA.appendChild(o);
+  }
+
+  document.getElementById('f-tahun').addEventListener('change', (e)=>{
+    const t = e.target.value;
+    selKelas.innerHTML = '<option value="">Semua Kelas</option>';
+    state.kelas.filter(k => !t || k.Tahun === t).forEach(k=>{
+      const o = document.createElement('option'); o.value = k.NamaKelas; o.textContent = k.NamaKelas; selKelas.appendChild(o);
+    });
+  });
+
+  document.getElementById('btn-tapis').addEventListener('click', muatDashboard);
+  document.getElementById('btn-reset').addEventListener('click', ()=>{
+    document.getElementById('f-tahun').value = '';
+    document.getElementById('f-kelas').value = '';
+    document.getElementById('f-subjek').value = '';
+    muatDashboard();
+  });
+
+  /* ---------- Analisis Murid: selektor Kelas -> Murid ---------- */
+  const muridSelKelas = document.getElementById('murid-sel-kelas');
+  state.kelas.forEach(k=>{
+    const o = document.createElement('option'); o.value = k.NamaKelas; o.textContent = k.NamaKelas; muridSelKelas.appendChild(o);
+  });
+  muridSelKelas.addEventListener('change', (e)=>{
+    const kls = e.target.value;
+    const selM = document.getElementById('murid-sel-murid');
+    selM.innerHTML = '<option value="">Pilih Murid...</option>';
+    state.murid.filter(m => m.Kelas === kls).sort((a,b)=> a.Nama.localeCompare(b.Nama)).forEach(m=>{
+      const o = document.createElement('option'); o.value = m.ID; o.textContent = m.Nama; selM.appendChild(o);
+    });
+    document.getElementById('murid-profil-wrap').innerHTML = '<div class="empty-hint">Pilih Murid untuk lihat profil individu.</div>';
+  });
+  document.getElementById('murid-sel-murid').addEventListener('change', (e)=>{
+    if (e.target.value) muatProfilMurid(e.target.value);
+  });
+
+  /* ---------- Analisis Subjek: selektor ---------- */
+  const subjekSel = document.getElementById('subjek-sel-subjek');
+  state.subjek.forEach(s=>{
+    const o = document.createElement('option'); o.value = s.NamaSubjek; o.textContent = s.NamaSubjek; subjekSel.appendChild(o);
+  });
+  const subjekSelTA = document.getElementById('subjek-sel-tahunakademik');
+  for (let y = now; y >= now - 2; y--){
+    const o = document.createElement('option'); o.value = y; o.textContent = y; subjekSelTA.appendChild(o);
+  }
+  subjekSel.addEventListener('change', muatAnalisisSubjek);
+  subjekSelTA.addEventListener('change', muatAnalisisSubjek);
+
+  /* ---------- Analisis Kelas: selektor ---------- */
+  const kelasSel = document.getElementById('kelas-sel-kelas');
+  state.kelas.forEach(k=>{
+    const o = document.createElement('option'); o.value = k.NamaKelas; o.textContent = k.NamaKelas; kelasSel.appendChild(o);
+  });
+  const kelasSelTA = document.getElementById('kelas-sel-tahunakademik');
+  for (let y = now; y >= now - 2; y--){
+    const o = document.createElement('option'); o.value = y; o.textContent = y; kelasSelTA.appendChild(o);
+  }
+  kelasSel.addEventListener('change', muatAnalisisKelas);
+  kelasSelTA.addEventListener('change', muatAnalisisKelas);
+}
+
+function muatAnalisisKelas(){
+  const kelas = document.getElementById('kelas-sel-kelas').value;
+  const wrap = document.getElementById('kelas-detail-wrap');
+  if (!kelas){
+    wrap.innerHTML = '<div class="empty-hint">Pilih kelas untuk lihat analisis lanjut (radar subjek, trend pencapaian).</div>';
+    return;
+  }
+  const tahunAkademik = document.getElementById('kelas-sel-tahunakademik').value;
+  wrap.innerHTML = '<div class="empty-hint">Memuatkan...</div>';
+
+  fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=analisisKelas&kelas=${encodeURIComponent(kelas)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}`)
+    .then(r=>r.json())
+    .then(res=>{
+      if (!res.ok || !res.data){ wrap.innerHTML = '<div class="empty-hint">Gagal memuatkan analisis kelas.</div>'; return; }
+      renderAnalisisKelas(res.data);
+    })
+    .catch(()=>{ wrap.innerHTML = '<div class="empty-hint">Gagal memuatkan analisis kelas.</div>'; });
+}
+
+
+function muatAnalisisSubjek(){
+  const subjek = document.getElementById('subjek-sel-subjek').value;
+  const wrap = document.getElementById('subjek-detail-wrap');
+  if (!subjek){
+    wrap.innerHTML = '<div class="empty-hint">Pilih subjek untuk lihat analisis lanjut (trend, prestasi ikut kelas, dll).</div>';
+    return;
+  }
+  const tahunAkademik = document.getElementById('subjek-sel-tahunakademik').value;
+  wrap.innerHTML = '<div class="empty-hint">Memuatkan...</div>';
+
+  fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=analisisSubjek&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}`)
+    .then(r=>r.json())
+    .then(res=>{
+      if (!res.ok || !res.data){ wrap.innerHTML = '<div class="empty-hint">Gagal memuatkan analisis subjek.</div>'; return; }
+      renderAnalisisSubjek(res.data);
+    })
+    .catch(()=>{ wrap.innerHTML = '<div class="empty-hint">Gagal memuatkan analisis subjek.</div>'; });
+}
+
+async function muatDashboard(){
+  const tahun = document.getElementById('f-tahun').value;
+  const kelas = document.getElementById('f-kelas').value;
+  const subjek = document.getElementById('f-subjek').value;
+  const tahunAkademik = document.getElementById('f-tahunakademik').value;
+
+  const url = `${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=dashboard&tahun=${encodeURIComponent(tahun)}&kelas=${encodeURIComponent(kelas)}&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}`;
+  const res = await fetch(url).then(r=>r.json());
+  if (!res.ok){ return; }
+  render(res.data);
+}
+
+function render(d){
+  renderStatCardsPeperiksaan(d);
+  renderChartGred(d.agihanGred);
+  renderTableSubjek(d.prestasiSubjek);
+  renderChartTrendLulus(d.trendGPS);
+  renderChartTOVAR(d.analisisTOVAR);
+  renderChartTOVARLulus(d.analisisTOVAR);
+  renderChartJulat(d.julatMarkah);
+  renderTableKedudukanKelas(d.kedudukanKelas);
+  renderTableSetiapPeperiksaan(d.analisisSetiapPeperiksaan);
+  renderTablePerbandinganTahun(d.perbandinganTahun);
+
+  renderStatCardsPBD(d);
+  renderChartTPHistogram(d.agihanTP);
+  renderChartTPPai(d.agihanTP);
+  renderChartTrendTP(d.trendTP);
+  renderChartTPKelas(d.kedudukanKelasPBD);
+  renderTableMuridTP(d.senaraiMuridTP1, 'tbl-murid-tp1');
+  renderTableMuridTP(d.senaraiMuridTP6, 'tbl-murid-tp6');
+  renderTableTPSubjek(d.prestasiSubjek);
+
+  renderTableRingkasanSemuaSubjek(d.prestasiSubjek);
+  renderChartPerbandinganSubjek(d.prestasiSubjek);
+
+  renderTableRingkasanSemuaKelas(d.ringkasanKelas);
+  renderChartRankingKelas(d.ringkasanKelas);
+  renderChartPerbandinganTPKelas(d.ringkasanKelas);
+}
+
+function renderStatCardsPeperiksaan(d){
+  renderKadRingkasPeperiksaan(d);
+  const etr = (d.analisisTOVAR || []).find(x => x.slot === 'ETR');
+  const cards = [
+    { lbl:'Bilangan Calon', val:d.bilanganCalon ?? '-', icn:'🧑‍🎓', bg:'#E6F1FB' },
+    { lbl:'Peratus Lulus', val:d.peratusLulus ? d.peratusLulus + '%' : '-', icn:'✅', bg:'#E4F5EC' },
+    { lbl:'GPS Sekolah', val:d.gps || '-', icn:'🎓', bg:'#F1EAFB' },
+    { lbl:'ETR (GPS)', val:etr && etr.gps != null ? etr.gps : '-', icn:'🎯', bg:'#FEF0E4' },
+    { lbl:'ETR (% Lulus)', val:etr && etr.peratusLulus != null ? etr.peratusLulus + '%' : '-', icn:'🎯', bg:'#FEF0E4' },
+    { lbl:'Bilangan A', val:d.agihanGred ? d.agihanGred.A : '-', icn:'🏆', bg:'#E4F5EC' },
+    { lbl:'Bilangan Gagal', val:d.agihanGred ? d.agihanGred.F : '-', icn:'⚠️', bg:'#FBE9E7' },
+  ];
+  document.getElementById('stat-row-peperiksaan').innerHTML = cards.map(c=>`
+    <div class="stat-card">
+      <div class="icn" style="background:${c.bg};">${c.icn}</div>
+      <div class="lbl">${c.lbl}</div>
+      <div class="val">${c.val}</div>
+    </div>`).join('');
+}
+
+// Format nombor kemas untuk papar dalam tooltip (buang .0 yang tak perlu)
+function krFmt_(n){
+  if (n === null || n === undefined) return '-';
+  return Number.isInteger(n) ? String(n) : String(n);
+}
+
+function renderKadRingkasPeperiksaan(d){
+  const rp = d.ringkasanPeratusan || {};
+  const wrap = document.getElementById('stat-row-ringkas-peperiksaan');
+  if (!wrap) return;
+
+  const kad = (opt) => {
+    const { lbl, nilaiUtama, nilaiKecil, judulTooltip, isiTooltip, formula, contoh } = opt;
+    return `
+      <div class="kad-ringkas">
+        <div class="kr-lbl">${lbl} <span class="kr-info-btn">ⓘ</span></div>
+        <div class="kr-val">${nilaiUtama}${nilaiKecil ? ` <small>${nilaiKecil}</small>` : ''}</div>
+        <div class="kr-tooltip">
+          <div>${judulTooltip}</div>
+          <div style="margin-top:4px; color:#D9E2EF;">${isiTooltip}</div>
+          ${formula ? `<div class="kr-formula">${formula}</div>` : ''}
+          ${contoh ? `<div style="color:#B9C6D9;">${contoh}</div>` : ''}
+        </div>
+      </div>`;
+  };
+
+  const asas = rp.purataAsas, sasaran = rp.purataSasaran, tengah = rp.purataPertengahan, akhir = rp.purataAkhir, capai = rp.pencapaianSasaran || {};
+
+  wrap.innerHTML = [
+    kad({
+      lbl: 'Purata Asas (TOV)',
+      nilaiUtama: asas ? asas.purata + '%' : '-',
+      judulTooltip: '📍 <b>TOV = Markah Asas Murid</b>',
+      isiTooltip: 'Purata markah asas (Ujian Diagnostik Awal Tahun) semua murid, diambil sebelum sebarang intervensi pengajaran.',
+      formula: 'Jumlah markah TOV ÷ bilangan murid',
+      contoh: asas ? `Contoh: ${asas.jumlahMarkah} ÷ ${asas.bilangan} = <b>${asas.purata}%</b>` : 'Tiada data TOV lagi.',
+    }),
+    kad({
+      lbl: 'Purata Sasaran (ETR)',
+      nilaiUtama: sasaran ? sasaran.purata + '%' : '-',
+      judulTooltip: '🎯 <b>ETR = Sasaran Murid</b>',
+      isiTooltip: 'Purata sasaran pencapaian yang ditetapkan guru bagi <b>setiap murid</b> (sasaran setiap murid boleh berbeza-beza).',
+      formula: 'Jumlah ETR semua murid ÷ bilangan murid',
+      contoh: sasaran ? `Contoh: ${sasaran.jumlahMarkah} ÷ ${sasaran.bilangan} = <b>${sasaran.purata}%</b>` : 'Tiada sasaran ETR ditetapkan lagi.',
+    }),
+    kad({
+      lbl: 'Purata Pertengahan',
+      nilaiUtama: tengah ? tengah.purata + '%' : '-',
+      judulTooltip: '📘 <b>Ujian Pertengahan Tahun</b>',
+      isiTooltip: 'Purata markah Ujian Pertengahan Tahun bagi murid yang mempunyai markah direkodkan.',
+      formula: 'Jumlah markah Pertengahan ÷ bilangan murid bermarkah',
+      contoh: tengah ? `Contoh: ${tengah.jumlahMarkah} ÷ ${tengah.bilangan} = <b>${tengah.purata}%</b>` : 'Tiada markah Pertengahan Tahun lagi.',
+    }),
+    kad({
+      lbl: 'Purata Akhir',
+      nilaiUtama: akhir ? akhir.purata + '%' : '-',
+      judulTooltip: '📗 <b>Ujian Akhir Tahun</b>',
+      isiTooltip: 'Purata markah Ujian Akhir Tahun bagi murid yang mempunyai markah direkodkan.',
+      formula: 'Jumlah markah Akhir ÷ bilangan murid bermarkah',
+      contoh: akhir ? `Contoh: ${akhir.jumlahMarkah} ÷ ${akhir.bilangan} = <b>${akhir.purata}%</b>` : 'Tiada markah Akhir Tahun lagi.',
+    }),
+    kad({
+      lbl: 'Mencapai Sasaran (ETR)',
+      nilaiUtama: capai.bilKeseluruhan ? `${capai.bilCapai} / ${capai.bilKeseluruhan}` : '-',
+      nilaiKecil: capai.peratus != null ? capai.peratus + '%' : '',
+      judulTooltip: '✅ <b>Bilangan Murid Capai Sasaran Sendiri</b>',
+      isiTooltip: 'Bilangan murid yang markah <b>Akhir Tahun</b> masing-masing sama atau lebih tinggi daripada <b>ETR mereka sendiri</b> — dikira SATU MURID SATU MURID, <u>bukan</u> purata kelas dibandingkan purata ETR.',
+      formula: 'Murid capai ETR sendiri ÷ jumlah murid ada kedua-dua markah × 100',
+      contoh: capai.bilKeseluruhan ? `Contoh: ${capai.bilCapai} murid capai ETR sendiri daripada ${capai.bilKeseluruhan} murid = <b>${capai.peratus}%</b>` : 'Perlu markah Akhir DAN ETR untuk dikira.',
+    }),
+  ].join('');
+}
+
+function renderChartTOVAR(list){
+  if (state.charts.tovar) state.charts.tovar.destroy();
+  if (!list){ return; }
+  const labels = list.map(x => x.slot);
+  const data = list.map(x => x.gps);
+  state.charts.tovar = new Chart(document.getElementById('chart-tovar'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'GPS', data, backgroundColor: labels.map(l=> l==='ETR' ? '#C08A3E' : '#1B3A6B'), borderRadius:4, maxBarThickness:44 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ reverse:true, title:{ display:true, text:'GPS (lebih rendah = lebih baik)', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderChartTOVARLulus(list){
+  if (state.charts.tovarLulus) state.charts.tovarLulus.destroy();
+  if (!list){ return; }
+  const labels = list.map(x => x.slot);
+  const data = list.map(x => x.peratusLulus);
+  state.charts.tovarLulus = new Chart(document.getElementById('chart-tovar-lulus'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'% Lulus', data, backgroundColor: labels.map(l=> l==='ETR' ? '#C08A3E' : '#1F8A5F'), borderRadius:4, maxBarThickness:44 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ min:0, max:100, title:{ display:true, text:'% Lulus', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderChartTrendLulus(trend){
+  if (state.charts.trendLulus) state.charts.trendLulus.destroy();
+  if (!trend || trend.length === 0){
+    document.getElementById('chart-trend-lulus').parentElement.innerHTML = '<div class="empty-hint">Belum cukup data merentas tahun akademik.</div>';
+    return;
+  }
+  const labels = trend.map(t=>t.tahunAkademik);
+  const data = trend.map(t=>t.peratusLulus);
+  state.charts.trendLulus = new Chart(document.getElementById('chart-trend-lulus'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'% Lulus', data, borderColor:'#1F8A5F', backgroundColor:'rgba(31,138,95,0.1)', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:'#1F8A5F' }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ min:0, max:100, title:{ display:true, text:'% Lulus', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderChartJulat(julat){
+  if (state.charts.julat) state.charts.julat.destroy();
+  if (!julat){ return; }
+  const labels = Object.keys(julat);
+  const data = Object.values(julat);
+  state.charts.julat = new Chart(document.getElementById('chart-julat'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'Bilangan', data, backgroundColor:'#2D6FBB', borderRadius:4, maxBarThickness:30 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ ticks:{ autoSkip:false, maxRotation:45, font:{ size:10 } } }, y:{ beginAtZero:true, ticks:{ precision:0 } } }
+    }
+  });
+}
+
+function renderTableKedudukanKelas(list){
+  const el = document.getElementById('tbl-kedudukan-kelas');
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada data kelas untuk penapis ini.</div>'; return; }
+  const rows = list.map((k,i)=>`
+    <tr>
+      <td><span class="rank-num ${i===0?'top1':''}">${i+1}</span></td>
+      <td>${k.kelas}</td>
+      <td>${k.gps}</td>
+      <td>${k.purataMarkah}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th></th><th>Kelas</th><th>GPS</th><th>Purata Markah</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderTableSetiapPeperiksaan(list){
+  const el = document.getElementById('tbl-setiap-peperiksaan');
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada rekod peperiksaan untuk penapis ini.</div>'; return; }
+  const rows = list.map(j=>`
+    <tr>
+      <td>${j.jenisUjian}</td>
+      <td>${j.gps}</td>
+      <td>${j.peratusLulus}%</td>
+      <td>${j.bilCalon}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th>Jenis Ujian</th><th>GPS</th><th>% Lulus</th><th>Bil. Calon</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderTablePerbandinganTahun(pb){
+  const el = document.getElementById('tbl-perbandingan-tahun');
+  if (!pb){ el.innerHTML = '<div class="empty-hint">Tiada data tahun sebelumnya untuk perbandingan (pilih Tahun Akademik pada penapis).</div>'; return; }
+  const deltaGps = (pb.gpsSemasa - pb.gpsLepas).toFixed(2);
+  const deltaLulus = (pb.lulusSemasa - pb.lulusLepas).toFixed(1);
+  el.innerHTML = `
+    <table class="rank-table">
+      <thead><tr><th></th><th>${pb.tahunLepas}</th><th>${pb.tahunSemasa}</th><th>Perubahan</th></tr></thead>
+      <tbody>
+        <tr><td>GPS</td><td>${pb.gpsLepas}</td><td>${pb.gpsSemasa}</td><td style="color:${deltaGps<=0?'#1F8A5F':'#A23B3B'};">${deltaGps<=0?'':'+'}${deltaGps}</td></tr>
+        <tr><td>% Lulus</td><td>${pb.lulusLepas}%</td><td>${pb.lulusSemasa}%</td><td style="color:${deltaLulus>=0?'#1F8A5F':'#A23B3B'};">${deltaLulus>=0?'+':''}${deltaLulus}%</td></tr>
+      </tbody>
+    </table>`;
+}
+
+function renderChartGred(agihan){
+  const labels = Object.keys(agihan).map(g => `${g} (${GRED_LABEL[g]})`);
+  const data = Object.values(agihan);
+  const warna = Object.keys(agihan).map(g => GRED_WARNA[g]);
+  const total = data.reduce((a,b)=>a+b,0);
+
+  document.getElementById('legend-gred').innerHTML = Object.keys(agihan).map(g=>{
+    const peratus = total ? ((agihan[g]/total)*100).toFixed(1) : 0;
+    return `<span><span class="sw" style="background:${GRED_WARNA[g]};"></span>${g} (${GRED_LABEL[g]}) ${agihan[g]} (${peratus}%)</span>`;
+  }).join('');
+
+  if (state.charts.gred) state.charts.gred.destroy();
+  state.charts.gred = new Chart(document.getElementById('chart-gred'), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: warna, borderColor:'#fff', borderWidth:2 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } }
+  });
+}
+
+function renderTableSubjek(list){
+  const el = document.getElementById('tbl-subjek');
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada data subjek untuk penapis ini.</div>'; return; }
+  const rows = list.map((s,i)=>`
+    <tr>
+      <td><span class="rank-num ${i===0?'top1':''}">${i+1}</span></td>
+      <td>${s.subjek}</td>
+      <td>${s.gps ?? '-'}</td>
+      <td>${s.purataTP ? 'TP'+s.purataTP : '-'}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th></th><th>Subjek</th><th>GPS</th><th>TP Purata</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* ============================================================
+ * ANALISIS PBD
+ * ============================================================ */
+const TP_WARNA = { 1:'#A23B3B', 2:'#B34747', 3:'#D97706', 4:'#C08A3E', 5:'#2D6FBB', 6:'#1F8A5F' };
+const TP_LABEL = { 1:'Belum Menguasai', 2:'Sedikit Menguasai', 3:'Menguasai Sebahagian', 4:'Menguasai', 5:'Cemerlang', 6:'Sangat Cemerlang' };
+
+function renderStatCardsPBD(d){
+  const agihan = d.agihanTP || {};
+  const cards = [
+    { lbl:'Purata TP Sekolah', val:d.purataTP ? 'TP'+d.purataTP : '-', icn:'📊', bg:'#E6F1FB' },
+    { lbl:'Bilangan Murid TP1–TP6', val:d.totalRekodPBD ?? '-', icn:'🧑‍🎓', bg:'#F1EAFB' },
+    { lbl:'Belum Menguasai (TP1)', val:agihan[1] ?? 0, icn:'⚠️', bg:'#FBE9E7' },
+    { lbl:'Cemerlang (TP6)', val:agihan[6] ?? 0, icn:'🏆', bg:'#E4F5EC' },
+  ];
+  document.getElementById('stat-row-pbd').innerHTML = cards.map(c=>`
+    <div class="stat-card">
+      <div class="icn" style="background:${c.bg};">${c.icn}</div>
+      <div class="lbl">${c.lbl}</div>
+      <div class="val">${c.val}</div>
+    </div>`).join('');
+}
+
+function renderChartTPHistogram(agihan){
+  if (state.charts.tpHist) state.charts.tpHist.destroy();
+  if (!agihan){ return; }
+  const labels = Object.keys(agihan).map(k=>'TP'+k);
+  const data = Object.values(agihan);
+  state.charts.tpHist = new Chart(document.getElementById('chart-tp-histogram'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'Bilangan Murid', data, backgroundColor: Object.keys(agihan).map(k=>TP_WARNA[k]), borderRadius:4, maxBarThickness:40 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }
+    }
+  });
+}
+
+function renderChartTPPai(agihan){
+  if (state.charts.tpPai) state.charts.tpPai.destroy();
+  if (!agihan){ return; }
+  const labels = Object.keys(agihan).map(k=>`TP${k} (${TP_LABEL[k]})`);
+  const data = Object.values(agihan);
+  const total = data.reduce((a,b)=>a+b,0);
+  document.getElementById('legend-tp').innerHTML = Object.keys(agihan).map(k=>{
+    const peratus = total ? ((agihan[k]/total)*100).toFixed(1) : 0;
+    return `<span><span class="sw" style="background:${TP_WARNA[k]};"></span>TP${k} ${agihan[k]} (${peratus}%)</span>`;
+  }).join('');
+  state.charts.tpPai = new Chart(document.getElementById('chart-tp-pai'), {
+    type: 'pie',
+    data: { labels, datasets: [{ data, backgroundColor: Object.keys(agihan).map(k=>TP_WARNA[k]), borderColor:'#fff', borderWidth:2 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } }
+  });
+}
+
+function renderChartTrendTP(trend){
+  if (state.charts.trendTP) state.charts.trendTP.destroy();
+  if (!trend || trend.length === 0){
+    document.getElementById('chart-trend-tp').parentElement.innerHTML = '<div class="empty-hint">Belum cukup data merentas tahun akademik.</div>';
+    return;
+  }
+  const labels = trend.map(t=>t.tahunAkademik);
+  const data = trend.map(t=>t.purataTP);
+  state.charts.trendTP = new Chart(document.getElementById('chart-trend-tp'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Purata TP', data, borderColor:'#2D6FBB', backgroundColor:'rgba(45,111,187,0.1)', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:'#2D6FBB' }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ min:1, max:6, title:{ display:true, text:'Purata TP (lebih tinggi = lebih baik)', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderChartTPKelas(list){
+  if (state.charts.tpKelas) state.charts.tpKelas.destroy();
+  if (!list || list.length === 0){
+    document.getElementById('chart-tp-kelas').parentElement.innerHTML = '<div class="empty-hint">Tiada data PBD untuk penapis ini.</div>';
+    return;
+  }
+  const labels = list.map(k=>k.kelas);
+  const data = list.map(k=>k.purataTP);
+  state.charts.tpKelas = new Chart(document.getElementById('chart-tp-kelas'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'Purata TP', data, backgroundColor:'#1B3A6B', borderRadius:4, maxBarThickness:40 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ ticks:{ autoSkip:false, maxRotation:45, font:{ size:10 } } }, y:{ min:1, max:6, title:{ display:true, text:'Purata TP', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderTableMuridTP(list, elId){
+  const el = document.getElementById(elId);
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada murid dalam kategori ini untuk penapis semasa.</div>'; return; }
+  const rows = list.map(m=>`
+    <tr>
+      <td>${m.nama}</td>
+      <td>${m.kelas}</td>
+      <td>${m.subjek}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th>Nama Murid</th><th>Kelas</th><th>Subjek</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderTableTPSubjek(list){
+  const el = document.getElementById('tbl-tp-subjek');
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada data PBD untuk penapis ini.</div>'; return; }
+  const tersusun = [...list].filter(s => s.purataTP != null).sort((a,b)=> b.purataTP - a.purataTP);
+  if (tersusun.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada data PBD untuk penapis ini.</div>'; return; }
+  const rows = tersusun.map((s,i)=>`
+    <tr>
+      <td><span class="rank-num ${i===0?'top1':''}">${i+1}</span></td>
+      <td>${s.subjek}</td>
+      <td>TP${s.purataTP}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th></th><th>Subjek</th><th>TP Purata</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* ============================================================
+ * ANALISIS MURID
+ * ============================================================ */
+async function muatProfilMurid(muridId){
+  const wrap = document.getElementById('murid-profil-wrap');
+  wrap.innerHTML = '<div class="empty-hint">Memuatkan profil...</div>';
+
+  const res = await fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=profilMurid&muridId=${encodeURIComponent(muridId)}`).then(r=>r.json());
+  if (!res.ok || !res.data){ wrap.innerHTML = '<div class="empty-hint">Gagal memuatkan profil murid.</div>'; return; }
+  renderProfilMurid(res.data);
+}
+
+function renderProfilMurid(d){
+  const wrap = document.getElementById('murid-profil-wrap');
+  const ranking = d.rankingKelas ? `${d.rankingKelas.kedudukan} daripada ${d.rankingKelas.daripada} murid (ikut GPS)` : '-';
+
+  wrap.innerHTML = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="icn" style="background:#F1EAFB;">🧑‍🎓</div><div class="lbl">Nama</div><div class="val" style="font-size:15px;">${d.nama}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#E6F1FB;">🏫</div><div class="lbl">Kelas</div><div class="val" style="font-size:15px;">${d.kelas}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#F1EAFB;">🎓</div><div class="lbl">GPS Individu</div><div class="val">${d.gpsIndividu ?? '-'}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#E6F1FB;">📊</div><div class="lbl">Purata TP</div><div class="val">${d.purataTPIndividu ? 'TP'+d.purataTPIndividu : '-'}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#FEF0E4;">🏆</div><div class="lbl">Ranking Kelas</div><div class="val" style="font-size:15px;">${ranking}</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Radar — Kekuatan Mata Pelajaran</h2>
+        <div style="position:relative; height:260px;"><canvas id="chart-radar-murid" role="img" aria-label="Carta radar kekuatan murid mengikut subjek">Purata markah murid ikut subjek.</canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Graf Perkembangan (TOV → AR1 → AR2 → AR3)</h2>
+        <div style="position:relative; height:260px;"><canvas id="chart-perkembangan-murid" role="img" aria-label="Carta garis perkembangan markah murid dari TOV ke AR3">Perkembangan purata markah murid.</canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Prestasi Peperiksaan</h2>
+        <div id="tbl-prestasi-peperiksaan-murid"></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Prestasi PBD</h2>
+        <div id="tbl-prestasi-pbd-murid"></div>
+      </div>
+    </div>
+  `;
+
+  renderChartRadarMurid(d.radarSubjek);
+  renderChartPerkembanganMurid(d.grafPerkembangan);
+  renderTablePrestasiMurid(d.prestasiPeperiksaan, 'tbl-prestasi-peperiksaan-murid', 'peperiksaan');
+  renderTablePrestasiMurid(d.prestasiPBD, 'tbl-prestasi-pbd-murid', 'pbd');
+}
+
+function renderChartRadarMurid(list){
+  if (state.charts.radarMurid) state.charts.radarMurid.destroy();
+  if (!list || list.length === 0){
+    document.getElementById('chart-radar-murid').parentElement.innerHTML = '<div class="empty-hint">Tiada rekod markah untuk murid ini.</div>';
+    return;
+  }
+  const labels = list.map(x=>x.subjek);
+  const data = list.map(x=>x.purataMarkah);
+  state.charts.radarMurid = new Chart(document.getElementById('chart-radar-murid'), {
+    type: 'radar',
+    data: { labels, datasets: [{ label:'Purata Markah', data, borderColor:'#1B3A6B', backgroundColor:'rgba(27,58,107,0.15)', pointBackgroundColor:'#1B3A6B' }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ r:{ min:0, max:100, ticks:{ stepSize:20, font:{ size:9 } }, pointLabels:{ font:{ size:10.5 } } } }
+    }
+  });
+}
+
+function renderChartPerkembanganMurid(list){
+  if (state.charts.perkembanganMurid) state.charts.perkembanganMurid.destroy();
+  if (!list || list.length === 0){
+    document.getElementById('chart-perkembangan-murid').parentElement.innerHTML = '<div class="empty-hint">Tiada rekod merentas TOV/AR1/AR2/AR3 untuk murid ini.</div>';
+    return;
+  }
+  const labels = list.map(x=>x.slot);
+  const data = list.map(x=>x.purataMarkah);
+  state.charts.perkembanganMurid = new Chart(document.getElementById('chart-perkembangan-murid'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Purata Markah', data, borderColor:'#1F8A5F', backgroundColor:'rgba(31,138,95,0.1)', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:'#1F8A5F' }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ min:0, max:100, title:{ display:true, text:'Purata Markah', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderTablePrestasiMurid(list, elId, jenis){
+  const el = document.getElementById(elId);
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada rekod untuk murid ini.</div>'; return; }
+  if (jenis === 'peperiksaan'){
+    const rows = list.map(r=>`
+      <tr>
+        <td>${r.subjek}</td>
+        <td>${r.jenisUjian}</td>
+        <td>${r.markah}</td>
+        <td><span class="badge-pill" style="background:${GRED_WARNA[r.gred]};">${r.gred}</span></td>
+        <td>${r.tahunAkademik}</td>
+      </tr>`).join('');
+    el.innerHTML = `<table class="rank-table"><thead><tr><th>Subjek</th><th>Jenis Ujian</th><th>Markah</th><th>Gred</th><th>Tahun</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } else {
+    const rows = list.map(r=>`
+      <tr>
+        <td>${r.subjek}</td>
+        <td>TP${r.tp}</td>
+        <td>${r.tahunAkademik}</td>
+      </tr>`).join('');
+    el.innerHTML = `<table class="rank-table"><thead><tr><th>Subjek</th><th>Tahap Penguasaan</th><th>Tahun</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+}
+
+/* ============================================================
+ * ANALISIS SUBJEK
+ * ============================================================ */
+function renderTableRingkasanSemuaSubjek(list){
+  const el = document.getElementById('tbl-ringkasan-semua-subjek');
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada data subjek untuk penapis ini.</div>'; return; }
+  const rows = list.map((s,i)=>`
+    <tr>
+      <td><span class="rank-num ${i===0?'top1':''}">${i+1}</span></td>
+      <td>${s.subjek}</td>
+      <td>${s.gps ?? '-'}</td>
+      <td>${s.peratusLulus != null ? s.peratusLulus+'%' : '-'}</td>
+      <td>${s.bilA ?? 0}</td>
+      <td>${s.bilGagal ?? 0}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th></th><th>Subjek</th><th>GPS</th><th>% Lulus</th><th>A</th><th>Gagal</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderChartPerbandinganSubjek(list){
+  if (state.charts.perbandinganSubjek) state.charts.perbandinganSubjek.destroy();
+  if (!list || list.length === 0){
+    document.getElementById('chart-perbandingan-subjek').parentElement.innerHTML = '<div class="empty-hint">Tiada data subjek untuk penapis ini.</div>';
+    return;
+  }
+  const tersusun = [...list].filter(s => s.gps != null);
+  const labels = tersusun.map(s=>s.subjek);
+  const data = tersusun.map(s=>s.gps);
+  state.charts.perbandinganSubjek = new Chart(document.getElementById('chart-perbandingan-subjek'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'GPS', data, backgroundColor:'#1B3A6B', borderRadius:4, maxBarThickness:36 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ ticks:{ autoSkip:false, maxRotation:45, font:{ size:10 } } }, y:{ reverse:true, title:{ display:true, text:'GPS (lebih rendah = lebih baik)', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderAnalisisSubjek(d){
+  const wrap = document.getElementById('subjek-detail-wrap');
+  wrap.innerHTML = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="icn" style="background:#F1EAFB;">🎓</div><div class="lbl">GPS Subjek</div><div class="val">${d.ringkasan.gps ?? '-'}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#E4F5EC;">✅</div><div class="lbl">Peratus Lulus</div><div class="val">${d.ringkasan.peratusLulus != null ? d.ringkasan.peratusLulus+'%' : '-'}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#E4F5EC;">🏆</div><div class="lbl">Bilangan A</div><div class="val">${d.ringkasan.bilA}</div></div>
+      <div class="stat-card"><div class="icn" style="background:#FBE9E7;">⚠️</div><div class="lbl">Bilangan Gagal</div><div class="val">${d.ringkasan.bilGagal}</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Trend GPS — ${d.subjek}</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-trend-subjek"></canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Prestasi &amp; Perbandingan Antara Kelas</h2>
+        <div style="position:relative; height:220px;"><canvas id="chart-subjek-kelas"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Analisis Item</h2>
+        <div class="empty-hint">Belum tersedia — sistem hanya merekod markah keseluruhan setiap murid, bukan markah peringkat soalan/item individu.</div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Prestasi Mengikut Guru</h2>
+        <div class="empty-hint">Belum tersedia — sistem belum ada pemetaan guru↔subjek↔kelas. Boleh ditambah kemudian jika diperlukan.</div>
+      </div>
+    </div>
+  `;
+
+  if (state.charts.trendSubjek) state.charts.trendSubjek.destroy();
+  if (!d.trendGPS || d.trendGPS.length === 0){
+    document.getElementById('chart-trend-subjek').parentElement.innerHTML = '<div class="empty-hint">Belum cukup data merentas tahun akademik.</div>';
+  } else {
+    state.charts.trendSubjek = new Chart(document.getElementById('chart-trend-subjek'), {
+      type: 'line',
+      data: { labels: d.trendGPS.map(t=>t.tahunAkademik), datasets: [{ label:'GPS', data: d.trendGPS.map(t=>t.gps), borderColor:'#C08A3E', backgroundColor:'rgba(192,138,62,0.1)', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:'#C08A3E' }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ reverse:true, title:{ display:true, text:'GPS', font:{ size:10 } } } } }
+    });
+  }
+
+  if (state.charts.subjekKelas) state.charts.subjekKelas.destroy();
+  if (!d.prestasiKelas || d.prestasiKelas.length === 0){
+    document.getElementById('chart-subjek-kelas').parentElement.innerHTML = '<div class="empty-hint">Tiada data kelas untuk penapis ini.</div>';
+  } else {
+    state.charts.subjekKelas = new Chart(document.getElementById('chart-subjek-kelas'), {
+      type: 'bar',
+      data: { labels: d.prestasiKelas.map(k=>k.kelas), datasets: [{ label:'GPS', data: d.prestasiKelas.map(k=>k.gps), backgroundColor:'#2D6FBB', borderRadius:4, maxBarThickness:40 }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ reverse:true, title:{ display:true, text:'GPS', font:{ size:10 } } } } }
+    });
+  }
+}
+
+/* ============================================================
+ * ANALISIS KELAS
+ * ============================================================ */
+function renderTableRingkasanSemuaKelas(list){
+  const el = document.getElementById('tbl-ringkasan-semua-kelas');
+  if (!list || list.length === 0){ el.innerHTML = '<div class="empty-hint">Tiada data kelas untuk penapis ini.</div>'; return; }
+  const rows = list.map((k,i)=>`
+    <tr>
+      <td><span class="rank-num ${i===0?'top1':''}">${i+1}</span></td>
+      <td>${k.kelas}</td>
+      <td>${k.bilanganMurid}</td>
+      <td>${k.gps ?? '-'}</td>
+      <td>${k.peratusLulus != null ? k.peratusLulus+'%' : '-'}</td>
+      <td>${k.purataTP ? 'TP'+k.purataTP : '-'}</td>
+    </tr>`).join('');
+  el.innerHTML = `<table class="rank-table"><thead><tr><th></th><th>Kelas</th><th>Bil. Murid</th><th>GPS</th><th>% Lulus</th><th>TP Purata</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderChartRankingKelas(list){
+  if (state.charts.rankingKelas) state.charts.rankingKelas.destroy();
+  const tersusun = (list || []).filter(k => k.gps != null);
+  if (tersusun.length === 0){
+    document.getElementById('chart-ranking-kelas').parentElement.innerHTML = '<div class="empty-hint">Tiada data GPS kelas untuk penapis ini.</div>';
+    return;
+  }
+  state.charts.rankingKelas = new Chart(document.getElementById('chart-ranking-kelas'), {
+    type: 'bar',
+    data: { labels: tersusun.map(k=>k.kelas), datasets: [{ label:'GPS', data: tersusun.map(k=>k.gps), backgroundColor:'#1B3A6B', borderRadius:4, maxBarThickness:40 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ ticks:{ autoSkip:false, maxRotation:45, font:{ size:10 } } }, y:{ reverse:true, title:{ display:true, text:'GPS (lebih rendah = lebih baik)', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderChartPerbandinganTPKelas(list){
+  if (state.charts.perbandinganTPKelas) state.charts.perbandinganTPKelas.destroy();
+  const tersusun = (list || []).filter(k => k.purataTP != null);
+  if (tersusun.length === 0){
+    document.getElementById('chart-perbandingan-tp-kelas').parentElement.innerHTML = '<div class="empty-hint">Tiada data PBD kelas untuk penapis ini.</div>';
+    return;
+  }
+  state.charts.perbandinganTPKelas = new Chart(document.getElementById('chart-perbandingan-tp-kelas'), {
+    type: 'bar',
+    data: { labels: tersusun.map(k=>k.kelas), datasets: [{ label:'Purata TP', data: tersusun.map(k=>k.purataTP), backgroundColor:'#2D6FBB', borderRadius:4, maxBarThickness:40 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ ticks:{ autoSkip:false, maxRotation:45, font:{ size:10 } } }, y:{ min:1, max:6, title:{ display:true, text:'Purata TP', font:{ size:10 } } } }
+    }
+  });
+}
+
+function renderAnalisisKelas(d){
+  const wrap = document.getElementById('kelas-detail-wrap');
+  wrap.innerHTML = `
+    <div class="grid-2">
+      <div class="card-box">
+        <h2><span class="dot"></span>Radar — Kekuatan Subjek Kelas ${d.kelas}</h2>
+        <div style="position:relative; height:260px;"><canvas id="chart-radar-kelas"></canvas></div>
+      </div>
+      <div class="card-box">
+        <h2><span class="dot"></span>Trend Pencapaian (GPS) Merentas Tahun</h2>
+        <div style="position:relative; height:260px;"><canvas id="chart-trend-kelas"></canvas></div>
+      </div>
+    </div>
+  `;
+
+  if (state.charts.radarKelas) state.charts.radarKelas.destroy();
+  if (!d.radarSubjek || d.radarSubjek.length === 0){
+    document.getElementById('chart-radar-kelas').parentElement.innerHTML = '<div class="empty-hint">Tiada rekod markah untuk kelas ini.</div>';
+  } else {
+    state.charts.radarKelas = new Chart(document.getElementById('chart-radar-kelas'), {
+      type: 'radar',
+      data: { labels: d.radarSubjek.map(x=>x.subjek), datasets: [{ label:'Purata Markah', data: d.radarSubjek.map(x=>x.purataMarkah), borderColor:'#1B3A6B', backgroundColor:'rgba(27,58,107,0.15)', pointBackgroundColor:'#1B3A6B' }] },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{ r:{ min:0, max:100, ticks:{ stepSize:20, font:{ size:9 } }, pointLabels:{ font:{ size:10.5 } } } }
+      }
+    });
+  }
+
+  if (state.charts.trendKelas) state.charts.trendKelas.destroy();
+  if (!d.trendGPS || d.trendGPS.length === 0){
+    document.getElementById('chart-trend-kelas').parentElement.innerHTML = '<div class="empty-hint">Belum cukup data merentas tahun akademik.</div>';
+  } else {
+    state.charts.trendKelas = new Chart(document.getElementById('chart-trend-kelas'), {
+      type: 'line',
+      data: { labels: d.trendGPS.map(t=>t.tahunAkademik), datasets: [{ label:'GPS', data: d.trendGPS.map(t=>t.gps), borderColor:'#1F8A5F', backgroundColor:'rgba(31,138,95,0.1)', fill:true, tension:0.3, pointRadius:5, pointBackgroundColor:'#1F8A5F' }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ reverse:true, title:{ display:true, text:'GPS', font:{ size:10 } } } } }
+    });
+  }
+}
+</script>
+  </div>
+</div>
+</body>
+</html>

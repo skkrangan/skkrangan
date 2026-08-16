@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kad Prestasi Akademik SK Krangan — Input Markah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root{
+    --navy:#1B3A6B;
+    --navy-dark:#122748;
+    --gold:#C08A3E;
+    --crimson:#A23B3B;
+    --bg:#F5F6FA;
+    --card:#FFFFFF;
+    --ink:#1E2433;
+    --muted:#6B7280;
+    --border:#E4E7EE;
+    --ok:#1F8A5F;
+    --err:#C0392B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+  }
+  h1,h2,h3,.font-display{ font-family:'Fraunces', serif; }
+
+  /* ---------- Layout ---------- */
+  #app{ display:block; max-width:1180px; margin:0 auto; padding:24px 20px 80px; }
+  header.topbar{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; gap:16px; flex-wrap:wrap;
+  }
+  header.topbar .brand{ display:flex; align-items:center; gap:12px; }
+  header.topbar .brand .badge{
+    width:44px; height:44px; border-radius:12px; background:var(--navy); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px;
+  }
+  header.topbar h1{ font-size:20px; margin:0; color:var(--navy); }
+  header.topbar .sub{ font-size:12px; color:var(--muted); margin:2px 0 0; }
+  #user-chip{ display:flex; align-items:center; gap:8px; background:var(--card); padding:6px 12px 6px 6px; border-radius:999px; border:1px solid var(--border); font-size:12px;}
+  #user-chip img{ width:28px; height:28px; border-radius:50%; }
+
+  .card-box{ background:var(--card); border-radius:16px; padding:22px; border:1px solid var(--border); margin-bottom:20px; }
+  .card-box h2{ font-size:15px; color:var(--navy); margin:0 0 16px; display:flex; align-items:center; gap:8px; }
+  .card-box h2 .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); display:inline-block; }
+
+  .grid-3{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px; }
+  label.field-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); display:block; margin-bottom:6px; }
+  select, input[type=text], input[type=number]{
+    width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid var(--border); font-size:14px;
+    font-family:inherit; background:#fff; color:var(--ink);
+  }
+  select:focus, input:focus{ outline:none; border-color:var(--navy); }
+
+  .mode-toggle{ display:flex; gap:8px; }
+  .mode-toggle button{
+    flex:1; padding:10px; border-radius:10px; border:1.5px solid var(--border); background:#fff;
+    font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; color:var(--muted);
+  }
+  .mode-toggle button.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+
+  table.input-grid{ width:100%; border-collapse:collapse; margin-top:6px; }
+  table.input-grid th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted);
+    padding:10px 8px; border-bottom:2px solid var(--border);
+  }
+  table.input-grid td{ padding:8px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle; }
+  table.input-grid tr:hover td{ background:#FAFBFD; }
+  .input-markah-baharu.sudah-hantar{ background:#EAF7EE; border-color:#1F8A5F !important; }
+  .lagenda-markah{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted); margin-top:10px; }
+  .lagenda-markah .kotak{ width:14px; height:14px; border-radius:4px; background:#EAF7EE; border:1.5px solid #1F8A5F; display:inline-block; }
+  .row-idx{ color:var(--muted); font-size:12px; width:28px; }
+  .grade-pill{
+    display:inline-block; min-width:26px; text-align:center; padding:3px 8px; border-radius:999px;
+    font-size:11px; font-weight:800; color:#fff;
+  }
+  .g-A{background:#1F8A5F;} .g-B{background:#2D6FBB;} .g-C{background:var(--gold);}
+  .g-D{background:#D97706;} .g-E{background:#B34747;} .g-F{background:var(--crimson);}
+
+  .actions-bar{ display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+  button.btn-primary{
+    background:var(--navy); color:#fff; border:none; padding:12px 24px; border-radius:12px;
+    font-family:inherit; font-weight:700; font-size:13px; cursor:pointer;
+  }
+  button.btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
+  button.btn-ghost{
+    background:transparent; color:var(--navy); border:1.5px solid var(--navy); padding:12px 20px; border-radius:12px;
+    font-family:inherit; font-weight:700; font-size:13px; cursor:pointer;
+  }
+
+  #toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px;
+    opacity:0; transition:.25s; z-index:1000; pointer-events:none; max-width:90vw;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  #toast.err{ background:var(--err); }
+  #toast.ok{ background:var(--ok); }
+
+  .empty-hint{ color:var(--muted); font-size:13px; padding:20px; text-align:center; }
+
+  /* ---------- Borang Digital PBD (SK/SP) ---------- */
+  .grid-2c{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width: 900px){ .grid-2c{ grid-template-columns:1fr; } }
+  .tp-grid{ display:grid; grid-template-columns:repeat(6, 1fr); gap:10px; }
+  .tp-pill{ border:2px solid var(--border); border-radius:14px; padding:16px 8px; text-align:center; cursor:pointer; transition:.12s; background:#fff; }
+  .tp-pill .num{ font-size:15px; font-weight:800; }
+  .tp-pill .lbl{ font-size:10.5px; color:var(--muted); margin-top:2px; }
+  .tp-pill[data-tp="1"]{ --c:#A23B3B; } .tp-pill[data-tp="2"]{ --c:#B34747; }
+  .tp-pill[data-tp="3"]{ --c:#D97706; } .tp-pill[data-tp="4"]{ --c:#C08A3E; }
+  .tp-pill[data-tp="5"]{ --c:#2D6FBB; } .tp-pill[data-tp="6"]{ --c:#1F8A5F; }
+  .tp-pill .num{ color:var(--c); }
+  .tp-pill.selected{ border-color:var(--c); background:color-mix(in srgb, var(--c) 10%, white); box-shadow:0 0 0 3px color-mix(in srgb, var(--c) 20%, transparent); }
+  @media (max-width:640px){ .tp-grid{ grid-template-columns:repeat(3,1fr); } }
+  .evidens-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:10px; margin-bottom:12px; }
+  .evidens-btn{ border:1.5px dashed var(--border); border-radius:12px; padding:14px 10px; text-align:center; cursor:pointer; font-size:12px; color:var(--muted); background:#FAFBFD; transition:.12s; }
+  .evidens-btn:hover{ border-color:var(--navy); color:var(--navy); }
+  .evidens-btn .ic{ font-size:20px; display:block; margin-bottom:6px; }
+  .evidens-preview{ font-size:12px; color:var(--ok); margin-top:8px; word-break:break-all; }
+  #digital-evidens-link-wrap{ display:none; margin-top:10px; }
+  textarea.digital-textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid var(--border); font-size:14px; font-family:inherit; resize:vertical; min-height:90px; }
+  .charcount{ font-size:11px; color:var(--muted); text-align:right; margin-top:4px; }
+  #admin-import summary::-webkit-details-marker{ display:none; }
+  .diag{ font-size:11px; color:var(--muted); margin-top:30px; text-align:center; }
+
+  /* ---------- Shell + Sidebar (selaras Dashboard Kad Prestasi Akademik) ---------- */
+  #shell{ display:flex; min-height:100vh; }
+  #sidebar{
+    width:236px; flex-shrink:0; background:var(--navy); color:#fff;
+    position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 14px 20px;
+  }
+  #sidebar .side-brand{ display:flex; align-items:center; gap:10px; padding:0 8px 18px; border-bottom:1px solid rgba(255,255,255,.12); margin-bottom:14px; }
+  #sidebar .side-brand .badge2{ width:38px; height:38px; border-radius:10px; background:var(--gold); color:var(--navy-dark); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; flex-shrink:0; }
+  #sidebar .side-brand h1{ font-size:14px; margin:0; color:#fff; line-height:1.25; font-family:'Fraunces', serif; }
+  #sidebar .side-brand p{ font-size:10px; margin:2px 0 0; color:rgba(255,255,255,.6); }
+  #sidebar .nav-section-lbl{ font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.4); padding:14px 10px 6px; }
+  #sidebar .nav-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; cursor:pointer;
+    font-size:12.5px; font-weight:600; color:rgba(255,255,255,.85); margin-bottom:2px; transition:.12s;
+  }
+  #sidebar .nav-item .ic{ width:16px; text-align:center; flex-shrink:0; font-size:13px; }
+  #sidebar .nav-item:hover{ background:rgba(255,255,255,.08); color:#fff; }
+  #sidebar .nav-item.active{ background:var(--gold); color:var(--navy-dark); font-weight:800; }
+  #sidebar .nav-item.sub{ padding-left:26px; font-size:11.5px; color:rgba(255,255,255,.65); }
+  #sidebar .nav-item.sub .ic{ font-size:11px; }
+  #main-area{ flex:1; min-width:0; }
+
+  @media (max-width: 900px){
+    #shell{ flex-direction:column; }
+    #sidebar{ width:100%; height:auto; position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:4px; padding:12px; }
+    #sidebar .side-brand{ border:none; margin:0; padding:0 8px 0 0; }
+    #sidebar .nav-section-lbl{ display:none; }
+    #sidebar .nav-item{ padding:7px 10px; }
+  }
+
+  /* ---------- Sub-toggle: Manual vs Muat Naik Fail ---------- */
+  .submode-toggle{ display:flex; gap:8px; margin-bottom:16px; }
+  .submode-toggle button{
+    padding:8px 16px; border-radius:999px; border:1.5px solid var(--border); background:#fff;
+    font-family:inherit; font-weight:700; font-size:12px; cursor:pointer; color:var(--muted);
+  }
+  .submode-toggle button.active{ background:var(--gold); border-color:var(--gold); color:#fff; }
+
+  .upload-panel{ display:flex; flex-direction:column; gap:14px; }
+  .upload-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .dropzone{
+    border:2px dashed var(--border); border-radius:14px; padding:28px 18px; text-align:center;
+    background:#FAFBFD; cursor:pointer; transition:.15s;
+  }
+  .dropzone:hover, .dropzone.drag{ border-color:var(--navy); background:#F0F4FB; }
+  .dropzone svg{ margin-bottom:8px; }
+  .dropzone p{ margin:0; font-size:13px; color:var(--muted); }
+  .dropzone .fname{ font-weight:700; color:var(--navy); }
+  #file-input{ display:none; }
+
+  .status-pill{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:10px; font-weight:800; }
+  .status-ok{ background:#E4F5EC; color:var(--ok); }
+  .status-notfound{ background:#FBE9E7; color:var(--err); }
+  .status-invalid{ background:#FEF3E0; color:#B8730E; }
+
+  .upload-summary{ font-size:12px; color:var(--muted); }
+  .upload-summary b{ color:var(--ink); }
+</style>
+</head>
+<body>
+
+<div id="shell">
+  <nav id="sidebar">
+    <div class="side-brand">
+      <div class="badge2">KAD</div>
+      <div>
+        <h1>Kad Prestasi Akademik</h1>
+        <p>SK Krangan, Serian</p>
+      </div>
+    </div>
+
+    <!-- Dashboard disorok buat masa ini - fokus penuh kepada Input Markah. -->
+    <div class="nav-item" data-href="eprestasi_dashboard.html" style="display:none;"><span class="ic">🏠</span>Dashboard</div>
+    <div class="nav-item active" data-href="eprestasi.html"><span class="ic">✏️</span>Input Markah</div>
+    <div class="nav-item sub" data-set-mode="peperiksaan"><span class="ic">1.</span>Peperiksaan</div>
+    <!-- PBD disorok buat masa ini - fokus penuh kepada Peperiksaan dahulu.
+         Format eksport MOEIS belum disahkan/disesuaikan dengan pemproses fail
+         PBD, jadi ciri ni dipendekkan sementara supaya tak keliru guru dengan
+         ciri yang belum tentu berfungsi betul dengan fail sebenar mereka. -->
+    <div class="nav-item sub" data-set-mode="pbd" style="display:none;"><span class="ic">2.</span>PBD</div>
+
+    <div class="nav-section-lbl">Analisis Akademik</div>
+    <!-- Analisis Peperiksaan/PBD/Murid/Kelas disorok buat masa ini - fokus
+         penuh kepada Input Markah dahulu. Analisis Subjek dikekalkan. -->
+    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-peperiksaan" style="display:none;"><span class="ic">📈</span>Analisis Peperiksaan</div>
+    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-pbd" style="display:none;"><span class="ic">📊</span>Analisis PBD</div>
+    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-murid" style="display:none;"><span class="ic">🧑‍🎓</span>Analisis Murid</div>
+    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-subjek"><span class="ic">📘</span>Analisis Subjek</div>
+    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-kelas" style="display:none;"><span class="ic">🏫</span>Analisis Kelas</div>
+
+    <!-- Bahagian Laporan disorok sepenuhnya buat masa ini. -->
+    <div class="nav-section-lbl" style="display:none;">Laporan</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">📄</span>Laporan Individu</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">👥</span>Laporan Kelas</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">🏫</span>Laporan Tingkatan</div>
+    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">⬇️</span>Muat Turun (PDF/Excel)</div>
+
+    <div class="nav-section-lbl">Sistem</div>
+    <div class="nav-item" data-soon="1"><span class="ic">⚙️</span>Tetapan</div>
+    <div class="nav-item" data-soon="1"><span class="ic">👤</span>Pengguna</div>
+    <div class="nav-item" data-soon="1"><span class="ic">❓</span>Bantuan</div>
+  </nav>
+
+  <div id="main-area">
+
+<!-- ================= APP (Mod Pratonton: tanpa login) ================= -->
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="badge">SK</div>
+      <div>
+        <h1>Kad Prestasi Akademik — Input Markah</h1>
+        <p class="sub">Kad Prestasi Akademik SK Krangan · <span style="color:var(--gold); font-weight:700;">Mod Pratonton (tiada log masuk)</span></p>
+      </div>
+    </div>
+    <div id="user-chip">
+      <label class="field-label" style="margin:0; white-space:nowrap;">Nama Guru:</label>
+      <input type="text" id="input-nama-guru" placeholder="Cth: Cikgu Aimuni" style="width:160px; padding:6px 10px; border-radius:8px; border:1.5px solid var(--border); font-family:inherit; font-size:12px;">
+    </div>
+  </header>
+
+  <!-- ================= ADMIN: IMPORT SK/SP (disorok buat masa ini) ================= -->
+  <details id="admin-import" style="display:none; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:0; margin-bottom:20px; overflow:hidden;">
+    <summary style="padding:16px 22px; cursor:pointer; font-weight:700; color:var(--navy); font-size:13px; list-style:none;">⚙️ Alat Pentadbir — Import Senarai SK/SP (Standard Kandungan &amp; Standard Pembelajaran)</summary>
+    <div style="padding:0 22px 22px; border-top:1px solid var(--border);">
+      <p style="font-size:12.5px; color:var(--muted); margin:14px 0 8px;">
+        Muat naik fail Excel/CSV senarai SK/SP mengikut DSKP (boleh gabung pelbagai subjek dalam satu fail). Format lajur diperlukan:
+        <code>Subjek, Tahun, KodSK, NamaSK, KodSP, NamaSP</code>.
+      </p>
+      <button type="button" class="btn-ghost" id="btn-templat-sksp">⬇️ Muat Turun Templat</button>
+      <div class="dropzone" id="dropzone-sksp" style="margin-top:14px;">
+        <p style="margin:0; font-size:13px; color:var(--muted);">Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.xlsx, .xls, .csv)</span></p>
+      </div>
+      <input type="file" id="file-input-sksp" accept=".xlsx,.xls,.csv" style="display:none;">
+      <div id="sksp-preview"></div>
+    </div>
+  </details>
+
+  <div class="card-box">
+    <h2><span class="dot"></span>Pilih Kelas &amp; Subjek</h2>
+    <div class="grid-3">
+      <div>
+        <label class="field-label">Tahun</label>
+        <select id="sel-tahun"><option value="">Pilih Tahun...</option></select>
+      </div>
+      <div>
+        <label class="field-label">Kelas</label>
+        <select id="sel-kelas"><option value="">Pilih Kelas...</option></select>
+      </div>
+      <div>
+        <label class="field-label">Subjek</label>
+        <select id="sel-subjek"><option value="">Pilih Subjek...</option></select>
+      </div>
+      <div>
+        <label class="field-label">Tahun Akademik</label>
+        <select id="sel-tahun-akademik"></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-box" style="display:none;">
+    <h2><span class="dot"></span>Jenis Penilaian</h2>
+    <div id="mode-toggle-wrap" style="font-size:13px; font-weight:700; color:var(--navy); display:flex; align-items:center; gap:8px;">
+      <span id="mode-label-icon">📝</span><span id="mode-label-text">Peperiksaan / Ujian (Markah)</span>
+      <span style="font-size:11px; font-weight:600; color:var(--muted);">— tukar mod di sidebar (Input Markah → 1. Peperiksaan / 2. PBD)</span>
+    </div>
+    <div class="grid-3" style="margin-top:14px; display:none;" id="jenis-ujian-wrap">
+      <!-- Pemilih "Jenis Ujian" tunggal ini disorok - jadual input markah sekarang
+           terus ada 4 lajur (TOV/Pertengahan/Akhir/ETR) setiap satu isi serentak,
+           jadi tak perlu pilih SATU jenis ujian dahulu macam sebelum ini. -->
+      <div>
+        <label class="field-label">Jenis Ujian</label>
+        <select id="sel-jenis-ujian">
+          <option>Ujian Diagnostik (Awal Tahun / TOV)</option>
+          <option>Ujian Bulanan 1</option>
+          <option>Ujian Bulanan 2</option>
+          <option>Peperiksaan Pertengahan Tahun</option>
+          <option>Peperiksaan Akhir Tahun</option>
+          <option>ETR (Sasaran)</option>
+          <option>Ujian Lisan</option>
+        </select>
+        <p id="jenis-ujian-hint" style="font-size:11px; color:var(--muted); margin:6px 0 0;"></p>
+      </div>
+    </div>
+    <p id="peperiksaan-hint-baharu" style="font-size:12px; color:var(--muted); margin:14px 0 0; display:none;">
+      Isi mana-mana lajur yang berkenaan untuk setiap murid (tak perlu isi semua). Lajur kosong tidak akan disimpan.
+    </p>
+  </div>
+
+  <div class="card-box">
+    <h2><span class="dot"></span>Senarai Murid</h2>
+
+    <div class="submode-toggle" id="submode-toggle-wrap" style="display:none;">
+      <button type="button" id="submode-manual" class="active" style="display:none;">✏️ Input Manual</button>
+      <button type="button" id="submode-upload">📁 Muat Naik Fail (1 Subjek)</button>
+      <button type="button" id="submode-sppb" style="display:none;">📋 Muat Naik SPPB (Pelbagai Subjek)</button>
+      <button type="button" id="submode-digital" style="display:none;">🧾 Borang Digital (SK/SP)</button>
+    </div>
+    <!-- NOTA: Mod "Input Manual", "SPPB", "Borang Digital" disembunyikan buat masa
+         ini atas permintaan - fokus PBD kepada "Muat Naik Fail" sahaja dahulu.
+         Kod/fungsi kekal utuh, cuma butang disorok (style="display:none") supaya
+         senang diaktifkan semula bila-bila masa - cari "display:none" pada 3
+         butang ni untuk buka semula. -->
+
+    <div id="grid-wrap">
+      <div class="empty-hint">Sila pilih Tahun, Kelas dan Subjek untuk memaparkan senarai murid.</div>
+    </div>
+
+    <div class="actions-bar" id="actions-bar-utama">
+      <button type="button" class="btn-ghost" id="btn-reset">Kosongkan</button>
+      <button type="button" class="btn-ghost" id="btn-simpan-draf" style="border-color:var(--gold); color:var(--gold);">💾 Simpan Draf</button>
+      <button type="button" class="btn-primary" id="btn-simpan" disabled>📤 Hantar</button>
+    </div>
+    <p id="draf-status" style="font-size:11.5px; color:var(--muted); margin-top:8px; text-align:right;"></p>
+  </div>
+
+  <p class="diag">Kad Prestasi Akademik SK Krangan · <span id="diag-version"></span></p>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+ * KONFIGURASI - Kemas kini selepas deploy Apps Script
+ * ============================================================ */
+const EPRESTASI_CONFIG = {
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFhO1lMO--n0kCCpnQTBMzK6za4JxYHKpxyF6omTpyhsmQRfU7FZGwDA4LRW7KT_1Q/exec',
+  API_SECRET: '', // Kosong buat masa ini — backend akan langkau semakan jika Script Properties tiada API_SECRET
+  // GOOGLE_CLIENT_ID & DELIMA_DOMAIN dikeluarkan buat sementara (Mod Pratonton tanpa login).
+  // Akan diaktifkan semula apabila Kad Prestasi Akademik disatukan ke dashboard sedia ada.
+};
+
+// 4 lajur input markah serentak untuk mod Peperiksaan - guru isi kesemuanya
+// (mana yang berkenaan) dalam SATU jadual, bukan pilih satu Jenis Ujian dahulu.
+// 'jenis' mesti sepadan PERSIS dengan nilai JENIS_UJIAN_KE_SLOT dalam backend.
+const PEPERIKSAAN_LAJUR = [
+  { label: 'TOV', jenis: 'Ujian Diagnostik (Awal Tahun / TOV)' },
+  { label: 'Ujian Pertengahan Tahun', jenis: 'Peperiksaan Pertengahan Tahun' },
+  { label: 'Ujian Akhir Tahun', jenis: 'Peperiksaan Akhir Tahun' },
+  { label: 'ETR (Sasaran)', jenis: 'ETR (Sasaran)' },
+];
+
+let state = {
+  murid: [], kelas: [], subjek: [],
+  mode: 'peperiksaan', // 'peperiksaan' | 'pbd'
+  subMode: 'manual',   // 'manual' | 'upload' (hanya relevan untuk mod pbd buat masa ini)
+  parsedUploadRows: [], // hasil parse fail: [{muridId,nama,kelas,subjek,tp,status}]
+  user: null,
+};
+
+/* ---------- Navigasi Sidebar ---------- */
+document.querySelectorAll('#sidebar .nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    if (item.dataset.setMode){
+      tukarMod(item.dataset.setMode);
+      document.getElementById('mode-toggle-wrap')?.scrollIntoView({ behavior:'smooth', block:'start' });
+      return;
+    }
+    if (item.dataset.href){ window.location.href = item.dataset.href; return; }
+    if (item.dataset.soon){ showToast(`"${item.textContent.trim()}" akan datang dalam kemas kini seterusnya.`); return; }
+  });
+});
+
+/* ---------- Toast ---------- */
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> t.className = '', 3200);
+}
+
+/* ---------- Mula Mod Pratonton (tiada login) ---------- */
+window.onload = function(){
+  muatSenarai();
+  isiTahunAkademik();
+  const parammode = new URLSearchParams(window.location.search).get('mode');
+  tukarMod(parammode === 'pbd' ? 'pbd' : 'peperiksaan');
+};
+
+function isiTahunAkademik(){
+  const sel = document.getElementById('sel-tahun-akademik');
+  const now = new Date().getFullYear();
+  sel.innerHTML = '';
+  for (let y = now; y >= now - 2; y--){
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    sel.appendChild(opt);
+  }
+}
+
+/* ---------- Muat Senarai Murid / Kelas / Subjek ---------- */
+async function muatSenarai(){
+  try{
+    const [rMurid, rKelas, rSubjek, rVersi] = await Promise.all([
+      fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiMurid`).then(r=>r.json()),
+      fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiKelas`).then(r=>r.json()),
+      fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiSubjek`).then(r=>r.json()),
+      fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=versi`).then(r=>r.json()),
+    ]);
+    state.murid = rMurid.data || [];
+    state.kelas = rKelas.data || [];
+    state.subjek = rSubjek.data || [];
+    document.getElementById('diag-version').textContent =
+      rVersi.scriptVersion ? `Versi Backend: ${rVersi.scriptVersion}` : '';
+
+    isiSelectTahun();
+    isiSelectSubjek();
+  }catch(err){
+    showToast('Gagal memuatkan data. Semak sambungan/konfigurasi APPS_SCRIPT_URL.', 'err');
+  }
+}
+
+function isiSelectTahun(){
+  const tahunUnik = [...new Set(state.kelas.map(k => k.Tahun))];
+  const sel = document.getElementById('sel-tahun');
+  sel.innerHTML = '<option value="">Pilih Tahun...</option>';
+  tahunUnik.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    sel.appendChild(opt);
+  });
+}
+
+function isiSelectSubjek(){
+  const sel = document.getElementById('sel-subjek');
+  sel.innerHTML = '<option value="">Pilih Subjek...</option>';
+  state.subjek.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.NamaSubjek; opt.textContent = s.NamaSubjek;
+    sel.appendChild(opt);
+  });
+}
+
+document.getElementById('sel-tahun').addEventListener('change', (e)=>{
+  const tahun = e.target.value;
+  const selKelas = document.getElementById('sel-kelas');
+  selKelas.innerHTML = '<option value="">Pilih Kelas...</option>';
+  state.kelas.filter(k => k.Tahun === tahun).forEach(k => {
+    const opt = document.createElement('option');
+    opt.value = k.NamaKelas; opt.textContent = k.NamaKelas;
+    selKelas.appendChild(opt);
+  });
+  cubaPaparGrid();
+});
+
+['sel-kelas','sel-subjek'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', cubaPaparGrid);
+});
+
+/* ---------- Toggle Mod Peperiksaan / PBD ---------- */
+/* ---------- Mod ditukar terus melalui sidebar (lihat data-set-mode) ---------- */
+
+/* ---------- Nota Jenis Ujian (khususnya ETR) ---------- */
+const JENIS_UJIAN_NOTA = {
+  'Ujian Diagnostik (Awal Tahun / TOV)': 'TOV — titik mula pencapaian murid sebelum sebarang intervensi.',
+  'Ujian Bulanan 1': 'Dikira sebagai AR1 dalam Analisis Peperiksaan.',
+  'Ujian Bulanan 2': 'Dikira sebagai AR1 dalam Analisis Peperiksaan.',
+  'Peperiksaan Pertengahan Tahun': 'Dikira sebagai AR2 dalam Analisis Peperiksaan.',
+  'Peperiksaan Akhir Tahun': 'Dikira sebagai AR3 dalam Analisis Peperiksaan.',
+  'ETR (Sasaran)': '⚠️ Ini BUKAN keputusan sebenar — masukkan MARKAH SASARAN yang mahu dicapai setiap murid bagi kelas & subjek ini.',
+  'Ujian Lisan': 'Tidak dikira dalam analisis TOV/AR/ETR.',
+};
+function kemaskiniNotaJenisUjian(){
+  const val = document.getElementById('sel-jenis-ujian').value;
+  document.getElementById('jenis-ujian-hint').textContent = JENIS_UJIAN_NOTA[val] || '';
+}
+document.getElementById('sel-jenis-ujian').addEventListener('change', kemaskiniNotaJenisUjian);
+kemaskiniNotaJenisUjian();
+
+function tukarMod(mod){
+  state.mode = mod;
+  state.subMode = 'upload'; // Muat Naik Fail = lalai (Manual/SPPB/Digital disorok buat masa ini)
+  document.getElementById('mode-label-icon').textContent = mod === 'peperiksaan' ? '📝' : '📋';
+  document.getElementById('mode-label-text').textContent = mod === 'peperiksaan' ? 'Peperiksaan / Ujian (Markah)' : 'PBD (Tahap Penguasaan)';
+  document.getElementById('jenis-ujian-wrap').style.display = 'none'; // sentiasa disorok - lajur ujian kini terus dalam jadual
+  document.getElementById('peperiksaan-hint-baharu').style.display = mod==='peperiksaan' ? 'block' : 'none';
+
+  document.querySelectorAll('#sidebar .nav-item[data-set-mode]').forEach(item=>{
+    item.classList.toggle('active', item.dataset.setMode === mod);
+  });
+
+  const submodeWrap = document.getElementById('submode-toggle-wrap');
+  submodeWrap.style.display = mod === 'pbd' ? 'flex' : 'none';
+  document.getElementById('submode-manual').classList.remove('active');
+  document.getElementById('submode-upload').classList.add('active');
+  document.getElementById('submode-sppb').classList.remove('active');
+  document.getElementById('submode-digital').classList.remove('active');
+  document.getElementById('actions-bar-utama').style.display = 'flex';
+
+  cubaPaparGrid();
+}
+
+
+/* ---------- Sub-toggle: Input Manual vs Muat Naik Fail vs SPPB vs Borang Digital (PBD sahaja) ---------- */
+document.getElementById('submode-manual').addEventListener('click', ()=> tukarSubMod('manual'));
+document.getElementById('submode-upload').addEventListener('click', ()=> tukarSubMod('upload'));
+document.getElementById('submode-sppb').addEventListener('click', ()=> tukarSubMod('sppb'));
+document.getElementById('submode-digital').addEventListener('click', ()=> tukarSubMod('digital'));
+
+function tukarSubMod(sub){
+  state.subMode = sub;
+  document.getElementById('submode-manual').classList.toggle('active', sub==='manual');
+  document.getElementById('submode-upload').classList.toggle('active', sub==='upload');
+  document.getElementById('submode-sppb').classList.toggle('active', sub==='sppb');
+  document.getElementById('submode-digital').classList.toggle('active', sub==='digital');
+  document.getElementById('actions-bar-utama').style.display = sub === 'digital' ? 'none' : 'flex';
+  cubaPaparGrid();
+}
+
+/* ---------- Papar Grid Input ---------- */
+function cubaPaparGrid(){
+  const kelas = document.getElementById('sel-kelas').value;
+  const subjek = document.getElementById('sel-subjek').value;
+  const wrap = document.getElementById('grid-wrap');
+  const btnSimpan = document.getElementById('btn-simpan');
+
+  if (state.mode === 'pbd' && state.subMode === 'digital'){
+    renderDigitalPanel();
+    return;
+  }
+
+  if (!kelas || (!subjek && !(state.mode === 'pbd' && (state.subMode === 'sppb')))){
+    wrap.innerHTML = '<div class="empty-hint">Sila pilih Tahun dan Kelas' + (state.mode === 'pbd' && state.subMode === 'sppb' ? '' : ' dan Subjek') + ' untuk memaparkan senarai murid.</div>';
+    btnSimpan.disabled = true;
+    return;
+  }
+
+  if (state.mode === 'pbd' && state.subMode === 'upload'){
+    renderUploadPanel();
+    return;
+  }
+
+  if (state.mode === 'pbd' && state.subMode === 'sppb'){
+    renderSppbPanel();
+    return;
+  }
+
+  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas)
+    .sort((a,b)=> a.Nama.localeCompare(b.Nama));
+
+  if (senaraiMuridKelas.length === 0){
+    wrap.innerHTML = '<div class="empty-hint">Tiada murid dijumpai untuk kelas ini.</div>';
+    btnSimpan.disabled = true;
+    return;
+  }
+
+  const kolInput = state.mode === 'peperiksaan'
+    ? `<th style="width:100px;">TOV</th><th style="width:130px;">Ujian Pertengahan Tahun</th><th style="width:110px;">Ujian Akhir Tahun</th><th style="width:100px;">ETR (Sasaran)</th>`
+    : `<th style="width:150px;">Tahap Penguasaan</th>`;
+
+  let rows = senaraiMuridKelas.map((m, i) => {
+    const inputCell = state.mode === 'peperiksaan'
+      ? PEPERIKSAAN_LAJUR.map(l => `<td><input type="number" min="0" max="100" class="input-markah-baharu" data-jenis="${l.jenis}" data-murid-id="${m.ID}" data-nama="${m.Nama}" data-kelas="${m.Kelas}"></td>`).join('')
+      : `<td>
+           <select class="input-tp" data-murid-id="${m.ID}" data-nama="${m.Nama}" data-kelas="${m.Kelas}">
+             <option value="">-</option>
+             <option value="1">TP1</option><option value="2">TP2</option><option value="3">TP3</option>
+             <option value="4">TP4</option><option value="5">TP5</option><option value="6">TP6</option>
+           </select>
+         </td>`;
+    return `<tr><td class="row-idx">${i+1}</td><td>${m.Nama}</td>${inputCell}</tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <table class="input-grid">
+      <thead><tr><th></th><th>Nama Murid</th>${kolInput}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  btnSimpan.disabled = false;
+  muatDrafJikaAda(); // pulihkan draf tersimpan (jika ada) untuk kombinasi kelas/subjek/tahun ini
+  if (state.mode === 'peperiksaan') muatMarkahSediaAda(); // tarik & pra-isi markah yang dah dihantar sebelum ini
+}
+
+/* ============================================================
+ * MUAT NAIK FAIL PBD (Excel/CSV) - Pukal
+ * ============================================================ */
+function renderUploadPanel(){
+  const wrap = document.getElementById('grid-wrap');
+  const btnSimpan = document.getElementById('btn-simpan');
+  state.parsedUploadRows = [];
+  btnSimpan.disabled = true;
+
+  wrap.innerHTML = `
+    <div class="upload-panel">
+      <div class="upload-actions">
+        <button type="button" class="btn-ghost" id="btn-muat-templat">⬇️ Muat Turun Templat (${document.getElementById('sel-kelas').value})</button>
+        <span class="upload-summary">Templat mengandungi senarai murid kelas ini. Isi lajur "Tahap Penguasaan (TP1-TP6)" sahaja, jangan ubah nama/ID.</span>
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        <p id="dropzone-text">Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.xlsx, .xls, .csv)</span></p>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx,.xls,.csv">
+
+      <div id="upload-preview"></div>
+    </div>
+  `;
+
+  document.getElementById('btn-muat-templat').addEventListener('click', muatTurunTemplatPBD);
+
+  const dz = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  dz.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', (e)=>{ if (e.target.files[0]) prosesFailPBD(e.target.files[0]); });
+  dz.addEventListener('dragover', (e)=>{ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', ()=> dz.classList.remove('drag'));
+  dz.addEventListener('drop', (e)=>{
+    e.preventDefault(); dz.classList.remove('drag');
+    if (e.dataTransfer.files[0]) prosesFailPBD(e.dataTransfer.files[0]);
+  });
+}
+
+function muatTurunTemplatPBD(){
+  const kelas = document.getElementById('sel-kelas').value;
+  const subjek = document.getElementById('sel-subjek').value;
+  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas)
+    .sort((a,b)=> a.Nama.localeCompare(b.Nama));
+
+  let csv = 'ID Murid,Nama Murid,Kelas,Subjek,Tahap Penguasaan (TP1-TP6)\n';
+  senaraiMuridKelas.forEach(m=>{
+    csv += `${m.ID},"${m.Nama}","${m.Kelas}","${subjek}",\n`;
+  });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Templat_PBD_${kelas.replace(/\s+/g,'_')}_${subjek.replace(/\s+/g,'_')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function prosesFailPBD(file){
+  document.getElementById('dropzone-text').innerHTML = `Memproses <span class="fname">${file.name}</span>...`;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+      padankanDanPaparkan(rows, file.name);
+    }catch(err){
+      showToast('Gagal baca fail. Pastikan format .xlsx/.xls/.csv betul.', 'err');
+      document.getElementById('dropzone-text').innerHTML = 'Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.xlsx, .xls, .csv)</span>';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function padankanDanPaparkan(rows, namaFail){
+  const kelas = document.getElementById('sel-kelas').value;
+  const subjek = document.getElementById('sel-subjek').value;
+  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas);
+
+  const hasil = rows.map(r=>{
+    const idFail = String(r['ID Murid'] ?? r['ID'] ?? '').trim();
+    const namaFail_ = String(r['Nama Murid'] ?? r['Nama'] ?? '').trim();
+    const tpMentah = String(r['Tahap Penguasaan (TP1-TP6)'] ?? r['Tahap Penguasaan'] ?? r['TP'] ?? '').trim();
+
+    if (!idFail && !namaFail_) return null; // baris kosong, abaikan
+
+    let murid = senaraiMuridKelas.find(m => String(m.ID) === idFail);
+    if (!murid && namaFail_) {
+      murid = senaraiMuridKelas.find(m => m.Nama.toLowerCase() === namaFail_.toLowerCase());
+    }
+
+    const tp = Number(tpMentah);
+    let status = 'ok';
+    if (!murid) status = 'notfound';
+    else if (!tpMentah || isNaN(tp) || tp < 1 || tp > 6) status = 'invalid';
+
+    return {
+      muridId: murid ? murid.ID : idFail,
+      nama: murid ? murid.Nama : (namaFail_ || '(tidak dikenali)'),
+      kelas,
+      subjek,
+      tp: tpMentah,
+      status,
+    };
+  }).filter(Boolean);
+
+  state.parsedUploadRows = hasil;
+  document.getElementById('dropzone-text').innerHTML = `Fail dimuat: <span class="fname">${namaFail}</span> — klik untuk tukar fail`;
+  paparPreviewUpload(hasil);
+}
+
+function paparPreviewUpload(hasil){
+  const preview = document.getElementById('upload-preview');
+  const bilOk = hasil.filter(r=>r.status==='ok').length;
+  const bilNotfound = hasil.filter(r=>r.status==='notfound').length;
+  const bilInvalid = hasil.filter(r=>r.status==='invalid').length;
+
+  if (hasil.length === 0){
+    preview.innerHTML = '<div class="empty-hint">Tiada baris data dijumpai dalam fail.</div>';
+    document.getElementById('btn-simpan').disabled = true;
+    return;
+  }
+
+  const badgeMap = {
+    ok: '<span class="status-pill status-ok">OK</span>',
+    notfound: '<span class="status-pill status-notfound">Murid Tidak Dijumpai</span>',
+    invalid: '<span class="status-pill status-invalid">TP Tidak Sah</span>',
+  };
+
+  const rowsHtml = hasil.map(r => `
+    <tr>
+      <td>${r.nama}</td>
+      <td>${r.tp || '-'}</td>
+      <td>${badgeMap[r.status]}</td>
+    </tr>`).join('');
+
+  preview.innerHTML = `
+    <p class="upload-summary" style="margin:14px 0 6px;">
+      <b>${bilOk}</b> sedia disimpan &nbsp;·&nbsp;
+      <b style="color:var(--err);">${bilNotfound}</b> murid tidak dijumpai &nbsp;·&nbsp;
+      <b style="color:#B8730E;">${bilInvalid}</b> TP tidak sah
+    </p>
+    <table class="input-grid">
+      <thead><tr><th>Nama Murid (dalam fail)</th><th>TP</th><th>Status</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+
+  document.getElementById('btn-simpan').disabled = bilOk === 0;
+}
+
+/* ============================================================
+ * MUAT NAIK SPPB (Sistem Pengurusan Pentaksiran Bersepadu)
+ * Format pelbagai subjek serentak - satu baris per murid,
+ * satu lajur per subjek (BM, BI, MM, SAINS, SEJ, PM, BIN, RBT, PJPK, PMZ, PSV, dll)
+ * ============================================================ */
+const SPPB_SUBJECT_MAP = {
+  'BM': 'Bahasa Melayu',
+  'BI': 'Bahasa Inggeris',
+  'MM': 'Matematik',
+  'SAINS': 'Sains',
+  'SEJ': 'Sejarah',
+  'PM': 'Pendidikan Moral',
+  'PI': 'Pendidikan Islam',
+  'BIN': 'Bahasa Iban',
+  'RBT': 'Reka Bentuk dan Teknologi',
+  'PJPK': 'Pendidikan Jasmani dan Kesihatan',
+  'PJK': 'Pendidikan Jasmani dan Kesihatan',
+  'PMZ': 'Pendidikan Muzik',
+  'PSV': 'Pendidikan Seni Visual',
+  'TMK': 'Teknologi Maklumat dan Komunikasi',
+};
+const SPPB_KOD_TERTIB = ['BM','BI','MM','SAINS','SEJ','PM','BIN','RBT','PJPK','PMZ','PSV'];
+
+let sppbHasil = []; // [{muridId,nama,kelas,kod,subjek,tp,status}]
+
+function renderSppbPanel(){
+  const wrap = document.getElementById('grid-wrap');
+  sppbHasil = [];
+  document.getElementById('btn-simpan').disabled = true;
+
+  wrap.innerHTML = `
+    <div class="upload-panel">
+      <p class="upload-summary">Muat naik terus laporan <b>SPPB</b> (Sistem Pengurusan Pentaksiran Bersepadu) — satu fail untuk semua subjek murid dalam kelas ini sekali gus. Lajur dikenali secara automatik: ${SPPB_KOD_TERTIB.join(', ')}, dll.</p>
+      <div class="upload-actions">
+        <button type="button" class="btn-ghost" id="btn-muat-templat-sppb">⬇️ Muat Turun Templat SPPB (${document.getElementById('sel-kelas').value})</button>
+      </div>
+
+      <div class="dropzone" id="dropzone-sppb">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        <p id="dropzone-sppb-text">Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.pdf laporan SPPB, atau .xlsx / .csv)</span></p>
+      </div>
+      <input type="file" id="file-input-sppb" accept=".xlsx,.xls,.csv,.pdf">
+
+      <div id="sppb-preview"></div>
+    </div>
+  `;
+
+  document.getElementById('btn-muat-templat-sppb').addEventListener('click', muatTurunTemplatSPPB);
+
+  const dz = document.getElementById('dropzone-sppb');
+  const fileInput = document.getElementById('file-input-sppb');
+  dz.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', (e)=>{ if (e.target.files[0]) prosesFailSPPB(e.target.files[0]); });
+  dz.addEventListener('dragover', (e)=>{ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', ()=> dz.classList.remove('drag'));
+  dz.addEventListener('drop', (e)=>{
+    e.preventDefault(); dz.classList.remove('drag');
+    if (e.dataTransfer.files[0]) prosesFailSPPB(e.dataTransfer.files[0]);
+  });
+}
+
+function muatTurunTemplatSPPB(){
+  const kelas = document.getElementById('sel-kelas').value;
+  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas)
+    .sort((a,b)=> a.Nama.localeCompare(b.Nama));
+
+  let csv = 'ID Murid,Nama,' + SPPB_KOD_TERTIB.join(',') + '\n';
+  senaraiMuridKelas.forEach(m=>{
+    csv += `${m.ID},"${m.Nama}",${SPPB_KOD_TERTIB.map(()=>'').join(',')}\n`;
+  });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Templat_SPPB_${kelas.replace(/\s+/g,'_')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function prosesFailSPPB(file){
+  const namaFail = file.name.toLowerCase();
+  document.getElementById('dropzone-sppb-text').innerHTML = `Memproses <span class="fname">${file.name}</span>...`;
+
+  if (namaFail.endsWith('.pdf')){
+    prosesFailPdfSPPB(file);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+      padankanDanPaparkanSPPB(rows, file.name);
+    }catch(err){
+      showToast('Gagal baca fail. Pastikan format .xlsx/.xls/.csv betul.', 'err');
+      document.getElementById('dropzone-sppb-text').innerHTML = 'Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.pdf laporan SPPB, atau .xlsx / .csv)</span>';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ---------- Ekstrak PDF Laporan SPPB terus ---------- */
+if (typeof pdfjsLib !== 'undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+async function prosesFailPdfSPPB(file){
+  try{
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      fullText += content.items.map(it => it.str).join(' ') + ' ';
+    }
+
+    const norm = fullText.replace(/\s+/g, ' ').trim();
+    const kodSubjek = ekstrakKodSubjekPDF_(norm);
+    const rekodMurid = ekstrakRekodMuridPDF_(norm);
+
+    if (kodSubjek.length === 0 || rekodMurid.length === 0){
+      showToast('Gagal kesan struktur jadual dalam PDF ini. Cuba fail Excel/CSV sebagai alternatif.', 'err');
+      document.getElementById('dropzone-sppb-text').innerHTML = 'Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.pdf laporan SPPB, atau .xlsx / .csv)</span>';
+      return;
+    }
+
+    document.getElementById('dropzone-sppb-text').innerHTML =
+      `Fail dimuat: <span class="fname">${file.name}</span> — ${rekodMurid.length} murid, ${kodSubjek.length} subjek dikesan — klik untuk tukar fail`;
+
+    // Nota: teks PDF wujud dalam susunan lajur (bukan baris), jadi nama penuh murid
+    // sering terputus. Kami padankan guna PERKATAAN PERTAMA nama sahaja terhadap
+    // senarai murid kelas terpilih. Sila semak baris "Tidak Pasti" sebelum simpan.
+    const hasil = bentukHasilDaripadaPDF_(rekodMurid, kodSubjek);
+    sppbHasil = hasil;
+    paparPreviewSPPB(hasil, kodSubjek);
+  }catch(err){
+    showToast('Gagal baca fail PDF. Pastikan ia laporan SPPB yang sah.', 'err');
+    document.getElementById('dropzone-sppb-text').innerHTML = 'Klik untuk pilih fail, atau seret &amp; lepas di sini<br><span style="font-size:11px;">(.pdf laporan SPPB, atau .xlsx / .csv)</span>';
+  }
+}
+
+// Kesan kod subjek: imbas kod dikenali (SPPB_SUBJECT_MAP) dalam segmen header sebelum
+// rekod pertama, kekalkan tertib kemunculan asal dalam teks.
+function ekstrakKodSubjekPDF_(teksNorm){
+  const anchor = teksNorm.search(/\b\d{1,2}\s+[A-Z]{2,}\s+\d{12}/);
+  const segmen = anchor > 0 ? teksNorm.slice(0, anchor) : teksNorm;
+  const dijumpai = [];
+  Object.keys(SPPB_SUBJECT_MAP).forEach(kod=>{
+    const m = segmen.match(new RegExp('\\b' + kod + '\\b'));
+    if (m) dijumpai.push({ kod, pos: m.index });
+  });
+  return dijumpai.sort((a,b)=> a.pos - b.pos).map(x=>x.kod);
+}
+
+// Kesan setiap rekod murid: Bil, perkataan pertama nama, No. KP (12 digit), Jantina (L/P), TP berulang
+function ekstrakRekodMuridPDF_(teksNorm){
+  const re = /(\d{1,2})\s+((?:[A-Z]+\s+){0,3}[A-Z]+)\s+(\d{12})\s+([LP])\s+((?:\(TP[1-6]\)\s*){2,})/g;
+  const rekod = [];
+  let m;
+  while ((m = re.exec(teksNorm)) !== null){
+    const tps = [...m[5].matchAll(/\(TP([1-6])\)/g)].map(x => Number(x[1]));
+    rekod.push({ bil: Number(m[1]), namaSebahagian: m[2].trim(), ic: m[3], jantina: m[4], tps });
+  }
+  return rekod;
+}
+
+// Padankan rekod PDF (nama separa) dengan senarai murid kelas terpilih guna perkataan
+// PERTAMA nama sahaja. Padanan tunggal & unik -> yakin. Selainnya -> tidak pasti.
+function bentukHasilDaripadaPDF_(rekodMurid, kodSubjek){
+  const kelas = document.getElementById('sel-kelas').value;
+  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas);
+  const hasil = [];
+
+  rekodMurid.forEach(r=>{
+    const kataPertama = r.namaSebahagian.trim().split(/\s+/)[0].toLowerCase();
+    const calon = senaraiMuridKelas.filter(m => m.Nama.trim().split(/\s+/)[0].toLowerCase() === kataPertama);
+    const murid = calon.length === 1 ? calon[0] : null;
+
+    kodSubjek.forEach((kod, i)=>{
+      const tp = r.tps[i];
+      hasil.push({
+        muridId: murid ? murid.ID : '',
+        nama: murid ? murid.Nama : `${r.namaSebahagian}... (Bil.${r.bil})`,
+        kelas,
+        kod,
+        subjek: SPPB_SUBJECT_MAP[kod],
+        tp: tp || null,
+        status: !murid ? 'notfound' : (tp ? 'ok' : 'invalid'),
+      });
+    });
+  });
+
+  return hasil;
+}
+
+function ekstrakTP_(nilai){
+  // Terima "(TP3)", "TP3", "3", 3, dsb. -> pulangkan integer 1-6 atau null
+  const s = String(nilai).trim();
+  if (!s) return null;
+  const m = s.match(/([1-6])/);
+  return m ? Number(m[1]) : null;
+}
+
+function padankanDanPaparkanSPPB(rows, namaFail){
+  const kelas = document.getElementById('sel-kelas').value;
+  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas);
+
+  if (rows.length === 0){
+    document.getElementById('sppb-preview').innerHTML = '<div class="empty-hint">Tiada baris data dijumpai dalam fail.</div>';
+    return;
+  }
+
+  // Kenal pasti lajur subjek dalam fail (padan dengan SPPB_SUBJECT_MAP, tak kisah besar/kecil huruf)
+  const lajurFail = Object.keys(rows[0]);
+  const lajurSubjek = lajurFail
+    .map(l => ({ asal: l, kod: l.trim().toUpperCase().replace(/\(.*\)/,'').trim() }))
+    .filter(l => SPPB_SUBJECT_MAP[l.kod]);
+
+  const lajurNama = lajurFail.find(l => /nama/i.test(l)) || 'Nama';
+  const lajurId = lajurFail.find(l => /^id/i.test(l));
+
+  const hasil = [];
+  rows.forEach(r=>{
+    const idFail = lajurId ? String(r[lajurId] ?? '').trim() : '';
+    const namaFail_ = String(r[lajurNama] ?? '').trim();
+    if (!idFail && !namaFail_) return;
+
+    let murid = senaraiMuridKelas.find(m => String(m.ID) === idFail);
+    if (!murid && namaFail_){
+      murid = senaraiMuridKelas.find(m => m.Nama.toLowerCase() === namaFail_.toLowerCase());
+    }
+
+    lajurSubjek.forEach(ls=>{
+      const tp = ekstrakTP_(r[ls.asal]);
+      if (tp === null && String(r[ls.asal]).trim() === '') return; // sel kosong, langkau senyap
+      hasil.push({
+        muridId: murid ? murid.ID : idFail,
+        nama: murid ? murid.Nama : (namaFail_ || '(tidak dikenali)'),
+        kelas,
+        kod: ls.kod,
+        subjek: SPPB_SUBJECT_MAP[ls.kod],
+        tp,
+        status: !murid ? 'notfound' : (tp === null ? 'invalid' : 'ok'),
+      });
+    });
+  });
+
+  sppbHasil = hasil;
+  document.getElementById('dropzone-sppb-text').innerHTML = `Fail dimuat: <span class="fname">${namaFail}</span> — klik untuk tukar fail`;
+  paparPreviewSPPB(hasil, lajurSubjek.map(l=>l.kod));
+}
+
+function paparPreviewSPPB(hasil, kodSubjekDijumpai){
+  const preview = document.getElementById('sppb-preview');
+  const btnSimpan = document.getElementById('btn-simpan');
+
+  if (hasil.length === 0){
+    preview.innerHTML = '<div class="empty-hint">Tiada lajur subjek dikenali dalam fail. Pastikan header lajur guna kod seperti BM, BI, MM, SAINS, SEJ, PM, BIN, RBT, PJPK, PMZ, PSV.</div>';
+    btnSimpan.disabled = true;
+    return;
+  }
+
+  const bilOk = hasil.filter(r=>r.status==='ok').length;
+  const bilNotfound = hasil.filter(r=>r.status==='notfound').length;
+  const bilInvalid = hasil.filter(r=>r.status==='invalid').length;
+
+  // Kumpul ikut murid untuk paparan grid padat
+  const perMurid = {};
+  hasil.forEach(r=>{
+    const key = r.muridId + '|' + r.nama;
+    if (!perMurid[key]) perMurid[key] = { nama: r.nama, status: 'ok', subjek: {} };
+    perMurid[key].subjek[r.kod] = r;
+    if (r.status !== 'ok') perMurid[key].status = r.status;
+  });
+
+  const rowsHtml = Object.values(perMurid).map(m => {
+    const sel = kodSubjekDijumpai.map(kod=>{
+      const rec = m.subjek[kod];
+      if (!rec) return '<td style="color:var(--muted);">-</td>';
+      const badge = rec.status === 'ok'
+        ? `TP${rec.tp}`
+        : (rec.status === 'invalid' ? '<span class="status-pill status-invalid">?</span>' : '-');
+      return `<td>${badge}</td>`;
+    }).join('');
+    const namaLabel = m.status === 'notfound'
+      ? `${m.nama} <span class="status-pill status-notfound">Tidak Dijumpai</span>`
+      : m.nama;
+    return `<tr><td>${namaLabel}</td>${sel}</tr>`;
+  }).join('');
+
+  preview.innerHTML = `
+    <p class="upload-summary" style="margin:14px 0 6px;">
+      <b>${bilOk}</b> nilai TP sedia disimpan &nbsp;·&nbsp;
+      <b style="color:var(--err);">${bilNotfound}</b> baris murid tidak dijumpai &nbsp;·&nbsp;
+      <b style="color:#B8730E;">${bilInvalid}</b> nilai TP tidak sah
+    </p>
+    <div style="overflow-x:auto;">
+      <table class="input-grid">
+        <thead><tr><th>Nama Murid</th>${kodSubjekDijumpai.map(k=>`<th>${k}</th>`).join('')}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>`;
+
+  btnSimpan.disabled = bilOk === 0;
+}
+
+/* ---------- Reset ---------- */
+document.getElementById('btn-reset').addEventListener('click', ()=>{
+  document.querySelectorAll('.input-markah-baharu').forEach(i=>{ i.value=''; });
+  document.querySelectorAll('.input-tp').forEach(i=> i.value='');
+  if (state.mode === 'pbd' && state.subMode === 'upload'){
+    state.parsedUploadRows = [];
+    renderUploadPanel();
+  }
+  if (state.mode === 'pbd' && state.subMode === 'sppb'){
+    sppbHasil = [];
+    renderSppbPanel();
+  }
+});
+
+/* ---------- Simpan ---------- */
+document.getElementById('btn-simpan').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-simpan');
+  const subjek = document.getElementById('sel-subjek').value;
+  const tahunAkademik = document.getElementById('sel-tahun-akademik').value;
+
+  let rekod = [];
+  if (state.mode === 'peperiksaan'){
+    document.querySelectorAll('.input-markah-baharu').forEach(inp=>{
+      if (inp.value !== ''){
+        rekod.push({ muridId: inp.dataset.muridId, nama: inp.dataset.nama, kelas: inp.dataset.kelas, subjek, markah: inp.value, jenisUjian: inp.dataset.jenis });
+      }
+    });
+  } else if (state.mode === 'pbd' && state.subMode === 'upload'){
+    rekod = state.parsedUploadRows
+      .filter(r => r.status === 'ok')
+      .map(r => ({ muridId: r.muridId, nama: r.nama, kelas: r.kelas, subjek: r.subjek, tp: r.tp }));
+  } else if (state.mode === 'pbd' && state.subMode === 'sppb'){
+    rekod = sppbHasil
+      .filter(r => r.status === 'ok')
+      .map(r => ({ muridId: r.muridId, nama: r.nama, kelas: r.kelas, subjek: r.subjek, tp: r.tp }));
+  } else {
+    document.querySelectorAll('.input-tp').forEach(inp=>{
+      if (inp.value !== ''){
+        rekod.push({ muridId: inp.dataset.muridId, nama: inp.dataset.nama, kelas: inp.dataset.kelas, subjek, tp: inp.value });
+      }
+    });
+  }
+
+  if (rekod.length === 0){
+    showToast('Sila isi sekurang-kurangnya satu markah/TP sebelum simpan.', 'err');
+    return;
+  }
+
+  const namaGuru = document.getElementById('input-nama-guru').value.trim();
+  if (!namaGuru){
+    showToast('Sila isi Nama Guru dahulu sebelum simpan.', 'err');
+    document.getElementById('input-nama-guru').focus();
+    return;
+  }
+
+  const payload = {
+    apiSecret: EPRESTASI_CONFIG.API_SECRET,
+    action: state.mode === 'peperiksaan' ? 'simpanMarkahPeperiksaan' : 'simpanPBD',
+    tahunAkademik,
+    jenisUjian: document.getElementById('sel-jenis-ujian').value,
+    diinputOleh: namaGuru,
+    rekod,
+  };
+
+  btn.disabled = true;
+  btn.textContent = 'Menghantar...';
+
+  try{
+    const res = await fetch(EPRESTASI_CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data.ok){
+      showToast(`Berjaya dihantar: ${data.disimpan} rekod.`, 'ok');
+      bersihkanDraf_(); // dah rasmi dihantar - buang draf tersimpan supaya tak dipulihkan semula
+      if (state.mode === 'pbd' && state.subMode === 'upload'){
+        state.parsedUploadRows = [];
+        renderUploadPanel();
+      }
+      if (state.mode === 'pbd' && state.subMode === 'sppb'){
+        sppbHasil = [];
+        renderSppbPanel();
+      }
+    } else {
+      showToast('Ralat: ' + (data.error || 'tidak diketahui'), 'err');
+    }
+  }catch(err){
+    showToast('Gagal hantar ke pelayan. Semak sambungan internet.', 'err');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '📤 Hantar';
+  }
+});/* ============================================================
+ * ADMIN: IMPORT SK/SP (dipindah daripada pbd_borang_digital.html)
+ * ============================================================ */
+let skspParsed = [];
+
+document.getElementById('btn-templat-sksp').addEventListener('click', ()=>{
+  const csv = 'Subjek,Tahun,KodSK,NamaSK,KodSP,NamaSP\n' +
+    'Pendidikan Seni Visual,1,SK 1.1,Mendengar dan memberikan respons,SP 1.1.1,Mendengar dan memahami arahan\n' +
+    'Pendidikan Seni Visual,1,SK 1.1,Mendengar dan memberikan respons,SP 1.1.2,Memberikan respons terhadap arahan\n';
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'Templat_SK_SP.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+const dzSKSP = document.getElementById('dropzone-sksp');
+const fileInputSKSP = document.getElementById('file-input-sksp');
+dzSKSP.addEventListener('click', ()=> fileInputSKSP.click());
+fileInputSKSP.addEventListener('change', (e)=>{ if (e.target.files[0]) prosesFailSKSP(e.target.files[0]); });
+dzSKSP.addEventListener('dragover', (e)=>{ e.preventDefault(); dzSKSP.classList.add('drag'); });
+dzSKSP.addEventListener('dragleave', ()=> dzSKSP.classList.remove('drag'));
+dzSKSP.addEventListener('drop', (e)=>{ e.preventDefault(); dzSKSP.classList.remove('drag'); if (e.dataTransfer.files[0]) prosesFailSKSP(e.dataTransfer.files[0]); });
+
+function prosesFailSKSP(file){
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+      paparPreviewSKSP(rows);
+    }catch(err){ showToast('Gagal baca fail SK/SP.', 'err'); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function paparPreviewSKSP(rows){
+  skspParsed = rows;
+  const preview = document.getElementById('sksp-preview');
+  const skUnik = new Set(rows.map(r=>r['KodSK']+'|'+r['Subjek']));
+  const subjekUnik = new Set(rows.map(r=>r['Subjek']));
+  preview.innerHTML = `
+    <p style="font-size:12px; color:var(--muted); margin:12px 0 8px;"><b>${rows.length}</b> baris SP dijumpai merentas <b>${subjekUnik.size}</b> subjek dan <b>${skUnik.size}</b> SK. Semak ringkas di bawah, kemudian sahkan import.</p>
+    <div style="max-height:200px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead><tr style="background:#FAFBFD;"><th style="padding:6px 8px; text-align:left;">Subjek</th><th style="padding:6px 8px; text-align:left;">KodSK</th><th style="padding:6px 8px; text-align:left;">KodSP</th><th style="padding:6px 8px; text-align:left;">NamaSP</th></tr></thead>
+        <tbody>${rows.slice(0,50).map(r=>`<tr><td style="padding:6px 8px; border-top:1px solid var(--border);">${r['Subjek']}</td><td style="padding:6px 8px; border-top:1px solid var(--border);">${r['KodSK']}</td><td style="padding:6px 8px; border-top:1px solid var(--border);">${r['KodSP']}</td><td style="padding:6px 8px; border-top:1px solid var(--border);">${r['NamaSP']}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <button type="button" class="btn-primary" id="btn-sahkan-import-sksp" style="margin-top:12px;">Sahkan Import (${rows.length} SP)</button>
+  `;
+  document.getElementById('btn-sahkan-import-sksp').addEventListener('click', hantarImportSKSP);
+}
+
+async function hantarImportSKSP(){
+  if (skspParsed.length === 0) return;
+  const rekod = skspParsed
+    .filter(r => r['Subjek'] && r['KodSK'] && r['KodSP'])
+    .map(r => ({ subjek: r['Subjek'], tahun: r['Tahun'], kodSK: r['KodSK'], namaSK: r['NamaSK'], kodSP: r['KodSP'], namaSP: r['NamaSP'] }));
+
+  const SAIZ_BATCH = 500;
+  const btn = document.getElementById('btn-sahkan-import-sksp');
+  let jumlahSK = 0, jumlahSP = 0;
+
+  for (let i = 0; i < rekod.length; i += SAIZ_BATCH){
+    const kelompok = rekod.slice(i, i + SAIZ_BATCH);
+    btn.disabled = true;
+    btn.textContent = `Mengimport... (${Math.min(i + SAIZ_BATCH, rekod.length)}/${rekod.length})`;
+    try{
+      const res = await fetch(EPRESTASI_CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ apiSecret: EPRESTASI_CONFIG.API_SECRET, action: 'importSKSP', rekod: kelompok }),
+      }).then(r=>r.json());
+      if (res.ok){ jumlahSK += res.disimpanSK; jumlahSP += res.disimpanSP; }
+      else { showToast('Ralat pada kelompok ' + i + ': ' + (res.error || 'tidak diketahui'), 'err'); return; }
+    }catch(err){ showToast('Gagal hantar kelompok ' + i + '. Cuba semula.', 'err'); return; }
+  }
+
+  showToast(`Import selesai: ${jumlahSK} SK baharu, ${jumlahSP} SP baharu (${rekod.length} baris diproses).`, 'ok');
+  document.getElementById('sksp-preview').innerHTML = '';
+  skspParsed = [];
+}
+
+/* ============================================================
+ * BORANG DIGITAL PBD (SK/SP) - mod ke-4 dalam PBD
+ * ============================================================ */
+let digitalState = { sk: [], sp: [], tpTerpilih: null, evidensFail: null, evidensURL: '' };
+
+function renderDigitalPanel(){
+  const wrap = document.getElementById('grid-wrap');
+  document.getElementById('btn-simpan').disabled = true;
+  digitalState = { sk: [], sp: [], tpTerpilih: null, evidensFail: null, evidensURL: '' };
+
+  wrap.innerHTML = `
+    <div class="grid-2c" style="margin-bottom:16px;">
+      <div>
+        <label class="field-label">Kelas</label>
+        <select id="dg-kelas"><option value="">Pilih Kelas...</option></select>
+      </div>
+      <div>
+        <label class="field-label">Murid</label>
+        <select id="dg-murid"><option value="">Pilih Kelas dahulu...</option></select>
+      </div>
+    </div>
+
+    <div class="grid-2c" style="margin-bottom:16px;">
+      <div>
+        <label class="field-label">1. Standard Kandungan (SK)</label>
+        <select id="dg-sk"><option value="">Pilih Subjek dahulu...</option></select>
+      </div>
+      <div>
+        <label class="field-label">2. Standard Pembelajaran (SP)</label>
+        <select id="dg-sp"><option value="">Pilih SK dahulu...</option></select>
+      </div>
+    </div>
+
+    <label class="field-label">Pentaksiran — Tahap Penguasaan (TP)</label>
+    <div class="tp-grid" style="margin-bottom:18px;">
+      <div class="tp-pill" data-tp="1"><div class="num">TP1</div><div class="lbl">Belum Menguasai</div></div>
+      <div class="tp-pill" data-tp="2"><div class="num">TP2</div><div class="lbl">Hampir Menguasai</div></div>
+      <div class="tp-pill" data-tp="3"><div class="num">TP3</div><div class="lbl">Sederhana Menguasai</div></div>
+      <div class="tp-pill" data-tp="4"><div class="num">TP4</div><div class="lbl">Menguasai</div></div>
+      <div class="tp-pill" data-tp="5"><div class="num">TP5</div><div class="lbl">Sangat Menguasai</div></div>
+      <div class="tp-pill" data-tp="6"><div class="num">TP6</div><div class="lbl">Cemerlang</div></div>
+    </div>
+
+    <div class="grid-2c">
+      <div>
+        <label class="field-label">Evidens (Opsyenal)</label>
+        <div class="evidens-grid">
+          <div class="evidens-btn" id="dg-btn-gambar"><span class="ic">🖼️</span>Gambar</div>
+          <div class="evidens-btn" id="dg-btn-dokumen"><span class="ic">📄</span>Dokumen</div>
+          <div class="evidens-btn" id="dg-btn-video"><span class="ic">🎬</span>Video</div>
+          <div class="evidens-btn" id="dg-btn-pautan"><span class="ic">🔗</span>Pautan Drive</div>
+        </div>
+        <input type="file" id="dg-file-evidens" style="display:none;">
+        <div id="digital-evidens-link-wrap"><input type="url" id="dg-input-link" placeholder="https://drive.google.com/..."></div>
+        <div class="evidens-preview" id="dg-evidens-preview"></div>
+      </div>
+      <div>
+        <label class="field-label">Catatan Guru (Opsyenal)</label>
+        <textarea class="digital-textarea" id="dg-catatan" maxlength="300" placeholder="Catatan pemerhatian murid."></textarea>
+        <div class="charcount"><span id="dg-catatan-count">0</span> / 300 aksara</div>
+      </div>
+    </div>
+  `;
+
+  const selKelas = document.getElementById('dg-kelas');
+  state.kelas.forEach(k=>{ const o=document.createElement('option'); o.value=k.NamaKelas; o.textContent=k.NamaKelas; selKelas.appendChild(o); });
+
+  selKelas.addEventListener('change', (e)=>{
+    const selM = document.getElementById('dg-murid');
+    selM.innerHTML = '<option value="">Pilih Murid...</option>';
+    state.murid.filter(m => m.Kelas === e.target.value).sort((a,b)=>a.Nama.localeCompare(b.Nama)).forEach(m=>{
+      const o = document.createElement('option'); o.value = m.ID; o.textContent = m.Nama; selM.appendChild(o);
+    });
+    cubaAktifkanSimpanDigital();
+  });
+  document.getElementById('dg-murid').addEventListener('change', cubaAktifkanSimpanDigital);
+
+  document.getElementById('dg-sk').addEventListener('change', async (e)=>{
+    const kodSK = e.target.value;
+    const selSP = document.getElementById('dg-sp');
+    selSP.innerHTML = '<option value="">Memuatkan...</option>';
+    if (!kodSK){ selSP.innerHTML = '<option value="">Pilih SK dahulu...</option>'; cubaAktifkanSimpanDigital(); return; }
+    const subjek = document.getElementById('sel-subjek').value;
+    const res = await fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiSP&kodSK=${encodeURIComponent(kodSK)}&subjek=${encodeURIComponent(subjek)}`).then(r=>r.json());
+    digitalState.sp = res.data || [];
+    selSP.innerHTML = '<option value="">Pilih SP...</option>';
+    digitalState.sp.forEach(sp=>{ const o=document.createElement('option'); o.value=sp.KodSP; o.textContent=`${sp.KodSP} ${sp.NamaSP}`; selSP.appendChild(o); });
+    cubaAktifkanSimpanDigital();
+  });
+  document.getElementById('dg-sp').addEventListener('change', cubaAktifkanSimpanDigital);
+
+  document.querySelectorAll('#grid-wrap .tp-pill').forEach(pill=>{
+    pill.addEventListener('click', ()=>{
+      document.querySelectorAll('#grid-wrap .tp-pill').forEach(p=>p.classList.remove('selected'));
+      pill.classList.add('selected');
+      digitalState.tpTerpilih = pill.dataset.tp;
+      cubaAktifkanSimpanDigital();
+    });
+  });
+
+  document.getElementById('dg-catatan').addEventListener('input', (e)=>{
+    document.getElementById('dg-catatan-count').textContent = e.target.value.length;
+  });
+
+  ['dg-btn-gambar','dg-btn-dokumen','dg-btn-video'].forEach(id=>{
+    document.getElementById(id).addEventListener('click', ()=>{
+      const accept = id.includes('gambar') ? 'image/*' : id.includes('video') ? 'video/*' : '.pdf,.doc,.docx,.ppt,.pptx';
+      const inp = document.getElementById('dg-file-evidens');
+      inp.accept = accept;
+      inp.click();
+    });
+  });
+  document.getElementById('dg-file-evidens').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024){ showToast('Fail terlalu besar (>15MB). Guna pautan Google Drive.', 'err'); return; }
+    document.getElementById('dg-evidens-preview').textContent = `Memproses ${file.name}...`;
+    try{
+      const reader = new FileReader();
+      const base64 = await new Promise((resolve, reject)=>{
+        reader.onload = ()=> resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      digitalState.evidensFail = { namaFail: file.name, mimeType: file.type || 'application/octet-stream', dataBase64: base64 };
+      digitalState.evidensURL = '';
+      document.getElementById('dg-evidens-preview').textContent = `✓ ${file.name} sedia dimuat naik semasa simpan.`;
+    }catch(err){ showToast('Gagal baca fail.', 'err'); }
+  });
+  document.getElementById('dg-btn-pautan').addEventListener('click', ()=>{
+    document.getElementById('digital-evidens-link-wrap').style.display = 'block';
+  });
+  document.getElementById('dg-input-link').addEventListener('input', (e)=>{
+    digitalState.evidensURL = e.target.value.trim();
+    digitalState.evidensFail = null;
+    document.getElementById('dg-evidens-preview').textContent = digitalState.evidensURL ? '✓ Pautan disediakan.' : '';
+  });
+
+  // Muatkan SK ikut subjek yang dipilih pada penapis utama (Pilih Kelas & Subjek)
+  muatSKUntukDigital();
+}
+
+async function muatSKUntukDigital(){
+  const subjek = document.getElementById('sel-subjek').value;
+  const selSK = document.getElementById('dg-sk');
+  if (!selSK) return;
+  if (!subjek){ selSK.innerHTML = '<option value="">Pilih Subjek dalam "Pilih Kelas &amp; Subjek" di atas dahulu...</option>'; return; }
+  selSK.innerHTML = '<option value="">Memuatkan...</option>';
+  const res = await fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=senaraiSK&subjek=${encodeURIComponent(subjek)}`).then(r=>r.json());
+  digitalState.sk = res.data || [];
+  selSK.innerHTML = '<option value="">Pilih SK...</option>';
+  digitalState.sk.forEach(sk=>{ const o=document.createElement('option'); o.value=sk.KodSK; o.textContent=`${sk.KodSK} ${sk.NamaSK}`; selSK.appendChild(o); });
+  if (digitalState.sk.length === 0){
+    selSK.innerHTML = '<option value="">Tiada SK untuk subjek ini — import dahulu via Alat Pentadbir di atas</option>';
+  }
+}
+
+function cubaAktifkanSimpanDigital(){
+  const ok = document.getElementById('dg-kelas')?.value &&
+    document.getElementById('dg-murid')?.value &&
+    document.getElementById('sel-subjek').value &&
+    document.getElementById('dg-sk')?.value &&
+    document.getElementById('dg-sp')?.value &&
+    digitalState.tpTerpilih;
+  document.getElementById('btn-simpan-digital')?.remove();
+  if (ok){
+    const bar = document.createElement('div');
+    bar.className = 'actions-bar';
+    bar.innerHTML = `
+      <button type="button" class="btn-ghost" id="btn-batal-digital">Batal</button>
+      <button type="button" class="btn-primary" id="btn-simpan-digital">💾 Simpan Rekod PBD</button>`;
+    document.getElementById('grid-wrap').appendChild(bar);
+    document.getElementById('btn-batal-digital').addEventListener('click', renderDigitalPanel);
+    document.getElementById('btn-simpan-digital').addEventListener('click', simpanRekodDigital);
+  }
+}
+
+async function simpanRekodDigital(){
+  const btn = document.getElementById('btn-simpan-digital');
+  const namaGuru = document.getElementById('input-nama-guru').value.trim();
+  if (!namaGuru){ showToast('Sila isi Nama Guru di bahagian atas sebelum simpan.', 'err'); return; }
+
+  const selMurid = document.getElementById('dg-murid');
+  const selSK = document.getElementById('dg-sk');
+  const selSP = document.getElementById('dg-sp');
+
+  const payload = {
+    apiSecret: EPRESTASI_CONFIG.API_SECRET,
+    action: 'simpanPBDDigital',
+    muridId: selMurid.value,
+    nama: selMurid.options[selMurid.selectedIndex].textContent,
+    kelas: document.getElementById('dg-kelas').value,
+    subjek: document.getElementById('sel-subjek').value,
+    tahunAkademik: document.getElementById('sel-tahun-akademik').value,
+    kodSK: selSK.value,
+    namaSK: selSK.options[selSK.selectedIndex].textContent,
+    kodSP: selSP.value,
+    namaSP: selSP.options[selSP.selectedIndex].textContent,
+    tp: digitalState.tpTerpilih,
+    catatan: document.getElementById('dg-catatan').value,
+    guruPentaksir: namaGuru,
+    tarikhPentaksiran: new Date().toISOString().slice(0,10),
+    evidensURL: digitalState.evidensURL,
+    fail: digitalState.evidensFail,
+  };
+
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  try{
+    const res = await fetch(EPRESTASI_CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload),
+    }).then(r=>r.json());
+    if (res.ok){
+      showToast('Rekod PBD berjaya disimpan.', 'ok');
+      renderDigitalPanel();
+    } else {
+      showToast('Ralat: ' + (res.error || 'tidak diketahui'), 'err');
+      btn.disabled = false; btn.textContent = '💾 Simpan Rekod PBD';
+    }
+  }catch(err){
+    showToast('Gagal hantar ke pelayan. Semak sambungan.', 'err');
+    btn.disabled = false; btn.textContent = '💾 Simpan Rekod PBD';
+  }
+}
+
+/* ============================================================
+ * SIMPAN DRAF (localStorage - khusus peranti/pelayar ini sahaja)
+ * ============================================================ */
+function kunciDraf_(){
+  const kelas = document.getElementById('sel-kelas').value;
+  const subjek = document.getElementById('sel-subjek').value;
+  const tahunAkademik = document.getElementById('sel-tahun-akademik').value;
+  return `eprestasi_draf_${state.mode}_${state.subMode}_${kelas}_${subjek}_${tahunAkademik}`;
+}
+
+function kumpulNilaiUntukDraf_(){
+  if (state.mode === 'peperiksaan'){
+    return [...document.querySelectorAll('.input-markah-baharu')]
+      .filter(inp => inp.value !== '')
+      .map(inp => ({ muridId: inp.dataset.muridId, jenis: inp.dataset.jenis, value: inp.value }));
+  }
+  if (state.mode === 'pbd' && state.subMode === 'manual'){
+    return [...document.querySelectorAll('.input-tp')]
+      .filter(inp => inp.value !== '')
+      .map(inp => ({ muridId: inp.dataset.muridId, value: inp.value }));
+  }
+  return null; // mod lain (upload/SPPB/digital) ada alur kerja sendiri, tak guna draf gaya ni
+}
+
+document.getElementById('btn-simpan-draf').addEventListener('click', ()=>{
+  const status = document.getElementById('draf-status');
+  const kelas = document.getElementById('sel-kelas').value;
+  const subjek = document.getElementById('sel-subjek').value;
+
+  if (!kelas || (!subjek && state.subMode !== 'sppb')){
+    showToast('Sila pilih Kelas dan Subjek dahulu sebelum simpan draf.', 'err');
+    return;
+  }
+
+  const nilai = kumpulNilaiUntukDraf_();
+  if (nilai === null){
+    showToast('Simpan Draf belum disokong untuk mod ini.', 'err');
+    return;
+  }
+  if (nilai.length === 0){
+    showToast('Tiada nilai diisi untuk disimpan sebagai draf.', 'err');
+    return;
+  }
+
+  const draf = {
+    disimpanPada: new Date().toISOString(),
+    mode: state.mode, subMode: state.subMode,
+    kelas, subjek, tahunAkademik: document.getElementById('sel-tahun-akademik').value,
+    nilai,
+  };
+
+  try{
+    localStorage.setItem(kunciDraf_(), JSON.stringify(draf));
+    const masa = new Date(draf.disimpanPada).toLocaleTimeString('ms-MY', { hour:'2-digit', minute:'2-digit' });
+    status.textContent = `✓ Draf disimpan pada peranti ini (${masa}) — ${nilai.length} nilai. Draf akan dipulihkan automatik bila kembali ke kelas/subjek yang sama.`;
+    showToast(`Draf disimpan (${nilai.length} nilai).`, 'ok');
+  }catch(err){
+    showToast('Gagal simpan draf (mungkin storan peranti penuh).', 'err');
+  }
+});
+
+function muatDrafJikaAda(){
+  const status = document.getElementById('draf-status');
+  status.textContent = '';
+  if (state.mode === 'pbd' && !['manual'].includes(state.subMode)) return; // cuma manual/peperiksaan ada draf
+
+  let draf;
+  try{
+    const mentah = localStorage.getItem(kunciDraf_());
+    if (!mentah) return;
+    draf = JSON.parse(mentah);
+  }catch(err){ return; }
+  if (!draf || !Array.isArray(draf.nilai) || draf.nilai.length === 0) return;
+
+  if (state.mode === 'peperiksaan'){
+    draf.nilai.forEach(n => {
+      const inp = document.querySelector(`.input-markah-baharu[data-murid-id="${n.muridId}"][data-jenis="${CSS.escape(n.jenis)}"]`);
+      if (inp) inp.value = n.value;
+    });
+  } else if (state.mode === 'pbd' && state.subMode === 'manual'){
+    draf.nilai.forEach(n => {
+      const inp = document.querySelector(`.input-tp[data-murid-id="${n.muridId}"]`);
+      if (inp) inp.value = n.value;
+    });
+  }
+
+  const masa = new Date(draf.disimpanPada).toLocaleTimeString('ms-MY', { hour:'2-digit', minute:'2-digit' });
+  status.textContent = `📋 Draf tersimpan dipulihkan (disimpan ${masa}, ${draf.nilai.length} nilai). Sila semak sebelum "Hantar".`;
+  showToast('Draf sebelum ini dipulihkan.', 'ok');
+}
+
+function bersihkanDraf_(){
+  try{ localStorage.removeItem(kunciDraf_()); }catch(err){ /* senyap */ }
+  const status = document.getElementById('draf-status');
+  if (status) status.textContent = '';
+}
+
+/* ============================================================
+ * TARIK & PRA-ISI MARKAH SEDIA ADA (yang dah dihantar sebelum ini)
+ * ============================================================ */
+async function muatMarkahSediaAda(){
+  const kelas = document.getElementById('sel-kelas').value;
+  const subjek = document.getElementById('sel-subjek').value;
+  const tahunAkademik = document.getElementById('sel-tahun-akademik').value;
+  if (!kelas || !subjek || !tahunAkademik) return;
+
+  let bilDiisi = 0;
+  try{
+    const url = `${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=markahSediaAda&kelas=${encodeURIComponent(kelas)}&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}`;
+    const res = await fetch(url).then(r=>r.json());
+    if (!res.ok || !res.data) return;
+
+    // res.data: { [muridId]: { [jenisUjian]: markah } }
+    Object.keys(res.data).forEach(muridId=>{
+      const markahMurid = res.data[muridId];
+      Object.keys(markahMurid).forEach(jenis=>{
+        const inp = document.querySelector(`.input-markah-baharu[data-murid-id="${muridId}"][data-jenis="${CSS.escape(jenis)}"]`);
+        // Cuma pra-isi kalau input masih KOSONG - elak timpa apa yang guru BARU
+        // taip/draf pulih sebelum fungsi ni sempat siap (mengelak pertindihan).
+        if (inp && inp.value === ''){
+          inp.value = markahMurid[jenis];
+          inp.classList.add('sudah-hantar');
+          inp.title = 'Dah dihantar sebelum ini';
+          bilDiisi++;
+        }
+      });
+    });
+
+    if (bilDiisi > 0){
+      const wrap = document.getElementById('grid-wrap');
+      const lagenda = document.createElement('div');
+      lagenda.className = 'lagenda-markah';
+      lagenda.innerHTML = `<span class="kotak"></span> ${bilDiisi} markah dah dihantar sebelum ini (ditanda hijau) - kekal boleh diubah kalau perlu pembetulan.`;
+      wrap.appendChild(lagenda);
+    }
+  }catch(err){ /* senyap - kalau gagal tarik markah lama, guru masih boleh isi borang macam biasa */ }
+}
+</script>
+  </div>
+</div>
+</body>
+</html>
