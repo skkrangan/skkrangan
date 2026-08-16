@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Kad Prestasi Akademik | SK Krangan</title>
+<title>Dashboard ePrestasi Akademik | SK Krangan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -178,7 +178,7 @@
     <div class="side-brand">
       <div class="badge2">KAD</div>
       <div>
-        <h1>Kad Prestasi Akademik</h1>
+        <h1>ePrestasi Akademik</h1>
         <p>SK Krangan, Serian</p>
       </div>
     </div>
@@ -217,8 +217,8 @@
     <div class="brand">
       <div class="badge">SK</div>
       <div>
-        <h1>Dashboard Kad Prestasi Akademik</h1>
-        <p class="sub">Kad Prestasi Akademik SK Krangan, Serian</p>
+        <h1>Dashboard ePrestasi Akademik</h1>
+        <p class="sub">ePrestasi Akademik SK Krangan, Serian</p>
       </div>
     </div>
     <a href="dashboard.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; background:var(--navy); color:#fff; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap;">← Kembali ke Portal Staf</a>
@@ -502,7 +502,7 @@ async function muatSenaraiFilter(){
   state.kelas = rKelas.data || [];
   state.subjek = rSubjek.data || [];
   state.murid = rMurid.data || [];
-  document.getElementById('diag-version').textContent = rVersi.scriptVersion ? `Kad Prestasi Akademik · Versi Backend: ${rVersi.scriptVersion}` : '';
+  document.getElementById('diag-version').textContent = rVersi.scriptVersion ? `ePrestasi Akademik · Versi Backend: ${rVersi.scriptVersion}` : '';
 
   const selTahun = document.getElementById('f-tahun');
   [...new Set(state.kelas.map(k=>k.Tahun))].forEach(t=>{
@@ -1407,7 +1407,7 @@ function janaLaporanPanitia(d){
       @media print{ button{ display:none; } }
     </style></head><body>
     <h1>Laporan Panitia — ${d.subjek}</h1>
-    <p class="sub">Kad Prestasi Akademik SK Krangan · Dijana pada ${tarikh}</p>
+    <p class="sub">ePrestasi Akademik SK Krangan · Dijana pada ${tarikh}</p>
 
     <div class="ringkasan-grid">
       <div class="kad"><div class="val">${rp.purataAsas ? rp.purataAsas.purata+'%' : '-'}</div><div class="lbl">Purata Asas (TOV)</div></div>
