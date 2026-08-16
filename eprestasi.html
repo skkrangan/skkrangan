@@ -315,7 +315,8 @@
       </div>
     </div>
     <p id="peperiksaan-hint-baharu" style="font-size:12px; color:var(--muted); margin:14px 0 0; display:none;">
-      Isi mana-mana lajur yang berkenaan untuk setiap murid (tak perlu isi semua). Lajur kosong tidak akan disimpan.
+      Isi mana-mana lajur yang berkenaan untuk setiap murid (tak perlu isi semua). Lajur kosong tidak akan disimpan.<br>
+      ⓘ <b>TOV</b> = markah <b>Ujian Akhir Tahun tahun sebelumnya</b> murid tersebut (bukan ujian baharu).
     </p>
   </div>
 
@@ -498,7 +499,7 @@ document.getElementById('sel-tahun').addEventListener('change', (e)=>{
 
 /* ---------- Nota Jenis Ujian (khususnya ETR) ---------- */
 const JENIS_UJIAN_NOTA = {
-  'Ujian Diagnostik (Awal Tahun / TOV)': 'TOV — titik mula pencapaian murid sebelum sebarang intervensi.',
+  'Ujian Diagnostik (Awal Tahun / TOV)': 'TOV — markah Ujian Akhir Tahun tahun sebelumnya, dijadikan titik permulaan pencapaian murid.',
   'Ujian Bulanan 1': 'Dikira sebagai AR1 dalam Analisis Peperiksaan.',
   'Ujian Bulanan 2': 'Dikira sebagai AR1 dalam Analisis Peperiksaan.',
   'Peperiksaan Pertengahan Tahun': 'Dikira sebagai AR2 dalam Analisis Peperiksaan.',
@@ -591,7 +592,7 @@ function cubaPaparGrid(){
   }
 
   const kolInput = state.mode === 'peperiksaan'
-    ? `<th style="width:100px;">TOV</th><th style="width:130px;">Ujian Pertengahan Tahun</th><th style="width:110px;">Ujian Akhir Tahun</th><th style="width:100px;">ETR (Sasaran)</th>`
+    ? `<th style="width:100px;" title="TOV = markah Ujian Akhir Tahun tahun sebelumnya">TOV ⓘ</th><th style="width:130px;">Ujian Pertengahan Tahun</th><th style="width:110px;">Ujian Akhir Tahun</th><th style="width:100px;">ETR (Sasaran)</th>`
     : `<th style="width:150px;">Tahap Penguasaan</th>`;
 
   let rows = senaraiMuridKelas.map((m, i) => {
