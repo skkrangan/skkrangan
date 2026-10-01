@@ -87,14 +87,7 @@
     #section-eopr.active { position: static !important; display: block !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
     #section-eopr.active main { display: block !important; height: auto !important; overflow: visible !important; }
     #section-eopr.active main > section:not(.no-print) { display: block !important; height: auto !important; overflow: visible !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    /* section-ehadir kini turut 'fixed' (supaya tutup header luar bila aktif) -
-       position:fixed akan ROSAKKAN cetakan (kandungan terpotong 1 muka surat
-       sahaja) melainkan ditukar kembali kepada aliran dokumen biasa semasa cetak. */
-    #section-ehadir.active { position: static !important; display: block !important; height: auto !important; min-height: 0 !important; overflow: visible !important; inset: auto !important; }
     @page opr-page { size: A4 portrait; margin: 0mm; }
-    /* Laporan Bulanan eHadir kini ada 12 lajur (BIL + Nama + 10 status) - guna
-       kertas LANDSKAP supaya semua lajur muat dengan selesa tanpa font mikroskopik. */
-    @page monthly-page { size: A4 landscape; margin: 10mm; }
     .print-container {
       page: opr-page;
       -webkit-print-color-adjust: exact !important;
@@ -106,50 +99,19 @@
     body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
     .no-print { display: none !important; }
     .print-area { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-    #print-area-monthly {
-      page: monthly-page;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: auto !important; display: block !important;
-    }
+    #print-area-monthly { border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: 258mm !important; display: flex !important; flex-direction: column !important; }
     .school-header { margin-bottom: 5px !important; padding-bottom: 4px !important; }
     .school-logo { height: 44px !important; width: 44px !important; }
     .school-title { font-size: 12px !important; line-height: 1.15 !important; }
     .school-subtitle { font-size: 8px !important; }
     .report-title-section { margin-bottom: 5px !important; }
     .report-title-text { font-size: 10px !important; }
-    table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; table-layout: fixed !important; }
-    thead { display: table-header-group !important; } /* ulang tajuk lajur di setiap muka surat baharu */
-    tr { page-break-inside: avoid !important; } /* elak baris terpotong separuh, tapi jadual BOLEH sambung ke muka surat 2 tanpa jurang kosong */
-    th, td { padding: 5px 6px !important; font-size: 10px !important; line-height: 1.3 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-    /* Isu jadual terpotong semasa cetak: pembalut "overflow-x-auto" cuma boleh
-       diskrol pada skrin - semasa cetak, apa-apa kandungan yang perlu diskrol
-       akan HILANG terus (bukan disusun semula/reflow). Paksa nampak semua. */
-    .overflow-x-auto { overflow: visible !important; }
-    #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
-    #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
-    /* Lajur "Urusan Rasmi" (kedudukan ke-6) dapat lebar EKSTRA sebab
-       perkataan "Jawatankuasa" (12 aksara) terlalu panjang untuk lebar
-       lajur seragam - lajur status lain dikecilkan sedikit untuk seimbangkan. */
-    #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
-    #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
-    .signature-block { margin-top: 14px !important; padding-top: 6px !important; page-break-inside: avoid !important; }
+    table { width: 100% !important; border-collapse: collapse !important; margin-top: 2px !important; page-break-inside: avoid !important; }
+    th, td { padding: 2px 5px !important; font-size: 8px !important; line-height: 1.05 !important; border: 1px solid black !important; }
+    .signature-block { margin-top: auto !important; padding-top: 6px !important; }
     .signature-space { height: 45px !important; }
     @page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }
   }
-  /* ============================================================
-     PAPARAN SKRIN Laporan Bulanan - GAYA SAMA seperti @media print
-     di atas (lebar lajur, table-layout, saiz fon) supaya pratonton
-     di skrin biasa PADAN TEPAT dengan hasil cetak/PDF sebenar.
-     ============================================================ */
-  #print-area-monthly table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; }
-  #print-area-monthly th, #print-area-monthly td { padding: 5px 6px !important; font-size: 10px !important; line-height: 1.3 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-  #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
-  #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
-  #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
-  #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
-  #mobile-report-view summary::-webkit-details-marker{ display:none; }
-  #mobile-report-view details[open] summary i.fa-chevron-down{ transform:rotate(180deg); }
   .vertical-text-upright{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
   .vertical-text-upright span{ display:block; }
   .clip-roof-up{ clip-path: polygon(50% 0%, 100% 20%, 100% 100%, 0 100%, 0 20%); }
@@ -187,16 +149,6 @@
 
     <div id="g_id_signin" class="flex justify-center mb-4"></div>
 
-    <!-- PRATONTON TEMPATAN: hanya dipaparkan bila fail dibuka melalui file:// atau
-         localhost (semak JS di bawah). TIDAK AKAN kelihatan/berfungsi di laman
-         sebenar (skkrangan.github.io) walaupun blok ini tertinggal tidak sengaja. -->
-    <div id="local-preview-wrap" class="hidden mt-2 mb-2">
-      <button onclick="masukPratontonTempatan()" class="w-full py-2.5 rounded-full border-2 border-dashed border-amber-400 text-amber-600 text-xs font-bold hover:bg-amber-50 transition-colors">
-        🧪 Pratonton Tempatan (Aimuni Athirah - Guru ICT)
-      </button>
-      <p class="text-[10px] text-amber-500 mt-1.5">Hanya untuk ujian tempatan - tak berfungsi di laman langsung.</p>
-    </div>
-
     <div id="login-error" class="hidden text-left bg-crimson-soft border border-crimson/20 text-crimson text-sm rounded-2xl p-4 mt-2 flex gap-3">
       <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5"></i>
       <span id="login-error-text"></span>
@@ -212,7 +164,7 @@
 <div id="dashboard-shell" class="hidden min-h-screen relative z-10">
 
   <header class="no-print sticky top-0 z-40 glass border-b border-line">
-    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 h-20 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between">
       <button onclick="showModule('picker')" class="flex items-center gap-3">
         <div class="w-11 h-11 flex items-center justify-center">
           <img src="logo.png" alt="Logo" class="w-full h-full object-contain" onerror="this.style.display='none'">
@@ -235,17 +187,17 @@
   </header>
 
   <!-- ============ PEMILIH MODUL ============ -->
-  <div id="section-picker" class="tab-content active max-w-[1400px] mx-auto px-5 sm:px-8 py-14">
+  <div id="section-picker" class="tab-content active max-w-6xl mx-auto px-5 sm:px-8 py-14">
     <div class="mb-10 pop-in">
       <h2 class="font-display font-semibold text-3xl text-ink">Selamat kembali, <span id="welcome-name" class="text-navy">Staf</span> 👋</h2>
       <p class="text-ink-soft mt-1">Sila pilih sistem anda di bawah.</p>
     </div>
-    <div id="dashboard-pengumuman-box" class="hidden mb-8"></div>
     <div id="module-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <div id="versi-status-box" class="hidden mt-8 text-xs text-ink-faint bg-mist rounded-2xl p-4 max-w-md"></div>
   </div>
 
   <!-- ============ MODUL: KANDUNGAN LAMAN WEB (CMS) ============ -->
-  <div id="section-cms" class="tab-content max-w-[1400px] mx-auto px-5 sm:px-8 py-10">
+  <div id="section-cms" class="tab-content max-w-5xl mx-auto px-5 sm:px-8 py-10">
     <button onclick="showModule('picker')" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-ink-soft hover:text-ink"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Papan Pemuka</button>
     <div class="glass rounded-3xl p-8 shadow-sm">
       <h2 class="font-display font-bold text-2xl text-ink mb-1">Kandungan Laman Web</h2>
@@ -254,9 +206,6 @@
         <div class="flex gap-2 overflow-x-auto pb-1 border-b border-line">
           <button onclick="selectCmsHomepage()" id="cms-tab-lamanutama" class="text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0">
             <i data-lucide="home" class="w-4 h-4"></i> Laman Utama
-          </button>
-          <button onclick="selectCmsGaleriTab()" id="cms-tab-galeri" class="text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0">
-            <i data-lucide="images" class="w-4 h-4"></i> Galeri Sekolah
           </button>
           <div class="flex gap-2" id="cms-unit-tabs"></div>
         </div>
@@ -343,30 +292,45 @@
           </div>
           </div>
 
-          <!-- ===== Galeri Aktiviti Unit ===== -->
+          <div class="mt-6 bg-white border border-line rounded-2xl p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <i data-lucide="image" class="w-4 h-4 text-navy"></i>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Gambar Unit <span class="text-ink-faint normal-case font-normal">(pilihan &mdash; disimpan automatik sebaik dimuat naik)</span></h3>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
+              <label class="cursor-pointer inline-flex items-center justify-center gap-1.5 text-xs font-bold text-navy hover:text-navy-deep bg-mist hover:bg-navy-50 px-3 py-2.5 rounded-lg transition-all shrink-0">
+                <i data-lucide="image-plus" class="w-3.5 h-3.5"></i> <span id="cms-image-file-label">Pilih Gambar</span>
+                <input id="cms-image-file-input" type="file" accept="image/*" class="hidden" onchange="handleCmsImageChosen(event)">
+              </label>
+              <input id="cms-image-caption" type="text" placeholder="Kapsyen gambar (pilihan)" class="flex-1 bg-mist border border-line rounded-lg px-3 py-2.5 text-xs text-ink placeholder-ink-faint focus:ring-2 focus:ring-sky focus:outline-none">
+              <button onclick="uploadCmsImage()" class="shrink-0 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-lg transition-all inline-flex items-center justify-center gap-1.5">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik
+              </button>
+            </div>
+            <div id="cms-image-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+          </div>
+
+          <!-- ===== Galeri Sekolah (dikongsi semua unit) ===== -->
           <div class="mt-6 bg-white border border-line rounded-2xl p-6">
             <div class="flex items-center gap-2 mb-1">
-              <i data-lucide="image" class="w-4 h-4 text-navy"></i>
-              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Galeri Aktiviti Unit <span class="text-ink-faint normal-case font-normal">(khusus unit ini sahaja)</span></h3>
+              <i data-lucide="images" class="w-4 h-4 text-navy"></i>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Galeri Sekolah <span class="text-ink-faint normal-case font-normal">(dikongsi semua unit)</span></h3>
             </div>
-            <p class="text-[11px] text-ink-faint mb-3">Foto aktiviti/program khusus unit ini - dipaparkan pada tab "Galeri Aktiviti" halaman awam unit berkenaan sahaja (bukan Galeri Sekolah pusat).</p>
-            <div id="cms-image-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4"></div>
+            <p class="text-[11px] text-ink-faint mb-3">Foto yang dimuat naik di sini terus masuk ke Galeri Sekolah bersama di laman utama - sumbang foto program/aktiviti unit awak di sini.</p>
+            <div id="cms-galeri-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
             <div class="bg-mist rounded-2xl p-4 space-y-3">
               <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
               <div class="grid sm:grid-cols-3 gap-2">
-                <input type="text" id="cms-image-caption" placeholder="Kapsyen/Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-                <input type="date" id="cms-image-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-                <input type="text" id="cms-image-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+                <input type="text" id="cms-galeri-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+                <input type="date" id="cms-galeri-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+                <input type="text" id="cms-galeri-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
               </div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar, kemudian klik Simpan</p>
-              <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-mist border border-line hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
-                <i data-lucide="image-plus" class="w-3.5 h-3.5"></i> <span id="cms-image-file-label">Pilih Gambar (Satu atau Banyak Sekali Gus)</span>
-                <input id="cms-image-file-input" type="file" accept="image/*" multiple class="hidden" onchange="handleCmsImagesChosen(event)">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
+              <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
+                <input type="file" accept="image/*" multiple class="hidden" onchange="uploadCmsGaleriPhotos(event)">
               </label>
-              <button onclick="uploadCmsImagePhotos()" class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full transition-all w-full sm:w-auto">
-                <i data-lucide="save" class="w-3.5 h-3.5"></i> Simpan
-              </button>
-              <p id="cms-image-progress" class="text-[11px] text-ink-faint hidden"></p>
+              <p id="cms-galeri-progress" class="text-[11px] text-ink-faint hidden"></p>
             </div>
           </div>
 
@@ -426,7 +390,7 @@
           <div class="mt-6 bg-white border border-line rounded-2xl p-6">
             <div class="flex items-center gap-2 mb-1">
               <i data-lucide="clipboard-list" class="w-4 h-4 text-navy"></i>
-              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Laporan eOPR</h3>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-ink">Laporan Aktiviti</h3>
             </div>
             <p class="text-[11px] text-ink-faint mb-3">Laporan dicipta melalui modul eOPR (butang "Simpan ke Portal"). Di sini anda boleh lihat &amp; padam sahaja.</p>
             <div id="cms-report-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
@@ -446,30 +410,22 @@
             <p class="text-[11px] text-ink-faint mb-3">Dipaparkan di bahagian "Statistik" laman utama.</p>
             <div class="grid lg:grid-cols-2 gap-6 lg:items-start">
               <div class="min-w-0">
-                <div class="grid grid-cols-2 gap-3">
-                  <div class="bg-mist rounded-xl p-3">
-                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Murid (Jumlah)</label>
-                    <input type="number" id="hp-stat-murid" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none mb-2">
-                    <div class="grid grid-cols-2 gap-2">
-                      <div><label class="text-[9px] font-bold uppercase text-ink-faint block mb-1">Lelaki</label><input type="number" id="hp-stat-murid-lelaki" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-2 py-1.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none"></div>
-                      <div><label class="text-[9px] font-bold uppercase text-ink-faint block mb-1">Perempuan</label><input type="number" id="hp-stat-murid-perempuan" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-2 py-1.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none"></div>
-                    </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Murid</label>
+                    <input type="number" id="hp-stat-murid" oninput="updateHpStatistikPreview()" class="w-full bg-mist border border-line rounded-xl px-3 py-2.5 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                   </div>
-                  <div class="bg-mist rounded-xl p-3">
-                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Guru (Jumlah)</label>
-                    <input type="number" id="hp-stat-guru" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+                  <div>
+                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Guru</label>
+                    <input type="number" id="hp-stat-guru" oninput="updateHpStatistikPreview()" class="w-full bg-mist border border-line rounded-xl px-3 py-2.5 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                   </div>
-                  <div class="bg-mist rounded-xl p-3">
-                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Staf (Jumlah)</label>
-                    <input type="number" id="hp-stat-staf" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+                  <div>
+                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Staf</label>
+                    <input type="number" id="hp-stat-staf" oninput="updateHpStatistikPreview()" class="w-full bg-mist border border-line rounded-xl px-3 py-2.5 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                   </div>
-                  <div class="bg-mist rounded-xl p-3">
-                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Kelas (Jumlah)</label>
-                    <input type="number" id="hp-stat-kelas" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none mb-2">
-                    <div class="grid grid-cols-2 gap-2">
-                      <div><label class="text-[9px] font-bold uppercase text-ink-faint block mb-1">Pra Sekolah</label><input type="number" id="hp-stat-kelas-pra" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-2 py-1.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none"></div>
-                      <div><label class="text-[9px] font-bold uppercase text-ink-faint block mb-1">Tahun 1-6</label><input type="number" id="hp-stat-kelas-tahun16" oninput="updateHpStatistikPreview()" class="w-full bg-white border border-line rounded-lg px-2 py-1.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none"></div>
-                    </div>
+                  <div>
+                    <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Kelas</label>
+                    <input type="number" id="hp-stat-kelas" oninput="updateHpStatistikPreview()" class="w-full bg-mist border border-line rounded-xl px-3 py-2.5 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
                   </div>
                 </div>
                 <button onclick="saveHpStatistik()" class="mt-3 text-xs font-bold bg-navy text-white px-4 py-2 rounded-full hover:bg-navy-deep transition-all">Simpan Statistik</button>
@@ -582,25 +538,6 @@
 
           <div class="border-t border-line"></div>
 
-          <!-- Pengumuman (jalur atas laman utama) -->
-          <div>
-            <h3 class="font-bold text-ink mb-1">Pengumuman Penting (Jalur Atas)</h3>
-            <p class="text-[11px] text-ink-faint mb-3">Papar di jalur navy paling atas laman utama. Bila tiada pengumuman aktif, jalur automatik papar acara Takwim terdekat.</p>
-            <div class="grid lg:grid-cols-2 gap-6 lg:items-start">
-              <div class="min-w-0">
-                <div id="hp-pengumuman-list" class="space-y-3"></div>
-                <button onclick="addHpPengumumanRow()" class="mt-2 text-xs font-bold text-navy hover:text-gold flex items-center gap-1.5"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Tambah Pengumuman</button>
-                <div><button onclick="saveHpPengumuman()" class="mt-3 text-xs font-bold bg-navy text-white px-4 py-2 rounded-full hover:bg-navy-deep transition-all">Simpan Pengumuman</button></div>
-              </div>
-              <div class="lg:sticky lg:top-6 lg:self-start">
-                <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-2 flex items-center gap-1.5"><i data-lucide="eye" class="w-3 h-3"></i> Previu Jalur Atas</p>
-                <div id="hp-pengumuman-preview" class="space-y-2"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="border-t border-line"></div>
-
           <!-- Carta Organisasi Utama -->
           <div>
             <h3 class="font-bold text-ink mb-1">Carta Organisasi Utama</h3>
@@ -624,25 +561,11 @@
           <div>
             <h3 class="font-bold text-ink mb-1">Foto Hero (Slaid Halaman Utama)</h3>
             <p class="text-[11px] text-ink-faint mb-3">Foto yang beralih automatik di bahagian atas laman utama.</p>
-            <p id="hp-hero-no-access" class="hidden text-xs text-ink-soft bg-mist rounded-xl px-4 py-3 flex items-center gap-2">
-              <i data-lucide="lock" class="w-3.5 h-3.5 shrink-0"></i> Hanya Guru Besar, GPK dan Guru ICT boleh urus Foto Hero.
-            </p>
-            <div id="hp-hero-controls">
-              <div id="hp-hero-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
-              <div class="flex flex-wrap items-center gap-2 mb-3">
-                <label class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all">
-                  <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik Foto Hero
-                  <input type="file" accept="image/*" class="hidden" onchange="uploadHpHeroPhoto(event)">
-                </label>
-                <button type="button" onclick="toggleHpHeroGaleriPicker()" id="hp-hero-galeri-picker-btn" class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full transition-all">
-                  <i data-lucide="images" class="w-3.5 h-3.5"></i> Pilih dari Galeri Sekolah
-                </button>
-              </div>
-              <div id="hp-hero-galeri-picker" class="hidden bg-mist rounded-2xl p-4">
-                <p class="text-[11px] text-ink-faint mb-3">Tandakan (tick) foto Galeri Sekolah yang nak dipaparkan dalam slaid hero. Nyahtanda untuk buang daripada slaid.</p>
-                <div id="hp-hero-galeri-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
-              </div>
-            </div>
+            <div id="hp-hero-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
+            <label class="inline-flex items-center gap-2 text-xs font-bold bg-mist hover:bg-navy-50 text-ink px-4 py-2.5 rounded-full cursor-pointer transition-all">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i> Muat Naik Foto Hero
+              <input type="file" accept="image/*" class="hidden" onchange="uploadHpHeroPhoto(event)">
+            </label>
           </div>
 
           <div class="border-t border-line"></div>
@@ -670,34 +593,12 @@
           </div>
 
         </div>
-
-        <!-- ===== PANEL GALERI SEKOLAH (berasingan - boleh diakses semua staf) ===== -->
-        <div class="hidden" id="cms-galeri-panel">
-          <h3 class="font-bold text-ink mb-1">Galeri Sekolah</h3>
-          <p class="text-[11px] text-ink-faint mb-3">Koleksi foto aktiviti/kemudahan sekolah dipaparkan di menu "Galeri Sekolah" laman utama. Semua staf boleh sumbang foto di sini.</p>
-          <div id="cms-galeri-tab-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
-
-          <div class="bg-mist rounded-2xl p-4 space-y-3">
-            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
-            <div class="grid sm:grid-cols-3 gap-2">
-              <input type="text" id="cms-galeri-tab-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-              <input type="date" id="cms-galeri-tab-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-              <input type="text" id="cms-galeri-tab-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-            </div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta (Tiada Butang Simpan Berasingan)</p>
-            <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
-              <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
-              <input type="file" accept="image/*" multiple class="hidden" onchange="uploadCmsGaleriTabPhotos(event)">
-            </label>
-            <p id="cms-galeri-tab-progress" class="text-[11px] text-ink-faint hidden"></p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
   <!-- ============ MODUL: URUS STAF ============ -->
-  <div id="section-staf" class="tab-content max-w-[1400px] mx-auto px-5 sm:px-8 py-10">
+  <div id="section-staf" class="tab-content max-w-5xl mx-auto px-5 sm:px-8 py-10">
     <button onclick="showModule('picker')" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-ink-soft hover:text-ink"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Papan Pemuka</button>
     <div class="glass rounded-3xl p-8">
       <div class="flex items-center justify-between mb-2">
@@ -712,11 +613,35 @@
     </div>
   </div>
 
+  <!-- ============ MODUL: GALERI SEKOLAH (terbuka untuk semua staf) ============ -->
+  <div id="section-galeri" class="tab-content max-w-5xl mx-auto px-5 sm:px-8 py-10">
+    <button onclick="showModule('picker')" class="mb-6 inline-flex items-center gap-2 text-sm font-bold text-ink-soft hover:text-ink"><i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Papan Pemuka</button>
+    <div class="glass rounded-3xl p-8">
+      <h2 class="font-display font-semibold text-2xl text-ink mb-1">Galeri Sekolah</h2>
+      <p class="text-sm text-ink-soft mb-6">Muat naik gambar aktiviti/program untuk galeri sekolah di laman utama. Semua staf boleh sumbang foto di sini.</p>
+      <div id="galeri-standalone-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
+      <div class="bg-mist rounded-2xl p-5 space-y-3">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Langkah 1: Isi Maklumat Program (dikongsi untuk semua gambar yang dimuat naik sekali gus)</p>
+        <div class="grid sm:grid-cols-3 gap-2">
+          <input type="text" id="galeri-standalone-program" placeholder="Nama Program" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <input type="date" id="galeri-standalone-tarikh" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <input type="text" id="galeri-standalone-tempat" placeholder="Tempat Diadakan" class="bg-white border border-line rounded-xl px-3 py-2.5 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+        </div>
+        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint pt-1">Langkah 2: Pilih Gambar &mdash; Terus Dimuat Naik Serta-merta</p>
+        <label class="inline-flex items-center justify-center gap-2 text-xs font-bold bg-navy hover:bg-navy-deep text-white px-4 py-2.5 rounded-full cursor-pointer transition-all w-full sm:w-auto">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Pilih &amp; Muat Naik Gambar (Satu atau Banyak Sekali Gus)
+          <input type="file" accept="image/*" multiple class="hidden" onchange="uploadGaleriStandalone(event)">
+        </label>
+        <p id="galeri-standalone-progress" class="text-[11px] text-ink-faint hidden"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ MODUL: EHADIR (disisipkan) ============ -->
-  <div id="section-ehadir" class="tab-content fixed inset-0 z-[60] bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-y-auto">
+  <div id="section-ehadir" class="tab-content w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 relative">
             
-            <header class="bg-slate-900 text-white shadow-xl border-b-4 border-gold no-print transition-all duration-300 overflow-hidden">
-                <div class="max-w-[1400px] mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <header class="bg-slate-900 text-white shadow-xl border-b-4 border-gold no-print transition-all duration-300 rounded-t-3xl overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex items-center gap-4">
                         <img src="logo.png" alt="Logo SK Krangan" class="h-16 w-auto object-contain drop-shadow transition-transform hover:scale-105" onerror="this.src='https://placehold.co/150x150/1e293b/ffffff?text=SK+Krangan'">
                         <div>
@@ -738,7 +663,7 @@
             </header>
 
             <nav id="ehadir-nav" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 shadow-sm no-print transition-all duration-300">
-                <div class="max-w-[1400px] mx-auto px-4">
+                <div class="max-w-7xl mx-auto px-4">
                     <div class="flex space-x-1 sm:space-x-4">
                         <button onclick="switchTab('dashboard')" id="btn-dashboard" class="py-4 px-3 sm:px-5 font-bold text-sm border-b-4 border-navy text-navy dark:text-indigo-400 flex items-center gap-2 transition-all">
                             <i class="fa-solid fa-gauge-high"></i> Dashboard
@@ -759,7 +684,7 @@
                 </div>
             </nav>
 
-            <div class="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 flex-1 w-full">
+            <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 w-full">
 
                 <div id="tab-dashboard" class="ehadir-tab active space-y-6 no-print">
                     <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 dark:from-indigo-700 dark:to-indigo-950 rounded-2xl p-6 sm:p-7 shadow-sm text-white relative overflow-hidden">
@@ -815,9 +740,9 @@
                                     <div class="space-y-3 text-sm">
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Belum Kemas Kini')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-slate-400"></span> Belum Kemas Kini</span><span class="font-bold text-slate-950 dark:text-white" id="stat-belum-kemaskini">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Di Sekolah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Di Sekolah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school">0</span></div>
-                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Mesyuarat/Bengkel/Taklimat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Mesyuarat/Bengkel/Taklimat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school-mesy">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Di Sekolah : Mesyuarat/Bengkel')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span> Di Sekolah : Mesyuarat/Bengkel</span><span class="font-bold text-slate-950 dark:text-white" id="stat-school-mesy">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Bekerja Dari Rumah')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span> Bekerja Dari Rumah</span><span class="font-bold text-slate-950 dark:text-white" id="stat-wfh">0</span></div>
-                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
+                                        <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Rasmi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Luar Pejabat : Urusan Rasmi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-rasmi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Luar Pejabat : Urusan Peribadi')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Luar Pejabat : Urusan Peribadi</span><span class="font-bold text-slate-950 dark:text-white" id="stat-outside-peribadi">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-600"></span> Cuti Rehat</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat">0</span></div>
                                         <div class="flex justify-between items-center py-1 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg cursor-pointer" onclick="filterByStatusName('Cuti Rehat Khas')"><span class="text-slate-600 dark:text-slate-300 flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span> Cuti Rehat Khas</span><span class="font-bold text-slate-950 dark:text-white" id="stat-cuti-rehat-khas">0</span></div>
@@ -928,7 +853,7 @@
                         </div>
                     </div>
 
-                    <div id="print-area-monthly" class="print-area bg-white text-black p-10 border border-slate-300 max-w-[1400px] mx-auto text-slate-900 transition-all hidden md:block">
+                    <div id="print-area-monthly" class="print-area bg-white text-black p-8 border border-slate-200 shadow-lg rounded-2xl max-w-4xl mx-auto text-slate-900 transition-all hidden md:block">
                         <div class="school-header flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-5">
                             <div class="flex items-center gap-4">
                                 <img src="logo.png" alt="Logo SK Krangan" class="school-logo h-16 w-auto object-contain" onerror="this.src='https://placehold.co/150x150/1e293b/ffffff?text=SK+Krangan'">
@@ -941,24 +866,27 @@
                             <div class="text-right text-[10px] text-slate-500 font-semibold uppercase"><div>Dokumen Rasmi</div><div class="text-slate-950 font-black text-xs" id="report-meta-month">Bulan: -</div></div>
                         </div>
                         <div class="report-title-section text-center mb-4">
-                            <h2 class="report-title-text text-sm font-black tracking-wide uppercase text-slate-950">LAPORAN BULANAN STAF SK KRANGAN</h2>
+                            <h2 class="report-title-text text-sm font-black tracking-wide uppercase text-slate-950">LAPORAN BULANAN KEBERADAAN BARISAN PENTADBIR & GURU</h2>
                             <p class="text-[10px] text-slate-500 mt-0.5 uppercase font-bold">Sesi Bulan: <span id="report-selected-label" class="underline">Julai 2026</span></p>
                         </div>
                         <div id="report-analytics-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4"></div>
+                        <div id="report-attention-summary" class="mb-4"></div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border border-slate-300 border-collapse">
                                 <thead>
-                                    <tr id="monthly-report-table-head" class="bg-slate-100 border-b border-slate-300 text-slate-800 font-extrabold text-[9px] uppercase">
+                                    <tr class="bg-slate-100 border-b border-slate-300 text-slate-800 font-extrabold text-[9px] uppercase">
                                         <th class="p-2 border-r border-slate-300 text-center w-8">BIL</th>
-                                        <th class="p-2 border-r border-slate-300">Nama Staf</th>
-                                        <!-- Lajur status dijana secara dinamik oleh renderMonthlyReportHead() -
-                                             terus daripada statusOptions supaya SENTIASA selari dengan
-                                             senarai status sebenar (Ringkasan Keberadaan Staf), walaupun
-                                             status baharu ditambah/diubah pada masa hadapan. -->
+                                        <th class="p-2 border-r border-slate-300">Nama Pentadbir & Guru</th>
+                                        <th class="p-2 border-r border-slate-300 text-center">Di Sekolah</th>
+                                        <th class="p-2 border-r border-slate-300 text-center">Mesyuarat/Bengkel</th>
+                                        <th class="p-2 border-r border-slate-300 text-center">Urusan Rasmi</th>
+                                        <th class="p-2 border-r border-slate-300 text-center">Urusan Peribadi</th>
+                                        <th class="p-2 border-r border-slate-300 text-center">Cuti Rehat</th>
+                                        <th class="p-2 text-center text-rose-600">Cuti Sakit / Lain</th>
                                     </tr>
                                 </thead>
                                 <tbody id="monthly-report-table-body" class="divide-y divide-slate-300 text-[10px] text-slate-900 font-medium">
-                                    <tr><td colspan="12" class="p-8 text-center text-slate-400 italic">Sila pilih bulan di bahagian atas dan tekan butang "Jana Laporan".</td></tr>
+                                    <tr><td colspan="8" class="p-8 text-center text-slate-400 italic">Sila pilih bulan di bahagian atas dan tekan butang "Jana Laporan".</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -973,12 +901,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- ================= PAPARAN TELEFON (kad menegak, bukan jadual melebar) =================
-                         Ditunjukkan HANYA pada skrin kecil (<768px) - jadual 12-lajur landskap di atas
-                         (#print-area-monthly) langsung tersembunyi pada telefon (hidden md:block), jadi
-                         guru yang buka Laporan Bulanan guna telefon nampak KOSONG tanpa bahagian ni. -->
-                    <div id="mobile-report-view" class="block md:hidden no-print space-y-3"></div>
                 </div>
 
                 <div id="tab-audit" class="ehadir-tab space-y-6 hidden no-print">
@@ -1136,11 +1058,6 @@
           </div>
         </div>
 
-        <div id="photo-layout-picker-wrap" class="hidden">
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Susun Atur Foto</label>
-          <div id="photo-layout-picker" class="flex gap-2 flex-wrap"></div>
-        </div>
-
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Disediakan Oleh</label>
           <input type="text" id="input-author" oninput="updatePreview()" autocomplete="off" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none uppercase">
@@ -1175,15 +1092,7 @@
 
       <!-- OPR CARD: FIXED DIMENSION A4 -->
       <div id="opr-card" class="print-container relative w-[210mm] h-[297mm] bg-white shadow-2xl rounded-sm border border-slate-200 overflow-hidden select-none px-[12mm] py-[14mm] flex flex-col shrink-0">
-
-        <!-- LAPISAN PUTIH PEPEJAL (bukan CSS bg-white sahaja) - jaminan tambahan
-             sebab sesetengah penghurai PDF ringkas (cth. pratonton WhatsApp) kadang
-             salah tafsir kawasan mix-blend-mode/filter:blur() sebagai lutsinar,
-             lalu papar hitam. Div kosong pepejal ni sentiasa jadi lapisan PALING
-             bawah (z-index paling rendah), jadi walau apa pun berlaku pada lapisan
-             hiasan di atasnya, ada piksel putih SEBENAR di belakang segalanya. -->
-        <div class="absolute inset-0 bg-white" style="z-index:-1;"></div>
-
+        
         <!-- LATAR BELAKANG KREATIF -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div id="art-glow-1" class="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-30 transition-colors duration-700 bg-pink-300"></div>
@@ -1454,19 +1363,19 @@ if(pf){
    Emel DELIMA di bawah masih PLACEHOLDER - tukar ke emel sebenar staf.
    ===================================================================== */
 let staffData = [
-  { id: 1,  name: 'Stanley anak Ngawah',                position: 'Guru Besar',                                   status: 'Di Sekolah', delimaEmail: 'g-85307134@moe-dl.edu.my',    cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], canViewAttendanceDashboard: true, photo: 'staf-stanley.webp' },
-  { id: 2,  name: 'Dick Lester anak Bakir',              position: 'Guru Penolong Kanan Kurikulum',                status: 'Di Sekolah', delimaEmail: 'g-21307380@moe-dl.edu.my',   cmsUnits: ['Kurikulum'], canViewAttendanceDashboard: true, photo: 'staf-dick.webp' },
-  { id: 3,  name: 'Amir bin Ngatiman',                   position: 'Guru Penolong Kanan Hal Ehwal Murid',          status: 'Di Sekolah', delimaEmail: 'g-29307435@moe-dl.edu.my',         cmsUnits: ['Hal Ehwal Murid'], canViewAttendanceDashboard: true, photo: 'staf-amir.webp' },
-  { id: 4,  name: 'Mohammad Fadzly bin Noor Azman',      position: 'Guru Penolong Kanan Kokurikulum',              status: 'Di Sekolah', delimaEmail: 'g-71295196@moe-dl.edu.my',       cmsUnits: ['Kokurikulum'], canViewAttendanceDashboard: true, photo: 'staf-fadzly.webp' },
-  { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.webp' },
-  { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.webp' },
-  { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.webp' },
+  { id: 1,  name: 'Stanley anak Ngawah',                position: 'Guru Besar',                                   status: 'Di Sekolah', delimaEmail: 'g-85307134@moe-dl.edu.my',    cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], canViewAttendanceDashboard: true, photo: 'staf-stanley.jpg' },
+  { id: 2,  name: 'Dick Lester anak Bakir',              position: 'Guru Penolong Kanan Kurikulum',                status: 'Di Sekolah', delimaEmail: 'g-21307380@moe-dl.edu.my',   cmsUnits: ['Kurikulum'], canViewAttendanceDashboard: true, photo: 'staf-dick.jpg' },
+  { id: 3,  name: 'Amir bin Ngatiman',                   position: 'Guru Penolong Kanan Hal Ehwal Murid',          status: 'Di Sekolah', delimaEmail: 'g-29307435@moe-dl.edu.my',         cmsUnits: ['Hal Ehwal Murid'], canViewAttendanceDashboard: true, photo: 'staf-amir.jpg' },
+  { id: 4,  name: 'Mohammad Fadzly bin Noor Azman',      position: 'Guru Penolong Kanan Kokurikulum',              status: 'Di Sekolah', delimaEmail: 'g-71295196@moe-dl.edu.my',       cmsUnits: ['Kokurikulum'], canViewAttendanceDashboard: true, photo: 'staf-fadzly.jpg' },
+  { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.jpg' },
+  { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.jpg' },
+  { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.jpg' },
   { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-44425413@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-izzati.webp' },
-  { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.webp' },
-  { id: 17, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.webp' },
-  { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.webp' },
-  { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.webp' },
-  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Guru ICT', canViewAttendanceDashboard: true, photo: 'staf-aimuni.webp' },
+  { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.jpg' },
+  { id: 17, name: 'Siti Norhafizah binti Daud',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-70540376@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-siti.jpg' },
+  { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.jpg' },
+  { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.jpg' },
+  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Penyelaras Digital', canViewAttendanceDashboard: true, photo: 'staf-aimuni.jpg' },
   { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-syuhada.webp' },
   { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
   { id: 16, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'ajeksumping140@gmail.com',               cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
@@ -1497,19 +1406,7 @@ async function syncStaffFromBackend(){
       staffData.forEach(fallback => {
         if(!remoteIds.has(Number(fallback.id))) merged.push(fallback);
       });
-      // Susun ikut kedudukan paparan khusus (STAFF_SORT_OVERRIDE, ditetapkan
-      // SELEPAS gabungan supaya terpakai tak kira rekod datang dari Sheet
-      // (remote) atau kod sandaran (fallback)), guna 'id' sebagai sandaran.
-      // PENTING: id staf TIDAK BOLEH diubah kerana ia dipadan terus dengan
-      // rekod dalam Google Sheets (CMS_SCRIPT_URL) - tukar id di sini sahaja
-      // (tanpa kemas kini Sheet) akan sebabkan rekod sama dikira sebagai
-      // "2 orang berlainan" semasa gabungan, jadi nama akan terpapar BERULANG.
-      const STAFF_SORT_OVERRIDE = { 17: 9.5 }; // Siti Norhafizah - papar sebelum Arfiq Rahimi (id:10)
-      merged.sort((a, b) => {
-        const posA = STAFF_SORT_OVERRIDE[Number(a.id)] ?? Number(a.id);
-        const posB = STAFF_SORT_OVERRIDE[Number(b.id)] ?? Number(b.id);
-        return posA - posB;
-      });
+      merged.sort((a, b) => Number(a.id) - Number(b.id));
       staffData.length = 0;
       merged.forEach(s => staffData.push(s));
       staffSyncedFromBackend = true;
@@ -1553,7 +1450,7 @@ function renderStaffManagementList(){
         </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Label Peranan <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
-          <input type="text" id="staf-${idx}-rolelabel" value="${(s.cmsRoleLabel||'').replace(/"/g,'&quot;')}" placeholder="cth. Guru ICT" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <input type="text" id="staf-${idx}-rolelabel" value="${(s.cmsRoleLabel||'').replace(/"/g,'&quot;')}" placeholder="cth. Penyelaras Digital" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
         </div>
         <div>
           <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Nama Fail Gambar <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
@@ -1609,7 +1506,6 @@ async function saveStaffCard(idx){
   });
   const payload = {
     action: 'savestaf',
-    apiSecret: DASHBOARD_API_SECRET,
     id: s.id || 0,
     name, email,
     delimaEmail: email,
@@ -1652,7 +1548,7 @@ async function deleteStaffCard(idx){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deletestaf', apiSecret: DASHBOARD_API_SECRET, id: s.id })
+      body: JSON.stringify({ action: 'deletestaf', id: s.id })
     });
   }catch(e){ /* teruskan padam tempatan walaupun rangkaian gagal - senyap */ }
   staffData.splice(idx, 1);
@@ -1703,37 +1599,10 @@ function handleGoogleCredential(response){
   }
 
   if(!isDelimaDomain(email)){
-    showLoginError(`Akaun "${email}" bukan akaun DELIMA yang sah, dan tidak ditemui dalam senarai staf berdaftar. Sila log masuk menggunakan akaun @moe-dl.edu.my/@moe.gov.my, atau hubungi Guru ICT untuk daftarkan emel ini.`);
+    showLoginError(`Akaun "${email}" bukan akaun DELIMA yang sah, dan tidak ditemui dalam senarai staf berdaftar. Sila log masuk menggunakan akaun @moe-dl.edu.my/@moe.gov.my, atau hubungi Penyelaras Digital untuk daftarkan emel ini.`);
     return;
   }
-  showLoginError(`Akaun DELIMA "${email}" sah, tetapi belum didaftarkan dalam sistem sekolah ini. Sila hubungi Guru ICT.`);
-}
-
-// ============================================================================
-// PRATONTON TEMPATAN (ujian sahaja) - HANYA aktif bila fail dibuka melalui
-// file:// atau localhost/127.0.0.1. Semakan ini berlaku semasa muat halaman;
-// pada domain sebenar (skkrangan.github.io atau mana-mana hosting langsung),
-// butang ini KEKAL TERSEMBUNYI dan fungsi di bawah tidak akan tercetus,
-// walaupun blok kod ini tertinggal tidak sengaja semasa deploy.
-// ============================================================================
-(function initLocalPreviewGate(){
-  const isLocal = location.protocol === 'file:' ||
-                   location.hostname === 'localhost' ||
-                   location.hostname === '127.0.0.1';
-  if (!isLocal) return; // JANGAN dedahkan butang di luar persekitaran tempatan
-  const wrap = document.getElementById('local-preview-wrap');
-  if (wrap) wrap.classList.remove('hidden');
-})();
-
-function masukPratontonTempatan(){
-  const isLocal = location.protocol === 'file:' ||
-                   location.hostname === 'localhost' ||
-                   location.hostname === '127.0.0.1';
-  if (!isLocal) return; // pengesahan berlapis - tolak jika bukan tempatan
-  const staff = findStaffByEmail('g-80575536@moe-dl.edu.my'); // Aimuni Athirah - Guru ICT
-  if (!staff){ showLoginError('Rekod staf pratonton tidak dijumpai.'); return; }
-  currentUser = staff;
-  enterDashboard();
+  showLoginError(`Akaun DELIMA "${email}" sah, tetapi belum didaftarkan dalam sistem sekolah ini. Sila hubungi Penyelaras Digital.`);
 }
 
 function enterDashboard(){
@@ -1745,7 +1614,7 @@ function enterDashboard(){
   document.getElementById('user-role-label').innerText = currentUser.cmsRoleLabel || currentUser.position;
   renderModuleGrid();
   showModule('picker');
-  loadDashboardPengumuman();
+  if(currentUser.canViewAttendanceDashboard) semakVersiSkrip();
 
   // "Kemas Kini Status" (borang peribadi) dipaparkan untuk SEMUA staf KECUALI akaun
   // yang ditanda excludeFromAttendance (cth. Akaun Pentadbir Sistem - bukan orang sebenar).
@@ -1782,94 +1651,71 @@ function signOutDashboard(){
   if(typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
 }
 
-// Papar pengumuman aktif (dari sistem Pengumuman sedia ada) atas Dashboard staf juga
-async function loadDashboardPengumuman(){
-  const box = document.getElementById('dashboard-pengumuman-box');
+// Bandingkan versi dashboard ni dengan versi skrip Apps Script yang AKTIF
+// (dah dideploy). Kalau tak sepadan, mungkin salah satu belum dikemas kini -
+// ni bantu detect awal isu "Code.gs belum di-deploy" yang sering berlaku.
+async function semakVersiSkrip(){
+  const box = document.getElementById('versi-status-box');
   if(!box || !isCmsBackendConfigured()) return;
   try{
-    const res = await fetch(CMS_SCRIPT_URL + '?action=pengumuman');
+    const res = await fetch(CMS_SCRIPT_URL + '?action=versi');
     if(!res.ok) return;
-    const items = await res.json();
-    if(!Array.isArray(items) || !items.length){ box.classList.add('hidden'); box.innerHTML = ''; return; }
-    box.innerHTML = items.slice(0, 3).map(p => `
-      <div class="bg-navy rounded-2xl px-5 py-4 flex items-start gap-3 mb-3 last:mb-0">
-        <i data-lucide="megaphone" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
-        <p class="text-white text-sm font-semibold">${p.tajuk}</p>
-      </div>
-    `).join('');
+    const d = await res.json();
+    const sepadan = d.scriptVersion === DASHBOARD_VERSION;
     box.classList.remove('hidden');
-    lucide.createIcons();
-  }catch(e){ /* senyap */ }
+    box.innerHTML = sepadan
+      ? `<span class="text-emerald-600">✓</span> Dashboard (${DASHBOARD_VERSION}) dan Skrip Backend (${d.scriptVersion}) sepadan.`
+      : `<span class="text-amber-600">⚠</span> Versi tak sepadan - Dashboard: <strong>${DASHBOARD_VERSION}</strong>, Skrip Backend aktif: <strong>${d.scriptVersion}</strong>. Sila semak sama ada Code.gs perlu di-<em>deploy semula</em> (Deploy → Manage deployments → New version).`;
+  }catch(e){ /* senyap - jangan ganggu papan pemuka kalau semakan versi gagal */ }
 }
 
 function renderModuleGrid(){
   const grid = document.getElementById('module-grid');
   let cards = '';
   let idx = 0;
-  idx++;
-  cards += `
-    <button onclick="showModule('cms')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#C08A3E;">
-      <i data-lucide="layout-template" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F3E7D3;"><i data-lucide="layout-template" class="w-7 h-7" style="color:#C08A3E;"></i></div>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kandungan Laman Web</h3>
-      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#C08A3E;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#C08A3E;"></span></div>
-      <p class="relative text-sm text-ink-soft pr-10">${(currentUser.cmsUnits && currentUser.cmsUnits.length) ? 'Edit kandungan: ' + currentUser.cmsUnits.join(', ') + ', dan Galeri Sekolah.' : 'Muat naik gambar untuk Galeri Sekolah.'}</p>
-      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
-    </button>`;
-  idx++;
-  cards += `
-    <button onclick="showModule('ehadir')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#4F46E5;">
-      <i data-lucide="user-check" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#E0E7FF;"><i data-lucide="user-check" class="w-7 h-7" style="color:#4F46E5;"></i></div>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Sistem eHadir</h3>
-      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#4F46E5;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#4F46E5;"></span></div>
-      <p class="relative text-sm text-ink-soft pr-10">Rekod kehadiran staf harian.</p>
-      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
-    </button>`;
-  idx++;
-  idx++;
-  cards += `
-    <button onclick="showModule('eopr')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#A23B3B;">
-      <i data-lucide="file-text" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F5E1E1;"><i data-lucide="file-text" class="w-7 h-7" style="color:#A23B3B;"></i></div>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Laporan eOPR</h3>
-      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#A23B3B;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#A23B3B;"></span></div>
-      <p class="relative text-sm text-ink-soft pr-10">Jana laporan One Page Report.</p>
-      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
-    </button>`;
-  idx++;
-  if(currentUser.canViewAttendanceDashboard){
+  if(currentUser.cmsUnits && currentUser.cmsUnits.length > 0){
+    idx++;
     cards += `
-    <a href="https://skkrangan.github.io/skkrangan/eprestasi.html?guru=${encodeURIComponent(currentUser.name)}" target="_blank" rel="noopener" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#7C3AED;">
-      <i data-lucide="graduation-cap" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#EDE4FB;"><i data-lucide="graduation-cap" class="w-7 h-7" style="color:#7C3AED;"></i></div>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">ePrestasi Akademik</h3>
-      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#7C3AED;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#7C3AED;"></span></div>
-      <p class="relative text-sm text-ink-soft pr-10">Input markah peperiksaan &amp; analisis prestasi murid.</p>
-      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="external-link" class="w-4 h-4 text-white"></i></span>
-    </a>`;
-  } else {
-    cards += `
-    <div class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4 opacity-70 cursor-not-allowed" style="border-bottom-color:#94A3B8;" title="Akan dibuka tidak lama lagi">
-      <i data-lucide="graduation-cap" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#F1F5F9;"><i data-lucide="graduation-cap" class="w-7 h-7" style="color:#94A3B8;"></i></div>
-      <span class="absolute top-6 right-6 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full" style="background:#F1F5F9; color:#64748B;">Akan Datang</span>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">ePrestasi Akademik</h3>
-      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#94A3B8;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#94A3B8;"></span></div>
-      <p class="relative text-sm text-ink-soft pr-10">Input markah peperiksaan &amp; analisis prestasi murid.</p>
-      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-slate-300 flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-white"></i></span>
-    </div>`;
+      <button onclick="showModule('cms')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+        <i data-lucide="layout-template" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+        <div class="relative w-12 h-12 rounded-2xl bg-gold-soft flex items-center justify-center mb-5"><i data-lucide="layout-template" class="w-6 h-6 text-gold"></i></div>
+        <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Kandungan Laman Web</h3>
+        <p class="relative text-sm text-ink-soft">Edit kandungan: ${currentUser.cmsUnits.join(', ')}</p>
+      </button>`;
   }
+  idx++;
+  cards += `
+    <button onclick="showModule('galeri')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+      <i data-lucide="images" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center mb-5"><i data-lucide="images" class="w-6 h-6 text-sky-700"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Galeri Sekolah</h3>
+      <p class="relative text-sm text-ink-soft">Muat naik gambar aktiviti untuk galeri sekolah.</p>
+    </button>`;
+  idx++;
+  cards += `
+    <button onclick="showModule('ehadir')" class="module-card soft-card pop-in stagger-${idx} text-left rounded-3xl p-8 relative overflow-hidden">
+      <i data-lucide="user-check" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-12 h-12 rounded-2xl bg-navy-50 flex items-center justify-center mb-5"><i data-lucide="user-check" class="w-6 h-6 text-navy"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Sistem eHadir</h3>
+      <p class="relative text-sm text-ink-soft">Rekod kehadiran staf harian.</p>
+    </button>`;
+  idx++;
+  idx++;
+  cards += `
+    <button onclick="showModule('eopr')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden">
+      <i data-lucide="file-text" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-12 h-12 rounded-2xl bg-crimson-soft flex items-center justify-center mb-5"><i data-lucide="file-text" class="w-6 h-6 text-crimson"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Laporan eOPR</h3>
+      <p class="relative text-sm text-ink-soft">Jana laporan One Page Report.</p>
+    </button>`;
   if(currentUser.canViewAttendanceDashboard){
     idx++;
     cards += `
-      <button onclick="showModule('staf')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#16A34A;">
+      <button onclick="showModule('staf')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden">
         <i data-lucide="users" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
-        <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#DCFCE7;"><i data-lucide="users" class="w-7 h-7" style="color:#16A34A;"></i></div>
+        <div class="relative w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center mb-5"><i data-lucide="users" class="w-6 h-6 text-emerald-700"></i></div>
         <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">Urus Staf</h3>
-        <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#16A34A;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#16A34A;"></span></div>
-        <p class="relative text-sm text-ink-soft pr-10">Tambah/kemas kini staf & akses sistem.</p>
-        <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
+        <p class="relative text-sm text-ink-soft">Tambah/kemas kini staf & akses sistem.</p>
       </button>`;
   }
   grid.innerHTML = cards;
@@ -1888,9 +1734,10 @@ function showModule(id){
   document.querySelectorAll('#dashboard-shell > .tab-content').forEach(el => el.classList.remove('active'));
   const target = document.getElementById('section-' + id);
   if(target) target.classList.add('active');
-  document.body.style.overflow = (id === 'eopr' || id === 'ehadir') ? 'hidden' : '';
+  document.body.style.overflow = (id === 'eopr') ? 'hidden' : '';
   if(id === 'cms') renderCmsTabs();
   if(id === 'staf') renderStaffManagementList();
+  if(id === 'galeri') loadGaleriSekolahStandalone();
 }
 
 /* =====================================================================
@@ -1901,9 +1748,11 @@ function showModule(id){
    keadaan tersebut, cuma tidak berkongsi merentasi peranti.
    ===================================================================== */
 const CMS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypJbiN7WhcGZvII2P21z5THtfMMOAi0FG33kD3Xmc-LYLlhUsKyBSVfZ4zoYD6y7JY/exec";
-// Kunci perkongsian ringkas - elak panggilan terus/rambang ke URL Apps Script oleh pihak luar.
-// Ini BUKAN keselamatan penuh (kod boleh dilihat di View Source), tapi menghalang kebanyakan cubaan tidak sengaja/automatik.
-const DASHBOARD_API_SECRET = "M6L1NmeZ_IaHsIJf6SQ-y98KSakyuaiJ";
+// Versi dashboard ni - kemas kini setiap kali diberi versi baharu oleh
+// Claude. Dibandingkan automatik dengan versi skrip Apps Script yang AKTIF
+// (fungsi semakVersiSkrip()) supaya senang detect kalau salah satu belum
+// dikemas kini/deploy.
+const DASHBOARD_VERSION = '2026-07-21-v1';
 // Skrip AI Proxy berasingan (berdiri sendiri, akaun peribadi) - khusus untuk
 // ciri "Bantu Tulis dengan AI". Berasingan daripada CMS_SCRIPT_URL supaya tiada
 // konflik kebenaran dengan akaun DELIMA yang memiliki Sheet CMS.
@@ -1982,7 +1831,6 @@ function renderCmsTabs(){
     <button onclick="selectCmsUnit('${unit}')" id="cms-tab-${unit.replace(/\s+/g,'')}" class="text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all shrink-0">${unit}</button>
   `).join('');
   if(currentUser.cmsUnits.length) selectCmsUnit(currentUser.cmsUnits[0]);
-  else selectCmsGaleriTab();
 }
 
 const CMS_SECTION_LABELS = {
@@ -2042,7 +1890,7 @@ async function aiAssist(fieldId, contextLabel){
     const res = await fetch(AI_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'aiGenerate', apiSecret: DASHBOARD_API_SECRET, context: contextLabel, roughText: roughText }),
+      body: JSON.stringify({ action: 'aiGenerate', context: contextLabel, roughText: roughText }),
       signal: controller.signal
     });
     clearTimeout(timeoutId);
@@ -2325,11 +2173,8 @@ async function selectCmsUnit(unit){
   cmsActiveUnit = unit;
   document.getElementById('cms-unit-panel').classList.remove('hidden');
   document.getElementById('cms-homepage-panel').classList.add('hidden');
-  document.getElementById('cms-galeri-panel').classList.add('hidden');
   const lamanUtamaTab = document.getElementById('cms-tab-lamanutama');
   if(lamanUtamaTab) lamanUtamaTab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
-  const galeriTab = document.getElementById('cms-tab-galeri');
-  if(galeriTab) galeriTab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
 
   currentUser.cmsUnits.forEach(u => {
     const tab = document.getElementById('cms-tab-' + u.replace(/\s+/g,''));
@@ -2344,10 +2189,10 @@ async function selectCmsUnit(unit){
   let db = loadCmsDb();
   fillCmsFields(unit, (typeof db[unit] === 'string' && db[unit].trim()!=='') ? db[unit] : '');
   statusEl.innerText = isCmsBackendConfigured() ? 'Menyemak kandungan terkini...' : 'Mod tempatan sahaja (storan dikongsi belum disediakan)';
+  renderCmsImageGrid([]); // kosongkan dahulu semasa tukar tab
   renderCartaRows([]);
   renderMinitList([]);
   renderCmsReportGrid([]);
-  renderCmsImageGrid([]);
 
   if(isCmsBackendConfigured()){
     const remote = await fetchCmsDbRemote();
@@ -2360,10 +2205,96 @@ async function selectCmsUnit(unit){
     } else {
       statusEl.innerText = 'Gagal sambung ke storan dikongsi - memapar salinan tempatan';
     }
+    loadCmsImages(unit);
     loadCartaForUnit(unit);
     loadMinitForUnit(unit);
     loadCmsReports(unit);
-    loadCmsImages(unit);
+    loadCmsGaleri();
+  }
+}
+
+function renderCmsImageGrid(images){
+  const grid = document.getElementById('cms-image-grid');
+  if(!grid) return;
+  if(!images.length){
+    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada gambar dimuat naik lagi untuk unit ini.</p>`;
+    return;
+  }
+  grid.innerHTML = images.map(img => `
+    <div class="relative group">
+      <a href="${img.imageUrl}" target="_blank" rel="noopener" class="block aspect-square rounded-xl overflow-hidden border border-line hover:border-sky transition-all bg-mist" style="background-image:url('${img.imageUrl}'); background-size:cover; background-position:center;" title="Buka saiz penuh"></a>
+      <button onclick="deleteCmsImage('${img.imageUrl}')" title="Padam gambar" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+        <i data-lucide="trash-2" class="w-3 h-3"></i>
+      </button>
+      ${img.caption ? `<p class="text-[10px] text-ink-faint mt-1 truncate" title="${img.caption.replace(/"/g,'&quot;')}">${img.caption}</p>` : ''}
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+async function loadCmsImages(unit){
+  try{
+    const res = await fetch(CMS_SCRIPT_URL + '?action=images');
+    if(!res.ok) throw new Error();
+    const all = await res.json();
+    if(cmsActiveUnit === unit){
+      renderCmsImageGrid(Array.isArray(all) ? all.filter(img => img.unit === unit) : []);
+    }
+  }catch(e){ /* senyap - gambar sedia ada takkan papar jika rangkaian gagal */ }
+}
+
+let cmsImageSelectedFile = null;
+function handleCmsImageChosen(event){
+  cmsImageSelectedFile = event.target.files[0] || null;
+  document.getElementById('cms-image-file-label').innerText = cmsImageSelectedFile ? cmsImageSelectedFile.name : 'Pilih Gambar';
+}
+
+async function uploadCmsImage(){
+  if(!cmsActiveUnit) return;
+  if(!isCmsBackendConfigured()){
+    showToast('Storan dikongsi belum disediakan lagi. Sila hubungi Penyelaras Digital.', 'error');
+    return;
+  }
+  if(!cmsImageSelectedFile){
+    showToast('Sila pilih gambar dahulu.', 'error');
+    return;
+  }
+  const caption = document.getElementById('cms-image-caption').value.trim();
+  showToast('Memuat naik gambar...', 'info');
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try{
+      await fetch(CMS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'uploadImage', unit: cmsActiveUnit, imageBase64: reader.result, caption: caption, editor: currentUser.name })
+      });
+      showToast('Gambar berjaya dimuat naik!', 'success');
+      document.getElementById('cms-image-caption').value = '';
+      document.getElementById('cms-image-file-input').value = '';
+      document.getElementById('cms-image-file-label').innerText = 'Pilih Gambar';
+      cmsImageSelectedFile = null;
+      setTimeout(() => loadCmsImages(cmsActiveUnit), 1200);
+    }catch(e){
+      showToast('Gagal muat naik gambar. Sila cuba semula.', 'error');
+    }
+  };
+  reader.readAsDataURL(cmsImageSelectedFile);
+}
+
+async function deleteCmsImage(imageUrl){
+  if(!confirm('Padam gambar ini? Tindakan ini tidak boleh diundur.')) return;
+  showToast('Memadam gambar...', 'info');
+  try{
+    await fetch(CMS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'deleteImage', imageUrl: imageUrl })
+    });
+    showToast('Gambar berjaya dipadam.', 'success');
+    setTimeout(() => loadCmsImages(cmsActiveUnit), 1000);
+  }catch(e){
+    showToast('Gagal padam gambar.', 'error');
   }
 }
 
@@ -2404,7 +2335,7 @@ async function deleteCmsReport(imageUrl){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteReport', apiSecret: DASHBOARD_API_SECRET, imageUrl: imageUrl })
+      body: JSON.stringify({ action: 'deleteReport', imageUrl: imageUrl })
     });
     showToast('Laporan berjaya dipadam.', 'success');
     setTimeout(() => loadCmsReports(cmsActiveUnit), 1000);
@@ -2416,41 +2347,13 @@ async function deleteCmsReport(imageUrl){
 /* ============================================================
    PANEL LAMAN UTAMA - Statistik, Profil, Takwim, Carta Utama, Foto Hero
    ============================================================ */
-/* ---- Bantuan generik: drag-and-drop untuk susun semula senarai ----
-   Panggil selepas render setiap kali. containerEl = bekas ibu, selector = elemen yang boleh diseret
-   (mesti ada atribut data-drag-idx="N"), onReordered(fromIdx, toIdx) = callback bila item dilepas. */
-function initDragReorder(containerEl, selector, onReordered){
-  if(!containerEl) return;
-  let fromIdx = null;
-  containerEl.querySelectorAll(selector).forEach(el => {
-    el.setAttribute('draggable', 'true');
-    el.addEventListener('dragstart', () => {
-      fromIdx = Number(el.getAttribute('data-drag-idx'));
-      el.classList.add('opacity-40');
-    });
-    el.addEventListener('dragend', () => { el.classList.remove('opacity-40'); });
-    el.addEventListener('dragover', e => { e.preventDefault(); });
-    el.addEventListener('drop', e => {
-      e.preventDefault();
-      const toIdx = Number(el.getAttribute('data-drag-idx'));
-      if(fromIdx === null || fromIdx === toIdx) return;
-      onReordered(fromIdx, toIdx);
-      fromIdx = null;
-    });
-  });
-}
-
 let hpTakwimData = [];
-let hpHeroPhotosCache = [];
-let hpPengumumanData = [];
 let hpCartaData = [];
 
 async function selectCmsHomepage(){
   document.getElementById('cms-unit-panel').classList.add('hidden');
-  document.getElementById('cms-galeri-panel').classList.add('hidden');
   document.getElementById('cms-homepage-panel').classList.remove('hidden');
   document.getElementById('cms-tab-lamanutama').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-gradient-to-r from-blue to-cyan text-white flex items-center gap-2 shrink-0';
-  document.getElementById('cms-tab-galeri').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
   currentUser.cmsUnits.forEach(u => {
     const tab = document.getElementById('cms-tab-' + u.replace(/\s+/g,''));
     if(tab) tab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 shrink-0';
@@ -2459,24 +2362,9 @@ async function selectCmsHomepage(){
   loadHpStatistik();
   loadHpProfil();
   loadHpTakwim();
-  loadHpPengumuman();
   loadHpCartaUtama();
   loadHpHeroPhotos();
   loadHpGaleri();
-}
-
-async function selectCmsGaleriTab(){
-  document.getElementById('cms-unit-panel').classList.add('hidden');
-  document.getElementById('cms-homepage-panel').classList.add('hidden');
-  document.getElementById('cms-galeri-panel').classList.remove('hidden');
-  document.getElementById('cms-tab-galeri').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-gradient-to-r from-blue to-cyan text-white flex items-center gap-2 shrink-0';
-  document.getElementById('cms-tab-lamanutama').className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 flex items-center gap-2 shrink-0';
-  currentUser.cmsUnits.forEach(u => {
-    const tab = document.getElementById('cms-tab-' + u.replace(/\s+/g,''));
-    if(tab) tab.className = 'text-left px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-mist text-ink-soft hover:bg-navy-50 shrink-0';
-  });
-
-  loadCmsGaleriTab();
 }
 
 /* ---- Statistik ---- */
@@ -2490,43 +2378,37 @@ async function loadHpStatistik(){
     document.getElementById('hp-stat-guru').value = d.guru || '';
     document.getElementById('hp-stat-staf').value = d.staf || '';
     document.getElementById('hp-stat-kelas').value = d.kelas || '';
-    document.getElementById('hp-stat-murid-lelaki').value = d.muridLelaki || '';
-    document.getElementById('hp-stat-murid-perempuan').value = d.muridPerempuan || '';
-    document.getElementById('hp-stat-kelas-pra').value = d.kelasPra || '';
-    document.getElementById('hp-stat-kelas-tahun16').value = d.kelasTahun16 || '';
   }catch(e){ /* senyap - kekal kosong jika gagal */ }
   updateHpStatistikPreview();
 }
-// Previu statistik - macam mana 4 kad akan nampak di laman utama.
+// Previu statistik - macam mana 4 kaunter akan nampak di laman utama.
 function updateHpStatistikPreview(){
   const box = document.getElementById('hp-statistik-preview');
   if(!box) return;
-  const v = id => document.getElementById(id).value;
   const items = [
-    { label:'Murid', val:v('hp-stat-murid'), color:'#2563EB', sub:`Lelaki: ${v('hp-stat-murid-lelaki')||0} | Perempuan: ${v('hp-stat-murid-perempuan')||0}` },
-    { label:'Guru', val:v('hp-stat-guru'), color:'#16A34A', sub:null },
-    { label:'Staf', val:v('hp-stat-staf'), color:'#7C3AED', sub:null },
-    { label:'Kelas', val:v('hp-stat-kelas'), color:'#EA7A1E', sub:`Pra Sekolah: ${v('hp-stat-kelas-pra')||0} | Tahun 1-6: ${v('hp-stat-kelas-tahun16')||0}` }
+    ['Murid', document.getElementById('hp-stat-murid').value],
+    ['Guru', document.getElementById('hp-stat-guru').value],
+    ['Staf', document.getElementById('hp-stat-staf').value],
+    ['Kelas', document.getElementById('hp-stat-kelas').value]
   ];
-  box.innerHTML = items.map(it => `
-    <div class="bg-white border border-line rounded-xl p-3">
-      <p class="font-display font-semibold text-2xl leading-none" style="color:${it.color}">${it.val || '0'}</p>
-      <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mt-1">${it.label}</p>
-      ${it.sub ? `<p class="text-[10px] text-ink-faint mt-1">${it.sub}</p>` : ''}
+  box.innerHTML = items.map(([label, val]) => `
+    <div class="bg-white border border-line rounded-xl p-4 text-center">
+      <p class="font-display font-semibold text-2xl text-navy leading-none">${val || '0'}</p>
+      <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint mt-1">${label}</p>
     </div>`).join('');
 }
 async function saveHpStatistik(){
   showToast('Menyimpan statistik...', 'info');
   try{
-    const v = id => Number(document.getElementById(id).value) || 0;
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'saveStatistik', apiSecret: DASHBOARD_API_SECRET,
-        murid: v('hp-stat-murid'), guru: v('hp-stat-guru'), staf: v('hp-stat-staf'), kelas: v('hp-stat-kelas'),
-        muridLelaki: v('hp-stat-murid-lelaki'), muridPerempuan: v('hp-stat-murid-perempuan'),
-        kelasPra: v('hp-stat-kelas-pra'), kelasTahun16: v('hp-stat-kelas-tahun16'),
+        action: 'saveStatistik',
+        murid: Number(document.getElementById('hp-stat-murid').value) || 0,
+        guru: Number(document.getElementById('hp-stat-guru').value) || 0,
+        staf: Number(document.getElementById('hp-stat-staf').value) || 0,
+        kelas: Number(document.getElementById('hp-stat-kelas').value) || 0,
         editor: currentUser.name
       })
     });
@@ -2614,7 +2496,7 @@ function uploadFotoGuruBesar(event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadfotogurubesar', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadfotogurubesar', imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
@@ -2641,7 +2523,7 @@ async function saveHpProfil(){
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'saveProfil', apiSecret: DASHBOARD_API_SECRET,
+        action: 'saveProfil',
         visi: document.getElementById('hp-profil-visi').value,
         misi: document.getElementById('hp-profil-misi').value,
         moto: document.getElementById('hp-profil-moto').value,
@@ -2723,87 +2605,10 @@ async function saveHpTakwim(){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'saveTakwim', apiSecret: DASHBOARD_API_SECRET, events: hpTakwimData, editor: currentUser.name })
+      body: JSON.stringify({ action: 'saveTakwim', events: hpTakwimData, editor: currentUser.name })
     });
     showToast('Takwim berjaya disimpan.', 'success');
   }catch(e){ showToast('Gagal simpan takwim.', 'error'); }
-}
-
-/* ---- Pengumuman Penting (jalur atas laman utama) ---- */
-async function loadHpPengumuman(){
-  try{
-    const res = await fetch(CMS_SCRIPT_URL + '?action=pengumumansemua');
-    if(!res.ok) return;
-    const d = await res.json();
-    hpPengumumanData = Array.isArray(d) ? d : [];
-    renderHpPengumumanList();
-  }catch(e){ /* senyap */ }
-}
-function renderHpPengumumanList(){
-  const container = document.getElementById('hp-pengumuman-list');
-  if(!container) return;
-  if(!hpPengumumanData.length){
-    container.innerHTML = `<p class="text-xs text-ink-faint italic">Tiada pengumuman lagi. Klik "Tambah Pengumuman".</p>`;
-    updateHpPengumumanPreview();
-    return;
-  }
-  container.innerHTML = hpPengumumanData.map((it, idx) => `
-    <div class="bg-mist rounded-xl p-3 space-y-2">
-      <input type="text" value="${(it.tajuk||'').replace(/"/g,'&quot;')}" placeholder="Teks pengumuman (cth. Mesyuarat PIBG pada 5 Ogos)" oninput="hpPengumumanData[${idx}].tajuk=this.value; updateHpPengumumanPreview()" class="w-full bg-white border border-line rounded-lg px-3 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-      <div class="grid grid-cols-2 xl:grid-cols-[1fr_1fr_auto_auto_auto] gap-2 items-center">
-        <input type="date" value="${it.tarikhMula||''}" oninput="hpPengumumanData[${idx}].tarikhMula=this.value; updateHpPengumumanPreview()" title="Mula papar" class="bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-        <input type="date" value="${it.tarikhTamat||''}" oninput="hpPengumumanData[${idx}].tarikhTamat=this.value; updateHpPengumumanPreview()" title="Luput selepas" class="bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-        <input type="number" value="${it.keutamaan||0}" oninput="hpPengumumanData[${idx}].keutamaan=Number(this.value); updateHpPengumumanPreview()" title="Keutamaan (nombor lebih tinggi papar dulu)" class="w-16 bg-white border border-line rounded-lg px-2 py-2 text-xs text-ink focus:ring-2 focus:ring-navy focus:outline-none">
-        <label class="inline-flex items-center gap-1.5 text-[11px] font-bold text-ink-soft px-1"><input type="checkbox" ${it.aktif !== false ? 'checked' : ''} onchange="hpPengumumanData[${idx}].aktif=this.checked; updateHpPengumumanPreview()" class="rounded border-line text-navy focus:ring-navy"> Aktif</label>
-        <button onclick="removeHpPengumumanRow(${idx})" class="text-rose-500 hover:text-rose-700 p-2 justify-self-end"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-      </div>
-    </div>
-  `).join('');
-  lucide.createIcons();
-  updateHpPengumumanPreview();
-}
-// Previu - tiru logik laman awam: pengumuman aktif & belum luput, keutamaan tertinggi dulu.
-function updateHpPengumumanPreview(){
-  const box = document.getElementById('hp-pengumuman-preview');
-  if(!box) return;
-  const today = new Date(); today.setHours(0,0,0,0);
-  const valid = hpPengumumanData.filter(it => {
-    if(!it.tajuk || it.tajuk.trim() === '') return false;
-    if(it.aktif === false) return false;
-    const endDate = it.tarikhTamat || it.tarikhMula;
-    if(endDate && new Date(endDate + 'T23:59:59') < today) return false;
-    return true;
-  }).sort((a,b) => (b.keutamaan||0) - (a.keutamaan||0));
-  if(!valid.length){
-    box.innerHTML = '<p class="text-xs text-ink-faint italic">Tiada pengumuman aktif - jalur atas akan papar acara Takwim terdekat secara automatik.</p>';
-    return;
-  }
-  box.innerHTML = valid.map((it, i) => `
-    <div class="bg-navy rounded-xl px-4 py-3 flex items-center gap-2 ${i===0 ? '' : 'opacity-50'}">
-      <i data-lucide="megaphone" class="w-3.5 h-3.5 text-gold shrink-0"></i>
-      <span class="text-sm font-semibold text-white">${it.tajuk}</span>
-      ${i===0 ? '<span class="ml-auto text-[10px] font-bold text-gold uppercase">Papar</span>' : '<span class="ml-auto text-[10px] font-bold text-white/40 uppercase">Giliran</span>'}
-    </div>`).join('');
-  lucide.createIcons();
-}
-function addHpPengumumanRow(){
-  hpPengumumanData.push({ tajuk: '', tarikhMula: '', tarikhTamat: '', aktif: true, keutamaan: 0 });
-  renderHpPengumumanList();
-}
-function removeHpPengumumanRow(idx){
-  hpPengumumanData.splice(idx, 1);
-  renderHpPengumumanList();
-}
-async function saveHpPengumuman(){
-  showToast('Menyimpan pengumuman...', 'info');
-  try{
-    await fetch(CMS_SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'savePengumuman', apiSecret: DASHBOARD_API_SECRET, items: hpPengumumanData, editor: currentUser.name })
-    });
-    showToast('Pengumuman berjaya disimpan.', 'success');
-  }catch(e){ showToast('Gagal simpan pengumuman.', 'error'); }
 }
 
 /* ---- Carta Organisasi Utama ---- */
@@ -2824,8 +2629,7 @@ function renderHpCartaList(){
     return;
   }
   container.innerHTML = hpCartaData.map((m, idx) => `
-    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center" data-drag-idx="${idx}">
-      <i data-lucide="grip-vertical" class="w-4 h-4 text-ink-faint cursor-grab shrink-0 hidden xl:block" title="Seret untuk susun semula"></i>
+    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center">
       <div class="relative w-14 h-14 rounded-full overflow-hidden bg-white border border-line shrink-0 mx-auto sm:mx-0" style="background-image:url('${m.urlFoto||''}'); background-size:cover; background-position:center;">
         ${!m.urlFoto ? '<div class="w-full h-full flex items-center justify-center text-ink-faint"><i data-lucide="user" class="w-5 h-5"></i></div>' : ''}
         <label class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all">
@@ -2847,11 +2651,6 @@ function renderHpCartaList(){
   `).join('');
   lucide.createIcons();
   updateHpCartaUtamaPreview();
-  initDragReorder(container, '[data-drag-idx]', (fromIdx, toIdx) => {
-    const [moved] = hpCartaData.splice(fromIdx, 1);
-    hpCartaData.splice(toIdx, 0, moved);
-    renderHpCartaList();
-  });
 }
 // Previu Carta Organisasi Utama - macam mana kad hierarki akan nampak di laman utama.
 function updateHpCartaUtamaPreview(){
@@ -2890,7 +2689,7 @@ function uploadHpCartaPhoto(idx, event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadCartaUtamaFoto', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadCartaUtamaFoto', imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
@@ -2908,30 +2707,14 @@ async function saveHpCartaUtama(){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'saveCartaUtama', apiSecret: DASHBOARD_API_SECRET, members: hpCartaData, editor: currentUser.name })
+      body: JSON.stringify({ action: 'saveCartaUtama', members: hpCartaData, editor: currentUser.name })
     });
     showToast('Carta organisasi berjaya disimpan.', 'success');
   }catch(e){ showToast('Gagal simpan carta organisasi.', 'error'); }
 }
 
-/* ---- Foto Hero: akses terhad kepada Guru Besar, GPK & Guru ICT ----
-   Semakan guna LabelPeranan (cmsRoleLabel) 'Guru ICT' pada rekod staf. */
-const HERO_MANAGER_ROLE_LABEL = 'Guru ICT';
-function canManageHeroPhotos(){
-  if(!currentUser) return false;
-  const pos = (currentUser.position || '').trim();
-  if(pos === 'Guru Besar') return true;
-  if(pos.indexOf('Guru Penolong Kanan') === 0) return true; // GPK (semua bidang)
-  if((currentUser.cmsRoleLabel || '').trim() === HERO_MANAGER_ROLE_LABEL) return true; // Guru ICT
-  return false;
-}
+/* ---- Foto Hero ---- */
 async function loadHpHeroPhotos(){
-  const allowed = canManageHeroPhotos();
-  const controls = document.getElementById('hp-hero-controls');
-  const noAccess = document.getElementById('hp-hero-no-access');
-  if(controls) controls.classList.toggle('hidden', !allowed);
-  if(noAccess) noAccess.classList.toggle('hidden', allowed);
-  if(!allowed) return;
   try{
     const res = await fetch(CMS_SCRIPT_URL + '?action=fotohero');
     if(!res.ok) return;
@@ -2945,32 +2728,16 @@ function renderHpHeroGrid(photos){
     grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto hero dimuat naik lagi.</p>`;
     return;
   }
-  hpHeroPhotosCache = photos;
-  grid.innerHTML = photos.map((p, idx) => `
-    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line cursor-grab" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" data-drag-idx="${idx}">
-      <div class="absolute top-1 left-1 w-5 h-5 rounded-full bg-slate-900/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all pointer-events-none"><i data-lucide="grip-vertical" class="w-3 h-3 text-white"></i></div>
+  grid.innerHTML = photos.map(p => `
+    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;">
       <button onclick="deleteHpHeroPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
         <i data-lucide="trash-2" class="w-3 h-3"></i>
       </button>
     </div>
   `).join('');
   lucide.createIcons();
-  initDragReorder(grid, '[data-drag-idx]', async (fromIdx, toIdx) => {
-    const [moved] = hpHeroPhotosCache.splice(fromIdx, 1);
-    hpHeroPhotosCache.splice(toIdx, 0, moved);
-    renderHpHeroGrid(hpHeroPhotosCache);
-    try{
-      await fetch(CMS_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'reorderFotoHero', apiSecret: DASHBOARD_API_SECRET, urutan: hpHeroPhotosCache.map(p => p.urlFoto), editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
-      });
-      showToast('Susunan Foto Hero disimpan.', 'success');
-    }catch(e){ showToast('Gagal simpan susunan. Cuba lagi.', 'error'); }
-  });
 }
 function uploadHpHeroPhoto(event){
-  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
@@ -2980,7 +2747,7 @@ function uploadHpHeroPhoto(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadFotoHero', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+        body: JSON.stringify({ action: 'uploadFotoHero', imageBase64: e.target.result, editor: currentUser.name })
       });
       showToast('Foto hero berjaya dimuat naik.', 'success');
       setTimeout(loadHpHeroPhotos, 1200);
@@ -2989,157 +2756,62 @@ function uploadHpHeroPhoto(event){
   reader.readAsDataURL(file);
 }
 async function deleteHpHeroPhoto(urlFoto){
-  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
   if(!confirm('Padam foto hero ini?')) return;
   try{
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteFotoHero', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
+      body: JSON.stringify({ action: 'deleteFotoHero', urlFoto: urlFoto })
     });
     showToast('Foto hero dipadam.', 'success');
     setTimeout(loadHpHeroPhotos, 1000);
   }catch(e){ showToast('Gagal padam foto hero.', 'error'); }
 }
 
-/* ---- Foto Hero: pilih terus dari Galeri Sekolah (tick/nyahtick), tanpa muat naik semula ---- */
-let hpHeroGaleriPickerOpen = false;
-let hpHeroGaleriPhotosCache = [];
-let hpHeroUrlSet = new Set();
-
-function toggleHpHeroGaleriPicker(){
-  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
-  hpHeroGaleriPickerOpen = !hpHeroGaleriPickerOpen;
-  const box = document.getElementById('hp-hero-galeri-picker');
-  if(box) box.classList.toggle('hidden', !hpHeroGaleriPickerOpen);
-  if(hpHeroGaleriPickerOpen) loadHpHeroGaleriPicker();
-}
-
-async function loadHpHeroGaleriPicker(){
-  const grid = document.getElementById('hp-hero-galeri-grid');
-  if(!grid) return;
-  grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Memuatkan galeri...</p>`;
+/* ---- Galeri Sekolah (dikongsi semua unit - dipanggil dari tab Kandungan Unit) ---- */
+async function loadCmsGaleri(){
   try{
-    const [galeriRes, heroRes] = await Promise.all([
-      fetch(CMS_SCRIPT_URL + '?action=galeri'),
-      fetch(CMS_SCRIPT_URL + '?action=fotohero')
-    ]);
-    const galeriPhotos = galeriRes.ok ? await galeriRes.json() : [];
-    const heroPhotos = heroRes.ok ? await heroRes.json() : [];
-    hpHeroGaleriPhotosCache = Array.isArray(galeriPhotos) ? galeriPhotos : [];
-    hpHeroUrlSet = new Set((Array.isArray(heroPhotos) ? heroPhotos : []).map(p => p.urlFoto));
-    renderHpHeroGaleriGrid();
-  }catch(e){ grid.innerHTML = `<p class="col-span-full text-xs text-rose-500 italic">Gagal memuatkan Galeri Sekolah.</p>`; }
+    const res = await fetch(CMS_SCRIPT_URL + '?action=galeri');
+    if(!res.ok) return;
+    const d = await res.json();
+    renderCmsGaleriGrid(Array.isArray(d) ? d : []);
+  }catch(e){ /* senyap */ }
 }
-
-function renderHpHeroGaleriGrid(){
-  const grid = document.getElementById('hp-hero-galeri-grid');
+function renderCmsGaleriGrid(photos){
+  const grid = document.getElementById('cms-galeri-grid');
   if(!grid) return;
-  if(!hpHeroGaleriPhotosCache.length){
-    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto dalam Galeri Sekolah lagi.</p>`;
+  if(!photos.length){
+    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto galeri dimuat naik lagi.</p>`;
     return;
   }
-  grid.innerHTML = hpHeroGaleriPhotosCache.map(p => {
-    const checked = hpHeroUrlSet.has(p.urlFoto);
+  grid.innerHTML = photos.map(p => {
     const label = [p.namaProgram, p.tempat].filter(Boolean).join(' &bull; ');
-    const safeUrl = p.urlFoto.replace(/'/g, "\\'");
+    const fullInfo = [p.namaProgram, p.tarikh, p.tempat].filter(Boolean).join(' | ');
     return `
-    <button type="button" onclick="toggleHpHeroFromGaleri('${safeUrl}')" class="relative aspect-square rounded-xl overflow-hidden border-2 ${checked ? 'border-navy' : 'border-line'} text-left transition-all" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${label}">
-      <span class="absolute inset-0 ${checked ? 'bg-navy/25' : 'bg-black/0 group-hover:bg-black/10'}"></span>
-      <span class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center border border-white/70 ${checked ? 'bg-navy text-white' : 'bg-white/70 text-transparent'}">
-        <i data-lucide="check" class="w-3 h-3"></i>
-      </span>
-      ${label ? `<span class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</span>` : ''}
-    </button>`;
+    <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${fullInfo}">
+      ${label ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</div>` : ''}
+      <button onclick="deleteHpGaleriPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+        <i data-lucide="trash-2" class="w-3 h-3"></i>
+      </button>
+    </div>`;
   }).join('');
   lucide.createIcons();
 }
+async function uploadCmsGaleriPhotos(event){
+  const files = Array.from(event.target.files || []);
+  if(!files.length) return;
 
-async function toggleHpHeroFromGaleri(urlFoto){
-  if(!canManageHeroPhotos()){ showToast('Anda tiada akses untuk urus Foto Hero.', 'error'); return; }
-  const alreadyIn = hpHeroUrlSet.has(urlFoto);
-  // Optimistik: kemas kini paparan dahulu, hantar permintaan pada masa sama
-  if(alreadyIn) hpHeroUrlSet.delete(urlFoto); else hpHeroUrlSet.add(urlFoto);
-  renderHpHeroGaleriGrid();
-  try{
-    if(alreadyIn){
-      await fetch(CMS_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'deleteFotoHero', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
-      });
-      showToast('Foto dibuang dari slaid hero.', 'success');
-    } else {
-      await fetch(CMS_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'addFotoHeroLink', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto, editor: currentUser.name, editorPosition: currentUser.position || '', editorRoleLabel: currentUser.cmsRoleLabel || '' })
-      });
-      showToast('Foto ditambah ke slaid hero.', 'success');
-    }
-    setTimeout(loadHpHeroPhotos, 900);
-  }catch(e){
-    // gagal - kembalikan status asal
-    if(alreadyIn) hpHeroUrlSet.add(urlFoto); else hpHeroUrlSet.delete(urlFoto);
-    renderHpHeroGaleriGrid();
-    showToast('Tindakan gagal, cuba lagi.', 'error');
-  }
-}
+  const namaProgram = document.getElementById('cms-galeri-program').value.trim();
+  const tarikh = document.getElementById('cms-galeri-tarikh').value;
+  const tempat = document.getElementById('cms-galeri-tempat').value.trim();
 
-/* ---- Galeri Aktiviti Unit (khusus unit ini sahaja - dipanggil dari tab Kandungan Unit) ---- */
-function renderCmsImageGrid(images){
-  const grid = document.getElementById('cms-image-grid');
-  if(!grid) return;
-  if(!images.length){
-    grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada gambar dimuat naik lagi untuk unit ini.</p>`;
-    return;
-  }
-  grid.innerHTML = images.map(img => `
-    <div class="relative group">
-      <a href="${img.imageUrl}" target="_blank" rel="noopener" class="block aspect-square rounded-xl overflow-hidden border border-line hover:border-sky transition-all bg-mist" style="background-image:url('${img.imageUrl}'); background-size:cover; background-position:center;" title="Buka saiz penuh"></a>
-      <button onclick="deleteCmsImage('${img.imageUrl}')" title="Padam gambar" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-        <i data-lucide="trash-2" class="w-3 h-3"></i>
-      </button>
-      ${(() => { const label = [img.caption, img.tempat].filter(Boolean).join(' \u2022 '); return label ? `<p class="text-[10px] text-ink-faint mt-1 truncate" title="${label.replace(/"/g,'&quot;')}">${label}</p>` : ''; })()}
-    </div>
-  `).join('');
-  lucide.createIcons();
-}
-
-async function loadCmsImages(unit){
-  try{
-    const res = await fetch(CMS_SCRIPT_URL + '?action=images');
-    if(!res.ok) throw new Error();
-    const all = await res.json();
-    if(cmsActiveUnit === unit){
-      renderCmsImageGrid(Array.isArray(all) ? all.filter(img => img.unit === unit) : []);
-    }
-  }catch(e){ /* senyap - gambar sedia ada takkan papar jika rangkaian gagal */ }
-}
-
-let cmsImageSelectedFiles = [];
-function handleCmsImagesChosen(event){
-  cmsImageSelectedFiles = Array.from(event.target.files || []);
-  const label = document.getElementById('cms-image-file-label');
-  if(label) label.innerText = cmsImageSelectedFiles.length ? `${cmsImageSelectedFiles.length} gambar dipilih` : 'Pilih Gambar (Satu atau Banyak Sekali Gus)';
-}
-
-async function uploadCmsImagePhotos(){
-  if(!cmsActiveUnit) return;
-  if(!isCmsBackendConfigured()){
-    showToast('Storan dikongsi belum disediakan lagi. Sila hubungi Guru ICT.', 'error');
-    return;
-  }
-  const files = cmsImageSelectedFiles;
-  if(!files.length){
-    showToast('Sila pilih gambar dahulu.', 'error');
+  if(!namaProgram){
+    showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
+    event.target.value = '';
     return;
   }
 
-  const caption = document.getElementById('cms-image-caption').value.trim();
-  const tarikhProgram = document.getElementById('cms-image-tarikh').value;
-  const tempat = document.getElementById('cms-image-tempat').value.trim();
-  const progressEl = document.getElementById('cms-image-progress');
+  const progressEl = document.getElementById('cms-galeri-progress');
   progressEl.classList.remove('hidden');
 
   let uploaded = 0;
@@ -3149,40 +2821,18 @@ async function uploadCmsImagePhotos(){
       const dataUrl = await readFileAsDataUrl_(file);
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'uploadImage', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, imageBase64: dataUrl, caption: caption, tempat: tempat, tarikhProgram: tarikhProgram, editor: currentUser.name })
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       await new Promise(r => setTimeout(r, 400));
     }catch(err){ /* teruskan ke fail seterusnya walaupun satu gagal */ }
   }
 
-  cmsImageSelectedFiles = [];
-  document.getElementById('cms-image-file-input').value = '';
-  const label = document.getElementById('cms-image-file-label');
-  if(label) label.innerText = 'Pilih Gambar (Satu atau Banyak Sekali Gus)';
-  progressEl.innerText = `Selesai! ${uploaded} / ${files.length} gambar berjaya dimuat naik.`;
-  showToast(`${uploaded} gambar berjaya dimuat naik.`, 'success');
-  document.getElementById('cms-image-caption').value = '';
-  document.getElementById('cms-image-tarikh').value = '';
-  document.getElementById('cms-image-tempat').value = '';
-  setTimeout(() => { progressEl.classList.add('hidden'); loadCmsImages(cmsActiveUnit); }, 1500);
-}
-
-async function deleteCmsImage(imageUrl){
-  if(!confirm('Padam gambar ini? Tindakan ini tidak boleh diundur.')) return;
-  showToast('Memadam gambar...', 'info');
-  try{
-    await fetch(CMS_SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteImage', apiSecret: DASHBOARD_API_SECRET, imageUrl: imageUrl })
-    });
-    showToast('Gambar berjaya dipadam.', 'success');
-    setTimeout(() => loadCmsImages(cmsActiveUnit), 1000);
-  }catch(e){
-    showToast('Gagal padam gambar.', 'error');
-  }
+  progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
+  showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
+  event.target.value = '';
+  setTimeout(() => { progressEl.classList.add('hidden'); loadCmsGaleri(); }, 1500);
 }
 
 /* ---- Galeri Sekolah ---- */
@@ -3248,7 +2898,7 @@ async function uploadHpGaleriPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       // Jeda kecil antara setiap muat naik supaya tak bebankan backend serentak semasa upload pukal.
@@ -3259,7 +2909,7 @@ async function uploadHpGaleriPhotos(event){
   progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
   showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
   event.target.value = '';
-  setTimeout(() => { progressEl.classList.add('hidden'); loadHpGaleri(); loadCmsGaleriTab(); }, 1500);
+  setTimeout(() => { progressEl.classList.add('hidden'); loadHpGaleri(); }, 1500);
 }
 async function deleteHpGaleriPhoto(urlFoto){
   if(!confirm('Padam foto galeri ini?')) return;
@@ -3267,26 +2917,24 @@ async function deleteHpGaleriPhoto(urlFoto){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteGaleri', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto })
+      body: JSON.stringify({ action: 'deleteGaleri', urlFoto: urlFoto })
     });
     showToast('Foto galeri dipadam.', 'success');
-    setTimeout(() => { loadHpGaleri(); loadCmsGaleriTab(); }, 1000);
+    setTimeout(() => { loadHpGaleri(); loadCmsGaleri(); loadGaleriSekolahStandalone(); }, 1000);
   }catch(e){ showToast('Gagal padam foto galeri.', 'error'); }
 }
 
-/* ---- Galeri Sekolah (tab berasingan - boleh diakses SEMUA staf) ---- */
-/* Guna endpoint backend yang sama (action=galeri) - kongsi data sama dengan panel Laman Utama,
-   cuma ID elemen berbeza supaya dua UI ni boleh wujud serentak tanpa berlanggar. */
-async function loadCmsGaleriTab(){
+/* ---- Galeri Sekolah (modul berdiri sendiri - terbuka untuk SEMUA staf) ---- */
+async function loadGaleriSekolahStandalone(){
   try{
     const res = await fetch(CMS_SCRIPT_URL + '?action=galeri');
     if(!res.ok) return;
     const d = await res.json();
-    renderCmsGaleriTabGrid(Array.isArray(d) ? d : []);
+    renderGaleriStandaloneGrid(Array.isArray(d) ? d : []);
   }catch(e){ /* senyap */ }
 }
-function renderCmsGaleriTabGrid(photos){
-  const grid = document.getElementById('cms-galeri-tab-grid');
+function renderGaleriStandaloneGrid(photos){
+  const grid = document.getElementById('galeri-standalone-grid');
   if(!grid) return;
   if(!photos.length){
     grid.innerHTML = `<p class="col-span-full text-xs text-ink-faint italic">Tiada foto galeri dimuat naik lagi.</p>`;
@@ -3298,20 +2946,20 @@ function renderCmsGaleriTabGrid(photos){
     return `
     <div class="relative group aspect-square rounded-xl overflow-hidden border border-line" style="background-image:url('${p.urlFoto}'); background-size:cover; background-position:center;" title="${fullInfo}">
       ${label ? `<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-2 py-1 truncate">${label}</div>` : ''}
-      <button onclick="deleteCmsGaleriTabPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+      <button onclick="deleteHpGaleriPhoto('${p.urlFoto}')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
         <i data-lucide="trash-2" class="w-3 h-3"></i>
       </button>
     </div>`;
   }).join('');
   lucide.createIcons();
 }
-async function uploadCmsGaleriTabPhotos(event){
+async function uploadGaleriStandalone(event){
   const files = Array.from(event.target.files || []);
   if(!files.length) return;
 
-  const namaProgram = document.getElementById('cms-galeri-tab-program').value.trim();
-  const tarikh = document.getElementById('cms-galeri-tab-tarikh').value;
-  const tempat = document.getElementById('cms-galeri-tab-tempat').value.trim();
+  const namaProgram = document.getElementById('galeri-standalone-program').value.trim();
+  const tarikh = document.getElementById('galeri-standalone-tarikh').value;
+  const tempat = document.getElementById('galeri-standalone-tempat').value.trim();
 
   if(!namaProgram){
     showToast('Sila isi Nama Program dahulu sebelum muat naik.', 'error');
@@ -3319,7 +2967,7 @@ async function uploadCmsGaleriTabPhotos(event){
     return;
   }
 
-  const progressEl = document.getElementById('cms-galeri-tab-progress');
+  const progressEl = document.getElementById('galeri-standalone-progress');
   progressEl.classList.remove('hidden');
 
   let uploaded = 0;
@@ -3330,7 +2978,7 @@ async function uploadCmsGaleriTabPhotos(event){
       await fetch(CMS_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadGaleri', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
+        body: JSON.stringify({ action: 'uploadGaleri', imageBase64: dataUrl, namaProgram: namaProgram, tarikh: tarikh, tempat: tempat, editor: currentUser.name })
       });
       uploaded++;
       await new Promise(r => setTimeout(r, 400));
@@ -3340,19 +2988,7 @@ async function uploadCmsGaleriTabPhotos(event){
   progressEl.innerText = `Selesai! ${uploaded} / ${files.length} foto berjaya dimuat naik.`;
   showToast(`${uploaded} foto galeri berjaya dimuat naik.`, 'success');
   event.target.value = '';
-  setTimeout(() => { progressEl.classList.add('hidden'); loadCmsGaleriTab(); loadHpGaleri(); }, 1500);
-}
-async function deleteCmsGaleriTabPhoto(urlFoto){
-  if(!confirm('Padam foto galeri ini?')) return;
-  try{
-    await fetch(CMS_SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'deleteGaleri', apiSecret: DASHBOARD_API_SECRET, urlFoto: urlFoto })
-    });
-    showToast('Foto galeri dipadam.', 'success');
-    setTimeout(() => { loadCmsGaleriTab(); loadHpGaleri(); }, 1000);
-  }catch(e){ showToast('Gagal padam foto galeri.', 'error'); }
+  setTimeout(() => { progressEl.classList.add('hidden'); loadGaleriSekolahStandalone(); }, 1500);
 }
 
 
@@ -3400,8 +3036,7 @@ function renderCartaRows(){
     return;
   }
   box.innerHTML = cartaState.map((m, idx) => `
-    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center" data-drag-idx="${idx}">
-      <i data-lucide="grip-vertical" class="w-4 h-4 text-ink-faint cursor-grab shrink-0 hidden xl:block" title="Seret untuk susun semula"></i>
+    <div class="bg-mist rounded-xl p-3 flex flex-col xl:flex-row gap-2 xl:items-center">
       <div class="relative w-12 h-12 rounded-full overflow-hidden bg-white border border-line shrink-0 mx-auto xl:mx-0" style="background-image:url('${m.urlFoto||''}'); background-size:cover; background-position:center;">
         ${!m.urlFoto ? '<div class="w-full h-full flex items-center justify-center text-ink-faint"><i data-lucide="user" class="w-5 h-5"></i></div>' : ''}
         <label class="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-all">
@@ -3423,11 +3058,6 @@ function renderCartaRows(){
   `).join('');
   lucide.createIcons();
   updateCartaUnitPreview();
-  initDragReorder(box, '[data-drag-idx]', (fromIdx, toIdx) => {
-    const [moved] = cartaState.splice(fromIdx, 1);
-    cartaState.splice(toIdx, 0, moved);
-    renderCartaRows();
-  });
 }
 function uploadCartaUnitPhoto(idx, event){
   const file = event.target.files[0];
@@ -3439,7 +3069,7 @@ function uploadCartaUnitPhoto(idx, event){
       const res = await fetch(CMS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'uploadcartaunitfoto', apiSecret: DASHBOARD_API_SECRET, imageBase64: e.target.result })
+        body: JSON.stringify({ action: 'uploadcartaunitfoto', imageBase64: e.target.result })
       });
       const data = await res.json();
       if(data && data.imageUrl){
@@ -3494,15 +3124,7 @@ async function loadCartaForUnit(unit){
     if(!res.ok) throw new Error();
     const all = await res.json();
     if(cmsActiveUnit === unit){
-      const filtered = Array.isArray(all) ? all.filter(m => m.unit === unit).map(m => ({ nama:m.nama, jawatan:m.jawatan, tier:m.tier||3, urlFoto:m.urlFoto||'' })) : [];
-      // Buang rekod pendua (nama + jawatan sama) - data lama mungkin ada baris berulang di Sheet
-      const seen = new Set();
-      cartaState = filtered.filter(m => {
-        const key = (m.nama||'').trim().toLowerCase() + '|' + (m.jawatan||'').trim().toLowerCase();
-        if(seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
+      cartaState = Array.isArray(all) ? all.filter(m => m.unit === unit).map(m => ({ nama:m.nama, jawatan:m.jawatan, tier:m.tier||3, urlFoto:m.urlFoto||'' })) : [];
       renderCartaRows();
     }
   }catch(e){ /* senyap - kekal senarai kosong jika rangkaian gagal */ }
@@ -3519,7 +3141,7 @@ async function saveCartaUnit(){
     await fetch(CMS_SCRIPT_URL, {
       method:'POST', mode:'no-cors',
       headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ action:'saveCarta', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, members: cartaState.filter(m=>m.nama && m.nama.trim()!==''), editor: currentUser.name })
+      body: JSON.stringify({ action:'saveCarta', unit: cmsActiveUnit, members: cartaState.filter(m=>m.nama && m.nama.trim()!==''), editor: currentUser.name })
     });
     status.innerText = 'Disimpan ' + new Date().toLocaleTimeString('ms-MY');
     showToast('Carta Organisasi berjaya dikemas kini!', 'success');
@@ -3563,7 +3185,7 @@ async function deleteCmsMinit(fileUrl){
     await fetch(CMS_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteMinit', apiSecret: DASHBOARD_API_SECRET, fileUrl: fileUrl })
+      body: JSON.stringify({ action: 'deleteMinit', fileUrl: fileUrl })
     });
     showToast('Minit mesyuarat berjaya dipadam.', 'success');
     setTimeout(() => loadMinitForUnit(cmsActiveUnit), 1000);
@@ -3599,7 +3221,7 @@ async function uploadMinit(){
       await fetch(CMS_SCRIPT_URL, {
         method:'POST', mode:'no-cors',
         headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ action:'uploadMinit', apiSecret: DASHBOARD_API_SECRET, unit: cmsActiveUnit, title: title, meetingDate: meetingDate, fileBase64: reader.result, editor: currentUser.name })
+        body: JSON.stringify({ action:'uploadMinit', unit: cmsActiveUnit, title: title, meetingDate: meetingDate, fileBase64: reader.result, editor: currentUser.name })
       });
       status.innerText = '';
       showToast('Minit Mesyuarat berjaya dimuat naik!', 'success');
@@ -3658,9 +3280,9 @@ async function saveCmsContent(){
 /* =====================================================================
    PERMULAAN SISTEM
    ===================================================================== */
-window.onload = async function(){
+window.onload = function(){
   lucide.createIcons();
-  await syncStaffFromBackend(); // TUNGGU data staf terkini dari Sheet dahulu, elak currentUser terperangkap data lama
+  syncStaffFromBackend();
 
   if(typeof google !== 'undefined'){
     google.accounts.id.initialize({
@@ -3670,7 +3292,7 @@ window.onload = async function(){
     google.accounts.id.renderButton(document.getElementById('g_id_signin'), { theme:'filled_blue', size:'large', shape:'pill', text:'signin_with' });
   }
 
-  // Cuba pulihkan sesi log masuk sebelumnya (staffData di atas ini dah pasti versi terkini)
+  // Cuba pulihkan sesi log masuk sebelumnya
   try{
     const session = JSON.parse(localStorage.getItem('dashboard_session'));
     if(session){
@@ -3714,10 +3336,7 @@ window.onload = async function(){
       uploaderContainer.innerHTML = html;
   }
   lucide.createIcons();
-  // Borang bermula KOSONG (state.school dsb. sudah default '' ) - guru boleh klik
-  // butang "Templat Asal" secara manual jika mahu rujukan contoh pengisian.
-  renderObjectivesForm();
-  updatePreview();
+  loadTemplate();
 };
 </script>
 
@@ -3732,9 +3351,9 @@ window.onload = async function(){
 
         const statusDetails = {
             'Di Sekolah': { bg: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-300', icon: 'fa-school', badge: 'bg-emerald-100 dark:bg-emerald-950/40' },
-            'Mesyuarat/Bengkel/Taklimat': { bg: 'bg-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', icon: 'fa-chalkboard-user', badge: 'bg-teal-50 dark:bg-teal-950/40' },
+            'Di Sekolah : Mesyuarat/Bengkel': { bg: 'bg-emerald-400', text: 'text-emerald-600 dark:text-emerald-400', icon: 'fa-chalkboard-user', badge: 'bg-teal-50 dark:bg-teal-950/40' },
             'Bekerja Dari Rumah': { bg: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-300', icon: 'fa-house-laptop', badge: 'bg-blue-100 dark:bg-blue-950/40' },
-            'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
+            'Luar Pejabat : Urusan Rasmi': { bg: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300', icon: 'fa-business-time', badge: 'bg-amber-100 dark:bg-amber-950/40' },
             'Luar Pejabat : Urusan Peribadi': { bg: 'bg-amber-400', text: 'text-amber-600 dark:text-amber-400', icon: 'fa-user-clock', badge: 'bg-yellow-50 dark:bg-yellow-950/40' },
             'Cuti Rehat': { bg: 'bg-rose-600', text: 'text-rose-700 dark:text-rose-300', icon: 'fa-umbrella-beach', badge: 'bg-rose-100 dark:bg-rose-950/40' },
             'Cuti Rehat Khas': { bg: 'bg-fuchsia-500', text: 'text-fuchsia-700 dark:text-fuchsia-300', icon: 'fa-star', badge: 'bg-fuchsia-100 dark:bg-fuchsia-950/40' },
@@ -3750,13 +3369,12 @@ window.onload = async function(){
 
         // Medan "Hingga Tarikh" (hantar berbilang hari) hanya masuk akal untuk status
         // jenis cuti/urusan rasmi - BUKAN "Di Sekolah" (tak boleh pra-isytihar hadir hari akan datang).
-        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit'];
-        // Kotak "Tarikh Akhir" (hantar status berbilang hari) kini dibuka untuk
-        // SEMUA staf - bukan Guru ICT sahaja. Sebab: mana-mana staf boleh perlukan
-        // penghantaran berbilang hari (cth. Cuti Sakit/MC beberapa hari, Cuti Rehat
-        // rentas minggu), bukan keperluan khusus Guru ICT sahaja.
+        const MULTI_DAY_ELIGIBLE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain', 'Luar Pejabat : Urusan Rasmi', 'Luar Pejabat : Urusan Peribadi'];
+        // Kotak "Tarikh Akhir" (hantar status berbilang hari) DIHADKAN kepada
+        // Penyelaras Digital sahaja - staf lain (termasuk GB/GPK) cuma boleh
+        // hantar status untuk hari semasa sahaja.
         function canUseMultiDay_(){
-            return true;
+            return !!(currentUser && currentUser.cmsRoleLabel === 'Penyelaras Digital');
         }
         let allRecords = [];
         let summaryChartInstance = null;
@@ -3849,13 +3467,6 @@ window.onload = async function(){
                     <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
                 `;
                 document.getElementById(`status-menu-${staffId}`).classList.add('hidden');
-
-                const noteLabel = document.getElementById(`note-label-${staffId}`);
-                if (noteLabel) {
-                    const isWajib = statusText === 'Cuti Tanpa Rekod';
-                    noteLabel.querySelector('span').innerText = isWajib ? '(wajib diisi)' : '(pilihan)';
-                    noteLabel.querySelector('span').className = isWajib ? 'normal-case font-bold text-rose-500' : 'normal-case font-medium text-slate-400';
-                }
 
                 const enddateWrap = document.getElementById(`enddate-wrap-${staffId}`);
                 if (enddateWrap) {
@@ -3974,7 +3585,7 @@ window.onload = async function(){
                             </div>
                         </div>
                         <div>
-                            <label id="note-label-${s.id}" class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Catatan <span class="${s.status === 'Cuti Tanpa Rekod' ? 'normal-case font-bold text-rose-500' : 'normal-case font-medium text-slate-400'}">${s.status === 'Cuti Tanpa Rekod' ? '(wajib diisi)' : '(pilihan)'}</span></label>
+                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Catatan <span class="normal-case font-medium text-slate-400">(pilihan)</span></label>
                             <textarea id="note-input-${s.id}" rows="2" placeholder="Cth: Mesyuarat di PPD Serian..." class="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-400 dark:placeholder-slate-600 resize-none"></textarea>
                         </div>
                         <div id="enddate-wrap-${s.id}" class="${(MULTI_DAY_ELIGIBLE_STATUSES.includes(s.status) && canUseMultiDay_()) ? '' : 'hidden'}">
@@ -4104,7 +3715,7 @@ window.onload = async function(){
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'cancel', apiSecret: DASHBOARD_API_SECRET, id: currentUser.id, date: dateStr })
+                    body: JSON.stringify({ action: 'cancel', id: currentUser.id, date: dateStr })
                 });
                 showToast(`Tarikh ${dateStr} dibatalkan.`, 'success');
                 setTimeout(async () => { await fetchRecordsQuietly(); }, 800);
@@ -4117,16 +3728,8 @@ window.onload = async function(){
             if(!currentUser) return;
             const todayMap = getTodayStatusMap_();
             const todayRecordMap = getTodayRecordMap_();
+            const myStatus = todayMap[currentUser.id] || 'Belum Kemas Kini';
             const myTodayRecord = todayRecordMap[currentUser.id] || null;
-            // PEMBETULAN PENTING: ambil status TERUS daripada myTodayRecord (sumber
-            // yang sama digunakan untuk mesej "Status hari ini telah dikunci") apabila
-            // ia wujud - JANGAN bergantung pada todayMap secara berasingan. Sebelum
-            // ini, myStatus dan myTodayRecord datang daripada DUA panggilan/peta
-            // berasingan yang KADANG tak segerak (isu masa rangkaian/Sheets lambat
-            // proses), menyebabkan lencana "Status Semasa" papar "Belum Kemas Kini"
-            // walhal mesej kunci betul-betul tunjuk status sebenar (bug Cg Hadijah/
-            // Cg Marina). Guna satu sumber sahaja - mustahil berselisih lagi.
-            const myStatus = myTodayRecord ? myTodayRecord.status : (todayMap[currentUser.id] || 'Belum Kemas Kini');
 
             const grid = document.getElementById('staff-grid');
             if(grid){
@@ -4159,7 +3762,7 @@ window.onload = async function(){
             });
             let mySchoolDays = 0, myLeaveDays = 0;
             myMonthRecords.forEach(r => {
-                if(r.status === 'Di Sekolah' || r.status === 'Mesyuarat/Bengkel/Taklimat') mySchoolDays++;
+                if(r.status === 'Di Sekolah' || r.status === 'Di Sekolah : Mesyuarat/Bengkel') mySchoolDays++;
                 else myLeaveDays++;
             });
             const myRate = myMonthRecords.length > 0 ? Math.round((mySchoolDays / myMonthRecords.length) * 100) : 0;
@@ -4183,9 +3786,9 @@ window.onload = async function(){
             staffData.filter(s => !s.excludeFromAttendance).forEach(s => {
                 const status = todayMap[s.id] || 'Belum Kemas Kini';
                 if (status === 'Di Sekolah') { school++; countSchool++; }
-                else if (status === 'Mesyuarat/Bengkel/Taklimat') { school++; countSchoolMesy++; }
+                else if (status === 'Di Sekolah : Mesyuarat/Bengkel') { school++; countSchoolMesy++; }
                 else if (status === 'Bekerja Dari Rumah') { outside++; countWfh++; }
-                else if (status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') { outside++; countOutsideRasmi++; }
+                else if (status === 'Luar Pejabat : Urusan Rasmi') { outside++; countOutsideRasmi++; }
                 else if (status === 'Luar Pejabat : Urusan Peribadi') { outside++; countOutsidePeribadi++; }
                 else if (status === 'Cuti Rehat') { leave++; countCutiRehat++; }
                 else if (status === 'Cuti Rehat Khas') { leave++; countCutiRehatKhas++; }
@@ -4244,46 +3847,21 @@ window.onload = async function(){
                 </div>`;
         }
 
-        // Sahkan rekod BETUL-BETUL tersimpan di Sheet - cuba BERULANG KALI (bukan
-        // sekali dengan tempoh tetap) sebab Google Sheets/Apps Script kadang ambil
-        // lebih daripada 2 saat untuk proses satu tulisan (terutama bila Sheet dah
-        // besar/banyak staf). Tunggu tetap sahaja (macam sebelum ini) terbukti TAK
-        // MENCUKUPI secara KONSISTEN, bukan cuma sekali-sekala - sebab itu bug ni
-        // "selalu" berlaku kepada staf (Cg Hadijah, Cg Marina), bukan nasib buruk.
-        //
-        // Strategi baharu: cuba semak setiap ~1.2 saat, sehingga 5 kali (~6 saat
-        // maksimum). Sebaik rekod disahkan wujud, TERUS papar dashboard (jangan
-        // tunggu percubaan seterusnya). Kalau langsung tak jumpa selepas semua
-        // percubaan, beri amaran JELAS kepada staf (bukan senyap sahaja) supaya
-        // mereka tahu perlu semak/hantar semula - lebih baik daripada staf fikir
-        // dah berjaya sedangkan sebenarnya tidak.
-        async function verifyStatusUntilConfirmed_(id, staffName) {
-            const today = getTodayDateStr_();
-            const MAX_PERCUBAAN = 5;
-            const JEDA_MS = 1200;
-
-            for (let cubaan = 1; cubaan <= MAX_PERCUBAAN; cubaan++) {
-                await new Promise(r => setTimeout(r, JEDA_MS));
-                try {
-                    const verifyRes = await fetch(GOOGLE_SCRIPT_URL);
-                    if (!verifyRes.ok) continue;
-                    const verifyData = await verifyRes.json();
-                    if (!Array.isArray(verifyData)) continue;
-
-                    const found = verifyData.some(r => String(r.id) === String(id) && r.date === today);
-                    if (found) {
-                        // Disahkan wujud - tarik rekod PENUH (allRecords) & papar SEKALI SAHAJA.
-                        await fetchRecordsQuietly();
-                        switchTab('dashboard');
-                        return; // BERHENTI - jangan cuba/papar lagi selepas ini
-                    }
-                    // belum jumpa lagi - cuba sekali lagi pusingan seterusnya
-                } catch (e) { /* ralat rangkaian sekali-sekala - cuba lagi pusingan seterusnya */ }
-            }
-
-            // Semua percubaan habis, rekod masih tak dijumpai - beri amaran JELAS.
-            showToast(`Tidak dapat sahkan status ${staffName} tersimpan selepas beberapa percubaan. Sila SEMAK & HANTAR SEMULA untuk pastikan.`, 'error');
-            switchTab('dashboard'); // tetap papar dashboard supaya staf nampak keadaan sebenar (mungkin masih "Belum Kemas Kini")
+        // Sahkan rekod tersimpan di LATAR BELAKANG (tidak menyekat UI/tidak membuat staf menunggu).
+        // Hanya beri amaran jika benar-benar tiada rekod dijumpai selepas beberapa saat.
+        async function verifyStatusInBackground_(id, staffName) {
+            await new Promise(r => setTimeout(r, 2000)); // beri masa cukup Sheet proses, secara senyap
+            try {
+                const verifyRes = await fetch(GOOGLE_SCRIPT_URL);
+                if (!verifyRes.ok) return;
+                const verifyData = await verifyRes.json();
+                if (!Array.isArray(verifyData)) return;
+                const today = getTodayDateStr_();
+                const found = verifyData.some(r => String(r.id) === String(id) && r.date === today);
+                if (!found) {
+                    showToast(`Amaran: Tidak dapat disahkan status ${staffName} tersimpan. Sila semak semula & hantar sekali lagi jika perlu.`, 'error');
+                }
+            } catch (e) { /* senyap - jangan ganggu staf dengan ralat rangkaian latar belakang */ }
         }
 
         async function submitStatus(id, staffName) {
@@ -4299,14 +3877,7 @@ window.onload = async function(){
             const staffRecord = staffData.find(s => s.id === id);
             const staffPosition = staffRecord ? staffRecord.position : '';
             const originalText = btn.innerHTML;
-
-            // Catatan WAJIB diisi untuk status "Cuti Tanpa Rekod"
-            if (selectedStatus === 'Cuti Tanpa Rekod' && !noteVal) {
-                showToast('Sila isi catatan sebelum hantar status "Cuti Tanpa Rekod".', 'error');
-                if (noteInput) noteInput.focus();
-                return;
-            }
-
+            
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Mengunci...`;
             btn.className = "w-full bg-slate-400 text-slate-700 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 cursor-not-allowed";
@@ -4343,11 +3914,9 @@ window.onload = async function(){
                 showToast(isMultiDay ? `Status ${staffName} dihantar untuk beberapa hari!` : `Status ${staffName} dihantar!`, 'success');
                 btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Berjaya!`;
                 btn.className = "w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2";
-                // SATU laluan pengesahan sahaja (poll berulang sehingga disahkan) - bukan
-                // 2 pencetus berasingan (timer tetap + semakan latar belakang) yang boleh
-                // bertindih/berlumba antara satu sama lain, punca sebenar bug lencana status
-                // tersasar (Cg Hadijah/Cg Marina) walaupun rekod sebenarnya dah tersimpan.
-                verifyStatusUntilConfirmed_(id, staffName);
+                setTimeout(async () => { await fetchRecordsQuietly(); switchTab('dashboard'); }, 500);
+
+                verifyStatusInBackground_(id, staffName);
             } catch (err) {
                 let queue = JSON.parse(localStorage.getItem('sk_offline_queue')) || [];
                 queue.push({ id, name: staffName, position: staffPosition, status: selectedStatus, note: noteVal, endDate: endDateVal, date: new Date().toISOString().split('T')[0] });
@@ -4574,24 +4143,21 @@ window.onload = async function(){
             showToast("Fail laporan CSV berjaya dimuat turun!", "success");
         }
 
-        function renderMonthlyReportHead() {
-            const headRow = document.getElementById('monthly-report-table-head');
-            if (!headRow) return;
-            let html = `
-                <th class="p-2 border-r border-slate-300 text-center w-8">BIL</th>
-                <th class="p-2 border-r border-slate-300">Nama Staf</th>`;
-            statusOptions.forEach((status, i) => {
-                // Guna TEKS PENUH status (bukan singkatan) - kertas landskap sedia
-                // beri cukup ruang, teks akan bertindih baris (wrap) automatik.
-                // Titik pecah baris (<wbr>) diselit SELEPAS setiap garis miring untuk
-                // PAPARAN sahaja - pastikan perkataan pecah bersih di sempadan "/"
-                // (bukan terpotong tengah-tengah perkataan secara rawak). Nilai
-                // sebenar 'status' (guna untuk padanan data/rekod) TIDAK disentuh.
-                const labelPaparan = status.replace(/\//g, '/<wbr>');
-                const isLast = i === statusOptions.length - 1;
-                html += `<th class="p-1.5 ${isLast ? '' : 'border-r border-slate-300'} text-center leading-tight">${labelPaparan}</th>`;
-            });
-            headRow.innerHTML = html;
+        // Kira jumlah hari bekerja (Isnin-Jumaat) bagi bulan/tahun diberi. Kalau bulan
+        // terpilih ialah bulan SEMASA, kira setakat HARI INI sahaja (elak staf dituduh
+        // "tak kemaskini" untuk hari-hari yang belum sampai lagi). Nota: ini TIDAK
+        // menolak cuti am/cuti sekolah (Takwim) - anggaran berdasarkan hari bekerja biasa.
+        function kiraHariBekerjaBulan(tahun, bulan) {
+            const sekarang = new Date();
+            const bulanSemasa = (sekarang.getFullYear() === tahun) && ((sekarang.getMonth() + 1) === bulan);
+            const hariTerakhirBulan = new Date(tahun, bulan, 0).getDate();
+            const hadHari = bulanSemasa ? sekarang.getDate() : hariTerakhirBulan;
+            let jumlah = 0;
+            for (let d = 1; d <= hadHari; d++) {
+                const hari = new Date(tahun, bulan - 1, d).getDay(); // 0=Ahad, 6=Sabtu
+                if (hari !== 0 && hari !== 6) jumlah++;
+            }
+            return jumlah;
         }
 
         function generateMonthlyReport() {
@@ -4604,17 +4170,14 @@ window.onload = async function(){
 
             document.getElementById('report-meta-month').innerText = `Bulan: ${selectedMonthName} ${yearFilter}`;
             document.getElementById('report-selected-label').innerText = `${selectedMonthName} ${yearFilter}`;
-
-            renderMonthlyReportHead(); // jana lajur SEBELUM isi baris, supaya sentiasa terkini
-            const jumlahLajur = 2 + statusOptions.length;
-
+            
             const tbody = document.getElementById('monthly-report-table-body');
-            const mobileView = document.getElementById('mobile-report-view');
             if (allRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
                 const summaryBoxEmpty = document.getElementById('report-analytics-summary');
                 if(summaryBoxEmpty) summaryBoxEmpty.innerHTML = '';
-                if(mobileView) mobileView.innerHTML = `<p class="text-center text-rose-600 font-semibold text-sm p-6">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</p>`;
+                const attentionBoxEmpty = document.getElementById('report-attention-summary');
+                if(attentionBoxEmpty) attentionBoxEmpty.innerHTML = '';
                 return;
             }
 
@@ -4626,89 +4189,99 @@ window.onload = async function(){
 
             // ---- Ringkasan analitik keseluruhan (jumlah SEMUA staf bagi bulan ini) ----
             let totalSchoolDays = 0, totalLeaveDays = 0, totalRasmiDays = 0, totalSubmittedDays = 0;
-            const LEAVE_STATUSES = ['Cuti Rehat', 'Cuti Rehat Khas', 'Cuti Sakit', 'Cuti Tanpa Rekod', 'Cuti : Lain-lain'];
             monthlyData.forEach(log => {
                 totalSubmittedDays++;
-                if (log.status === 'Di Sekolah' || log.status === 'Mesyuarat/Bengkel/Taklimat') totalSchoolDays++;
-                else if (log.status === 'Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing') totalRasmiDays++;
-                else if (LEAVE_STATUSES.includes(log.status)) totalLeaveDays++;
+                if (log.status === 'Di Sekolah' || log.status === 'Di Sekolah : Mesyuarat/Bengkel') totalSchoolDays++;
+                else if (log.status === 'Luar Pejabat : Urusan Rasmi') totalRasmiDays++;
+                else if (log.status === 'Cuti Rehat' || log.status === 'Cuti Rehat Khas' || log.status === 'Cuti Sakit' || log.status === 'Cuti Tanpa Rekod' || log.status === 'Cuti : Lain-lain') totalLeaveDays++;
             });
             const attendanceRate = totalSubmittedDays > 0 ? Math.round((totalSchoolDays / totalSubmittedDays) * 100) : 0;
             const summaryBox = document.getElementById('report-analytics-summary');
             if(summaryBox){
                 summaryBox.innerHTML = `
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-emerald-700">${totalSchoolDays}</p><p class="text-[8px] font-bold text-emerald-700 uppercase tracking-wide">Jumlah Hari Di Sekolah<br>(Semua Staf)</p></div>
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-indigo-700">${attendanceRate}%</p><p class="text-[8px] font-bold text-indigo-700 uppercase tracking-wide">Purata Kehadiran<br>(Semua Staf)</p></div>
-                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-amber-700">${totalRasmiDays}</p><p class="text-[8px] font-bold text-amber-700 uppercase tracking-wide">Jumlah Urusan Rasmi<br>(Semua Staf)</p></div>
-                    <div class="bg-rose-50 border border-rose-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-rose-700">${totalLeaveDays}</p><p class="text-[8px] font-bold text-rose-700 uppercase tracking-wide">Jumlah Cuti<br>(Semua Staf)</p></div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-emerald-700">${totalSchoolDays}</p><p class="text-[8px] font-bold text-emerald-700 uppercase tracking-wide">Jumlah Hari Di Sekolah</p></div>
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-indigo-700">${attendanceRate}%</p><p class="text-[8px] font-bold text-indigo-700 uppercase tracking-wide">Purata Kehadiran</p></div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-amber-700">${totalRasmiDays}</p><p class="text-[8px] font-bold text-amber-700 uppercase tracking-wide">Jumlah Urusan Rasmi</p></div>
+                    <div class="bg-rose-50 border border-rose-200 rounded-lg p-2.5 text-center"><p class="text-lg font-black text-rose-700">${totalLeaveDays}</p><p class="text-[8px] font-bold text-rose-700 uppercase tracking-wide">Jumlah Cuti</p></div>
                 `;
             }
 
-            // Ringkasan sama untuk paparan telefon (kad statistik atas kad staf)
-            const mobileSummaryHTML = `
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                    <p class="text-center font-black text-slate-900 text-sm uppercase mb-0.5">Laporan Bulanan Staf SK Krangan</p>
-                    <p class="text-center text-[11px] text-slate-500 font-semibold mb-3">Sesi Bulan: ${selectedMonthName} ${yearFilter}</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center"><p class="text-base font-black text-emerald-700">${totalSchoolDays}</p><p class="text-[8px] font-bold text-emerald-700 uppercase">Hari Di Sekolah</p></div>
-                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2 text-center"><p class="text-base font-black text-indigo-700">${attendanceRate}%</p><p class="text-[8px] font-bold text-indigo-700 uppercase">Purata Kehadiran</p></div>
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="text-base font-black text-amber-700">${totalRasmiDays}</p><p class="text-[8px] font-bold text-amber-700 uppercase">Urusan Rasmi</p></div>
-                        <div class="bg-rose-50 border border-rose-200 rounded-lg p-2 text-center"><p class="text-base font-black text-rose-700">${totalLeaveDays}</p><p class="text-[8px] font-bold text-rose-700 uppercase">Jumlah Cuti</p></div>
-                    </div>
-                </div>`;
+            const jumlahHariBekerja = kiraHariBekerjaBulan(parseInt(yearFilter), parseInt(monthFilter));
 
-            // Setiap status dapat lajur SENDIRI (kira terus daripada statusOptions,
-            // sepadan 1-ke-1 dengan senarai "Ringkasan Keberadaan Staf") - tiada
-            // status disatukan/disenyapkan dalam lajur "lain-lain" lagi.
             let reportHTML = '';
-            let mobileCardsHTML = '';
+            const senaraiTakKemaskini = []; // {staff, hilang} - jumlah hari bekerja yang TIDAK dikemaskini, bagi semua staf
             staffData.filter(staff => !staff.excludeFromAttendance).forEach((staff, index) => {
                 const staffLogs = monthlyData.filter(r => r.name === staff.name);
-                const kiraanIkutStatus = {};
-                statusOptions.forEach(s => { kiraanIkutStatus[s] = 0; });
+                let countSchool = 0, countMesy = 0, countLuarRasmi = 0, countLuarPeribadi = 0, countCutiRehat = 0, countCutiSakitLain = 0;
+
                 staffLogs.forEach(log => {
-                    if (kiraanIkutStatus.hasOwnProperty(log.status)) kiraanIkutStatus[log.status]++;
+                    if (log.status === 'Di Sekolah') countSchool++;
+                    else if (log.status === 'Di Sekolah : Mesyuarat/Bengkel') countMesy++;
+                    else if (log.status === 'Luar Pejabat : Urusan Rasmi') countLuarRasmi++;
+                    else if (log.status === 'Luar Pejabat : Urusan Peribadi') countLuarPeribadi++;
+                    else if (log.status === 'Cuti Rehat') countCutiRehat++;
+                    else countCutiSakitLain++;
                 });
 
-                let selStatusCells = '';
-                let mobileRows = '';
-                statusOptions.forEach((status, i) => {
-                    const isLast = i === statusOptions.length - 1;
-                    const bil = kiraanIkutStatus[status];
-                    selStatusCells += `<td class="p-2 ${isLast ? '' : 'border-r border-slate-300'} text-center font-bold text-slate-700">${bil} hari</td>`;
-                    // Kad telefon: hanya sorot status yang ada nilai (>0 hari) supaya senang
-                    // imbas sekali pandang - status 0 hari kekal kelihatan tapi pudar.
-                    mobileRows += `<div class="flex justify-between items-center py-1.5 ${isLast ? '' : 'border-b border-slate-100'}">
-                        <span class="text-[11px] ${bil > 0 ? 'text-slate-700 font-semibold' : 'text-slate-400'}">${status}</span>
-                        <span class="text-[11px] font-black ${bil > 0 ? 'text-indigo-600' : 'text-slate-300'} shrink-0 ml-2">${bil} hari</span>
-                    </div>`;
-                });
+                const hariHilang = Math.max(0, jumlahHariBekerja - staffLogs.length);
+                if (hariHilang > 0) senaraiTakKemaskini.push({ staff, hariHilang });
 
                 reportHTML += `
                     <tr class="hover:bg-slate-50 border-b border-slate-300 transition-colors">
                         <td class="p-2 border-r border-slate-300 text-slate-500 font-bold text-center">${index + 1}</td>
                         <td class="p-2 border-r border-slate-300 font-black text-slate-900">${staff.name}<br><span class="text-[8px] text-indigo-600 uppercase font-bold tracking-wider">${staff.position}</span></td>
-                        ${selStatusCells}
+                        <td class="p-2 border-r border-slate-300 text-center font-bold text-emerald-600">${countSchool} hari</td>
+                        <td class="p-2 border-r border-slate-300 text-center font-bold text-teal-600">${countMesy} hari</td>
+                        <td class="p-2 border-r border-slate-300 text-center font-bold text-amber-600">${countLuarRasmi} hari</td>
+                        <td class="p-2 border-r border-slate-300 text-center font-bold text-amber-500">${countLuarPeribadi} hari</td>
+                        <td class="p-2 border-r border-slate-300 text-center font-bold text-rose-600">${countCutiRehat} hari</td>
+                        <td class="p-2 text-center font-bold text-rose-500">${countCutiSakitLain} hari</td>
                     </tr>
                 `;
-
-                mobileCardsHTML += `
-                    <details class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden" ${index === 0 ? 'open' : ''}>
-                        <summary class="p-4 cursor-pointer flex items-center justify-between gap-2 list-none">
-                            <div class="min-w-0">
-                                <p class="font-black text-slate-900 text-sm truncate">${index + 1}. ${staff.name}</p>
-                                <p class="text-[10px] text-indigo-600 uppercase font-bold tracking-wider truncate">${staff.position}</p>
-                            </div>
-                            <i class="fa-solid fa-chevron-down text-slate-400 text-xs shrink-0 transition-transform"></i>
-                        </summary>
-                        <div class="px-4 pb-4 pt-1 border-t border-slate-100">
-                            ${mobileRows}
-                        </div>
-                    </details>`;
             });
 
             tbody.innerHTML = reportHTML;
-            if (mobileView) mobileView.innerHTML = mobileSummaryHTML + mobileCardsHTML;
+
+            // ---- Ringkasan "Perlu Diberi Perhatian" - TOP 5 staf dengan bilangan PALING
+            // BANYAK hari bekerja yang tidak dikemaskini kehadirannya bagi bulan terpilih ----
+            const attentionBox = document.getElementById('report-attention-summary');
+            if (attentionBox) {
+                senaraiTakKemaskini.sort((a, b) => b.hariHilang - a.hariHilang);
+                const top5 = senaraiTakKemaskini.slice(0, 5);
+                if (top5.length === 0) {
+                    attentionBox.innerHTML = `
+                        <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 text-[10px] font-bold text-emerald-700 uppercase tracking-wide">
+                            <span>&#10003;</span> Semua staf telah mengemaskini kehadiran bagi ${selectedMonthName} ${yearFilter}.
+                        </div>`;
+                } else {
+                    attentionBox.innerHTML = `
+                        <div class="bg-rose-50 border border-rose-300 rounded-lg p-3">
+                            <p class="text-[10px] font-black text-rose-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                                <span>&#9888;</span> Perlu Diberi Perhatian &mdash; Top ${top5.length} Paling Banyak Tidak Kemaskini Kehadiran (${selectedMonthName} ${yearFilter})
+                            </p>
+                            <table class="w-full text-left border border-rose-200 border-collapse bg-white rounded overflow-hidden">
+                                <thead>
+                                    <tr class="bg-rose-100 text-rose-800 text-[8px] uppercase font-extrabold">
+                                        <th class="p-1.5 border-r border-rose-200 text-center w-8">Bil</th>
+                                        <th class="p-1.5 border-r border-rose-200">Nama</th>
+                                        <th class="p-1.5 border-r border-rose-200">Jawatan</th>
+                                        <th class="p-1.5 text-center w-32">Hari Tidak Dikemaskini</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-[9px] text-slate-800 divide-y divide-rose-100">
+                                    ${top5.map((item, i) => `
+                                        <tr>
+                                            <td class="p-1.5 border-r border-rose-100 text-center font-bold text-slate-500">${i + 1}</td>
+                                            <td class="p-1.5 border-r border-rose-100 font-bold">${item.staff.name}</td>
+                                            <td class="p-1.5 border-r border-rose-100 text-slate-500">${item.staff.position || '-'}</td>
+                                            <td class="p-1.5 text-center font-black text-rose-600">${item.hariHilang} hari</td>
+                                        </tr>`).join('')}
+                                </tbody>
+                            </table>
+                            <p class="text-[8px] text-rose-400 italic mt-1.5">* Berdasarkan ${jumlahHariBekerja} hari bekerja (Isnin&ndash;Jumaat${(new Date().getFullYear() === parseInt(yearFilter) && (new Date().getMonth() + 1) === parseInt(monthFilter)) ? ', setakat hari ini' : ''}) ditolak bilangan hari rekod dihantar. Tidak menolak cuti am/cuti sekolah.</p>
+                        </div>`;
+                }
+            }
         }
 
         function initChart() {
@@ -4742,7 +4315,7 @@ window.onload = async function(){
                         onClick: (event, elements) => {
                             if (elements.length > 0) {
                                 const index = elements[0].index;
-                                const statusMapping = ['Di Sekolah','Mesyuarat/Bengkel/Taklimat','Luar Pejabat : Urusan Rasmi: Jawatankuasa Pasukan/Peserta/Guru Pengiring/Guru Pembimbing','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
+                                const statusMapping = ['Di Sekolah','Di Sekolah : Mesyuarat/Bengkel','Luar Pejabat : Urusan Rasmi','Luar Pejabat : Urusan Peribadi','Cuti Rehat','Cuti Rehat Khas','Cuti Sakit','Cuti Tanpa Rekod','Cuti : Lain-lain'];
                                 filterByStatusName(statusMapping[index]);
                             }
                         },
@@ -5045,97 +4618,6 @@ window.onload = async function(){
     }
 
     // FUNGSI RENDER GRID GAMBAR DENGAN CROP PINTAR (guna background-image, serasi penuh dengan html2canvas)
-    // TEMPLAT SUSUN ATUR - setiap kiraan foto (2/3) ada >1 pilihan supaya guru
-    // boleh pilih sendiri ikut orientasi foto sebenar (landskap/potret/campuran).
-    // build(photoDiv, wrapClass) pulangkan HTML - photoDiv(n) & wrapClass disuntik semasa render.
-    const PHOTO_LAYOUT_TEMPLATES = {
-      2: [
-        { id: 'tindih', label: '⬍ Bertindan', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-rows-2 gap-1 bg-white border border-slate-100">
-            <div class="${wrapClass}">${photoDiv(0)}</div>
-            <div class="${wrapClass}">${photoDiv(1)}</div>
-          </div>` },
-        { id: 'sebelah', label: '⬌ Bersebelahan', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-cols-2 gap-1 bg-white border border-slate-100">
-            <div class="${wrapClass}">${photoDiv(0)}</div>
-            <div class="${wrapClass}">${photoDiv(1)}</div>
-          </div>` },
-      ],
-      3: [
-        { id: 'hero-kiri', label: '◧ Utama Kiri', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-cols-3 gap-1 bg-white border border-slate-100">
-            <div class="col-span-2 ${wrapClass}">${photoDiv(0)}</div>
-            <div class="grid grid-rows-2 gap-1">
-              <div class="${wrapClass}">${photoDiv(1)}</div>
-              <div class="${wrapClass}">${photoDiv(2)}</div>
-            </div>
-          </div>` },
-        { id: 'hero-atas', label: '⬒ Utama Atas', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-rows-3 gap-1 bg-white border border-slate-100">
-            <div class="row-span-2 ${wrapClass}">${photoDiv(0)}</div>
-            <div class="grid grid-cols-2 gap-1">
-              <div class="${wrapClass}">${photoDiv(1)}</div>
-              <div class="${wrapClass}">${photoDiv(2)}</div>
-            </div>
-          </div>` },
-        { id: 'sama-rata', label: '⬌ 3 Sama Rata', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-cols-3 gap-1 bg-white border border-slate-100">
-            <div class="${wrapClass}">${photoDiv(0)}</div>
-            <div class="${wrapClass}">${photoDiv(1)}</div>
-            <div class="${wrapClass}">${photoDiv(2)}</div>
-          </div>` },
-      ],
-      4: [
-        { id: 'grid-2x2', label: '⊞ Grid 2×2', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-cols-2 grid-rows-2 gap-1 bg-white border border-slate-100">
-            <div class="${wrapClass}">${photoDiv(0)}</div>
-            <div class="${wrapClass}">${photoDiv(1)}</div>
-            <div class="${wrapClass}">${photoDiv(2)}</div>
-            <div class="${wrapClass}">${photoDiv(3)}</div>
-          </div>` },
-        { id: 'baris', label: '⬌ 1 Baris', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-cols-4 gap-1 bg-white border border-slate-100">
-            <div class="${wrapClass}">${photoDiv(0)}</div>
-            <div class="${wrapClass}">${photoDiv(1)}</div>
-            <div class="${wrapClass}">${photoDiv(2)}</div>
-            <div class="${wrapClass}">${photoDiv(3)}</div>
-          </div>` },
-      ],
-      5: [
-        { id: 'default5', label: '⊞ Lalai', build: (photoDiv, wrapClass) => `
-          <div class="w-full h-full grid grid-cols-6 grid-rows-2 gap-1 bg-white border border-slate-100">
-             <div class="col-span-3 ${wrapClass}">${photoDiv(0)}</div>
-             <div class="col-span-3 ${wrapClass}">${photoDiv(1)}</div>
-             <div class="col-span-2 ${wrapClass}">${photoDiv(2)}</div>
-             <div class="col-span-2 ${wrapClass}">${photoDiv(3)}</div>
-             <div class="col-span-2 ${wrapClass}">${photoDiv(4)}</div>
-          </div>` },
-      ],
-    };
-
-    function pilihSusunAturFoto(total, layoutId){
-      if(!state.photoLayoutChoice) state.photoLayoutChoice = {};
-      state.photoLayoutChoice[total] = layoutId;
-      renderPhotoGrid();
-    }
-
-    function renderLayoutPicker(total){
-      const wrap = document.getElementById('photo-layout-picker-wrap');
-      const picker = document.getElementById('photo-layout-picker');
-      const opsi = PHOTO_LAYOUT_TEMPLATES[total];
-      if(!opsi || opsi.length <= 1){ wrap.classList.add('hidden'); return; }
-
-      if(!state.photoLayoutChoice) state.photoLayoutChoice = {};
-      const dipilih = state.photoLayoutChoice[total] || opsi[0].id;
-
-      wrap.classList.remove('hidden');
-      picker.innerHTML = opsi.map(o => `
-        <button type="button" onclick="pilihSusunAturFoto(${total}, '${o.id}')"
-          class="px-3 py-2 rounded-lg text-xs font-bold border transition-all ${o.id === dipilih ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-300 text-slate-600 hover:border-indigo-400'}">
-          ${o.label}
-        </button>`).join('');
-    }
-
     function renderPhotoGrid() {
       const grid = document.getElementById('view-photo-grid');
       if(!grid) return;
@@ -5153,31 +4635,55 @@ window.onload = async function(){
 
       if (activePhotos.length === 0) {
         grid.innerHTML = `<div class="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300 font-semibold text-xs border border-dashed border-slate-200">Tiada Foto Aktiviti Dimuat Naik</div>`;
-        document.getElementById('photo-layout-picker-wrap').classList.add('hidden');
         return;
       }
 
+      let html = '';
       const total = activePhotos.length;
-
+      
       // photoDiv: background-image + background-size:cover mengekalkan nisbah asal & serasi eksport html2canvas
       // (elak <img object-fit>, yang sering "pecah"/teregang semasa eksport JPG)
       // n = indeks dalam activePhotos (BUKAN indeks asal state.photos) - guna posFor(n) utk kedudukan tersimpan.
       const photoDiv = (n) => `<div class="w-full h-full bg-slate-100" style="background-image:url('${activePhotos[n]}'); background-size:cover; background-position:${posFor(n)};"></div>`;
       const wrapClass = "overflow-hidden w-full h-full bg-slate-100";
 
-      let html = '';
       if (total === 1) {
         html = `<div class="${wrapClass}">${photoDiv(0)}</div>`;
-      } else {
-        const opsi = PHOTO_LAYOUT_TEMPLATES[Math.min(total, 5)];
-        if(!state.photoLayoutChoice) state.photoLayoutChoice = {};
-        const dipilihId = state.photoLayoutChoice[total];
-        const templat = (opsi && (opsi.find(o => o.id === dipilihId) || opsi[0])) || null;
-        if (templat) html = templat.build(photoDiv, wrapClass);
+      } 
+      else if (total === 2) {
+        html = `<div class="w-full h-full grid grid-cols-2 gap-1 bg-white border border-slate-100">
+                  <div class="${wrapClass}">${photoDiv(0)}</div>
+                  <div class="${wrapClass}">${photoDiv(1)}</div>
+                </div>`;
+      } 
+      else if (total === 3) {
+        html = `<div class="w-full h-full grid grid-cols-3 gap-1 bg-white border border-slate-100">
+                  <div class="${wrapClass}">${photoDiv(0)}</div>
+                  <div class="${wrapClass}">${photoDiv(1)}</div>
+                  <div class="${wrapClass}">${photoDiv(2)}</div>
+                </div>`;
+      } 
+      else if (total === 4) {
+        html = `<div class="w-full h-full grid grid-cols-2 grid-rows-2 gap-1 bg-white border border-slate-100">
+                  <div class="${wrapClass}">${photoDiv(0)}</div>
+                  <div class="${wrapClass}">${photoDiv(1)}</div>
+                  <div class="${wrapClass}">${photoDiv(2)}</div>
+                  <div class="${wrapClass}">${photoDiv(3)}</div>
+                </div>`;
+      } 
+      else if (total === 5) {
+        html = `
+          <div class="w-full h-full grid grid-cols-6 grid-rows-2 gap-1 bg-white border border-slate-100">
+             <div class="col-span-3 ${wrapClass}">${photoDiv(0)}</div>
+             <div class="col-span-3 ${wrapClass}">${photoDiv(1)}</div>
+             <div class="col-span-2 ${wrapClass}">${photoDiv(2)}</div>
+             <div class="col-span-2 ${wrapClass}">${photoDiv(3)}</div>
+             <div class="col-span-2 ${wrapClass}">${photoDiv(4)}</div>
+          </div>
+        `;
       }
-
+      
       grid.innerHTML = html;
-      renderLayoutPicker(total);
     }
 
     // Auto-saiz fon: teks pendek -> fon besar, teks panjang -> fon kecil,
@@ -5379,60 +4885,48 @@ function updatePreview() {
       // tergantung selamanya jika rangkaian fon lambat/gagal.
       await Promise.race([document.fonts.ready, new Promise(res => setTimeout(res, 4000))]);
 
-      let canvasAsal = null;
-
-      // KAEDAH 1 (utama): html-to-image - guna enjin pelayar sendiri untuk render,
-      // jadi hasil eksport TEPAT sama macam previu (termasuk clip-path bentuk
-      // "bumbung" 2026, fon, kesan glow/blur) yang html2canvas tak mampu render.
-      if (typeof htmlToImage !== 'undefined') {
-        try {
-          const canvas = await htmlToImage.toCanvas(card, {
-            pixelRatio: 2,
-            backgroundColor: '#ffffff',
-            cacheBust: true
-          });
-          if (canvas && canvas.width > 0) canvasAsal = canvas;
-        } catch (error) {
-          console.warn('html-to-image gagal, cuba fallback html2canvas:', error);
+      // PENTING: art-glow-1/2 guna mix-blend-mode + filter:blur() - DUA ciri CSS yang
+      // TIDAK dapat dirender dengan betul semasa "dibekukan" jadi gambar statik oleh
+      // MANA-MANA enjin eksport (html-to-image ATAU html2canvas), walaupun ia nampak
+      // elok dalam previu langsung di pelayar. Kalau tak disorok, ia keluar sebagai
+      // TAMPALAN HITAM PEJAL dalam JPG/PDF yang dieksport (punca laporan "ada hitam"
+      // bila dikongsi/WhatsApp). Sorok/gantikan SEBELUM cuba kedua-dua kaedah, bukan
+      // fallback sahaja.
+      toggleDecorationsForExport(true);
+      try {
+        // KAEDAH 1 (utama): html-to-image - guna enjin pelayar sendiri untuk render,
+        // jadi hasil eksport TEPAT sama macam previu (termasuk clip-path bentuk
+        // "bumbung" 2026, fon) untuk bahagian lain kad.
+        if (typeof htmlToImage !== 'undefined') {
+          try {
+            const canvas = await htmlToImage.toCanvas(card, {
+              pixelRatio: 2,
+              backgroundColor: '#ffffff',
+              cacheBust: true
+            });
+            if (canvas && canvas.width > 0) return canvas;
+          } catch (error) {
+            console.warn('html-to-image gagal, cuba fallback html2canvas:', error);
+          }
         }
-      }
 
-      // KAEDAH 2 (fallback): html2canvas - kurang tepat (clip-path/blur tak disokong,
-      // jadi hiasan disorok sementara), tapi lebih toleran terhadap isu imej CORS.
-      if (!canvasAsal) {
-        toggleDecorationsForExport(true);
+        // KAEDAH 2 (fallback): html2canvas - lebih toleran terhadap isu imej CORS.
         try {
-          canvasAsal = await html2canvas(card, {
+          const canvas = await html2canvas(card, {
             scale: 2,
             useCORS: true,
             allowTaint: false,
             backgroundColor: '#ffffff',
             logging: false
           });
+          return canvas;
         } catch (error) {
           console.error("Ralat rendering Canvas:", error);
           return null;
-        } finally {
-          toggleDecorationsForExport(false);
         }
+      } finally {
+        toggleDecorationsForExport(false);
       }
-
-      if (!canvasAsal) return null;
-
-      // PEMBETULAN PENTING: pilihan backgroundColor perpustakaan di atas tidak selalu
-      // dikuatkuasakan sepenuhnya - jika kanvas ada sebarang piksel LUTSINAR, format
-      // JPEG (tiada saluran alfa) akan tukar piksel itu kepada HITAM secara automatik
-      // semasa toDataURL('image/jpeg'), bukan putih. Untuk jamin latar putih 100% tanpa
-      // bergantung semata pada tingkah laku perpustakaan, kita lukis dahulu segi empat
-      // putih penuh pada kanvas baharu, kemudian tindih kanvas asal di atasnya.
-      const canvasFinal = document.createElement('canvas');
-      canvasFinal.width = canvasAsal.width;
-      canvasFinal.height = canvasAsal.height;
-      const ctx = canvasFinal.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvasFinal.width, canvasFinal.height);
-      ctx.drawImage(canvasAsal, 0, 0);
-      return canvasFinal;
     }
 
     async function downloadAsJPG() {
@@ -5468,7 +4962,7 @@ function updatePreview() {
 
     async function saveDraf(){
       if(!isCmsBackendConfigured()){
-        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Guru ICT.', 'bg-amber-500');
+        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Penyelaras Digital.', 'bg-amber-500');
         return;
       }
       const btn = document.getElementById('btn-save-draf');
@@ -5489,7 +4983,7 @@ function updatePreview() {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
-            action: 'simpandraf', apiSecret: DASHBOARD_API_SECRET,
+            action: 'simpandraf',
             id: currentDrafId,
             editorEmail: (currentUser && currentUser.delimaEmail) || '',
             editorName: (currentUser && currentUser.name) || '',
@@ -5591,7 +5085,7 @@ function updatePreview() {
         await fetch(CMS_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'padamdraf', apiSecret: DASHBOARD_API_SECRET, id: id })
+          body: JSON.stringify({ action: 'padamdraf', id: id })
         });
         showToastOPR('Draf dipadam.', 'bg-slate-700');
         openDrafListModal();
@@ -5602,7 +5096,7 @@ function updatePreview() {
 
     async function saveReportToPortal() {
       if(!isCmsBackendConfigured()){
-        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Guru ICT.', 'bg-amber-500');
+        showToastOPR('Storan dikongsi belum disediakan. Sila hubungi Penyelaras Digital.', 'bg-amber-500');
         return;
       }
       const btn = document.getElementById('btn-save-portal');
@@ -5621,7 +5115,7 @@ function updatePreview() {
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            action: 'saveReport', apiSecret: DASHBOARD_API_SECRET,
+            action: 'saveReport',
             unit: unitForPortal,
             title: state.title,
             programDate: (state.datetime || '').split('\n')[0] || '',
@@ -5642,30 +5136,27 @@ function updatePreview() {
       }
     }
 
-    async function downloadAsPDF() {
-      showToastOPR('Menyediakan laporan untuk cetakan...', 'bg-emerald-600');
-
-      // Tunggu fon siap dahulu (sama teknik macam getCanvas()) - elak teks
-      // "melompat"/salah saiz semasa cetak jika fon belum sempat dimuat.
-      await Promise.race([document.fonts.ready, new Promise(res => setTimeout(res, 4000))]);
-
-      // PENGUKUHAN PENCEGAHAN: mix-blend-mode + filter:blur() pada hiasan
-      // art-glow-1/2 tak sentiasa dicetak konsisten merentas semua pelayar
-      // (terutama Firefox/Safari versi lama), walaupun print-color-adjust:exact
-      // sudah ditetapkan. Guna semula fungsi sedia ada (dah terbukti berkesan
-      // untuk eksport JPG/html2canvas) untuk gantikan sementara dengan gradient
-      // biasa semasa cetak sahaja - pulih semula selepas siap.
-      toggleDecorationsForExport(true);
-
-      const pulihkanHiasan = () => toggleDecorationsForExport(false);
-      window.addEventListener('afterprint', pulihkanHiasan, { once: true });
-      // Sandaran - sesetengah pelayar (terutama mudah alih) tak lancarkan
-      // 'afterprint' dengan boleh dipercayai, jadi pulih juga selepas tempoh munasabah.
-      setTimeout(pulihkanHiasan, 15000);
-
+    function downloadAsPDF() {
+      showToastOPR('Membuka tetingkap cetakan. Sila pilih "Save as PDF".', 'bg-emerald-600');
       setTimeout(() => {
+        // PENTING: sama isu macam eksport JPG - bulatan hiasan art-glow-1/2 (mix-blend-mode +
+        // filter:blur()) turut gagal dirender dengan betul semasa cetak/PDF oleh Chrome & lain-
+        // lain pelayar, walaupun -webkit-print-color-adjust:exact dah ditetapkan - keluar sebagai
+        // tampalan HITAM PEJAL dalam PDF. Sorok/gantikan sebelum cetak, pulihkan lepas tetingkap
+        // cetak ditutup (guna event 'afterprint' sebagai jaminan tambahan sekiranya print()
+        // tak menyekat sehingga dialog ditutup pada sesetengah pelayar).
+        toggleDecorationsForExport(true);
+        let dipulihkan = false;
+        const pulihkanHiasan = () => {
+          if (dipulihkan) return;
+          dipulihkan = true;
+          toggleDecorationsForExport(false);
+          window.removeEventListener('afterprint', pulihkanHiasan);
+        };
+        window.addEventListener('afterprint', pulihkanHiasan);
         window.print();
-      }, 300);
+        pulihkanHiasan();
+      }, 800);
     }
 
     function showToastOPR(msg, bg = 'bg-slate-900') {
