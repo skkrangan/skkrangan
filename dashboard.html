@@ -1464,7 +1464,7 @@ let staffData = [
   { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.webp' },
   { id: 8,  name: 'Noor Izzati Abdullah',                position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-44425413@moe-dl.edu.my',               cmsUnits: [], photo: 'staf-izzati.webp' },
   { id: 9,  name: 'Hadijah anak Ambun',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-16489881@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-hadijah.webp' },
-  { id: 19, name: 'Muliady bin Mahmud',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-ipgp21171900@moe-dl.edu.my',           cmsUnits: [], tarikhMulaKehadiran: '2026-09-28' }, // baru mula berkhidmat 28/9/2026 - jangan kira "tak kemaskini" sebelum tarikh ni
+  { id: 19, name: 'Muliady bin Mahmud',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-ipgp21171900@moe-dl.edu.my',           cmsUnits: [], tarikhMulaKehadiran: '2026-09-29' }, // baru daftar masuk 29/9/2026 - jangan kira "tak kemaskini" sebelum tarikh ni
   { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.webp' },
   { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.webp' },
   { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Guru ICT', canViewAttendanceDashboard: true, photo: 'staf-aimuni.webp' },
@@ -4647,7 +4647,7 @@ window.onload = async function(){
             headRow.innerHTML = html;
         }
 
-        function generateMonthlyReport() {
+        async function generateMonthlyReport() {
             const selectMonth = document.getElementById('report-month').value;
             if (!selectMonth) return;
 
@@ -4663,6 +4663,16 @@ window.onload = async function(){
 
             const tbody = document.getElementById('monthly-report-table-body');
             const mobileView = document.getElementById('mobile-report-view');
+
+            // PENTING: tarik rekod TERKINI daripada Google Sheets dahulu setiap kali "Jana
+            // Laporan" ditekan - sebelum ini `allRecords` cuma dimuat SEKALI semasa log masuk
+            // (fetchRecordsQuietly() dalam enterDashboard()), jadi kalau staf isytihar status
+            // SELEPAS SU log masuk, laporan yang dijana akan guna data lapuk (nampak macam staf
+            // tu "tak kemaskini" sedangkan dia dah kemaskini dalam Sheet). Tunjuk status memuat
+            // sekejap semasa tarik data.
+            tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-slate-400 italic"><i class="fa-solid fa-circle-notch fa-spin"></i> Menarik rekod terkini daripada Google Sheets...</td></tr>`;
+            await fetchRecordsQuietly();
+
             if (allRecords.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
                 const summaryBoxEmpty = document.getElementById('report-analytics-summary');
