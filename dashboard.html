@@ -1455,10 +1455,10 @@ if(pf){
    Emel DELIMA di bawah masih PLACEHOLDER - tukar ke emel sebenar staf.
    ===================================================================== */
 let staffData = [
-  { id: 1,  name: 'Stanley anak Ngawah',                position: 'Guru Besar',                                   status: 'Di Sekolah', delimaEmail: 'g-85307134@moe-dl.edu.my',    cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], canViewAttendanceDashboard: true, photo: 'staf-stanley.webp' },
-  { id: 2,  name: 'Dick Lester anak Bakir',              position: 'Guru Penolong Kanan Kurikulum',                status: 'Di Sekolah', delimaEmail: 'g-21307380@moe-dl.edu.my',   cmsUnits: ['Kurikulum'], canViewAttendanceDashboard: true, photo: 'staf-dick.webp' },
-  { id: 3,  name: 'Amir bin Ngatiman',                   position: 'Guru Penolong Kanan Hal Ehwal Murid',          status: 'Di Sekolah', delimaEmail: 'g-29307435@moe-dl.edu.my',         cmsUnits: ['Hal Ehwal Murid'], canViewAttendanceDashboard: true, photo: 'staf-amir.webp' },
-  { id: 4,  name: 'Mohammad Fadzly bin Noor Azman',      position: 'Guru Penolong Kanan Kokurikulum',              status: 'Di Sekolah', delimaEmail: 'g-71295196@moe-dl.edu.my',       cmsUnits: ['Kokurikulum'], canViewAttendanceDashboard: true, photo: 'staf-fadzly.webp' },
+  { id: 1,  name: 'Stanley anak Ngawah',                position: 'Guru Besar',                                   status: 'Di Sekolah', delimaEmail: 'g-85307134@moe-dl.edu.my',    cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], canViewAttendanceDashboard: true, canViewMonthlyReport: true, photo: 'staf-stanley.webp' },
+  { id: 2,  name: 'Dick Lester anak Bakir',              position: 'Guru Penolong Kanan Kurikulum',                status: 'Di Sekolah', delimaEmail: 'g-21307380@moe-dl.edu.my',   cmsUnits: ['Kurikulum'], canViewAttendanceDashboard: true, canViewMonthlyReport: true, photo: 'staf-dick.webp' },
+  { id: 3,  name: 'Amir bin Ngatiman',                   position: 'Guru Penolong Kanan Hal Ehwal Murid',          status: 'Di Sekolah', delimaEmail: 'g-29307435@moe-dl.edu.my',         cmsUnits: ['Hal Ehwal Murid'], canViewAttendanceDashboard: true, canViewMonthlyReport: true, photo: 'staf-amir.webp' },
+  { id: 4,  name: 'Mohammad Fadzly bin Noor Azman',      position: 'Guru Penolong Kanan Kokurikulum',              status: 'Di Sekolah', delimaEmail: 'g-71295196@moe-dl.edu.my',       cmsUnits: ['Kokurikulum'], canViewAttendanceDashboard: true, canViewMonthlyReport: true, photo: 'staf-fadzly.webp' },
   { id: 5,  name: 'Angeline anak Michael Jawa',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-10307379@moe-dl.edu.my',     cmsUnits: [], photo: 'staf-angeline.webp' },
   { id: 6,  name: 'Marina anak Luat',                    position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-22307419@moe-dl.edu.my',       cmsUnits: [], photo: 'staf-marina.webp' },
   { id: 7,  name: 'Jeanica May anak Kuyah',              position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-42304184@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-jeanica.webp' },
@@ -1467,7 +1467,7 @@ let staffData = [
   { id: 19, name: 'Muliady bin Mahmud',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-ipgp21171900@moe-dl.edu.my',           cmsUnits: [], tarikhMulaKehadiran: '2026-09-29' }, // baru daftar masuk 29/9/2026 - jangan kira "tak kemaskini" sebelum tarikh ni
   { id: 10, name: 'Mohd Arfiq Rahimi bin Abdul Rahman',  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-35570001@moe-dl.edu.my',        cmsUnits: [], photo: 'staf-arfiq.webp' },
   { id: 11, name: 'Elnisia anak Guwel',                  position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-32576685@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-elnisia.webp' },
-  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Guru ICT', canViewAttendanceDashboard: true, photo: 'staf-aimuni.webp' },
+  { id: 12, name: 'Aimuni Athirah binti Latif',          position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'g-80575536@moe-dl.edu.my',       cmsUnits: ['Pentadbiran','Kurikulum','Kokurikulum','Hal Ehwal Murid','Prasekolah'], cmsRoleLabel: 'Guru ICT', canViewAttendanceDashboard: true, canViewMonthlyReport: true, photo: 'staf-aimuni.webp' },
   { id: 13, name: 'Nur Syuhada binti Abdul Razak',       position: 'Guru Akademik',                                status: 'Di Sekolah', delimaEmail: 'PLACEHOLDER.syuhada@moe-dl.edu.my',      cmsUnits: [], photo: 'staf-syuhada.webp' },
   { id: 14, name: 'Liminang anak Sabang',                position: 'Pembantu Tadbir',                              status: 'Di Sekolah', delimaEmail: 'liminangsabang@gmail.com',               cmsUnits: [] },
   { id: 16, name: 'Ajek anak Sumping',                   position: 'Pembantu Pengurusan Murid Prasekolah',         status: 'Di Sekolah', delimaEmail: 'ajeksumping140@gmail.com',               cmsUnits: ['Prasekolah'], cmsRoleLabel: 'Penyelaras Prasekolah' },
@@ -1511,8 +1511,22 @@ async function syncStaffFromBackend(){
         const posB = STAFF_SORT_OVERRIDE[Number(b.id)] ?? Number(b.id);
         return posA - posB;
       });
+      // Tindihan julat tarikh PERKHIDMATAN (tarikhMulaKehadiran/tarikhTamatKehadiran)
+      // bagi staf tertentu - medan ni KHUSUS kod ini sahaja, TIADA dalam skema Google
+      // Sheets "Staf". Kalau staf berkenaan juga disimpan/dikemaskini melalui borang
+      // Urus Staf, rekod SHEET dia (tiada medan ni) akan MENGATASI rekod sandaran di
+      // atas semasa gabungan, jadi medan ni hilang senyap-senyap (punca bilangan "hari
+      // tak kemaskini" Muliady tersalah kira - dikira dari 1 bulan PENUH, bukan dari
+      // tarikh mula sebenar dia). Tindih SEMULA di sini, SELEPAS gabungan, supaya ia
+      // sentiasa terpakai tak kira rekod datang dari Sheet atau sandaran.
+      const STAFF_TARIKH_OVERRIDE = {
+        19: { tarikhMulaKehadiran: '2026-09-29' }, // Muliady bin Mahmud - baru daftar masuk
+      };
       staffData.length = 0;
-      merged.forEach(s => staffData.push(s));
+      merged.forEach(s => {
+        const ov = STAFF_TARIKH_OVERRIDE[Number(s.id)];
+        staffData.push(ov ? Object.assign({}, s, ov) : s);
+      });
       staffSyncedFromBackend = true;
     }
   }catch(e){ /* senyap - kekal guna senarai sandaran (fallback) dalam kod */ }
@@ -1750,8 +1764,12 @@ function enterDashboard(){
 
   // "Kemas Kini Status" (borang peribadi) dipaparkan untuk SEMUA staf KECUALI akaun
   // yang ditanda excludeFromAttendance (cth. Akaun Pentadbir Sistem - bukan orang sebenar).
-  // Bahagian pentadbir dalam Dashboard, "Rekod", "Laporan Bulanan" & "Log Audit" dihadkan mengikut peranan.
+  // Bahagian pentadbir dalam Dashboard, "Rekod" & "Log Audit" dihadkan mengikut peranan
+  // (canViewAttendanceDashboard). "Laporan Bulanan" guna kebenaran BERASINGAN & LEBIH
+  // KETAT (canViewMonthlyReport) - HANYA Guru Besar, GPK, dan Penyelaras Digital sahaja,
+  // walaupun staf lain mungkin ada akses Rekod/Log Audit pada masa hadapan.
   const canViewFullDashboard = !!currentUser.canViewAttendanceDashboard;
+  const canViewMonthlyReport = !!currentUser.canViewMonthlyReport;
   const btnStatus = document.getElementById('btn-status');
   const btnRekod = document.getElementById('btn-rekod');
   const btnLaporan = document.getElementById('btn-laporan');
@@ -1763,7 +1781,7 @@ function enterDashboard(){
   if(dashStatusCta) dashStatusCta.classList.toggle('hidden', !!currentUser.excludeFromAttendance);
   if(dashPersonalStats) dashPersonalStats.classList.toggle('hidden', !!currentUser.excludeFromAttendance);
   if(btnRekod) btnRekod.classList.toggle('hidden', !canViewFullDashboard);
-  if(btnLaporan) btnLaporan.classList.toggle('hidden', !canViewFullDashboard);
+  if(btnLaporan) btnLaporan.classList.toggle('hidden', !canViewMonthlyReport);
   if(btnAudit) btnAudit.classList.toggle('hidden', !canViewFullDashboard);
   if(adminDashSection) adminDashSection.classList.toggle('hidden', !canViewFullDashboard);
 
@@ -1773,11 +1791,23 @@ function enterDashboard(){
     fetchRecordsQuietly();
   }
   if(typeof lucide !== 'undefined') lucide.createIcons();
+
+  // PENTING: segar semula data KEHADIRAN HARI INI secara berkala (setiap 60 saat)
+  // selagi dashboard dibuka - sebelum ini `allRecords` cuma ditarik SEKALI semasa
+  // log masuk, jadi kalau staf LAIN isytihar status SELEPAS SU/pentadbir log masuk,
+  // papan "X staf belum kemas kini status hari ini" kekal tunjuk data lapuk sehingga
+  // seseorang tekan "Muat Semula Data"/"Jana Laporan" secara manual (punca aduan
+  // "nama Muliady masih belum kemaskini" walhal dia dah isytihar dalam Sheet).
+  if(dashAutoRefreshTimer) clearInterval(dashAutoRefreshTimer);
+  dashAutoRefreshTimer = setInterval(() => { if(currentUser) fetchRecordsQuietly(); }, 60000);
 }
+
+let dashAutoRefreshTimer = null;
 
 function signOutDashboard(){
   localStorage.removeItem('dashboard_session');
   currentUser = null;
+  if(dashAutoRefreshTimer){ clearInterval(dashAutoRefreshTimer); dashAutoRefreshTimer = null; }
   document.getElementById('dashboard-shell').classList.add('hidden');
   document.getElementById('login-gate').classList.remove('hidden');
   if(typeof google !== 'undefined') google.accounts.id.disableAutoSelect();
@@ -3792,6 +3822,14 @@ window.onload = async function(){
         }
 
         function switchTab(tabId) {
+            // PERTAHANAN BERLAPIS: Laporan Bulanan dihadkan kepada Guru Besar/GPK/Penyelaras
+            // Digital sahaja (canViewMonthlyReport) - sekatan ni bukan setakat sorok butang,
+            // tapi juga halang akses terus kalau seseorang cuba panggil switchTab('laporan')
+            // secara manual (cth. melalui konsol pelayar).
+            if (tabId === 'laporan' && !(currentUser && currentUser.canViewMonthlyReport)) {
+                if (typeof showToast === 'function') showToast('Akses Laporan Bulanan dihadkan kepada Guru Besar/GPK/Penyelaras Digital sahaja.', 'error');
+                tabId = 'dashboard';
+            }
             playPopSound();
             ['dashboard', 'status', 'rekod', 'laporan', 'audit'].forEach(t => {
                 const tab = document.getElementById(`tab-${t}`);
@@ -4802,7 +4840,7 @@ window.onload = async function(){
                 attentionHTML = `
                     <div class="bg-rose-50 border border-rose-300 rounded-lg p-3">
                         <p class="text-[10px] font-black text-rose-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                            <span>&#9888;</span> Jadual Kekerapan Staf Yang Tidak Kemaskini &mdash; Top ${top5.length} (${selectedMonthName} ${yearFilter})
+                            <span>&#9888;</span> Jadual Kekerapan Staf Yang Tidak Kemaskini (${selectedMonthName} ${yearFilter})
                         </p>
                         <table class="w-full text-left border border-rose-200 border-collapse bg-white rounded overflow-hidden">
                             <thead>
