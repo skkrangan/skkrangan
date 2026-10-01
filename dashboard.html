@@ -121,27 +121,30 @@
     }
     .school-header { margin-bottom: 3px !important; padding-bottom: 3px !important; }
     .school-logo { height: 30px !important; width: 30px !important; }
-    .school-title { font-size: 10px !important; line-height: 1.1 !important; }
-    .school-subtitle { font-size: 6.5px !important; line-height: 1.15 !important; }
+    .school-title { font-size: 11px !important; line-height: 1.1 !important; }
+    .school-subtitle { font-size: 7px !important; line-height: 1.15 !important; }
     .report-title-section { margin-bottom: 3px !important; }
-    .report-title-text { font-size: 9.5px !important; line-height: 1.1 !important; }
-    .report-title-section p { font-size: 7px !important; margin-top: 0 !important; }
+    .report-title-text { font-size: 10.5px !important; line-height: 1.1 !important; }
+    .report-title-section p { font-size: 7.5px !important; margin-top: 0 !important; }
     /* Kotak "Ringkasan Analitik" (Purata Kehadiran/Urusan Rasmi/Cuti) dah DIBUANG
-       daripada Laporan Bulanan atas permintaan SU - ruang yang dibebaskan digunakan
-       untuk besarkan fon jadual kekerapan tak kemaskini & jadual utama di bawah,
-       sambil laporan kekal dimampatkan untuk muat 1 muka surat sahaja. Fon jadual
-       utama (th,td di bawah) dinaikkan secara SEDERHANA sahaja (bukan maksimum) -
-       cubaan sebelum ini terlalu besar & terbitkan laporan 2 muka surat. */
+       daripada Laporan Bulanan atas permintaan SU, dan jadual "tidak kemaskini" kini
+       TOP 3 sahaja (sebelum ini TOP 5) - ruang yang dibebaskan daripada DUA-DUA
+       perubahan tu digunakan untuk besarkan fon jadual utama & tajuk di bawah,
+       sambil laporan kekal dimampatkan untuk muat 1 muka surat sahaja. Kalau bulan
+       tertentu masih melimpah lebih 1 muka surat walaupun dah begini, skrip
+       kecilkanLaporanBulananUntukCetak (lihat bahagian skrip di bawah) akan kecilkan
+       terus (zoom) secukupnya semasa cetak - itu JARINGAN KESELAMATAN, bukan
+       pengiraan fon ni sendiri yang perlu tepat 100%. */
     #print-area-monthly #report-attention-summary { margin-bottom: 3px !important; }
     #print-area-monthly #report-attention-summary > div { padding: 3.5px !important; border-radius: 3px !important; }
-    #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8px !important; margin-bottom: 1px !important; }
+    #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8.5px !important; margin-bottom: 1px !important; }
     #print-area-monthly #report-attention-summary table { margin-top: 0 !important; }
-    #print-area-monthly #report-attention-summary p:last-child { font-size: 6.5px !important; margin-top: 1px !important; }
+    #print-area-monthly #report-attention-summary p:last-child { font-size: 7px !important; margin-top: 1px !important; }
     table { width: 100% !important; border-collapse: collapse !important; margin-top: 1px !important; table-layout: fixed !important; }
     thead { display: table-header-group !important; } /* ulang tajuk lajur di setiap muka surat baharu */
     tr { page-break-inside: avoid !important; } /* elak baris terpotong separuh, tapi jadual BOLEH sambung ke muka surat 2 tanpa jurang kosong */
-    th, td { padding: 2px 5px !important; font-size: 9px !important; line-height: 1.2 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-    #print-area-monthly td span { font-size: 7px !important; line-height: 1.15 !important; }
+    th, td { padding: 2.5px 5px !important; font-size: 10px !important; line-height: 1.25 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+    #print-area-monthly td span { font-size: 8px !important; line-height: 1.2 !important; }
     /* Isu jadual terpotong semasa cetak: pembalut "overflow-x-auto" cuma boleh
        diskrol pada skrin - semasa cetak, apa-apa kandungan yang perlu diskrol
        akan HILANG terus (bukan disusun semula/reflow). Paksa nampak semua. */
@@ -156,7 +159,7 @@
     .signature-block { margin-top: 5px !important; padding-top: 3px !important; page-break-inside: avoid !important; }
     .signature-block .w-64 { width: 46mm !important; }
     .signature-space { height: 20px !important; margin-top: 5px !important; }
-    .signature-block p { font-size: 7px !important; line-height: 1.15 !important; margin-top: 0 !important; }
+    .signature-block p { font-size: 7.5px !important; line-height: 1.15 !important; margin-top: 0 !important; }
     @page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }
   }
   /* ============================================================
@@ -165,32 +168,32 @@
      di skrin biasa PADAN TEPAT dengan hasil cetak/PDF sebenar.
      ============================================================ */
   #print-area-monthly table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin-top: 1px !important; }
-  #print-area-monthly th, #print-area-monthly td { padding: 2px 5px !important; font-size: 9px !important; line-height: 1.2 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-  #print-area-monthly td span { font-size: 7px !important; line-height: 1.15 !important; }
+  #print-area-monthly th, #print-area-monthly td { padding: 2.5px 5px !important; font-size: 10px !important; line-height: 1.25 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+  #print-area-monthly td span { font-size: 8px !important; line-height: 1.2 !important; }
   #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
   #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
   #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
   #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
-  /* Kotak "Ringkasan Analitik" dah dibuang - jadual kekerapan tak kemaskini &
-     jadual utama dibesarkan SEDERHANA sahaja supaya pratonton skrin padan dengan
-     hasil cetak 1 muka surat (lihat @media print - cubaan terdahulu terlalu
-     besar & terbitkan 2 muka surat). */
+  /* Kotak "Ringkasan Analitik" dah dibuang, dan jadual "tidak kemaskini" kini TOP 3
+     sahaja (bukan TOP 5) - ruang yang dibebaskan digunakan untuk besarkan fon jadual
+     utama & tajuk supaya pratonton skrin padan dengan hasil cetak 1 muka surat
+     (lihat @media print untuk nilai yang sama + jaringan keselamatan zoom). */
   #print-area-monthly .school-header { margin-bottom: 3px !important; padding-bottom: 3px !important; }
   #print-area-monthly .school-logo { height: 30px !important; width: 30px !important; }
-  #print-area-monthly .school-title { font-size: 10px !important; line-height: 1.1 !important; }
-  #print-area-monthly .school-subtitle { font-size: 6.5px !important; line-height: 1.15 !important; }
+  #print-area-monthly .school-title { font-size: 11px !important; line-height: 1.1 !important; }
+  #print-area-monthly .school-subtitle { font-size: 7px !important; line-height: 1.15 !important; }
   #print-area-monthly .report-title-section { margin-bottom: 3px !important; }
-  #print-area-monthly .report-title-text { font-size: 9.5px !important; line-height: 1.1 !important; }
-  #print-area-monthly .report-title-section p { font-size: 7px !important; margin-top: 0 !important; }
+  #print-area-monthly .report-title-text { font-size: 10.5px !important; line-height: 1.1 !important; }
+  #print-area-monthly .report-title-section p { font-size: 7.5px !important; margin-top: 0 !important; }
   #print-area-monthly #report-attention-summary { margin-bottom: 3px !important; }
   #print-area-monthly #report-attention-summary > div { padding: 3.5px !important; border-radius: 3px !important; }
-  #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8px !important; margin-bottom: 1px !important; }
+  #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8.5px !important; margin-bottom: 1px !important; }
   #print-area-monthly #report-attention-summary table { margin-top: 0 !important; }
-  #print-area-monthly #report-attention-summary p:last-child { font-size: 6.5px !important; margin-top: 1px !important; }
+  #print-area-monthly #report-attention-summary p:last-child { font-size: 7px !important; margin-top: 1px !important; }
   #print-area-monthly .signature-block { margin-top: 5px !important; padding-top: 3px !important; }
   #print-area-monthly .signature-block .w-64 { width: 46mm !important; }
   #print-area-monthly .signature-space { height: 20px !important; margin-top: 5px !important; }
-  #print-area-monthly .signature-block p { font-size: 7px !important; line-height: 1.15 !important; margin-top: 0 !important; }
+  #print-area-monthly .signature-block p { font-size: 7.5px !important; line-height: 1.15 !important; margin-top: 0 !important; }
   #mobile-report-view summary::-webkit-details-marker{ display:none; }
   #mobile-report-view details[open] summary i.fa-chevron-down{ transform:rotate(180deg); }
   .vertical-text-upright{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
@@ -4930,14 +4933,17 @@ window.onload = async function(){
 
             tbody.innerHTML = reportHTML;
 
-            // ---- Jadual Kekerapan Staf Yang Tidak Kemaskini - TOP 5 staf dengan bilangan
-            // PALING BANYAK hari bekerja yang tidak dikemaskini kehadirannya bagi bulan terpilih ----
+            // ---- Jadual Kekerapan Staf Yang Tidak Kemaskini - TOP 3 staf dengan bilangan
+            // PALING BANYAK hari bekerja yang tidak dikemaskini kehadirannya bagi bulan terpilih.
+            // (Sebelum ini TOP 5 - dikecilkan kepada TOP 3 atas permintaan SU supaya ruang yang
+            // dibebaskan boleh digunakan untuk besarkan fon keseluruhan laporan, sambil kekal 1
+            // muka surat.) ----
             senaraiTakKemaskini.sort((a, b) => b.hariHilang - a.hariHilang);
-            const top5 = senaraiTakKemaskini.slice(0, 5);
+            const top3 = senaraiTakKemaskini.slice(0, 3);
             const catatanAsas = `* Berdasarkan ${jumlahHariBekerjaAsas} hari bekerja (Isnin&ndash;Jumaat, tolak cuti umum Malaysia/Sarawak${((new Date().getFullYear() === parseInt(yearFilter)) && ((new Date().getMonth() + 1) === parseInt(monthFilter))) ? ', setakat hari ini' : ''}) ditolak bilangan hari rekod dihantar. Staf baru mula/tamat berkhidmat pertengahan bulan dikira ikut tarikh perkhidmatan sebenar masing-masing.`;
 
             let attentionHTML;
-            if (top5.length === 0) {
+            if (top3.length === 0) {
                 attentionHTML = `
                     <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 text-[10px] font-bold text-emerald-700 uppercase tracking-wide">
                         <span>&#10003;</span> Semua staf telah mengemaskini kehadiran bagi ${selectedMonthName} ${yearFilter}.
@@ -4945,20 +4951,20 @@ window.onload = async function(){
             } else {
                 attentionHTML = `
                     <div class="bg-rose-50 border border-rose-300 rounded-lg p-3">
-                        <p class="text-[10px] font-black text-rose-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                            <span>&#9888;</span> Jadual Kekerapan Staf Yang Tidak Kemaskini (${selectedMonthName} ${yearFilter})
+                        <p class="text-[10.5px] font-black text-rose-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                            <span>&#9888;</span> Jadual Kekerapan Staf Yang Tidak Kemaskini &mdash; 3 Teratas (${selectedMonthName} ${yearFilter})
                         </p>
                         <table class="w-full text-left border border-rose-200 border-collapse bg-white rounded overflow-hidden">
                             <thead>
-                                <tr class="bg-rose-100 text-rose-800 text-[8px] uppercase font-extrabold">
+                                <tr class="bg-rose-100 text-rose-800 text-[8.5px] uppercase font-extrabold">
                                     <th class="p-1.5 border-r border-rose-200 text-center w-8">Bil</th>
                                     <th class="p-1.5 border-r border-rose-200">Nama</th>
                                     <th class="p-1.5 border-r border-rose-200">Jawatan</th>
                                     <th class="p-1.5 text-center w-32">Hari Tidak Dikemaskini</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-[9px] text-slate-800 divide-y divide-rose-100">
-                                ${top5.map((item, i) => `
+                            <tbody class="text-[10px] text-slate-800 divide-y divide-rose-100">
+                                ${top3.map((item, i) => `
                                     <tr>
                                         <td class="p-1.5 border-r border-rose-100 text-center font-bold text-slate-500">${i + 1}</td>
                                         <td class="p-1.5 border-r border-rose-100 font-bold">${item.staff.name}</td>
@@ -4967,7 +4973,7 @@ window.onload = async function(){
                                     </tr>`).join('')}
                             </tbody>
                         </table>
-                        <p class="text-[8px] text-rose-400 italic mt-1.5">${catatanAsas}</p>
+                        <p class="text-[8.5px] text-rose-400 italic mt-1.5">${catatanAsas}</p>
                     </div>`;
             }
             const attentionBox = document.getElementById('report-attention-summary');
