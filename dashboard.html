@@ -1834,14 +1834,27 @@ function enterDashboard(){
   }
   if(typeof lucide !== 'undefined') lucide.createIcons();
 
-  // PENTING: segar semula data KEHADIRAN HARI INI secara berkala (setiap 60 saat)
-  // selagi dashboard dibuka - sebelum ini `allRecords` cuma ditarik SEKALI semasa
-  // log masuk, jadi kalau staf LAIN isytihar status SELEPAS SU/pentadbir log masuk,
-  // papan "X staf belum kemas kini status hari ini" kekal tunjuk data lapuk sehingga
-  // seseorang tekan "Muat Semula Data"/"Jana Laporan" secara manual (punca aduan
-  // "nama Muliady masih belum kemaskini" walhal dia dah isytihar dalam Sheet).
+  // PENTING: segar semula data KEHADIRAN HARI INI *DAN* SENARAI STAF secara
+  // berkala (setiap 60 saat) selagi dashboard dibuka. SEBELUM INI hanya
+  // `allRecords` (rekod kehadiran) yang disegarkan di sini - `staffData`
+  // (senarai staf) cuma ditarik SEKALI semasa muka surat dimuatkan (window.onload,
+  // SEBELUM log masuk), dan butang "Muat Semula Data" pun cuma tarik rekod
+  // kehadiran, BUKAN senarai staf. Jadi staf BAHARU yang ditambah di Sheet
+  // "Staf" (lepas Urus Staf) SELEPAS tab dashboard ni dibuka akan terus
+  // "hilang" (tak muncul dalam papan "Kemas Kini Status Keberadaan", senarai
+  // "belum kemas kini", dsb.) sehingga seseorang log keluar & log masuk semula
+  // - inilah punca sebenar aduan "nama Muliady takda untuk kemas kini status
+  // hari ini". Jana Laporan Bulanan dah dibaiki (sentiasa tarik semula staf
+  // sebelum jana laporan), tapi paparan dashboard harian ni tak sepatutnya
+  // perlu tunggu laporan dijana dulu - jadi disegarkan terus di sini juga,
+  // dan dashboard dilukis semula (renderDashboard) lepas senarai staf berubah
+  // supaya staf baharu terus kelihatan tanpa perlu log keluar/masuk.
   if(dashAutoRefreshTimer) clearInterval(dashAutoRefreshTimer);
-  dashAutoRefreshTimer = setInterval(() => { if(currentUser) fetchRecordsQuietly(); }, 60000);
+  dashAutoRefreshTimer = setInterval(() => {
+    if(!currentUser) return;
+    fetchRecordsQuietly();
+    syncStaffFromBackend().then(() => { if(currentUser) renderDashboard(); });
+  }, 60000);
 }
 
 let dashAutoRefreshTimer = null;
@@ -4509,16 +4522,23 @@ window.onload = async function(){
 
         async function fetchRecords() {
             playPopSound();
-            showToast("Sedang memuat turun log rekod terkini...", "info");
+            showToast("Sedang memuat turun log rekod & senarai staf terkini...", "info");
             const tbody = document.getElementById('records-body');
             tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-slate-500"><i class="fa-solid fa-circle-notch animate-spin text-3xl text-indigo-600 mb-2 block"></i> Memuatkan rekod...</td></tr>`;
 
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL);
+                // Butang "Muat Semula Data" ni sepatutnya cara PALING PANTAS untuk admin
+                // segarkan semula semua data penting - jadi senarai STAF (staffData) pun
+                // ditarik semula sekali di sini (bukan rekod kehadiran sahaja), supaya staf
+                // baharu yang baru didaftarkan di Urus Staf terus kelihatan di seluruh
+                // dashboard (papan status hari ini, dropdown, dsb.) tanpa perlu tunggu
+                // segar-semula automatik 60 saat atau log keluar/masuk semula.
+                const [response] = await Promise.all([fetch(GOOGLE_SCRIPT_URL), syncStaffFromBackend()]);
                 if (!response.ok) throw new Error("Gagal menyambung.");
                 const data = await response.json();
                 allRecords = data.reverse();
                 applyFilters();
+                if (typeof renderDashboard === 'function') renderDashboard();
                 playChimeSound();
                 showToast("Pangkalan data log berjaya dimuat turun!", "success");
             } catch (err) {
@@ -4813,14 +4833,28 @@ window.onload = async function(){
             // dalam "Jadual Kekerapan Staf Yang Tidak Kemaskini" sebab tiada gunanya
             // ingatkan staf yang dah tiada di sekolah untuk kemas kini kehadiran.
             const activeStaffList = staffData.filter(staff => !staff.excludeFromAttendance);
-            // Padan nama secara TOLERAN (potong ruang lebih & abaikan huruf besar/kecil) -
-            // nama staf dalam Sheet "Staf" (staffData) kadang tertulis sedikit berbeza
-            // daripada nama dalam Sheet rekod kehadiran (cth. jarak/kekosongan ekstra,
-            // huruf besar/kecil tak konsisten). Padanan ketat (===) boleh tersilap anggap
-            // staf AKTIF sebagai "dah berpindah" hanya kerana ejaan nama tak 100% sama.
-            const normalisasiNama = (n) => (n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+            // Padan nama secara TOLERAN - nama staf dalam Sheet "Staf" (staffData) kadang
+            // tertulis sedikit berbeza daripada nama dalam Sheet rekod kehadiran. Padanan
+            // ketat (===) boleh tersilap anggap staf AKTIF sebagai "dah berpindah" hanya
+            // kerana ejaan nama tak 100% sama. Selain ruang/huruf besar-kecil, PUNCA YANG
+            // LEBIH KERAP di sekolah ni ialah kata penghubung nama adat (bin/binti/anak/ak/
+            // a-l/a-p) - cth. "Muliady bin Mahmud" (dalam Urus Staf) lawan "Muliady Mahmud"
+            // (dalam borang kemas kini status harian, tanpa "bin"). Dua nama tu SAMA ORANG
+            // tapi akan gagal padan kalau hanya ruang/case dibuang, sebab "bin"/"anak" tu
+            // sendiri masih ada beza. Jadi buang kata penghubung tu juga semasa membanding
+            // (paparan pada laporan tetap guna nama PENUH asal - ni cuma untuk padanan).
+            const normalisasiNama = (n) => (n || '')
+                .trim().toLowerCase().replace(/\s+/g, ' ')
+                .replace(/\b(bin|binti|anak|ak|a\/l|a\/p)\b\.?/g, '')
+                .replace(/\s+/g, ' ').trim();
             const activeStaffNamesNormalized = new Set(activeStaffList.map(s => normalisasiNama(s.name)));
             const departedNamesWithRecords = [...new Set(monthlyData.map(r => r.name))].filter(name => !activeStaffNamesNormalized.has(normalisasiNama(name)));
+            // Nota debug: kalau ada nama yang masih tersilap ditanda "berpindah" selepas
+            // padanan toleran di atas, senarai ni akan tercatat dalam Console pelayar (F12
+            // > Console) supaya ejaan sebenar yang berkonflik boleh dikenal pasti terus.
+            if (departedNamesWithRecords.length) {
+                console.warn('[Laporan Bulanan] Nama berikut ada rekod kehadiran tapi tak padan mana-mana staf AKTIF (akan ditanda "Sudah Berpindah/Tamat"):', departedNamesWithRecords, '— senarai nama staf aktif (selepas normalisasi):', [...activeStaffNamesNormalized]);
+            }
             const departedStaffList = departedNamesWithRecords.map(name => {
                 const sampleLog = monthlyData.find(r => r.name === name);
                 return { name, position: (sampleLog && sampleLog.position) || 'Bekas Staf', _departed: true };
@@ -4833,7 +4867,14 @@ window.onload = async function(){
             let reportHTML = '';
             let mobileCardsHTML = '';
             reportStaffList.forEach((staff, index) => {
-                const staffLogs = monthlyData.filter(r => r.name === staff.name);
+                // Guna padanan NAMA TOLERAN yang sama (normalisasiNama) di sini juga - kalau
+                // tidak, staf yang ejaan namanya berbeza sikit antara Urus Staf & borang
+                // kemas kini status (cth. ada/tiada "bin") akan terpadam dengan betul dalam
+                // senarai staf AKTIF (tak lagi ditanda "berpindah"), tapi rekod kehadiran dia
+                // tetap tak terkesan di sini (padanan ketat ===) - jadi dia akan nampak macam
+                // "0 hari hadir, semua hari hilang" walhal dia dah kemas kini setiap hari.
+                const staffNameNormalized = normalisasiNama(staff.name);
+                const staffLogs = monthlyData.filter(r => normalisasiNama(r.name) === staffNameNormalized);
                 // Hari bekerja KHUSUS staf ni - hormat tarikhMulaKehadiran/tarikhTamatKehadiran
                 // kalau staf berkenaan baru mula/dah tamat berkhidmat pertengahan bulan.
                 const jumlahHariBekerjaStaf = kiraHariBekerjaBulan(
@@ -4954,9 +4995,29 @@ window.onload = async function(){
             area.style.zoom = '';
             const MM_KE_PX = 96 / 25.4;
             const RUANG_TINGGI_PX = (210 - 16) * MM_KE_PX; // A4 landskap, tolak margin 8mm atas+bawah (@page monthly-page)
+            const LEBAR_CETAK_PX = (297 - 16) * MM_KE_PX; // lebar sebenar bila dicetak: A4 landskap 297mm, tolak margin 8mm kiri+kanan
+            // PENTING - PUNCA SEBENAR laporan "1 muka surat tetapi tidak lengkap":
+            // di skrin, #print-area-monthly guna class max-w-[1400px] (~1400px, jauh
+            // lebih lebar daripada ~1062px lebar sebenar bila dicetak). Kalau tinggi
+            // diukur terus pada lebar skrin yang lebih luas tu, teks wrap ke LEBIH
+            // SIKIT baris berbanding bila benar-benar dicetak pada lebar yang lebih
+            // sempit (lebih sempit = lebih banyak baris = lebih tinggi). Ini buat
+            // skala zoom yang dikira jadi TERLALU BESAR (kurang dikecilkan daripada
+            // sepatutnya) - laporan nampak muat 1 muka surat semasa kira, tapi bila
+            // dicetak betul pada lebar sebenar, kandungan jadi lebih tinggi daripada
+            // yang dijangka dan terpotong oleh had max-height print CSS di atas.
+            // Jadi kena PAKSA lebar kawasan ukur sama dengan lebar cetak sebenar
+            // buat sementara waktu semasa mengukur, supaya pembalutan teks (word
+            // wrap) sama macam bila dicetak betul-betul.
+            const lebarAsal = area.style.width;
+            const maxLebarAsal = area.style.maxWidth;
+            area.style.width = LEBAR_CETAK_PX + 'px';
+            area.style.maxWidth = LEBAR_CETAK_PX + 'px';
             const tinggiSebenarPx = area.scrollHeight;
+            area.style.width = lebarAsal;
+            area.style.maxWidth = maxLebarAsal;
             if (tinggiSebenarPx > RUANG_TINGGI_PX) {
-                const skala = Math.max(0.55, RUANG_TINGGI_PX / tinggiSebenarPx);
+                const skala = Math.max(0.5, RUANG_TINGGI_PX / tinggiSebenarPx);
                 area.style.zoom = skala;
             }
         }
