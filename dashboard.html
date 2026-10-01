@@ -112,27 +112,29 @@
       print-color-adjust: exact !important;
       border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: auto !important; display: block !important;
     }
-    .school-header { margin-bottom: 4px !important; padding-bottom: 4px !important; }
-    .school-logo { height: 34px !important; width: 34px !important; }
-    .school-title { font-size: 11px !important; line-height: 1.1 !important; }
-    .school-subtitle { font-size: 7px !important; line-height: 1.15 !important; }
-    .report-title-section { margin-bottom: 4px !important; }
-    .report-title-text { font-size: 10.5px !important; line-height: 1.1 !important; }
-    .report-title-section p { font-size: 7.5px !important; margin-top: 0 !important; }
+    .school-header { margin-bottom: 3px !important; padding-bottom: 3px !important; }
+    .school-logo { height: 30px !important; width: 30px !important; }
+    .school-title { font-size: 10px !important; line-height: 1.1 !important; }
+    .school-subtitle { font-size: 6.5px !important; line-height: 1.15 !important; }
+    .report-title-section { margin-bottom: 3px !important; }
+    .report-title-text { font-size: 9.5px !important; line-height: 1.1 !important; }
+    .report-title-section p { font-size: 7px !important; margin-top: 0 !important; }
     /* Kotak "Ringkasan Analitik" (Purata Kehadiran/Urusan Rasmi/Cuti) dah DIBUANG
        daripada Laporan Bulanan atas permintaan SU - ruang yang dibebaskan digunakan
        untuk besarkan fon jadual kekerapan tak kemaskini & jadual utama di bawah,
-       sambil laporan kekal dimampatkan untuk muat 1 muka surat sahaja. */
-    #print-area-monthly #report-attention-summary { margin-bottom: 4px !important; }
-    #print-area-monthly #report-attention-summary > div { padding: 4px !important; border-radius: 3px !important; }
-    #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8.5px !important; margin-bottom: 1.5px !important; }
+       sambil laporan kekal dimampatkan untuk muat 1 muka surat sahaja. Fon jadual
+       utama (th,td di bawah) dinaikkan secara SEDERHANA sahaja (bukan maksimum) -
+       cubaan sebelum ini terlalu besar & terbitkan laporan 2 muka surat. */
+    #print-area-monthly #report-attention-summary { margin-bottom: 3px !important; }
+    #print-area-monthly #report-attention-summary > div { padding: 3.5px !important; border-radius: 3px !important; }
+    #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8px !important; margin-bottom: 1px !important; }
     #print-area-monthly #report-attention-summary table { margin-top: 0 !important; }
-    #print-area-monthly #report-attention-summary p:last-child { font-size: 7px !important; margin-top: 1.5px !important; }
+    #print-area-monthly #report-attention-summary p:last-child { font-size: 6.5px !important; margin-top: 1px !important; }
     table { width: 100% !important; border-collapse: collapse !important; margin-top: 1px !important; table-layout: fixed !important; }
     thead { display: table-header-group !important; } /* ulang tajuk lajur di setiap muka surat baharu */
     tr { page-break-inside: avoid !important; } /* elak baris terpotong separuh, tapi jadual BOLEH sambung ke muka surat 2 tanpa jurang kosong */
-    th, td { padding: 2.5px 6px !important; font-size: 9.5px !important; line-height: 1.25 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-    #print-area-monthly td span { font-size: 7.5px !important; line-height: 1.2 !important; }
+    th, td { padding: 2px 5px !important; font-size: 9px !important; line-height: 1.2 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+    #print-area-monthly td span { font-size: 7px !important; line-height: 1.15 !important; }
     /* Isu jadual terpotong semasa cetak: pembalut "overflow-x-auto" cuma boleh
        diskrol pada skrin - semasa cetak, apa-apa kandungan yang perlu diskrol
        akan HILANG terus (bukan disusun semula/reflow). Paksa nampak semua. */
@@ -144,10 +146,10 @@
        lajur seragam - lajur status lain dikecilkan sedikit untuk seimbangkan. */
     #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
     #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
-    .signature-block { margin-top: 6px !important; padding-top: 4px !important; page-break-inside: avoid !important; }
-    .signature-block .w-64 { width: 48mm !important; }
-    .signature-space { height: 24px !important; margin-top: 6px !important; }
-    .signature-block p { font-size: 7.5px !important; line-height: 1.15 !important; margin-top: 0 !important; }
+    .signature-block { margin-top: 5px !important; padding-top: 3px !important; page-break-inside: avoid !important; }
+    .signature-block .w-64 { width: 46mm !important; }
+    .signature-space { height: 20px !important; margin-top: 5px !important; }
+    .signature-block p { font-size: 7px !important; line-height: 1.15 !important; margin-top: 0 !important; }
     @page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }
   }
   /* ============================================================
@@ -156,31 +158,32 @@
      di skrin biasa PADAN TEPAT dengan hasil cetak/PDF sebenar.
      ============================================================ */
   #print-area-monthly table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin-top: 1px !important; }
-  #print-area-monthly th, #print-area-monthly td { padding: 2.5px 6px !important; font-size: 9.5px !important; line-height: 1.25 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
-  #print-area-monthly td span { font-size: 7.5px !important; line-height: 1.2 !important; }
+  #print-area-monthly th, #print-area-monthly td { padding: 2px 5px !important; font-size: 9px !important; line-height: 1.2 !important; border: 1px solid black !important; word-wrap: break-word !important; overflow-wrap: break-word !important; }
+  #print-area-monthly td span { font-size: 7px !important; line-height: 1.15 !important; }
   #print-area-monthly th:nth-child(1), #print-area-monthly td:nth-child(1) { width: 3% !important; }
   #print-area-monthly th:nth-child(2), #print-area-monthly td:nth-child(2) { width: 15% !important; }
   #print-area-monthly th:nth-child(n+3):not(:nth-child(6)), #print-area-monthly td:nth-child(n+3):not(:nth-child(6)) { width: 7.5% !important; }
   #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
   /* Kotak "Ringkasan Analitik" dah dibuang - jadual kekerapan tak kemaskini &
-     jadual utama dibesarkan supaya pratonton skrin padan dengan hasil cetak
-     1 muka surat (lihat @media print). */
-  #print-area-monthly .school-header { margin-bottom: 4px !important; padding-bottom: 4px !important; }
-  #print-area-monthly .school-logo { height: 34px !important; width: 34px !important; }
-  #print-area-monthly .school-title { font-size: 11px !important; line-height: 1.1 !important; }
-  #print-area-monthly .school-subtitle { font-size: 7px !important; line-height: 1.15 !important; }
-  #print-area-monthly .report-title-section { margin-bottom: 4px !important; }
-  #print-area-monthly .report-title-text { font-size: 10.5px !important; line-height: 1.1 !important; }
-  #print-area-monthly .report-title-section p { font-size: 7.5px !important; margin-top: 0 !important; }
-  #print-area-monthly #report-attention-summary { margin-bottom: 4px !important; }
-  #print-area-monthly #report-attention-summary > div { padding: 4px !important; border-radius: 3px !important; }
-  #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8.5px !important; margin-bottom: 1.5px !important; }
+     jadual utama dibesarkan SEDERHANA sahaja supaya pratonton skrin padan dengan
+     hasil cetak 1 muka surat (lihat @media print - cubaan terdahulu terlalu
+     besar & terbitkan 2 muka surat). */
+  #print-area-monthly .school-header { margin-bottom: 3px !important; padding-bottom: 3px !important; }
+  #print-area-monthly .school-logo { height: 30px !important; width: 30px !important; }
+  #print-area-monthly .school-title { font-size: 10px !important; line-height: 1.1 !important; }
+  #print-area-monthly .school-subtitle { font-size: 6.5px !important; line-height: 1.15 !important; }
+  #print-area-monthly .report-title-section { margin-bottom: 3px !important; }
+  #print-area-monthly .report-title-text { font-size: 9.5px !important; line-height: 1.1 !important; }
+  #print-area-monthly .report-title-section p { font-size: 7px !important; margin-top: 0 !important; }
+  #print-area-monthly #report-attention-summary { margin-bottom: 3px !important; }
+  #print-area-monthly #report-attention-summary > div { padding: 3.5px !important; border-radius: 3px !important; }
+  #print-area-monthly #report-attention-summary > div > p:first-child { font-size: 8px !important; margin-bottom: 1px !important; }
   #print-area-monthly #report-attention-summary table { margin-top: 0 !important; }
-  #print-area-monthly #report-attention-summary p:last-child { font-size: 7px !important; margin-top: 1.5px !important; }
-  #print-area-monthly .signature-block { margin-top: 6px !important; padding-top: 4px !important; }
-  #print-area-monthly .signature-block .w-64 { width: 48mm !important; }
-  #print-area-monthly .signature-space { height: 24px !important; margin-top: 6px !important; }
-  #print-area-monthly .signature-block p { font-size: 7.5px !important; line-height: 1.15 !important; margin-top: 0 !important; }
+  #print-area-monthly #report-attention-summary p:last-child { font-size: 6.5px !important; margin-top: 1px !important; }
+  #print-area-monthly .signature-block { margin-top: 5px !important; padding-top: 3px !important; }
+  #print-area-monthly .signature-block .w-64 { width: 46mm !important; }
+  #print-area-monthly .signature-space { height: 20px !important; margin-top: 5px !important; }
+  #print-area-monthly .signature-block p { font-size: 7px !important; line-height: 1.15 !important; margin-top: 0 !important; }
   #mobile-report-view summary::-webkit-details-marker{ display:none; }
   #mobile-report-view details[open] summary i.fa-chevron-down{ transform:rotate(180deg); }
   .vertical-text-upright{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
@@ -4790,12 +4793,29 @@ window.onload = async function(){
             const jumlahHariBekerjaAsas = kiraHariBekerjaBulan(parseInt(yearFilter), parseInt(monthFilter));
             const senaraiTakKemaskini = []; // {staff, hariHilang} - jumlah hari bekerja TIDAK dikemaskini, semua staf
 
+            // Staf yang dah dipadam daripada staffData (cth. berpindah sekolah/tamat
+            // perkhidmatan & dibuang di Urus Staf - macam Siti Norhafizah) TIDAK PATUT
+            // terus hilang daripada laporan BULAN-BULAN SEBELUM mereka pergi - itu
+            // sejarah kehadiran sebenar yang masih perlu dipamerkan. Jadi sesiapa yang
+            // ADA rekod kehadiran pada bulan terpilih ni tapi dah tiada dalam staffData
+            // aktif sekarang, tetap dimasukkan (ditanda _departed) - tapi TIDAK disenarai
+            // dalam "Jadual Kekerapan Staf Yang Tidak Kemaskini" sebab tiada gunanya
+            // ingatkan staf yang dah tiada di sekolah untuk kemas kini kehadiran.
+            const activeStaffList = staffData.filter(staff => !staff.excludeFromAttendance);
+            const activeStaffNames = new Set(activeStaffList.map(s => s.name));
+            const departedNamesWithRecords = [...new Set(monthlyData.map(r => r.name))].filter(name => !activeStaffNames.has(name));
+            const departedStaffList = departedNamesWithRecords.map(name => {
+                const sampleLog = monthlyData.find(r => r.name === name);
+                return { name, position: (sampleLog && sampleLog.position) || 'Bekas Staf', _departed: true };
+            });
+            const reportStaffList = [...activeStaffList, ...departedStaffList];
+
             // Setiap status dapat lajur SENDIRI (kira terus daripada statusOptions,
             // sepadan 1-ke-1 dengan senarai "Ringkasan Keberadaan Staf") - tiada
             // status disatukan/disenyapkan dalam lajur "lain-lain" lagi.
             let reportHTML = '';
             let mobileCardsHTML = '';
-            staffData.filter(staff => !staff.excludeFromAttendance).forEach((staff, index) => {
+            reportStaffList.forEach((staff, index) => {
                 const staffLogs = monthlyData.filter(r => r.name === staff.name);
                 // Hari bekerja KHUSUS staf ni - hormat tarikhMulaKehadiran/tarikhTamatKehadiran
                 // kalau staf berkenaan baru mula/dah tamat berkhidmat pertengahan bulan.
@@ -4804,7 +4824,9 @@ window.onload = async function(){
                     staff.tarikhMulaKehadiran, staff.tarikhTamatKehadiran
                 );
                 const hariHilang = Math.max(0, jumlahHariBekerjaStaf - staffLogs.length);
-                if (hariHilang > 0) senaraiTakKemaskini.push({ staff, hariHilang });
+                // Staf yang dah berpindah/tamat (_departed) TIDAK disenaraikan dalam jadual
+                // "tidak kemaskini" - tiada gunanya ingatkan staf yang dah tiada di sekolah.
+                if (hariHilang > 0 && !staff._departed) senaraiTakKemaskini.push({ staff, hariHilang });
                 const kiraanIkutStatus = {};
                 statusOptions.forEach(s => { kiraanIkutStatus[s] = 0; });
                 staffLogs.forEach(log => {
@@ -4828,7 +4850,7 @@ window.onload = async function(){
                 reportHTML += `
                     <tr class="hover:bg-slate-50 border-b border-slate-300 transition-colors">
                         <td class="p-2 border-r border-slate-300 text-slate-500 font-bold text-center">${index + 1}</td>
-                        <td class="p-2 border-r border-slate-300 font-black text-slate-900">${staff.name}<br><span class="text-[8px] text-indigo-600 uppercase font-bold tracking-wider">${staff.position}</span></td>
+                        <td class="p-2 border-r border-slate-300 font-black text-slate-900">${staff.name}<br><span class="text-[8px] ${staff._departed ? 'text-rose-500' : 'text-indigo-600'} uppercase font-bold tracking-wider">${staff.position}${staff._departed ? ' &bull; Sudah Berpindah/Tamat' : ''}</span></td>
                         ${selStatusCells}
                     </tr>
                 `;
@@ -4838,7 +4860,7 @@ window.onload = async function(){
                         <summary class="p-4 cursor-pointer flex items-center justify-between gap-2 list-none">
                             <div class="min-w-0">
                                 <p class="font-black text-slate-900 text-sm truncate">${index + 1}. ${staff.name}</p>
-                                <p class="text-[10px] text-indigo-600 uppercase font-bold tracking-wider truncate">${staff.position}</p>
+                                <p class="text-[10px] ${staff._departed ? 'text-rose-500' : 'text-indigo-600'} uppercase font-bold tracking-wider truncate">${staff.position}${staff._departed ? ' &bull; Sudah Berpindah/Tamat' : ''}</p>
                             </div>
                             <i class="fa-solid fa-chevron-down text-slate-400 text-xs shrink-0 transition-transform"></i>
                         </summary>
