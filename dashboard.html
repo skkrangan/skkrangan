@@ -4742,9 +4742,13 @@ window.onload = async function(){
             // (fetchRecordsQuietly() dalam enterDashboard()), jadi kalau staf isytihar status
             // SELEPAS SU log masuk, laporan yang dijana akan guna data lapuk (nampak macam staf
             // tu "tak kemaskini" sedangkan dia dah kemaskini dalam Sheet). Tunjuk status memuat
-            // sekejap semasa tarik data.
-            tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-slate-400 italic"><i class="fa-solid fa-circle-notch fa-spin"></i> Menarik rekod terkini daripada Google Sheets...</td></tr>`;
-            await fetchRecordsQuietly();
+            // sekejap semasa tarik data. `staffData` (senarai STAF, bukan rekod kehadiran) turut
+            // disegerakkan semula di sini atas sebab yang sama - kalau tidak, staf BAHARU yang
+            // ditambah di Urus Staf SELEPAS SU log masuk akan ada rekod kehadiran tapi tiada
+            // dalam `staffData` yang lapuk, jadi tersilap ditanda "Sudah Berpindah/Tamat" dalam
+            // laporan walaupun dia sebenarnya guru baharu yang baru masuk, bukan staf lama yang pergi.
+            tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-slate-400 italic"><i class="fa-solid fa-circle-notch fa-spin"></i> Menarik rekod & senarai staf terkini daripada Google Sheets...</td></tr>`;
+            await Promise.all([fetchRecordsQuietly(), syncStaffFromBackend()]);
 
             if (allRecords.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${jumlahLajur}" class="p-8 text-center text-rose-600 font-semibold italic">Sila pastikan anda telah memuat turun rekod daripada tab "Rekod" terlebih dahulu.</td></tr>`;
@@ -4917,6 +4921,38 @@ window.onload = async function(){
 
             if (mobileView) mobileView.innerHTML = mobileSummaryHTML + attentionHTML + mobileCardsHTML;
         }
+
+        // ============================================================
+        // JARINGAN KESELAMATAN "1 MUKA SURAT SAHAJA" untuk Laporan Bulanan
+        // ------------------------------------------------------------
+        // Saiz fon dalam CSS @media print (lihat <style> atas) dah ditala supaya
+        // MUAT 1 muka surat A4 landskap untuk kebanyakan bulan - tapi bilangan
+        // baris (staf aktif + staf lama yang masih ada rekod bulan tu) & panjang
+        // jadual "tidak kemaskini" BOLEH berubah ikut bulan, jadi anggaran fon
+        // tetap boleh tersasar sekali-sekala (cth. bulan dengan ramai staf tak
+        // kemaskini). Jadi sebagai JAMINAN TAMBAHAN, ukur tinggi SEBENAR laporan
+        // sejurus SEBELUM cetak/PDF - kalau ia masih melebihi ruang 1 muka surat,
+        // kecilkan terus (zoom) secukupnya supaya PASTI muat, tak kira apa pun
+        // puncanya. Ini hanya terpakai semasa cetak - paparan skrin biasa tidak
+        // terjejas.
+        function kecilkanLaporanBulananUntukCetak() {
+            const area = document.getElementById('print-area-monthly');
+            if (!area || area.classList.contains('hidden')) return;
+            area.style.zoom = '';
+            const MM_KE_PX = 96 / 25.4;
+            const RUANG_TINGGI_PX = (210 - 16) * MM_KE_PX; // A4 landskap, tolak margin 8mm atas+bawah (@page monthly-page)
+            const tinggiSebenarPx = area.scrollHeight;
+            if (tinggiSebenarPx > RUANG_TINGGI_PX) {
+                const skala = Math.max(0.55, RUANG_TINGGI_PX / tinggiSebenarPx);
+                area.style.zoom = skala;
+            }
+        }
+        function kembalikanSaizLaporanBulanan() {
+            const area = document.getElementById('print-area-monthly');
+            if (area) area.style.zoom = '';
+        }
+        window.addEventListener('beforeprint', kecilkanLaporanBulananUntukCetak);
+        window.addEventListener('afterprint', kembalikanSaizLaporanBulanan);
 
         function initChart() {
             const isDark = document.documentElement.classList.contains('dark');
