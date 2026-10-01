@@ -111,6 +111,13 @@
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
       border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: auto !important; display: block !important;
+      /* JAMINAN KERAS 1 MUKA SURAT: walaupun saiz fon di atas & fungsi JS
+         kecilkanLaporanBulananUntukCetak (lihat bahagian skrip di bawah) dah cuba
+         pastikan kandungan muat, had tinggi ni jadi SUDUT PERTAHANAN TERAKHIR -
+         apa-apa yang masih melimpah selepas itu akan dipotong (bukan tercetak
+         pada muka surat 2 yang hampir kosong). 210mm - (8mm atas + 8mm bawah). */
+      max-height: 194mm !important;
+      overflow: hidden !important;
     }
     .school-header { margin-bottom: 3px !important; padding-bottom: 3px !important; }
     .school-logo { height: 30px !important; width: 30px !important; }
@@ -959,7 +966,7 @@
                             <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Pilih Bulan & Tahun</label><input type="month" id="report-month" class="w-full p-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition-all font-bold"></div>
                             <div class="flex gap-2">
                                 <button onclick="generateMonthlyReport()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-[1.02] active:scale-95"><i class="fa-solid fa-chart-line"></i> Jana Laporan</button>
-                                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-[1.02] active:scale-95"><i class="fa-solid fa-print"></i> Cetak / PDF</button>
+                                <button onclick="kecilkanLaporanBulananUntukCetak(); window.print()" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-[1.02] active:scale-95"><i class="fa-solid fa-print"></i> Cetak / PDF</button>
                             </div>
                         </div>
                     </div>
@@ -4806,8 +4813,14 @@ window.onload = async function(){
             // dalam "Jadual Kekerapan Staf Yang Tidak Kemaskini" sebab tiada gunanya
             // ingatkan staf yang dah tiada di sekolah untuk kemas kini kehadiran.
             const activeStaffList = staffData.filter(staff => !staff.excludeFromAttendance);
-            const activeStaffNames = new Set(activeStaffList.map(s => s.name));
-            const departedNamesWithRecords = [...new Set(monthlyData.map(r => r.name))].filter(name => !activeStaffNames.has(name));
+            // Padan nama secara TOLERAN (potong ruang lebih & abaikan huruf besar/kecil) -
+            // nama staf dalam Sheet "Staf" (staffData) kadang tertulis sedikit berbeza
+            // daripada nama dalam Sheet rekod kehadiran (cth. jarak/kekosongan ekstra,
+            // huruf besar/kecil tak konsisten). Padanan ketat (===) boleh tersilap anggap
+            // staf AKTIF sebagai "dah berpindah" hanya kerana ejaan nama tak 100% sama.
+            const normalisasiNama = (n) => (n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+            const activeStaffNamesNormalized = new Set(activeStaffList.map(s => normalisasiNama(s.name)));
+            const departedNamesWithRecords = [...new Set(monthlyData.map(r => r.name))].filter(name => !activeStaffNamesNormalized.has(normalisasiNama(name)));
             const departedStaffList = departedNamesWithRecords.map(name => {
                 const sampleLog = monthlyData.find(r => r.name === name);
                 return { name, position: (sampleLog && sampleLog.position) || 'Bekas Staf', _departed: true };
