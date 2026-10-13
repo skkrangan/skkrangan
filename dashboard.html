@@ -1572,10 +1572,19 @@ async function syncStaffFromBackend(){
       const STAFF_TARIKH_OVERRIDE_IKUT_NAMA = {
         'Muliady bin Mahmud': { tarikhMulaKehadiran: '2026-09-29' }, // baru daftar masuk
       };
+      // Gambar lalai ikut nama - HANYA dipakai jika rekod tiada gambar (Sheet kosong).
+      // Jika Gambar diisi dalam Urus Staf / Sheet, nilai itu diutamakan.
+      const STAFF_GAMBAR_LALAI_IKUT_NAMA = {
+        'muliady mahmud': 'staf-muliady.webp',
+      };
+      const _kunciNama = n => String(n||'').toLowerCase().replace(/\b(bin|binti|anak|ak|a\/l|a\/p)\b/g,' ').replace(/\s+/g,' ').trim();
       staffData.length = 0;
       merged.forEach(s => {
         const ov = STAFF_TARIKH_OVERRIDE_IKUT_NAMA[s.name];
-        staffData.push(ov ? Object.assign({}, s, ov) : s);
+        let rec = ov ? Object.assign({}, s, ov) : s;
+        const gambarLalai = STAFF_GAMBAR_LALAI_IKUT_NAMA[_kunciNama(rec.name)];
+        if (gambarLalai && !rec.photo) rec = Object.assign({}, rec, { photo: gambarLalai });
+        staffData.push(rec);
       });
       staffSyncedFromBackend = true;
     }
