@@ -386,7 +386,7 @@ const EMBED=LIVE&&!!CONFIG.PARENT_ORIGIN&&window.parent!==window;
 let NOW=new Date();
 let ME='',MENU=['guru','admin','dash'],MYNAME='';
 let SETTINGS={hariSebelum:3,jam:17};
-let CURNOW=true,weeks=[],teachers=[],subs={},CURRENT=1,TOTAL=0;
+let ME_SEM='',CURNOW=true,weeks=[],teachers=[],subs={},CURRENT=1,TOTAL=0;
 const pad=n=>String(n).padStart(2,'0');
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fmtDT(d){let h=d.getHours();const ap=h>=12?'PM':'AM';h=h%12||12;return d.getDate()+' '+MON[d.getMonth()]+', '+h+':'+pad(d.getMinutes())+' '+ap}
@@ -743,7 +743,7 @@ function adminReview(){
   active().forEach(w=>{const c=counts(w.n).sent;pend+=c;if(c&&!firstW)firstW=w.n;});
   const focus='<div class="focus"><div class="t"><strong>'+pend+' RPH menunggu semakan</strong><span>'+(pend?'Bermula Minggu '+firstW+'. Skrol ke bawah, minggu demi minggu.':'Semua RPH yang dihantar telah disemak.')+'</span></div>'+
     (pend?'<button class="btn pri" data-act="goto" data-k="a'+firstW+'">Pergi ke Minggu '+firstW+'</button>':'')+'</div>';
-  return '<div class="wrap"><div><h2>Semakan Mingguan</h2><p class="lead" style="margin-top:4px">Buka satu minggu dan skrol. Semua staf yang menghantar pada minggu itu terpapar bersama fail dan refleksi masing-masing.</p></div>'+
+  return '<div class="wrap"><div><h2>Semakan Mingguan</h2>'+(ME_SEM?'<p class="hint warnbox" role="status">Akses semakan sementara untuk ujian, tamat selepas '+esc(ME_SEM)+'. Tindakan semakan direkodkan dalam Log Audit.</p>':'')+'<p class="lead" style="margin-top:4px">Buka satu minggu dan skrol. Semua staf yang menghantar pada minggu itu terpapar bersama fail dan refleksi masing-masing.</p></div>'+
     focus+active().map(adminWeek).join('')+'<p class="foot">Minggu selepas Minggu '+CURRENT+' belum dipaparkan.'+(LIVE?'':' Data contoh untuk prototaip.')+'</p></div>';
 }
 
@@ -1483,7 +1483,7 @@ function applyRow(r){
 }
 function setupLive(p){
   SETTINGS=Object.assign({hariSebelum:3,jam:17},p.tetapan||{});ui.setF=null;
-  buildWeeks(p.takwim);teachers=p.guru;setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=p.me.jawatan||'';ME_PERANAN=p.me.peranan;ME_ADMIN=!!p.me.admin;ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
+  buildWeeks(p.takwim);teachers=p.guru;setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=p.me.jawatan||'';ME_PERANAN=p.me.peranan;ME_ADMIN=!!p.me.admin;ME_SEM=p.me.sementara||'';ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
   const old=subs;subs={};
   const KEEP=['parts','merging','mstage','upErr','mtok','upQ','draft','err','rdirty','rbusy','rver','rrid','rridV','rconflict','srvVer','srvTeks','_t','refleksi','refleksiVersi','file'];
   teachers.forEach(t=>weeks.forEach(w=>{const k=key(t.id,w.n),b=blankSub(),o=old[k];
