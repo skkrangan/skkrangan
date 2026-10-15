@@ -67,13 +67,13 @@ button,input,textarea{font:inherit;color:inherit}
 
 /* viewer */
 .vw{position:fixed;inset:0;z-index:50;background:rgba(6,14,40,.62);display:flex;align-items:stretch;justify-content:center;padding:0}
-.vw-in{background:var(--surface);width:100%;max-width:980px;display:flex;flex-direction:column;min-height:0}
-@media(min-width:760px){.vw{padding:20px}.vw-in{border-radius:10px;overflow:hidden}}
-.vw-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.vw-in{background:var(--surface);width:100%;max-width:1600px;display:flex;flex-direction:column;min-height:0}
+@media(min-width:760px){.vw{padding:10px}.vw-in{border-radius:10px;overflow:hidden}}
+.vw-h{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .vw-h .t{flex:1;min-width:180px}.vw-h .t b{display:block;font-family:var(--font-head);font-size:1.05rem}.vw-h .t span{font-size:.8rem;color:var(--muted)}
 .vw-b{flex:1;min-height:0;overflow:auto;background:var(--surface-2)}
 .vw-b iframe{width:100%;height:100%;min-height:70vh;border:0;background:#fff;display:block}
-.vw-f{border-top:1px solid var(--line);padding:10px 16px;font-size:.86rem;max-height:30vh;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.vw-f{border-top:1px solid var(--line);padding:8px 16px;font-size:.86rem;max-height:18vh;overflow:auto;display:flex;flex-direction:column;gap:6px}
 .vw-f b{font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .vw-f p{margin:2px 0 0}
 .vw-note{font-size:.76rem;color:var(--muted);padding:8px 16px;background:var(--idle-bg)}
@@ -112,6 +112,8 @@ button,input,textarea{font:inherit;color:inherit}
 .jw-t td button:hover{background:var(--gold-soft)}
 .jw-t td button.e{color:#9AA5A0;font-size:1.1rem}
 .jw-t td.ls{background:#E8F3EC}.jw-t td.ls button b{display:block;color:var(--navy)}.jw-t td.ls button span{display:block;color:var(--muted);font-size:.74rem}
+.jw-t tbody td{height:54px}
+.jw-t td.ls .ro{padding:8px 4px;text-align:center}.jw-t td.ls .ro b{display:block;color:var(--navy)}.jw-t td.ls .ro span{display:block;color:var(--muted);font-size:.74rem}
 .jw-t td.ls.on,.jw-t td.on{outline:2px solid var(--navy);outline-offset:-2px}
 .paper.docx{overflow:auto;padding:12px;background:#fff}.paper.docx .docx{margin:0 auto 12px!important;box-shadow:0 0 4px rgba(0,0,0,.2)}
 .jw-ed{margin-top:12px;border:1px solid var(--navy);border-radius:6px;padding:12px;background:var(--surface)}
@@ -842,7 +844,7 @@ async function jwBaca(skipConfirm){
   jwDraftInit();const has=!jwKosong();
   if(has&&!skipConfirm&&!window.confirm('Jadual di atas akan digantikan dengan cadangan bacaan fail. Teruskan?'))return;
   ui.jwBusy=true;ui.jwNote='';render();
-  const fill=(sl,note)=>{ui.jwBusy=false;jwLoad(sl);ui.jwNote=note+(ui.jwx.length?' '+ui.jwx.length+' kelas tiada waktu yang jelas: letakkan dalam grid.':'');render();};
+  const fill=(sl,note)=>{ui.jwBusy=false;ui.jwEdit=true;jwLoad(sl);ui.jwNote=note+(ui.jwx.length?' '+ui.jwx.length+' kelas tiada waktu yang jelas: letakkan dalam grid.':'');render();};
   const fail=m=>{ui.jwBusy=false;ui.jwNote=m;render();};
   let why='';
   try{
@@ -887,15 +889,20 @@ function jwDraftInit(force){
   if(ui.jwl&&!force)return;
   jwLoad((JADUAL[ME]&&JADUAL[ME].slots)||[]);
 }
+const jwTersimpan=()=>!!(JADUAL[ME]&&JADUAL[ME].slots&&JADUAL[ME].slots.length);
+/* Jadual yang sudah disimpan dipaparkan sebagai bacaan sahaja. Ia boleh diubah hanya selepas menekan "Ubah jadual waktu". */
+const jwEdit=()=>!jwTersimpan()||!!ui.jwEdit||(ui.jwx&&ui.jwx.length>0);
 function jwTotalTxt(){const w=ui.jwl.reduce((s,l)=>s+(l.b-l.a+1),0);return (ui.jwl.length+ui.jwx.length)+' kelas · '+w+' waktu seminggu';}
-function jwGrid(){
+function jwGrid(ro){
   const th='<tr><th class="hr">Hari</th>'+PERIODS.map(p=>p.n?'<th>Waktu '+p.n+'<small>'+p.m+'–'+p.t+'</small></th>':'<th class="rh">Rehat</th>').join('')+'</tr>';
   const rows=HARI.map((hn,i)=>{const h=i+1;let tds='<td class="dy">'+hn+'</td>';
     for(let c=0;c<PERIODS.length;c++){const p=PERIODS[c];
       if(!p.n){tds+='<td class="rh"></td>';continue;}
       const li=ui.jwl.findIndex(l=>l.h===h&&l.a<=p.n&&p.n<=l.b);
       if(li>=0){const l=ui.jwl[li];if(l.a!==p.n)continue;
-        tds+='<td class="ls'+(ui.jwe&&ui.jwe.i===li?' on':'')+'" colspan="'+(l.b-l.a+1)+'"><button data-act="jwcell" data-i="'+li+'" aria-label="'+hn+' waktu '+jwWaktu(l.a,l.b).slice(1)+': '+esc(l.subjek)+' '+esc(l.kelas)+'. Ubah"><b>'+esc(l.subjek)+'</b><span>'+esc(l.kelas)+'</span><span>'+jwMasa(l.a,l.b)+'</span></button></td>';}
+        if(ro)tds+='<td class="ls" colspan="'+(l.b-l.a+1)+'"><div class="ro" role="text" aria-label="'+hn+' waktu '+jwWaktu(l.a,l.b).slice(1)+': '+esc(l.subjek)+' '+esc(l.kelas)+'"><b>'+esc(l.subjek)+'</b><span>'+esc(l.kelas)+'</span><span>'+jwMasa(l.a,l.b)+'</span></div></td>';
+      else tds+='<td class="ls'+(ui.jwe&&ui.jwe.i===li?' on':'')+'" colspan="'+(l.b-l.a+1)+'"><button data-act="jwcell" data-i="'+li+'" aria-label="'+hn+' waktu '+jwWaktu(l.a,l.b).slice(1)+': '+esc(l.subjek)+' '+esc(l.kelas)+'. Ubah"><b>'+esc(l.subjek)+'</b><span>'+esc(l.kelas)+'</span><span>'+jwMasa(l.a,l.b)+'</span></button></td>';}
+      else if(ro)tds+='<td></td>';
       else tds+='<td'+(ui.jwe&&ui.jwe.i<0&&ui.jwe.h===h&&ui.jwe.a===p.n?' class="on"':'')+'><button class="e" data-act="jwcell" data-h="'+h+'" data-n="'+p.n+'" aria-label="'+hn+' waktu '+p.n+' kosong. Tambah kelas">+</button></td>';}
     return '<tr>'+tds+'</tr>';}).join('');
   return '<div class="jw-wrap"><table class="jw-t"><thead>'+th+'</thead><tbody>'+rows+'</tbody></table></div>';
@@ -920,8 +927,9 @@ function jadualView(){
   jwDraftInit();
   const f=JADUAL[ME]&&JADUAL[ME].file;
   return '<div class="wrap"><div><h2>Jadual Waktu Saya</h2><p class="lead" style="margin-top:4px">Isi jadual anda mengikut hari dan waktu. Sistem menjana senarai refleksi mingguan daripada jadual ini, satu refleksi bagi setiap kelas. Anda juga boleh memuat naik jadual waktu rasmi (PDF atau gambar) untuk rujukan pentadbir.</p></div>'+
-   '<div class="card"><div class="rl-head"><span class="lbl">Jadual waktu mingguan</span><span class="pill '+(jwKosong()?'idle':'ok')+'" id="jw-total">'+jwTotalTxt()+'</span></div><p class="hint">Tekan sel untuk menambah atau mengubah kelas. Isi Tahun/Kelas dan Subjek, kemudian pilih waktu mula dan tamat (waktu berganda = pilih dua waktu).</p>'+jwGrid()+jwEditor()+jwUnplaced()+
-   '<div class="actions"><button class="btn pri" data-act="jwsave">Simpan jadual</button><span class="hint">Perubahan jadual digunakan untuk refleksi seterusnya.</span></div></div>'+
+   '<div class="card"><div class="rl-head"><span class="lbl">Jadual waktu mingguan</span><span class="pill '+(jwKosong()?'idle':'ok')+'" id="jw-total">'+jwTotalTxt()+'</span></div><p class="hint">'+(jwEdit()?'Tekan sel untuk menambah atau mengubah kelas. Isi Tahun/Kelas dan Subjek, kemudian pilih waktu mula dan tamat (waktu berganda = pilih dua waktu).':'Jadual waktu anda telah disimpan. Tekan Ubah jadual waktu jika perlu membuat perubahan.')+'</p>'+jwGrid(!jwEdit())+(jwEdit()?jwEditor()+jwUnplaced()+
+   '<div class="actions"><button class="btn pri" data-act="jwsave">Simpan jadual</button>'+(jwTersimpan()?'<button class="btn" data-act="jwbatal">Batal</button>':'')+'<span class="hint">Perubahan jadual digunakan untuk refleksi seterusnya.</span></div>':
+   '<div class="actions"><button class="btn pri" data-act="jwubah">Ubah jadual waktu</button></div>')+'</div>'+
    '<div class="card"><span class="lbl">Fail jadual waktu rasmi (pilihan, PDF/Word/JPG/PNG, maksimum 5 MB)</span>'+
    '<div class="actions">'+(f?'<span class="file"><span class="ext">'+esc(f.ext)+'</span> '+esc(f.name)+'</span><button class="btn sm" data-act="jwopen" data-t="'+ME+'">Buka</button><button class="btn sm pri" data-act="jwbaca"'+(ui.jwBusy?' disabled':'')+'>'+(ui.jwBusy?'Membaca jadual…':'Baca jadual daripada fail')+'</button>':'<span class="hint">Belum dimuat naik.</span>')+
    '<label class="btn sm" style="cursor:pointer">'+(f?'Ganti fail':'Muat naik fail')+'<input type="file" data-jwfile="1" accept=".pdf,.jpg,.jpeg,.png,.docx" hidden></label></div>'+(ui.jwNote?'<p class="hint warnbox" role="status">'+esc(ui.jwNote)+'</p>':'')+'<p class="hint">Selepas fail dimuat naik, tekan "Baca jadual daripada fail". Sistem mengisi grid jadual di atas. Anda mesti menyemak dan menekan Simpan jadual sebelum ia digunakan.</p></div></div>';
@@ -1002,9 +1010,10 @@ function histHtml(s){
   if(!s.log||!s.log.length)return'';
   return '<details class="hist"><summary>Sejarah tindakan ('+s.log.length+')</summary><ol>'+s.log.slice().reverse().map(l=>'<li><span class="mono">'+fmtDT(new Date(l.t))+'</span> · '+esc(l.who)+' · '+esc(l.act)+'</li>').join('')+'</ol></details>';
 }
+const PDFFIT='#navpanes=0&view=FitH';/* PDF dibuka selebar ruang, tanpa panel lakaran kecil */
 function viewBody(t,w,f){
-  if(f.url&&f.ext==='PDF')return'<iframe src="'+f.url+'" title="'+esc(f.name)+'"></iframe>';
-  if(f.pdfUrl)return'<iframe src="'+f.pdfUrl+'" title="'+esc(f.name)+'"></iframe>';
+  if(f.url&&f.ext==='PDF')return'<iframe src="'+f.url+PDFFIT+'" title="'+esc(f.name)+'"></iframe>';
+  if(f.pdfUrl)return'<iframe src="'+f.pdfUrl+PDFFIT+'" title="'+esc(f.name)+'"></iframe>';
   if(f.url&&f.ext==='DOCX'&&!f.pdfErr)return'<div class="paper docx" id="docx-host"><p>Memuatkan paparan fail Word…</p></div>';
   if(f.url)return'<div class="paper"><p>Fail Word tidak dapat dipaparkan'+(f.pdfErr?' ('+esc(f.pdfErr)+')':'')+'. Gunakan Muat turun untuk membukanya.</p></div>';
   return mockPaper(t,w);
@@ -1568,6 +1577,8 @@ document.addEventListener('click',e=>{
     else ui.jwe={i:-1,h:+b.dataset.h,kelas:'',subjek:'',a:+b.dataset.n,b:+b.dataset.n,err:''};
     render();const f=document.querySelector('[data-jwe=kelas]');if(f)f.focus();}
   else if(a==='jwcancel'){ui.jwe=null;render();}
+  else if(a==='jwubah'){jwDraftInit(true);ui.jwEdit=true;ui.jwe=null;render();}
+  else if(a==='jwbatal'){jwDraftInit(true);ui.jwEdit=false;ui.jwe=null;render();toast('Perubahan dibatalkan. Jadual yang disimpan dikekalkan.');}
   else if(a==='jwdel'){if(ui.jwe&&ui.jwe.i>=0){ui.jwl.splice(ui.jwe.i,1);}ui.jwe=null;render();}
   else if(a==='jwok'){const e=ui.jwe;if(!e)return;
     const l={h:e.h,kelas:String(e.kelas).trim(),subjek:String(e.subjek).trim(),a:e.a,b:e.b};
@@ -1585,7 +1596,7 @@ document.addEventListener('click',e=>{
   else if(a==='jwbaca'){jwBaca();}
   else if(a==='jwsave'){
     jwDraftInit();const slots=jwSlots();
-    const done=r=>{JADUAL[ME]=Object.assign({file:null},JADUAL[ME],r.jadual||{slots});const me=teachers.find(x=>x.id===ME);if(me)me.kelas=r.kelas||slots.length||undefined;jwDraftInit(true);render();toast('Jadual waktu disimpan. '+slots.length+' kelas seminggu.');};
+    const done=r=>{JADUAL[ME]=Object.assign({file:null},JADUAL[ME],r.jadual||{slots});const me=teachers.find(x=>x.id===ME);if(me)me.kelas=r.kelas||slots.length||undefined;jwDraftInit(true);ui.jwEdit=false;render();toast('Jadual waktu disimpan. '+slots.length+' kelas seminggu.');};
     if(!LIVE){done({jadual:{slots},kelas:slots.length});return;}
     api('jadualSave',{slots}).then(done).catch(handleErr);}
   else if(a==='radd'){const q=sub(ME,w);q.rextra=(q.rextra||0)+1;render();}
