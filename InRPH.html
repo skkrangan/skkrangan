@@ -323,6 +323,18 @@ textarea:disabled{background:var(--surface-2);color:var(--muted)}
 
 /* report */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px}
+/* Pemilih minggu: satu minggu dipaparkan pada satu masa, bukan senarai panjang */
+.wnav{display:flex;flex-direction:column;gap:8px}
+.wnav-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wnav-r .cur{flex:1;min-width:150px;font-weight:600;color:var(--navy)}
+.wsqs{display:flex;flex-wrap:wrap;gap:4px}
+.wsq{position:relative;min-width:34px;height:32px;border:1px solid var(--line-strong);border-radius:6px;background:var(--idle-bg);color:var(--idle);font:600 .78rem var(--font-mono);cursor:pointer;padding:0 4px}
+.wsq.ok{background:var(--ok-bg);color:var(--ok);border-color:#9FD2B4}.wsq.sent{background:var(--sent-bg);color:var(--sent);border-color:#9CC4EA}
+.wsq.fix{background:var(--fix-bg);color:var(--fix);border-color:#EDC48B}.wsq.late{background:var(--late-bg);color:var(--late);border-color:#EDA9A3}
+.wsq.cu{opacity:.45}.wsq.fut{opacity:.55}
+.wsq[aria-pressed="true"]{outline:2px solid var(--navy);outline-offset:1px}
+.wsq .dot{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;border-radius:99px;background:var(--sent);color:#fff;font:600 .65rem/16px var(--font-body);text-align:center;padding:0 3px}
+.wleg{font-size:.74rem;color:var(--muted)}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
 .chip{border:1px solid var(--line-strong);background:var(--surface);border-radius:99px;padding:5px 12px;font-family:var(--font-mono);font-size:.8rem;cursor:pointer;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
@@ -559,7 +571,7 @@ function pillFor(s,w,tid){
 const pill=(s,w,tid)=>{const p=pillFor(s,w,tid);return '<span class="pill '+p[0]+'">'+p[1]+'</span>'};
 
 const ui={dq:'',df:'semua',exF:{t:'',a:1,b:1,sebab:''},role:'guru',tab:'rph',selWeek:1,open:new Set(),pasteText:'',loading:false,fatal:''};
-function openDefaults(){ui.open=new Set(['g'+CURRENT,'a'+CURRENT,'a'+(CURRENT-1)]);ui.selWeek=CURRENT;weeks.forEach(w=>{const q=subs[key(ME,w.n)];if(q&&q.status==='pembetulan')ui.open.add('g'+w.n);});}
+function openDefaults(){ui.open=new Set(['g'+CURRENT,'a'+CURRENT,'a'+(CURRENT-1)]);ui.selWeek=CURRENT;ui.gw=CURRENT;ui.aw=0;ui.rf=null;ui.rq='';weeks.forEach(w=>{const q=subs[key(ME,w.n)];if(q&&q.status==='pembetulan')ui.open.add('g'+w.n);});}
 
 /* ---------- GURU ---------- */
 function fileMeta(f){return fmtSize(f.size)+(f.pages?' · '+f.pages+' halaman':'')+(f.from>1?' · digabung daripada '+f.from+' fail':'')+' · '+esc(f.date)}
@@ -680,6 +692,15 @@ async function arkibMuat(){
   }
   render();
 }
+function wkNav(kind,sel,list,info){
+  const i=list.findIndex(x=>x.n===sel),pv=list[i-1],nx=list[i+1],pre=kind;
+  return '<div class="card wnav"><div class="wnav-r"><button class="btn sm" data-act="'+pre+'n" data-w="'+(pv?pv.n:'')+'"'+(pv?'':' disabled')+'>‹ Sebelum</button>'+
+    '<span class="cur">Minggu '+sel+' <span class="mono" style="font-weight:400">· '+esc(weeks[sel-1].label)+'</span></span>'+
+    '<button class="btn sm" data-act="'+pre+'n" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+'>Seterusnya ›</button></div>'+
+    '<div class="wsqs" role="group" aria-label="Pilih minggu">'+list.map(x=>{const o=info(x);
+      return '<button class="wsq '+o.c+(x.n===sel?' sel':'')+'" data-act="'+pre+'" data-w="'+x.n+'" aria-pressed="'+(x.n===sel)+'" aria-label="Minggu '+x.n+': '+esc(o.t)+'" title="Minggu '+x.n+' · '+esc(weeks[x.n-1].label)+' · '+esc(o.t)+'">'+x.n+(o.b?'<span class="dot">'+o.b+'</span>':'')+'</button>';}).join('')+'</div>'+
+    '<p class="wleg">Hijau: disemak · Biru: menunggu semakan · Jingga: perlu pembetulan · Merah: lewat · Kelabu: belum hantar/belum dibuka</p></div>';
+}
 function guruView(){
   const mine=weeks.map(w=>sub(ME,w.n)),cnt=st=>mine.filter((s,i)=>s.status===st).length;
   const cur=sub(ME,CURRENT),cp=pillFor(cur,CURRENT,ME);
@@ -687,13 +708,13 @@ function guruView(){
     '<span>'+(submitted(cur)?'RPH minggu ini sudah dihantar.':cur.file?'Fail sudah dimuat naik. Tekan Hantar untuk menghantar.':'Fail RPH belum dimuat naik.')+'</span>'+
     '<div class="tally" style="margin-top:6px"><span class="pill ok">'+cnt('disemak')+' disemak</span><span class="pill sent">'+cnt('dihantar')+' menunggu semakan</span><span class="pill fix">'+cnt('pembetulan')+' perlu pembetulan</span></div></div>'+
     '<button class="btn pri" data-act="goto" data-k="g'+CURRENT+'">'+(submitted(cur)?'Buka Minggu '+CURRENT:'Muat naik RPH Minggu '+CURRENT)+'</button></div>';
-  const FF=ui.rekodF||'semua',selF=wk=>{if(FF==='semua')return true;if(wk.cuti||wk.n>CURRENT)return false;const q=sub(ME,wk.n);return FF==='belum'?(!submitted(q)&&!exc(ME,wk.n)):q.status===FF;};
-  const chipsF='<div class="chips" role="group" aria-label="Tapis minggu">'+[['semua','Semua minggu'],['belum','Belum hantar'],['dihantar','Menunggu semakan'],['disemak','Disemak'],['pembetulan','Perlu pembetulan']].map(c=>'<button class="chip" data-act="rf" data-f="'+c[0]+'" aria-pressed="'+(FF===c[0])+'">'+c[1]+'</button>').join('')+'</div>';
+  if(!ui.gw||ui.gw<1||ui.gw>weeks.length)ui.gw=CURRENT;ui.open.add('g'+ui.gw);
+  const chipsF=wkNav('gw',ui.gw,weeks,x=>{if(x.cuti)return{c:'cu',t:'Cuti'};const p=pillFor(sub(ME,x.n),x.n,ME);return{c:p[0]==='idle'?(x.n>CURRENT?'fut':''):p[0],t:p[1]};});
   const unread=NOTIFS.filter(n=>!n.readAt);
   const nb=NOTIFS.length?'<div class="card"><span class="lbl">Notifikasi'+(unread.length?' <span class="pill fix">'+unread.length+' baharu</span>':'')+'</span>'+NOTIFS.slice(0,5).map(n=>'<div class="note '+(n.readAt?'info':'fix')+'"><b>Minggu '+n.w+(n.jenis==='pembetulan'?' · Perlu pembetulan':'')+'</b><p>'+esc(n.mesej)+'</p><small>'+fmtDT(new Date(n.createdAt))+'</small>'+(n.readAt?'':' <button class="btn sm" data-act="nread" data-id="'+esc(n.id)+'">Tandakan dibaca</button>')+'</div>').join('')+'</div>':'';
   return '<div class="wrap"><div><h2>RPH Saya</h2><p class="lead" style="margin-top:4px">Muat naik fail RPH setiap minggu (boleh banyak fail, sistem gabungkan menjadi satu), hantar kepada Guru Besar atau PK Kurikulum, dan kemas kini refleksi selepas PdP.</p></div>'+
     nb+'<p class="flow"><b>Muat naik fail</b><i>→</i><b>Hantar</b><i>→</i><b>Taip refleksi selepas PdP</b><i>→</i><b>Semakan &amp; komen pentadbir</b></p>'+
-    focus+arkibCard()+chipsF+weeks.filter(selF).map(guruWeek).join('')+'<p class="foot">'+(LIVE?'':'Data contoh untuk prototaip.')+'</p></div>';
+    focus+arkibCard()+chipsF+guruWeek(weeks[ui.gw-1])+'<p class="foot">'+(LIVE?'':'Data contoh untuk prototaip.')+'</p></div>';
 }
 
 /* ---------- PENTADBIR: semakan ---------- */
@@ -728,23 +749,28 @@ function rvRow(t,w){
   }
   return '<article class="rv">'+head+file+refl+dec+'</article>';
 }
-function adminWeek(wk){
-  const w=wk.n,k='a'+w,c=counts(w);
-  const order={dihantar:0,pembetulan:1,disemak:2,draf:3,belum:3};
-  const list=teachers.filter(t=>!exc(t.id,w)||submitted(sub(t.id,w))).sort((a,b)=>order[sub(a.id,w).status]-order[sub(b.id,w).status]);
-  return '<details class="week" id="a-w'+w+'" data-k="'+k+'"'+(ui.open.has(k)?' open':'')+'>'+
-    '<summary><span class="wk-n">M'+w+'</span><span class="wk-meta"><strong>Minggu '+w+'</strong><span class="mono">'+wk.label+'</span></span>'+(w===CURRENT?'<span class="now">Minggu ini</span>':'')+
-    '<span class="sp"></span><span class="sum-pills">'+(c.sent?'<span class="pill sent">'+c.sent+' menunggu</span>':'')+(c.fix?'<span class="pill fix">'+c.fix+' pembetulan</span>':'')+
-    '<span class="pill ok">'+c.ok+' disemak</span>'+(c.miss?'<span class="pill '+(pastDue(w)?'late':'idle')+'">'+c.miss+(pastDue(w)?' lewat':' belum hantar')+'</span>':'')+'</span><span class="chev" aria-hidden="true"></span></summary>'+
-    '<div class="week-body"><div class="rows">'+list.map(t=>rvRow(t,w)).join('')+'</div></div></details>';
+const rvStat={menunggu:s=>s.status==='dihantar',pembetulan:s=>s.status==='pembetulan',disemak:s=>s.status==='disemak',belum:s=>!submitted(s),semua:()=>true};
+function rvList(w){
+  const order={dihantar:0,pembetulan:1,disemak:2,draf:3,belum:3},Q=(ui.rq||'').trim().toLowerCase(),F=rvStat[ui.rf]?ui.rf:'semua';
+  const all=teachers.filter(t=>!exc(t.id,w)||submitted(sub(t.id,w))).sort((a,b)=>order[sub(a.id,w).status]-order[sub(b.id,w).status]||a.name.localeCompare(b.name));
+  const sel=all.filter(t=>rvStat[F](sub(t.id,w))&&(!Q||(t.name+' '+t.sub).toLowerCase().includes(Q)));
+  return sel.length?sel.map(t=>rvRow(t,w)).join(''):'<p class="lead" style="margin:10px 0">'+(Q?'Tiada staf sepadan dengan carian.':F==='menunggu'?'Tiada RPH menunggu semakan untuk minggu ini.':'Tiada rekod dalam tapisan ini.')+'</p>';
 }
 function adminReview(){
   let pend=0,firstW=0;
   active().forEach(w=>{const c=counts(w.n).sent;pend+=c;if(c&&!firstW)firstW=w.n;});
-  const focus='<div class="focus"><div class="t"><strong>'+pend+' RPH menunggu semakan</strong><span>'+(pend?'Bermula Minggu '+firstW+'. Skrol ke bawah, minggu demi minggu.':'Semua RPH yang dihantar telah disemak.')+'</span></div>'+
-    (pend?'<button class="btn pri" data-act="goto" data-k="a'+firstW+'">Pergi ke Minggu '+firstW+'</button>':'')+'</div>';
-  return '<div class="wrap"><div><h2>Semakan Mingguan</h2>'+(ME_SEM?'<p class="hint warnbox" role="status">Akses semakan sementara untuk ujian, tamat selepas '+esc(ME_SEM)+'. Tindakan semakan direkodkan dalam Log Audit.</p>':'')+'<p class="lead" style="margin-top:4px">Buka satu minggu dan skrol. Semua staf yang menghantar pada minggu itu terpapar bersama fail dan refleksi masing-masing.</p></div>'+
-    focus+active().map(adminWeek).join('')+'<p class="foot">Minggu selepas Minggu '+CURRENT+' belum dipaparkan.'+(LIVE?'':' Data contoh untuk prototaip.')+'</p></div>';
+  const act=active();
+  if(!ui.aw||!act.some(x=>x.n===ui.aw)){ui.aw=firstW||CURRENT;ui.rf=null;}
+  const w=ui.aw,c=counts(w);
+  if(!rvStat[ui.rf])ui.rf=c.sent?'menunggu':'semua';
+  const focus='<div class="focus"><div class="t"><strong>'+pend+' RPH menunggu semakan</strong><span>'+(pend?'Bermula Minggu '+firstW+'. Pilih minggu di bawah, hanya RPH yang menunggu dipaparkan.':'Semua RPH yang dihantar telah disemak.')+'</span></div>'+
+    (pend&&firstW!==w?'<button class="btn pri" data-act="aw" data-w="'+firstW+'">Pergi ke Minggu '+firstW+'</button>':'')+'</div>';
+  const nav=wkNav('aw',w,act,x=>{const k=counts(x.n);return k.sent?{c:'sent',t:k.sent+' menunggu semakan',b:k.sent}:k.fix?{c:'fix',t:k.fix+' perlu pembetulan'}:k.miss?{c:pastDue(x.n)?'late':'',t:k.miss+(pastDue(x.n)?' lewat':' belum hantar')}:{c:'ok',t:'semua disemak'};});
+  const fl=[['menunggu','Menunggu semakan',c.sent],['pembetulan','Perlu pembetulan',c.fix],['disemak','Disemak',c.ok],['belum','Belum hantar',c.miss],['semua','Semua',c.n]];
+  const chips='<div class="chips" role="group" aria-label="Tapis status">'+fl.map(f=>'<button class="chip" data-act="rvf" data-f="'+f[0]+'" aria-pressed="'+(ui.rf===f[0])+'">'+f[1]+' ('+f[2]+')</button>').join('')+'</div>';
+  return '<div class="wrap"><div><h2>Semakan Mingguan</h2>'+(ME_SEM?'<p class="hint warnbox" role="status">Akses semakan sementara untuk ujian, tamat selepas '+esc(ME_SEM)+'. Tindakan semakan direkodkan dalam Log Audit.</p>':'')+'<p class="lead" style="margin-top:4px">Pilih satu minggu, kemudian semak staf yang menunggu. Fail dan refleksi dipaparkan bersama.</p></div>'+
+    focus+nav+'<div class="card"><div class="wnav-r"><strong>Minggu '+w+'</strong>'+chips+'<input data-rq="1" type="search" placeholder="Cari nama staf" aria-label="Cari staf" value="'+esc(ui.rq||'')+'" style="max-width:220px"></div>'+
+    '<div class="rows" id="rv-list">'+rvList(w)+'</div></div><p class="foot">Minggu selepas Minggu '+CURRENT+' belum dipaparkan.'+(LIVE?'':' Data contoh untuk prototaip.')+'</p></div>';
 }
 
 /* ---------- PENTADBIR: laporan ---------- */
@@ -1622,7 +1648,10 @@ document.addEventListener('click',e=>{
   else if(a==='setsave'){setSave();}
   else if(a==='csvg'){dlText('laporan-mengikut-staf.csv',csvGuru());}
   else if(a==='csvb'){dlText('belum-menghantar-minggu-'+ui.selWeek+'.csv',csvBelum());}
-  else if(a==='goto'){const k=b.dataset.k;if(k[0]==='g')ui.tab='rph';else if(k[0]==='a')ui.tab='semak';ui.open.add(k);render();const el=document.querySelector('[data-k="'+k+'"]');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+  else if(a==='goto'){const k=b.dataset.k;if(k[0]==='g'){ui.tab='rph';ui.gw=+k.slice(1);}else if(k[0]==='a'){ui.tab='semak';ui.aw=+k.slice(1);ui.rf=null;}ui.open.add(k);render();const el=document.querySelector('[data-k="'+k+'"]')||document.querySelector('.wnav');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+  else if(a==='gw'||a==='gwn'){if(!w)return;ui.gw=w;ui.open.add('g'+w);render();}
+  else if(a==='aw'||a==='awn'){if(!w)return;ui.aw=w;ui.rf=null;ui.rq='';render();}
+  else if(a==='rvf'){ui.rf=b.dataset.f;render();}
   else if(a==='hantar'){const s=sub(ME,w);if(!s.file||s.merging)return;
     if(LIVE){flushRefl(w).then(ok=>{if(!ok){toast('Refleksi belum berjaya disimpan. Cuba lagi.');return;}srv('hantar',{w},'Minggu '+w+' dihantar untuk semakan.');});return;}
     s.prevKomen=s.status==='pembetulan'?s.komen:'';s.komen='';s.status='dihantar';s.log.push({t:new Date().toISOString(),who:MYNAME,act:'Dihantar'});render();toast('Minggu '+w+' dihantar untuk semakan.');}
@@ -1741,6 +1770,7 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d.matches&&d.matches(
 });
 document.addEventListener('input',e=>{
   const t=e.target;if(!t.matches)return;
+  if(t.matches('[data-rq]')){ui.rq=t.value;render();const el=document.querySelector('[data-rq]');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}return;}
   if(t.matches('[data-mq]')){ui.mq=t.value;render();const el=document.querySelector('[data-mq]');if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length);}return;}
   if(t.matches('[data-af]')){ui.af=ui.af||{};ui.af[t.dataset.af]=t.value;return;}
   if(t.matches('[data-set]')){ui.setF[t.dataset.set]=t.value;return;}
