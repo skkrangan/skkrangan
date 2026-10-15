@@ -1029,7 +1029,7 @@ function rekodView(){
 
 const defTab=r=>r==='guru'?'home':r==='admin'?'pantau':'dash';
 /* ===== Peringkat A–D: bar sisi, dashboard guru, pemantauan, pengecualian, notifikasi, laporan, log audit, tetapan, profil ===== */
-let EXALL=[],AUDIT=[],AUDITJ=[],AUDITLOAD=false,AUDITERR='',ME_EMEL='',ME_JAWATAN='',ME_PERANAN='guru',ME_MENGAJAR=true;
+let EXALL=[],AUDIT=[],AUDITJ=[],AUDITLOAD=false,AUDITERR='',ME_EMEL='',ME_JAWATAN='',ME_PERANAN='guru',ME_ADMIN=!LIVE,ME_MENGAJAR=true;
 const NLBL={pembetulan:'Perlu pembetulan',disemak:'Telah disemak',makluman:'Makluman'};
 const mapEx=x=>({id:x.id,t:x.t,a:+x.a,b:+x.b,sebab:x.sebab||'',oleh:x.oleh||'',masa:x.masa||'',aktif:x.aktif!==false});
 function setEx(r){EXEMPT=(r.pengecualian||[]).map(mapEx);if(r.pengecualianSemua)EXALL=r.pengecualianSemua.map(mapEx);}
@@ -1183,7 +1183,7 @@ function setSave(){
 function profilView(){
   const me=teachers.find(t=>t.id===ME)||{},row=(a,b)=>'<tr><th scope="row">'+a+'</th><td>'+b+'</td></tr>';
   return '<div class="wrap"><div><h2>Profil</h2><p class="lead" style="margin-top:4px">Maklumat akaun anda. Maklumat ini datang daripada Urus Staf portal dan tidak boleh diubah di sini.</p></div>'+
-   '<div class="card"><table class="tbl prof"><tbody>'+row('Nama',esc(MYNAME))+row('Emel DELIMa',esc(ME_EMEL||'–'))+row('Jawatan',esc(ME_JAWATAN||me.sub||'–'))+row('Peranan',ME_PERANAN==='pentadbir'?'Pentadbir':'Guru')+row('Menghantar RPH',ME_MENGAJAR?'Ya':'Tidak')+
+   '<div class="card"><table class="tbl prof"><tbody>'+row('Nama',esc(MYNAME))+row('Emel DELIMa',esc(ME_EMEL||'–'))+row('Jawatan',esc(ME_JAWATAN||me.sub||'–'))+row('Peranan',ME_ADMIN?'Admin Sistem (semua fungsi)':ME_PERANAN==='pentadbir'?'Penyemak':'Guru')+row('Menghantar RPH',ME_MENGAJAR?'Ya':'Tidak')+
    (ME_MENGAJAR?row('Kelas seminggu',me.kelas?me.kelas+' kelas':'Belum diisi')+row('Jadual waktu',hasJadual(ME)?'Telah diisi':'Belum diisi'):'')+'</tbody></table>'+
    '<div class="actions">'+(ME_MENGAJAR?'<button class="btn" data-act="tab" data-tab="jadual">Jadual waktu</button>':'')+(LIVE?'<button class="btn" data-act="reload">Muat semula data</button>'+(EMBED?'':'<button class="btn warn" data-act="logout">Log keluar</button>'):'')+'</div></div></div>';
 }
@@ -1226,7 +1226,7 @@ function render(){
     app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:460px;margin:24px auto"><img class="lg3" src="'+LOGO+'" alt="Logo InRPH" width="96" height="96"><h2>'+(ui.embedMsg?'InRPH tidak dapat dibuka':'Log masuk DELIMa')+'</h2>'+(ui.embedMsg?'':'<p class="lead">Log masuk dengan akaun <b>DELIMa</b> anda (g-xxxxxxxx@'+esc(CONFIG.DOMAIN||'moe-dl.edu.my')+'). Akaun peribadi seperti Gmail tidak diterima. Jika akaun anda tidak dikenali, hubungi Penyelaras ICT.</p>')+(ui.loginErr?'<p class="err" role="alert">'+esc(ui.loginErr)+'</p>':'')+'<div id="gbtn" style="margin-top:12px"></div></div></div>';
     return;
   }
-  const GR={admin:['Pentadbir',[['pantau','Pemantauan'],['semak','Semakan Mingguan'],['exc','Pengecualian'],['laporan','Laporan'],['audit','Log Audit'],['tetapan','Tetapan']]],guru:['Saya',[['home','Dashboard Saya'],['rph','RPH Saya'],['jadual','Jadual Waktu']]],dash:['Sekolah',[['dash','Dashboard Sekolah']]]};
+  const GR={admin:['Pentadbir',[['pantau','Pemantauan'],['semak','Semakan Mingguan'],['exc','Pengecualian'],['laporan','Laporan']].concat(ME_ADMIN?[['audit','Log Audit'],['tetapan','Tetapan']]:[])],guru:['Saya',[['home','Dashboard Saya'],['rph','RPH Saya'],['jadual','Jadual Waktu']]],dash:['Sekolah',[['dash','Dashboard Sekolah']]]};
   const groups=['guru','dash','admin'].filter(r=>MENU.includes(r)&&GR[r]).map(r=>({r,name:GR[r][0],items:GR[r][1]}));
   const common=[['notif','Notifikasi'],['profil','Profil']];
   const allTabs=groups.reduce((a,g)=>a.concat(g.items),[]).concat(common);
@@ -1393,7 +1393,7 @@ function applyRow(r){
 }
 function setupLive(p){
   SETTINGS=Object.assign({hariSebelum:3,jam:17},p.tetapan||{});ui.setF=null;
-  buildWeeks(p.takwim);teachers=p.guru;setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=p.me.jawatan||'';ME_PERANAN=p.me.peranan;ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
+  buildWeeks(p.takwim);teachers=p.guru;setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=p.me.jawatan||'';ME_PERANAN=p.me.peranan;ME_ADMIN=!!p.me.admin;ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
   subs={};teachers.forEach(t=>weeks.forEach(w=>{subs[key(t.id,w.n)]=blankSub();}));
   p.hantaran.forEach(applyRow);
   const m=[];if(p.me.peranan==='pentadbir')m.push('admin');if(p.me.mengajar)m.push('guru');
