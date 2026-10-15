@@ -3851,7 +3851,7 @@ function erphHandleReauth(credential){
   erphSendToken();
 }
 function erphReset(){
-  erphCred = null; window.__erphReauth = false; try{ sessionStorage.removeItem('dash_idtok'); }catch(e){}
+  erphCred = null; window.__erphReauth = false; try{ sessionStorage.removeItem('dash_idtok'); sessionStorage.removeItem('inrph_init'); }catch(e){}
   const fr = erphFrame(); if(fr) fr.removeAttribute('src');
   const box = document.getElementById('erph-reauth'); if(box) box.classList.add('hidden');
 }
