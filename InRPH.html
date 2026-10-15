@@ -1304,7 +1304,7 @@ async function mergeParts(w){
   const stamp=()=>new Date().toISOString();
   s.merging=true;s.mstage='Menggabungkan fail…';
   try{
-    if(LIVE&&parts.some(p=>p.ext==='DOCX')){
+    if(LIVE&&parts.length>1&&parts.some(p=>p.ext==='DOCX')){
       s.mstage='Menukar fail Word kepada PDF…';render();
       for(const p of parts){
         if(p.ext!=='DOCX')continue;
@@ -1319,7 +1319,7 @@ async function mergeParts(w){
     }
     if(parts.length===1&&parts[0].ext==='DOCX'){
       const p=parts[0];render();
-      if(await finishFile(w,s,tok,p.blob,{name:p.name,ext:'DOCX',size:p.size,date:fmtDT(new Date()),from:1}))dropOld(),render(),toast('Fail dimuat naik. Tekan Hantar untuk menghantar.');
+      if(await finishFile(w,s,tok,p.blob,{name:p.name,ext:'DOCX',size:p.size,date:fmtDT(new Date()),from:1})){dropOld();render();toast('Fail dimuat naik. Tekan Hantar untuk menghantar.');if(LIVE)api('docxCache',{w}).catch(()=>{});}
       return;
     }
     if(parts.some(p=>p.ext==='DOCX')){
