@@ -767,13 +767,13 @@
   <div id="section-erph" class="tab-content fixed inset-0 z-[60] bg-white">
     <div id="erph-reauth" class="hidden absolute inset-0 z-10 bg-white/95 flex items-center justify-center p-6">
       <div class="text-center max-w-md">
-        <p class="font-display font-semibold text-lg text-ink mb-1">Sahkan identiti anda untuk eRPH</p>
-        <p class="text-sm text-ink-soft mb-4">Sesi Google anda telah tamat. Tekan butang di bawah dengan akaun DELIMA yang sama. Anda tidak perlu log masuk portal semula.</p>
+        <p class="font-display font-semibold text-lg text-ink mb-1">Sahkan identiti anda untuk InRPH</p>
+        <p class="text-sm text-ink-soft mb-4">Sesi Google untuk InRPH telah tamat (token Google sah kira-kira satu jam). Tekan butang di bawah dengan akaun DELIMA yang sama. Anda tidak perlu log masuk portal semula.</p>
         <div id="erph-gbtn" class="flex justify-center"></div>
-        <button onclick="showModule('picker')" class="mt-5 text-sm font-bold text-ink-soft hover:text-ink">&larr; Kembali ke Papan Pemuka</button>
+        <button onclick="inrphKembali()" class="mt-5 text-sm font-bold text-ink-soft hover:text-ink">&larr; Kembali</button>
       </div>
     </div>
-    <iframe id="erph-frame" title="eRPH" class="w-full h-full border-0 block bg-white"></iframe>
+    <iframe id="erph-frame" title="InRPH" class="w-full h-full border-0 block bg-white"></iframe>
   </div>
 
   <!-- ============ MODUL: EHADIR (disisipkan) ============ -->
@@ -1961,7 +1961,7 @@ function renderModuleGrid(){
     <button onclick="openErph()" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#0E7490;">
       <i data-lucide="clipboard-check" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
       <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#CFFAFE;"><i data-lucide="clipboard-check" class="w-7 h-7" style="color:#0E7490;"></i></div>
-      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">eRPH</h3>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">InRPH</h3>
       <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#0E7490;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#0E7490;"></span></div>
       <p class="relative text-sm text-ink-soft pr-10">Hantar RPH mingguan, semakan pentadbir dan laporan penghantaran.</p>
       <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
@@ -3805,14 +3805,21 @@ async function saveCmsContent(){
    Token Google tamat ~1 jam: jika tamat/tiada (cth. selepas muat semula portal,
    kerana sesi portal hanya menyimpan emel), butang pengesahan semula dipaparkan.
    ===================================================================== */
-let erphCred = null;
-function erphStoreCred(c){ erphCred = c; }
+let erphCred = (function(){ try{ return sessionStorage.getItem('dash_idtok') || null; }catch(e){ return null; } })();
+function erphStoreCred(c){ erphCred = c; try{ sessionStorage.setItem('dash_idtok', c); }catch(e){} }
 function erphCredValid(){
   if(!erphCred) return false;
   try{
     const p = JSON.parse(atob(erphCred.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    if(currentUser && String(p.email||'').toLowerCase() !== String(currentUser.delimaEmail||'').toLowerCase()) return false;
     return p.exp * 1000 > Date.now() + 60000;
   }catch(e){ return false; }
+}
+// Dibuka melalui pautan terus (?app=inrph, biasanya dari senarai aplikasi DELIMa): kembali ke DELIMa. Jika tidak: papan pemuka dashboard.
+const DELIMA_APLIKASI_URL = 'https://d3.delima.edu.my/applications';
+function inrphKembali(){
+  if(window.__inrphDeepDone){ window.location.href = DELIMA_APLIKASI_URL; return; }
+  showModule('picker');
 }
 function erphFrame(){ return document.getElementById('erph-frame'); }
 function erphSendToken(){
@@ -3844,7 +3851,7 @@ function erphHandleReauth(credential){
   erphSendToken();
 }
 function erphReset(){
-  erphCred = null; window.__erphReauth = false;
+  erphCred = null; window.__erphReauth = false; try{ sessionStorage.removeItem('dash_idtok'); }catch(e){}
   const fr = erphFrame(); if(fr) fr.removeAttribute('src');
   const box = document.getElementById('erph-reauth'); if(box) box.classList.add('hidden');
 }
@@ -3853,7 +3860,7 @@ window.addEventListener('message', function(e){
   const fr = erphFrame();
   if(!fr || e.source !== fr.contentWindow) return;
   const d = e.data;
-  if(d && d.type === 'erph-close'){ showModule('picker'); return; }
+  if(d && d.type === 'erph-close'){ inrphKembali(); return; }
   if(!d || (d.type !== 'erph-ready' && d.type !== 'erph-need-token')) return;
   if(!currentUser) return;
   if(!erphSendToken()) erphNeedAuth();

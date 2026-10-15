@@ -1215,7 +1215,7 @@ function csvBelum(){const w=ui.selWeek,q=v=>{let t=String(v);if(/^[=+\-@\t\r]/.t
 /* ---------- shell ---------- */
 function render(){
   const app=document.getElementById('app');
-  const brand='<div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali ke Papan Pemuka">← Papan Pemuka</button>':'')+'<div class="brand"><b>In<em style="font-style:normal;color:var(--blue)">RPH</em></b><span>SK Krangan · Hantar RPH melalui muat naik'+(LIVE?'':' · MOD DEMO')+'</span></div></div>';
+  const brand='<div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<div class="brand"><b>In<em style="font-style:normal;color:var(--blue)">RPH</em></b><span>SK Krangan · Hantar RPH melalui muat naik'+(LIVE?'':' · MOD DEMO')+'</span></div></div>';
   if(ui.screen==='loading'){app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><p class="lead">Memuatkan data…</p></div>';return;}
   if(ui.screen==='login'){
     app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:460px;margin:24px auto"><h2>'+(ui.embedMsg?'InRPH tidak dapat dibuka':'Log masuk DELIMa')+'</h2>'+(ui.embedMsg?'':'<p class="lead">Log masuk dengan akaun <b>DELIMa</b> anda (g-xxxxxxxx@'+esc(CONFIG.DOMAIN||'moe-dl.edu.my')+'). Akaun peribadi seperti Gmail tidak diterima. Jika akaun anda tidak dikenali, hubungi Penyelaras ICT.</p>')+(ui.loginErr?'<p class="err" role="alert">'+esc(ui.loginErr)+'</p>':'')+'<div id="gbtn" style="margin-top:12px"></div></div></div>';
@@ -1236,7 +1236,7 @@ function render(){
   app.innerHTML='<div class="shell"><aside class="side" aria-label="Menu utama"><div class="side-brand"><b>In<em>RPH</em></b><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div>'+
    '<nav class="side-nav">'+navHtml+'</nav>'+
    '<div class="side-foot">'+(LIVE?esc(MYNAME):'Data contoh, tidak disimpan')+'</div></aside>'+
-   '<div class="main"><header class="top"><div class="top-in"><div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali ke Papan Pemuka">← Papan Pemuka</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
+   '<div class="main"><header class="top"><div class="top-in"><div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
    (LIVE?'<div class="hr"><div class="acct"><span>'+esc(MYNAME)+'</span><button data-act="reload">Muat semula</button>'+(EMBED?'':'<button data-act="logout">Log keluar</button>')+'</div></div>':'')+'</div></header>'+body+'</div></div>';
 }
 let tt;
