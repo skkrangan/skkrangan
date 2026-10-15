@@ -138,6 +138,7 @@ button,input,textarea{font:inherit;color:inherit}
 .side{background:var(--navy);color:#fff;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 12px;gap:18px;overflow:auto}
 .side-brand{padding:0 8px;border-bottom:2px solid #E3B85A;padding-bottom:14px;display:flex;align-items:center;gap:10px}
 .side-brand .lg{width:46px;height:46px;flex:none;border-radius:50%}.side-brand .sb-t{min-width:0}
+.main.stale .wrap{pointer-events:none;opacity:.88}.stale-bar{background:var(--gold-soft);color:var(--navy);font-size:.82rem;padding:6px 14px;border-bottom:1px solid #E6D3A6}
 .lg2{width:42px;height:42px;flex:none;border-radius:50%}.lg3{display:block;width:96px;height:96px;margin:0 auto 10px;border-radius:50%}
 .side-brand b{font-family:var(--font-head);font-size:1.55rem;color:#fff;letter-spacing:.01em;line-height:1.1;display:block}
 .side-brand b em{font-style:normal;color:#E3B85A}
@@ -1241,7 +1242,7 @@ function render(){
   app.innerHTML='<div class="shell"><aside class="side" aria-label="Menu utama"><div class="side-brand"><img class="lg" src="'+LOGO+'" alt="Logo InRPH" width="46" height="46"><div class="sb-t"><b>In<em>RPH</em></b><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div></div>'+
    '<nav class="side-nav">'+navHtml+'</nav>'+
    '<div class="side-foot">'+(LIVE?esc(MYNAME):'Data contoh, tidak disimpan')+'</div></aside>'+
-   '<div class="main"><header class="top"><div class="top-in"><div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
+   '<div class="main'+(ui.stale?' stale':'')+'">'+(ui.stale?'<div class="stale-bar" role="status">Memuatkan data terkini… (paparan terakhir ditunjukkan dahulu)</div>':'')+'<header class="top"><div class="top-in"><div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
    (LIVE?'<div class="hr"><div class="acct"><span>'+esc(MYNAME)+'</span><button data-act="reload">Muat semula</button>'+(EMBED?'':'<button data-act="logout">Log keluar</button>')+'</div></div>':'')+'</div></header>'+body+'</div></div>';
 }
 let tt;
@@ -1366,7 +1367,7 @@ window.addEventListener('message',e=>{
   const d=e.data;if(!d||d.type!=='erph-token'||typeof d.token!=='string')return;
   ID_TOKEN=d.token;
   if(tokWait){const r=tokWait;tokWait=null;r(true);}
-  else if(ui.screen==='loading'||ui.screen==='login'){ui.screen='loading';render();loadInit().catch(handleErr);}
+  else if(ui.screen==='loading'||ui.screen==='login'||ui.stale){if(!ui.stale)ui.screen='loading';render();loadInit().catch(handleErr);}
 });
 async function api(action,data,_retry){
   const body=JSON.stringify(Object.assign({action,idToken:ID_TOKEN,reqId:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)},data||{}));
@@ -1401,8 +1402,9 @@ function setupLive(p){
   if(!MENU.includes(ui.role)||!ui.booted){ui.role=MENU[0];ui.tab=defTab(ui.role);}
   ui.booted=true;openDefaults();
 }
-function dropToken(){ID_TOKEN=null;try{sessionStorage.removeItem('erph_tok')}catch(_){}}
+function dropToken(){ID_TOKEN=null;try{sessionStorage.removeItem('erph_tok')}catch(_){}swrBuang();}
 function handleErr(e){
+  if(e&&(e.code==='AUTH'||e.code==='NOACCESS')){ui.stale=false;swrBuang();}
   if(EMBED&&e&&(e.code==='AUTH'||e.code==='NOACCESS')){ui.screen='login';ui.embedMsg=true;ui.loginErr=e.message||'Sesi tamat. Muat semula halaman portal.';render();return;}
   if(e&&(e.code==='AUTH'||e.code==='NOACCESS')){dropToken();ui.loginErr=e.message||'Sesi tamat. Sila log masuk semula.';showLogin();}
   else toast((e&&e.message)||'Ralat tidak diketahui.');
@@ -1429,13 +1431,24 @@ async function onCred(r){
   ui.screen='loading';ui.loginErr='';render();
   try{await loadInit();}catch(e){handleErr(e);}
 }
-async function loadInit(){const p=await api('init');setupLive(p);ui.screen='app';render();}
+const SWR_KEY='inrph_init';
+async function loadInit(segar){
+  const p=await api('init',segar?{segarStaf:1}:undefined);setupLive(p);ui.stale=false;ui.screen='app';render();
+  try{sessionStorage.setItem(SWR_KEY,JSON.stringify({t:Date.now(),p}));}catch(e){}
+}
+function swrBuang(){try{sessionStorage.removeItem(SWR_KEY);}catch(e){}}
+/* Paparkan data terakhir (tab ini sahaja) serta-merta sementara data terkini dimuatkan. Tindakan dikunci sehingga data terkini tiba. */
+function swrCuba(){
+  try{const j=JSON.parse(sessionStorage.getItem(SWR_KEY)||'null');if(!j||!j.p||Date.now()-j.t>12*3600*1000)return false;
+    setupLive(j.p);ui.stale=true;ui.screen='app';render();return true;}catch(e){return false;}
+}
 async function boot(){
   if(!LIVE){setupDemo();openDefaults();ui.screen='app';render();return;}
   ui.screen='loading';render();
+  swrCuba();
   if(EMBED){
     window.parent.postMessage({type:'erph-ready'},CONFIG.PARENT_ORIGIN);
-    setTimeout(()=>{if(ui.screen==='loading'&&!ui.booted){ui.screen='login';ui.loginErr='Portal tidak memberi token log masuk. Muat semula halaman portal, atau log masuk di sini.';showLogin();}},9000);
+    setTimeout(()=>{if((ui.screen==='loading'||ui.stale)&&!ui.booted){ui.screen='login';ui.loginErr='Portal tidak memberi token log masuk. Muat semula halaman portal, atau log masuk di sini.';showLogin();}},9000);
     return;
   }
   let tok=null;try{tok=sessionStorage.getItem('erph_tok')}catch(e){}
@@ -1530,7 +1543,7 @@ document.addEventListener('click',e=>{
   else if(a==='buka'){const s=sub(t,w);
     if(LIVE){srv('buka',{t,w}).then(r=>{if(r){s.draft=s.prevKomen;}});return;}
     s.status='dihantar';s.draft=s.komen;s.komen='';s.log.push({t:new Date().toISOString(),who:'Pentadbir',act:'Semakan dibuka semula'});render();}
-  else if(a==='reload'){loadInit().then(()=>toast('Data dikemas kini.')).catch(handleErr);}
+  else if(a==='reload'){loadInit(ME_ADMIN).then(()=>toast('Data dikemas kini.')).catch(handleErr);}
   else if(a==='logout'){dropToken();try{google.accounts.id.disableAutoSelect()}catch(e){}ui.loginErr='';showLogin();}
   else if(a==='portalback'){window.parent.postMessage({type:'erph-close'},CONFIG.PARENT_ORIGIN);}
   else if(a==='csv'){downloadCsv();}
