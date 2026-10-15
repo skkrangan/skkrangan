@@ -130,6 +130,9 @@ button,input,textarea{font:inherit;color:inherit}
 .rl-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--green-soft);color:var(--navy);font:600 .8rem var(--mono,monospace);display:flex;align-items:center;justify-content:center;margin-top:6px}
 .rl-f{flex:1;display:flex;flex-direction:column;gap:6px}
 .rl-f textarea{min-height:0;height:58px;resize:vertical}
+.rl-att{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.84rem}
+.rl-att label{display:flex;align-items:center;gap:6px}
+.rl-att input{width:76px!important}
 .rl-f input,.rl-f textarea{width:100%;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:5px;padding:8px 10px;font:inherit;color:var(--fg);background:var(--surface)}
 .card .miss-list li{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .exp select{border:1px solid var(--line-strong);background:var(--surface);border-radius:5px;padding:8px 10px}
@@ -462,22 +465,29 @@ const TAKWIM_2026=[
 ];
 const key=(t,w)=>t+'-'+w;
 const KELAS_LALAI=1;
-function parseR(v){v=String(v||'');if(!v.trim())return[];if(v.trim()[0]==='['){try{const a=JSON.parse(v);if(Array.isArray(a))return a.map(x=>({k:String(x.k||''),t:String(x.t||'')}));}catch(_){}}return[{k:'',t:v}];}
-function serR(a){a=a.slice();while(a.length&&!a[a.length-1].k.trim()&&!a[a.length-1].t.trim())a.pop();return a.length?JSON.stringify(a):'';}
+function parseR(v){v=String(v||'');if(!v.trim())return[];if(v.trim()[0]==='['){try{const a=JSON.parse(v);if(Array.isArray(a))return a.map(x=>({k:String(x.k||''),t:String(x.t||''),h:String(x.h==null?'':x.h),j:String(x.j==null?'':x.j)}));}catch(_){}}return[{k:'',t:v,h:'',j:''}];}
+function serR(a){a=a.slice();while(a.length&&!a[a.length-1].k.trim()&&!a[a.length-1].t.trim()&&!a[a.length-1].h.trim()&&!a[a.length-1].j.trim())a.pop();return a.length?JSON.stringify(a):'';}
 const rNeed=tid=>{const t=teachers.find(x=>x.id===tid);return (t&&t.kelas)||KELAS_LALAI;};
-const rDone=s=>parseR(s.refleksi).filter(x=>x.t.trim()).length;
+/* Satu kelas dikira lengkap apabila refleksi ditulis DAN bilangan murid hadir diisi (hadir tidak melebihi jumlah murid jika jumlah diisi). */
+const rFull=x=>!!x.t.trim()&&/^\d{1,3}$/.test(x.h.trim())&&(x.j.trim()===''||(/^\d{1,3}$/.test(x.j.trim())&&+x.h<=+x.j));
+const rHadir=x=>/^\d{1,3}$/.test(x.h.trim())?x.h.trim()+(/^\d{1,3}$/.test(x.j.trim())?' / '+x.j.trim():''):'';
+const rDone=s=>parseR(s.refleksi).filter(rFull).length;
+function lastJ(k){k=String(k||'').trim();if(!k)return '';for(let w=weeks.length;w>=1;w--){const q=subs[key(ME,w)];if(!q||!q.refleksi)continue;const x=parseR(q.refleksi).find(y=>y.k.trim()===k&&/^\d{1,3}$/.test(y.j.trim()));if(x)return x.j.trim();}return '';}
 const rOk=(s,tid)=>rDone(s)>=rNeed(tid);
-function rHtml(s,tid){const a=parseR(s.refleksi).filter(x=>x.t.trim()),n=rNeed(tid);
+function rHtml(s,tid){const a=parseR(s.refleksi).filter(x=>x.t.trim()||x.h.trim()),n=rNeed(tid),d=rDone(s);
   if(!a.length)return '<em>Belum diisi</em>';
-  return '<span class="hint">'+a.length+' / '+n+' kelas ditulis'+(a.length<n?' · belum lengkap':'')+'</span>'+a.map((x,i)=>'<span style="display:block;margin-top:6px"><b>'+(esc(x.k||slotLabel(tid,i))||'Kelas '+(i+1))+'</b><br>'+esc(x.t)+'</span>').join('');}
+  return '<span class="hint">'+d+' / '+n+' kelas lengkap (refleksi dan kehadiran)'+(d<n?' · belum lengkap':'')+'</span>'+a.map((x,i)=>'<span style="display:block;margin-top:6px"><b>'+(esc(x.k||slotLabel(tid,i))||'Kelas '+(i+1))+'</b> <span class="hint">· Murid hadir: '+(rHadir(x)?esc(rHadir(x)):'belum diisi')+'</span><br>'+esc(x.t)+'</span>').join('');}
 function rEditor(w,s,locked){
-  const a=parseR(s.refleksi),n=Math.max(rNeed(ME)+(s.rextra||0),a.length),done=a.filter(x=>x.t.trim()).length,need=rNeed(ME);
-  let h='<div class="rl-head"><span class="lbl">Refleksi PdP setiap kelas <span class="hint">· ditaip sendiri oleh staf</span></span><span class="pill '+(done>=need?'ok':'idle')+'" id="rp-'+w+'">'+done+' / '+need+' kelas</span></div>'+
+  const a=parseR(s.refleksi),n=Math.max(rNeed(ME)+(s.rextra||0),a.length),done=a.filter(rFull).length,need=rNeed(ME);
+  let h='<div class="rl-head"><span class="lbl">Refleksi PdP dan kehadiran murid setiap kelas <span class="hint">· ditaip sendiri oleh staf</span></span><span class="pill '+(done>=need?'ok':'idle')+'" id="rp-'+w+'">'+done+' / '+need+' kelas</span></div>'+
    (hasJadual(ME)?'<p class="hint">Senarai kelas dijana daripada jadual waktu anda ('+need+' kelas seminggu). Semakan hanya boleh ditandakan Disemak apabila semua kelas telah ditulis.</p>':'<p class="hint warnbox">Jadual waktu belum diisi, jadi senarai kelas belum dijana. Isi jadual supaya bilangan refleksi sepadan dengan kelas anda. <button class="btn sm" data-act="tab" data-tab="jadual">Isi jadual waktu</button></p>');
-  for(let i=0;i<n;i++){const x=a[i]||{k:'',t:''};
-    const sl=slotLabel(ME,i);
+  for(let i=0;i<n;i++){const x=a[i]||{k:'',t:'',h:'',j:''};
+    const sl=slotLabel(ME,i),bad=x.h.trim()&&x.j.trim()&&+x.h>+x.j;
     h+='<div class="rl-row"><span class="rl-n">'+(i+1)+'</span><div class="rl-f">'+(sl?'<b class="rl-lab">'+esc(x.k||sl)+'</b>':'<input type="text" maxlength="80" data-rw="'+w+'" data-ri="'+i+'" data-rf="k" '+(locked?'disabled':'')+' placeholder="Hari · kelas · mata pelajaran (cth. Isnin · 5 Bestari · PSV)" value="'+esc(x.k)+'" aria-label="Kelas '+(i+1)+'">')+
-     '<textarea data-rw="'+w+'" data-ri="'+i+'" data-rf="t" maxlength="1000" rows="2" '+(locked?'disabled':'')+' placeholder="Cth: 26 daripada 28 murid menguasai objektif. Dua murid perlu bimbingan tambahan." aria-label="Refleksi kelas '+(i+1)+'">'+esc(x.t)+'</textarea></div></div>';}
+     '<textarea data-rw="'+w+'" data-ri="'+i+'" data-rf="t" maxlength="1000" rows="2" '+(locked?'disabled':'')+' placeholder="Cth: 26 daripada 28 murid menguasai objektif. Dua murid perlu bimbingan tambahan." aria-label="Refleksi kelas '+(i+1)+'">'+esc(x.t)+'</textarea>'+
+     '<div class="rl-att"><label>Murid hadir <input type="number" inputmode="numeric" min="0" max="999" step="1" data-rw="'+w+'" data-ri="'+i+'" data-rf="h" '+(locked?'disabled':'')+' value="'+esc(x.h)+'" aria-label="Murid hadir kelas '+(i+1)+'"></label>'+
+     '<label>daripada <input type="number" inputmode="numeric" min="0" max="999" step="1" data-rw="'+w+'" data-ri="'+i+'" data-rf="j" '+(locked?'disabled':'')+' value="'+esc(x.j)+'" aria-label="Jumlah murid kelas '+(i+1)+'"></label>'+
+     (bad?'<span class="err">Hadir melebihi jumlah murid.</span>':'')+'</div></div></div>';}
   if(!locked&&n<100)h+='<button class="btn sm" data-act="radd" data-w="'+w+'">+ Tambah kelas</button>';
   return h;
 }
@@ -511,7 +521,7 @@ function setupDemo(){
     const s=blankSub();
     if(c!=='b'){
       s.file=mkFile(ti,w);
-      {const need=rNeed(t.id),arr=[];for(let i=0;i<need;i++)arr.push({k:['Isnin','Selasa','Rabu','Khamis','Jumaat'][Math.floor(i/2)]+' · '+(i%2?'5 Bestari':'2 Cemerlang'),t:REFL[(ti+w+i)%REFL.length]});s.refleksi=serR(arr);}
+      {const need=rNeed(t.id),arr=[];for(let i=0;i<need;i++)arr.push({k:['Isnin','Selasa','Rabu','Khamis','Jumaat'][Math.floor(i/2)]+' · '+(i%2?'5 Bestari':'2 Cemerlang'),t:REFL[(ti+w+i)%REFL.length],h:String(24+((ti+w+i)%5)),j:'28'});s.refleksi=serR(arr);}
       s.log.push({t:new Date(wk.s.getTime()-864e5).toISOString(),who:t.name,act:'Dihantar'});
       if(c==='d'){s.log.push({t:new Date(wk.s.getTime()+2*864e5).toISOString(),who:'Pentadbir',act:'Ditandakan Disemak'});s.status='disemak';s.komen=OKN[(ti*3+w)%OKN.length];const r=new Date(wk.s.getTime()+2*864e5);r.setHours(16,(ti*9)%60);s.reviewed=fmtDT(r);}
       if(c==='s'){s.status='dihantar';if((ti+w)%3===0)s.refleksi=serR(parseR(s.refleksi).slice(0,4));}
@@ -600,6 +610,74 @@ function guruWeek(wk){
     '<div>'+rEditor(w,s,lockedR)+''+
     '<div class="save" id="sv-'+w+'">'+(lockedR?'Refleksi dikunci selepas disemak.':'')+'</div><div class="actions"><button class="btn sm" data-act="cetakw" data-t="'+ME+'" data-w="'+w+'">Cetak RPH &amp; refleksi</button></div></div>'+act+'</div></details>';
 }
+/* ---------- Salinan luar talian: RPH yang sudah disemak dimuat turun ke laptop sebagai satu fail ZIP ---------- */
+const arkibList=()=>weeks.filter(w=>!w.cuti&&sub(ME,w.n).status==='disemak');
+function arkibCard(){
+  const n=arkibList().length,A=ui.arkib||{};
+  return '<div class="card"><span class="lbl">Simpan salinan ke laptop</span>'+
+    '<p class="hint" style="margin:4px 0 8px">Muat turun semua RPH anda yang sudah disemak (fail RPH, refleksi, kehadiran murid dan catatan semakan) sebagai satu fail ZIP. Simpan di laptop supaya boleh ditunjukkan semasa pemantauan walaupun tiada internet. Buka <b>INDEX.html</b> di dalam ZIP dengan pelayar.</p>'+
+    '<div class="actions"><button class="btn pri" data-act="arkib"'+(n&&!A.busy?'':' disabled')+'>'+(A.busy?'Menyediakan…':'Muat turun '+n+' RPH disemak (ZIP)')+'</button>'+
+    '<span class="hint" id="ark-msg" role="status">'+esc(A.msg||(n?'':'Belum ada RPH yang disemak.'))+'</span></div></div>';
+}
+let zipP=null;
+function loadZip(){
+  if(window.JSZip)return Promise.resolve();
+  if(!zipP)zipP=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';sc.onload=res;sc.onerror=()=>{zipP=null;rej(new Error('Pustaka ZIP tidak dapat dimuatkan. Semak sambungan internet.'));};document.head.appendChild(sc);});
+  return zipP;
+}
+const safeName=x=>String(x).normalize('NFKD').replace(/[^\w.\- ]+/g,'').trim().replace(/\s+/g,'_').slice(0,60)||'fail';
+async function arkibFile(w,f){
+  if(f.url){const r=await fetch(f.url);return await r.blob();}
+  if(!LIVE)return null;
+  const r=await api('getfile',{t:ME,w});
+  const bin=atob(r.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return new Blob([u],{type:r.mime||'application/octet-stream'});
+}
+function arkibIndex(rows,nama,tarikh){
+  const css='body{font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:860px;margin:24px auto;padding:0 16px;color:#1c2b22}h1{font-size:1.3rem;margin:0}h2{font-size:1.05rem;margin:0}.m{color:#5b6b61;font-size:.85rem}section{border:1px solid #cfd8d2;border-radius:8px;padding:12px 14px;margin:14px 0;page-break-inside:avoid}.k{margin:8px 0 0}.k b{display:block}.n{background:#eef5f0;border-radius:6px;padding:8px 10px;margin-top:8px}a{color:#0f5b38}';
+  return '<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RPH Disemak - '+esc(nama)+'</title><style>'+css+'</style></head><body>'+
+   '<h1>SEKOLAH KEBANGSAAN KRANGAN</h1><p class="m">Salinan RPH yang telah disemak · '+esc(nama)+' · disimpan pada '+esc(tarikh)+' (waktu Malaysia) · '+rows.length+' minggu</p>'+
+   rows.map(r=>{
+     const rl=parseR(r.s.refleksi).filter(x=>x.t.trim()||x.h.trim());
+     return '<section><h2>Minggu '+r.w.n+' <span class="m">· '+esc(r.w.label)+' '+r.w.s.getFullYear()+'</span></h2>'+
+      '<p class="m">Disemak: '+esc(r.s.reviewed||'-')+'</p>'+
+      '<p>'+(r.path?'Fail RPH: <a href="'+esc(encodeURI(r.path))+'">'+esc(r.s.file.name)+'</a>':'Fail RPH: <i>'+esc(r.catatan||'tiada dalam salinan ini')+'</i>')+'</p>'+
+      (rl.length?rl.map((x,i)=>'<div class="k"><b>'+esc(x.k||slotLabel(ME,i)||'Kelas '+(i+1))+' · Murid hadir: '+(esc(rHadir(x))||'belum diisi')+'</b>'+esc(x.t)+'</div>').join(''):'<p class="m">Refleksi tiada.</p>')+
+      (r.s.komen?'<div class="n"><b>Catatan semakan:</b> '+esc(r.s.komen)+'</div>':'')+'</section>';}).join('')+
+   '</body></html>';
+}
+async function arkibMuat(){
+  const A=ui.arkib={busy:true,msg:'Menyediakan…'};render();
+  const say=m=>{A.msg=m;const e=document.getElementById('ark-msg');if(e)e.textContent=m;};
+  try{
+    await loadZip();
+    const ws=arkibList();if(!ws.length)throw new Error('Belum ada RPH yang disemak.');
+    const zip=new JSZip(),rows=[];let gagal=0;
+    for(let i=0;i<ws.length;i++){
+      const w=ws[i],s=sub(ME,w.n),f=s.file;say('Memuat turun fail '+(i+1)+' / '+ws.length+'…');
+      const row={w,s,path:'',catatan:''};
+      if(f){
+        try{
+          const blob=await arkibFile(w.n,f);
+          if(blob){const ext=(f.ext||'pdf').toLowerCase(),path='Minggu_'+String(w.n).padStart(2,'0')+'/'+safeName(f.name.replace(/\.[^.]+$/,''))+'.'+ext;zip.file(path,blob);row.path=path;}
+          else row.catatan='mod contoh: fail tiada';
+        }catch(e){if(e&&e.code==='AUTH')throw e;gagal++;row.catatan='fail tidak dapat dimuat turun, cuba lagi';}
+      }else row.catatan='fail tiada';
+      rows.push(row);
+    }
+    const tarikh=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kuching',dateStyle:'medium',timeStyle:'short'}).format(new Date());
+    const ymd=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuching'}).format(new Date());
+    zip.file('INDEX.html',arkibIndex(rows,MYNAME,tarikh));
+    say('Memampatkan…');
+    const out=await zip.generateAsync({type:'blob',compression:'STORE'});
+    const a=document.createElement('a'),u=URL.createObjectURL(out);a.href=u;a.download='RPH-Disemak_'+safeName(MYNAME.replace(/^Cg\.\s*/,''))+'_'+ymd+'.zip';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
+    ui.arkib={busy:false,msg:(gagal?gagal+' fail tidak dapat dimuat turun. ':'')+'Selesai: '+ws.length+' minggu disimpan dalam ZIP ('+ymd+').'};
+  }catch(e){
+    if(e&&e.code==='AUTH'){ui.arkib={busy:false,msg:''};handleErr(e);return;}
+    ui.arkib={busy:false,msg:'Gagal: '+((e&&e.message)||'cuba lagi')};
+  }
+  render();
+}
 function guruView(){
   const mine=weeks.map(w=>sub(ME,w.n)),cnt=st=>mine.filter((s,i)=>s.status===st).length;
   const cur=sub(ME,CURRENT),cp=pillFor(cur,CURRENT,ME);
@@ -613,7 +691,7 @@ function guruView(){
   const nb=NOTIFS.length?'<div class="card"><span class="lbl">Notifikasi'+(unread.length?' <span class="pill fix">'+unread.length+' baharu</span>':'')+'</span>'+NOTIFS.slice(0,5).map(n=>'<div class="note '+(n.readAt?'info':'fix')+'"><b>Minggu '+n.w+(n.jenis==='pembetulan'?' · Perlu pembetulan':'')+'</b><p>'+esc(n.mesej)+'</p><small>'+fmtDT(new Date(n.createdAt))+'</small>'+(n.readAt?'':' <button class="btn sm" data-act="nread" data-id="'+esc(n.id)+'">Tandakan dibaca</button>')+'</div>').join('')+'</div>':'';
   return '<div class="wrap"><div><h2>RPH Saya</h2><p class="lead" style="margin-top:4px">Muat naik fail RPH setiap minggu (boleh banyak fail, sistem gabungkan menjadi satu), hantar kepada Guru Besar atau PK Kurikulum, dan kemas kini refleksi selepas PdP.</p></div>'+
     nb+'<p class="flow"><b>Muat naik fail</b><i>→</i><b>Hantar</b><i>→</i><b>Taip refleksi selepas PdP</b><i>→</i><b>Semakan &amp; komen pentadbir</b></p>'+
-    focus+chipsF+weeks.filter(selF).map(guruWeek).join('')+'<p class="foot">'+(LIVE?'':'Data contoh untuk prototaip.')+'</p></div>';
+    focus+arkibCard()+chipsF+weeks.filter(selF).map(guruWeek).join('')+'<p class="foot">'+(LIVE?'':'Data contoh untuk prototaip.')+'</p></div>';
 }
 
 /* ---------- PENTADBIR: semakan ---------- */
@@ -638,7 +716,7 @@ function rvRow(t,w){
       '<div><label class="lbl" for="k-'+id+'">Catatan semakan <span class="hint">· wajib jika perlu pembetulan</span></label>'+
       '<textarea id="k-'+id+'" data-kom="'+id+'" placeholder="Tulis komen untuk staf jika perlu.">'+esc(s.draft)+'</textarea>'+
       (s.err?'<p class="err" role="alert">Tulis catatan supaya staf tahu apa yang perlu dibetulkan.</p>':'')+'</div>'+
-      (rOk(s,t.id)?'':'<p class="hint">Refleksi belum lengkap ('+rDone(s)+' / '+rNeed(t.id)+' kelas). Tandakan Disemak dibuka selepas staf menulis refleksi semua kelas, atau pulangkan untuk pembetulan dengan catatan.</p>')+'<div class="actions"><button class="btn ok" data-act="semak" data-t="'+t.id+'" data-w="'+w+'"'+(rOk(s,t.id)?'':' disabled')+'>Tandakan Disemak</button>'+
+      (rOk(s,t.id)?'':'<p class="hint">Refleksi dan kehadiran murid belum lengkap ('+rDone(s)+' / '+rNeed(t.id)+' kelas). Tandakan Disemak dibuka selepas staf menulis refleksi semua kelas, atau pulangkan untuk pembetulan dengan catatan.</p>')+'<div class="actions"><button class="btn ok" data-act="semak" data-t="'+t.id+'" data-w="'+w+'"'+(rOk(s,t.id)?'':' disabled')+'>Tandakan Disemak</button>'+
       '<button class="btn warn" data-act="betul" data-t="'+t.id+'" data-w="'+w+'">Perlu pembetulan</button></div>';
   }else if(s.status==='disemak'){
     dec='<div class="note ok"><b>Disemak</b>'+(s.komen?'<p>'+esc(s.komen)+'</p>':'')+'<small>'+esc(s.reviewed)+'</small></div>'+
@@ -997,10 +1075,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelec
 ui.rekodF='semua';
 function printWeek(tid,w){
   const q=sub(tid,w),t=tName(tid),wk=weeks[w-1],name=t?t.name:MYNAME;
-  const rl=parseR(q.refleksi).filter(x=>x.t.trim());
+  const rl=parseR(q.refleksi).filter(x=>x.t.trim()||x.h.trim());
   const st={disemak:'Disemak',dihantar:'Dihantar (menunggu semakan)',pembetulan:'Perlu pembetulan',draf:'Draf (belum dihantar)',belum:'Belum dihantar'}[q.status]||q.status;
   const sent=(q.log||[]).filter(x=>x.act==='Dihantar').slice(-1)[0];
-  const rows=rl.length?rl.map((x,i)=>'<tr><td style="width:6%">'+(i+1)+'</td><td style="width:26%">'+esc(x.k||slotLabel(tid,i)||'-')+'</td><td>'+esc(x.t)+'</td></tr>').join(''):'<tr><td colspan="3"><em>Refleksi belum ditulis.</em></td></tr>';
+  const rows=rl.length?rl.map((x,i)=>'<tr><td style="width:6%">'+(i+1)+'</td><td style="width:26%">'+esc(x.k||slotLabel(tid,i)||'-')+'</td><td style="width:14%">'+(esc(rHadir(x))||'-')+'</td><td>'+esc(x.t)+'</td></tr>').join(''):'<tr><td colspan="4"><em>Refleksi belum ditulis.</em></td></tr>';
   const need=rNeed(tid);
   let a=document.getElementById('printarea');if(!a){a=document.createElement('div');a.id='printarea';document.body.appendChild(a);}
   a.innerHTML='<h1>SEKOLAH KEBANGSAAN KRANGAN</h1><p class="ps">Rekod RPH dan Refleksi Pengajaran Mingguan</p>'+
@@ -1009,7 +1087,7 @@ function printWeek(tid,w){
    '<tr><td><b>Fail RPH</b></td><td>: '+(q.file?esc(q.file.name)+(q.file.pages?' ('+q.file.pages+' halaman)':''):'Tiada')+'</td></tr>'+
    '<tr><td><b>Tarikh hantar</b></td><td>: '+(sent?esc(fmtDT(new Date(sent.t))):'-')+'</td></tr>'+
    '<tr><td><b>Status</b></td><td>: '+esc(st)+(q.reviewed&&q.status==='disemak'?' pada '+esc(q.reviewed):'')+'</td></tr></table>'+
-   '<b>Refleksi pengajaran ('+rl.length+' / '+need+' kelas)</b><table><thead><tr><th>Bil.</th><th>Hari / Kelas</th><th>Refleksi</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+   '<b>Refleksi pengajaran ('+rDone(q)+' / '+need+' kelas lengkap)</b><table><thead><tr><th>Bil.</th><th>Hari / Kelas</th><th>Murid hadir</th><th>Refleksi</th></tr></thead><tbody>'+rows+'</tbody></table>'+
    (q.komen?'<p><b>Catatan pentadbir:</b> '+esc(q.komen)+'</p>':'')+
    '<div class="sg"><div>Tandatangan staf<br>Tarikh:</div><div>Disemak oleh (Guru Besar / PK)<br>Tarikh:</div></div>';
   const clean=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',clean);};
@@ -1560,6 +1638,7 @@ document.addEventListener('click',e=>{
   else if(a==='view'){openViewer(t,w,b);}
   else if(a==='vclose'){if(b.dataset.bg&&e.target!==b)return;closeViewer();}
   else if(a==='rf'){ui.rekodF=b.dataset.f;render();}
+  else if(a==='arkib'){if(!(ui.arkib&&ui.arkib.busy))arkibMuat();}
   else if(a==='selweek'){ui.selWeek=w;ui.pasteText='';render();}
   else if(a==='salin'){
     const txt=reportText(ui.selWeek);
@@ -1607,7 +1686,13 @@ window.addEventListener('beforeunload',e=>{if(Object.values(subs).some(x=>x.rdir
 document.addEventListener('input',e=>{
   const r=e.target.closest('[data-rw]');
   if(r){const w=+r.dataset.rw,i=+r.dataset.ri,f=r.dataset.rf,q=sub(ME,w);
-    const arr=parseR(q.refleksi);while(arr.length<=i)arr.push({k:'',t:''});arr[i][f]=r.value;if(f==='t'&&!arr[i].k&&slotLabel(ME,i))arr[i].k=slotLabel(ME,i);q.refleksi=serR(arr);
+    const arr=parseR(q.refleksi);while(arr.length<=i)arr.push({k:'',t:'',h:'',j:''});
+    let val=r.value;if(f==='h'||f==='j'){val=val.replace(/\D/g,'').slice(0,3);if(val!==r.value)r.value=val;}
+    arr[i][f]=val;if((f==='t'||f==='h')&&!arr[i].k&&slotLabel(ME,i))arr[i].k=slotLabel(ME,i);
+    if(f==='h'&&val&&!arr[i].j.trim()){const lj=lastJ(arr[i].k||slotLabel(ME,i));if(lj){arr[i].j=lj;const ji=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"][data-rf="j"]');if(ji)ji.value=lj;}}
+    q.refleksi=serR(arr);
+    if(f==='h'||f==='j'){const bx=r.closest('.rl-att');if(bx){let er=bx.querySelector('.err');const bad=arr[i].h.trim()&&arr[i].j.trim()&&+arr[i].h>+arr[i].j;
+      if(bad&&!er){er=document.createElement('span');er.className='err';er.textContent='Hadir melebihi jumlah murid.';bx.appendChild(er);}else if(!bad&&er)er.remove();}}
     q.rdirty=true;q.rver=(q.rver||0)+1;
     const sv=document.getElementById('sv-'+w);if(sv&&!q.rconflict)sv.textContent='Menyimpan…';
     const pl=document.getElementById('rp-'+w);if(pl){const d=rDone(q),n=rNeed(ME);pl.textContent=d+' / '+n+' kelas';pl.className='pill '+(d>=n?'ok':'idle');}
