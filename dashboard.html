@@ -763,6 +763,19 @@
     </div>
   </div>
 
+  <!-- ============ MODUL: ERPH (dibenamkan melalui iframe, token Google dikongsi dari log masuk portal) ============ -->
+  <div id="section-erph" class="tab-content fixed inset-0 z-[60] bg-white">
+    <div id="erph-reauth" class="hidden absolute inset-0 z-10 bg-white/95 flex items-center justify-center p-6">
+      <div class="text-center max-w-md">
+        <p class="font-display font-semibold text-lg text-ink mb-1">Sahkan identiti anda untuk eRPH</p>
+        <p class="text-sm text-ink-soft mb-4">Sesi Google anda telah tamat. Tekan butang di bawah dengan akaun DELIMA yang sama. Anda tidak perlu log masuk portal semula.</p>
+        <div id="erph-gbtn" class="flex justify-center"></div>
+        <button onclick="showModule('picker')" class="mt-5 text-sm font-bold text-ink-soft hover:text-ink">&larr; Kembali ke Papan Pemuka</button>
+      </div>
+    </div>
+    <iframe id="erph-frame" title="eRPH" class="w-full h-full border-0 block bg-white"></iframe>
+  </div>
+
   <!-- ============ MODUL: EHADIR (disisipkan) ============ -->
   <div id="section-ehadir" class="tab-content bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
             
@@ -1757,12 +1770,15 @@ function hideLoginError(){
 }
 
 function handleGoogleCredential(response){
+  // eRPH: pengesahan semula identiti Google di dalam modul eRPH (tanpa log masuk portal semula)
+  if(window.__erphReauth){ erphHandleReauth(response.credential); return; }
   hideLoginError();
   let payload;
   try { payload = JSON.parse(atob(response.credential.split('.')[1])); }
   catch(e){ showLoginError('Gagal mengesahkan token log masuk. Sila cuba semula.'); return; }
 
   const email = payload.email;
+  erphStoreCred(response.credential); // simpan dalam memori sahaja, untuk modul eRPH
 
   // Semak dahulu jika emel ni SUDAH terdaftar dalam senarai staf (Urus Staf) -
   // kalau ya, BENARKAN log masuk walaupun bukan domain DELIMA. Ini penting
@@ -1820,6 +1836,13 @@ function enterDashboard(){
   renderModuleGrid();
   showModule('picker');
   loadDashboardPengumuman();
+
+  // Pautan terus ke InRPH (tidak dipaparkan sebagai kad): dashboard.html?app=inrph
+  // Log masuk dashboard dikongsi; tiada log masuk Google berasingan untuk InRPH.
+  if(!window.__inrphDeepDone && new URLSearchParams(location.search).get('app') === 'inrph'){
+    window.__inrphDeepDone = true;
+    openErph();
+  }
 
   // "Kemas Kini Status" (borang peribadi) dipaparkan untuk SEMUA staf KECUALI akaun
   // yang ditanda excludeFromAttendance (cth. Akaun Pentadbir Sistem - bukan orang sebenar).
@@ -1879,6 +1902,7 @@ let dashAutoRefreshTimer = null;
 function signOutDashboard(){
   localStorage.removeItem('dashboard_session');
   currentUser = null;
+  erphReset();
   if(dashAutoRefreshTimer){ clearInterval(dashAutoRefreshTimer); dashAutoRefreshTimer = null; }
   document.getElementById('dashboard-shell').classList.add('hidden');
   document.getElementById('login-gate').classList.remove('hidden');
@@ -1930,6 +1954,20 @@ function renderModuleGrid(){
       <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
     </button>`;
   idx++;
+  // eRPH sengaja disembunyikan daripada papan pemuka portal (dibuka terus melalui pautan eRPH, log masuk DELIMa). Tukar ke true untuk papar semula.
+  const ERPH_PAPAR_DALAM_PORTAL = false;
+  if (ERPH_PAPAR_DALAM_PORTAL) {
+  cards += `
+    <button onclick="openErph()" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#0E7490;">
+      <i data-lucide="clipboard-check" class="absolute -right-3 -bottom-3 w-24 h-24 text-mist pointer-events-none"></i>
+      <div class="relative w-16 h-16 rounded-full flex items-center justify-center mb-5" style="background:#CFFAFE;"><i data-lucide="clipboard-check" class="w-7 h-7" style="color:#0E7490;"></i></div>
+      <h3 class="relative font-display font-semibold text-lg text-ink mb-1.5">eRPH</h3>
+      <div class="relative flex items-center gap-1.5 mb-3"><span class="h-px w-8" style="background:#0E7490;"></span><span class="w-1.5 h-1.5 rounded-full" style="background:#0E7490;"></span></div>
+      <p class="relative text-sm text-ink-soft pr-10">Hantar RPH mingguan, semakan pentadbir dan laporan penghantaran.</p>
+      <span class="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-navy-deep flex items-center justify-center"><i data-lucide="chevrons-right" class="w-4 h-4 text-white"></i></span>
+    </button>`;
+  idx++;
+  }
   idx++;
   cards += `
     <button onclick="showModule('eopr')" class="module-card soft-card pop-in stagger-${Math.min(idx,3)} text-left rounded-3xl p-8 relative overflow-hidden border-b-4" style="border-bottom-color:#A23B3B;">
@@ -1991,7 +2029,7 @@ function showModule(id){
   document.querySelectorAll('#dashboard-shell > .tab-content').forEach(el => el.classList.remove('active'));
   const target = document.getElementById('section-' + id);
   if(target) target.classList.add('active');
-  document.body.style.overflow = (id === 'eopr') ? 'hidden' : '';
+  document.body.style.overflow = (id === 'eopr' || id === 'erph') ? 'hidden' : '';
   if(id === 'cms') renderCmsTabs();
   if(id === 'staf') renderStaffManagementList();
 }
@@ -3756,6 +3794,75 @@ async function saveCmsContent(){
     status.innerText = 'Disimpan tempatan sahaja (rangkaian gagal)';
     showToast('Gagal sambung ke storan dikongsi. Disimpan tempatan sahaja buat masa ini.', 'error');
   }
+}
+
+/* =====================================================================
+   MODUL InRPH - dibenamkan melalui iframe (InRPH.html, domain/origin sama).
+   Pengesahan: token Google (ID token) daripada log masuk portal dihantar ke eRPH
+   melalui postMessage. Token HANYA disimpan dalam memori (bukan localStorage).
+   Pelayan eRPH (Apps Script) mengesahkan token itu sendiri dan menyemak emel
+   dalam helaian Guru, jadi peranan tidak boleh dipalsukan dari pelayar.
+   Token Google tamat ~1 jam: jika tamat/tiada (cth. selepas muat semula portal,
+   kerana sesi portal hanya menyimpan emel), butang pengesahan semula dipaparkan.
+   ===================================================================== */
+let erphCred = null;
+function erphStoreCred(c){ erphCred = c; }
+function erphCredValid(){
+  if(!erphCred) return false;
+  try{
+    const p = JSON.parse(atob(erphCred.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.exp * 1000 > Date.now() + 60000;
+  }catch(e){ return false; }
+}
+function erphFrame(){ return document.getElementById('erph-frame'); }
+function erphSendToken(){
+  const fr = erphFrame();
+  if(!fr || !fr.contentWindow || !erphCredValid()) return false;
+  fr.contentWindow.postMessage({ type:'erph-token', token: erphCred }, location.origin);
+  const box = document.getElementById('erph-reauth'); if(box) box.classList.add('hidden');
+  return true;
+}
+function erphNeedAuth(){
+  const box = document.getElementById('erph-reauth'); if(!box) return;
+  box.classList.remove('hidden');
+  window.__erphReauth = true;
+  if(typeof google !== 'undefined'){
+    const b = document.getElementById('erph-gbtn'); b.innerHTML = '';
+    google.accounts.id.renderButton(b, { theme:'filled_blue', size:'large', shape:'pill', text:'continue_with' });
+  }
+}
+function erphHandleReauth(credential){
+  // Hanya terima jika emel sama dengan staf yang sedang log masuk
+  let email = '';
+  try{ email = JSON.parse(atob(credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).email || ''; }catch(e){}
+  if(!currentUser || email.toLowerCase() !== String(currentUser.delimaEmail || '').toLowerCase()){
+    alert('Akaun Google yang dipilih tidak sama dengan akaun yang log masuk ke portal. Sila pilih akaun yang sama.');
+    return;
+  }
+  window.__erphReauth = false;
+  erphStoreCred(credential);
+  erphSendToken();
+}
+function erphReset(){
+  erphCred = null; window.__erphReauth = false;
+  const fr = erphFrame(); if(fr) fr.removeAttribute('src');
+  const box = document.getElementById('erph-reauth'); if(box) box.classList.add('hidden');
+}
+window.addEventListener('message', function(e){
+  if(e.origin !== location.origin) return;
+  const fr = erphFrame();
+  if(!fr || e.source !== fr.contentWindow) return;
+  const d = e.data;
+  if(d && d.type === 'erph-close'){ showModule('picker'); return; }
+  if(!d || (d.type !== 'erph-ready' && d.type !== 'erph-need-token')) return;
+  if(!currentUser) return;
+  if(!erphSendToken()) erphNeedAuth();
+});
+function openErph(){
+  showModule('erph');
+  const fr = erphFrame();
+  if(!fr.getAttribute('src')) fr.setAttribute('src', 'InRPH.html');
+  else if(!erphSendToken() && !erphCredValid()) erphNeedAuth();
 }
 
 /* =====================================================================
