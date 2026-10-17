@@ -442,6 +442,12 @@ small{font-size:.875rem}
 .vver-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}.vver-l li{border:1px solid var(--line);border-radius:10px;padding:10px 12px}.vver-l p{margin:4px 0}
 .ars-f{align-items:flex-end;flex-wrap:wrap}.ars-f label{display:flex;flex-direction:column;gap:4px}.ars-f select,.ars-f input{min-height:44px;font:inherit}
 .ars-r{margin:6px 0 0;padding-left:18px}.ars-r li{margin:3px 0}
+/* Menu tepi: kumpulan boleh dilipat; menu boleh disorok pada komputer */
+.side-h{width:100%;background:transparent;border:0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:left;min-height:40px;border-radius:6px}
+.side-h:hover{background:rgba(255,255,255,.08)}.side-h i{font-style:normal;font-size:1rem}
+.side-h:focus-visible{outline:3px solid #E3B85A;outline-offset:1px}
+.mnu{display:inline-flex;align-items:center;gap:6px}
+@media(min-width:761px){.shell.nosb{grid-template-columns:minmax(0,1fr)}.shell.nosb .side{display:none}}
 </style>
 </head>
 <body>
@@ -685,7 +691,8 @@ function pillFor(s,w,tid){
 }
 const pill=(s,w,tid)=>{const p=pillFor(s,w,tid);return '<span class="pill '+p[0]+'">'+p[1]+'</span>'};
 
-const ui={dq:'',df:'semua',exF:{t:'',a:1,b:1,sebab:''},role:'guru',tab:'rph',selWeek:1,open:new Set(),pasteText:'',loading:false,fatal:''};
+const lsG=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},lsS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const ui={grpC:lsG('inrph.menu.grp',[]),sideHide:lsG('inrph.menu.hide',false),dq:'',df:'semua',exF:{t:'',a:1,b:1,sebab:''},role:'guru',tab:'rph',selWeek:1,open:new Set(),pasteText:'',loading:false,fatal:''};
 function openDefaults(){ui.open=new Set(['g'+CURRENT,'a'+CURRENT,'a'+(CURRENT-1)]);ui.selWeek=CURRENT;ui.gw=CURRENT;ui.aw=0;ui.rf=null;ui.rq='';weeks.forEach(w=>{const q=subs[key(ME,w.n)];if(q&&q.status==='pembetulan')ui.open.add('g'+w.n);});}
 
 /* ---------- GURU ---------- */
@@ -1747,11 +1754,13 @@ function render(){
   const unread=NOTIFS.filter(n=>!n.readAt).length;
   const title=(allTabs.find(t=>t[0]===ui.tab)||[0,''])[1];
   const nb=t=>'<button data-act="tab" data-tab="'+t[0]+'"'+(ui.tab===t[0]?' aria-current="page"':'')+'>'+t[1]+(t[0]==='notif'&&unread?'<span class="badge">'+unread+'</span>':'')+'</button>';
-  const navHtml=groups.map(g=>(groups.length>1?'<span class="side-h">'+g.name+'</span>':'')+g.items.map(nb).join('')).join('')+(groups.length>1?'<span class="side-h">Akaun</span>':'')+common.map(nb).join('');
-  app.innerHTML='<div class="shell"><div class="scrim'+(ui.menu?' on':'')+'" data-act="menu"></div><aside class="side'+(ui.menu?' open':'')+'" id="side" aria-label="Menu utama"><div class="side-brand"><img class="lg" src="'+LOGO+'" alt="Logo InRPH" width="46" height="46"><div class="sb-t"><b>In<em>RPH</em></b><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div></div>'+
+  const gh=(n,items)=>{const col=ui.grpC.includes(n),has=items.some(t=>t[0]===ui.tab);
+    return '<button class="side-h" data-act="grp" data-g="'+esc(n)+'" aria-expanded="'+(!col)+'"><span>'+n+'</span><i aria-hidden="true">'+(col?'▸':'▾')+'</i></button>'+(col?items.filter(t=>t[0]===ui.tab):items).map(nb).join('');};
+  const navHtml=groups.length>1?groups.map(g=>gh(g.name,g.items)).join('')+gh('Akaun',common):groups.map(g=>g.items.map(nb).join('')).join('')+common.map(nb).join('');
+  app.innerHTML='<div class="shell'+(ui.sideHide?' nosb':'')+'"><div class="scrim'+(ui.menu?' on':'')+'" data-act="menu"></div><aside class="side'+(ui.menu?' open':'')+'" id="side" aria-label="Menu utama"><div class="side-brand"><img class="lg" src="'+LOGO+'" alt="Logo InRPH" width="46" height="46"><div class="sb-t"><b>In<em>RPH</em></b><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div></div>'+
    '<nav class="side-nav">'+navHtml+'</nav>'+
    '<div class="side-foot">'+(LIVE?esc(MYNAME):'Data contoh, tidak disimpan')+'<br><small style="opacity:.7">Versi '+VERSI+'</small></div></aside>'+
-   '<div class="main'+(ui.stale?' stale':'')+'">'+(ui.stale?'<div class="stale-bar" role="status">'+(ui.staleErr?esc(ui.staleErr)+' Paparan di bawah ialah data lama, tindakan dikunci. ':'Memuatkan data terkini… (paparan terakhir ditunjukkan dahulu) ')+'<button class="btn sm" data-act="sambung">Sambung semula</button></div>':'')+'<header class="top"><div class="top-in"><div class="top-l"><button class="mnu" data-act="menu" aria-controls="side" aria-expanded="'+(!!ui.menu)+'">☰ Menu</button>'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
+   '<div class="main'+(ui.stale?' stale':'')+'">'+(ui.stale?'<div class="stale-bar" role="status">'+(ui.staleErr?esc(ui.staleErr)+' Paparan di bawah ialah data lama, tindakan dikunci. ':'Memuatkan data terkini… (paparan terakhir ditunjukkan dahulu) ')+'<button class="btn sm" data-act="sambung">Sambung semula</button></div>':'')+'<header class="top"><div class="top-in"><div class="top-l"><button class="mnu" data-act="menu" aria-controls="side" aria-expanded="'+(window.matchMedia('(max-width:760px)').matches?!!ui.menu:!ui.sideHide)+'">☰ Menu</button>'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
    (LIVE?'<div class="hr"><div class="acct"><span>'+esc(MYNAME)+'</span><button data-act="reload">Muat semula</button>'+(EMBED?'':'<button data-act="logout">Log keluar</button>')+'</div></div>':'')+'</div></header>'+body+'</div></div>';
 }
 document.addEventListener('wk-go',e=>{const {k,w}=e.detail;
@@ -2035,7 +2044,8 @@ document.addEventListener('click',e=>{
     if(a==='betul'&&!sub(t,w).draft.trim()){const er=document.getElementById('vk-err');if(er){er.hidden=false;}const ta=document.getElementById('vk-'+t+'-'+w);if(ta)ta.focus();return;}
     const tutup=n=>{if(sub(t,w).status!=='dihantar')closeViewer();else if(n>0)setTimeout(()=>tutup(n-1),500);};setTimeout(()=>tutup(16),400);
   }
-  if(a==='menu'){ui.menu=!ui.menu;render();return;}
+  if(a==='menu'){if(window.matchMedia('(max-width:760px)').matches)ui.menu=!ui.menu;else{ui.sideHide=!ui.sideHide;lsS('inrph.menu.hide',ui.sideHide);}render();return;}
+  if(a==='grp'){const g=b.dataset.g,i=ui.grpC.indexOf(g);if(i<0)ui.grpC.push(g);else ui.grpC.splice(i,1);lsS('inrph.menu.grp',ui.grpC);render();const nb2=document.querySelector('.side-h[data-g="'+g.replace(/"/g,'')+'"]');if(nb2)nb2.focus();return;}
   if(a==='tab'){ui.menu=false;ui.tab=b.dataset.tab;ui.pasteText='';if(ui.tab==='audit'){if(!ui.af)ui.af={dari:'',hingga:'',tindakan:'',cari:''};loadAudit();}else if(ui.tab==='urus'){urusMuat();}else render();window.scrollTo(0,0);}
   else if(a==='jwcell'){jwDraftInit();
     if(b.dataset.i!==undefined){const l=ui.jwl[+b.dataset.i];ui.jwe={i:+b.dataset.i,h:l.h,kelas:l.kelas,subjek:l.subjek,a:l.a,b:l.b,err:''};}
