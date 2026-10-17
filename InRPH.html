@@ -32,7 +32,7 @@ html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button,input,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.mono{font-family:var(--font-mono);font-size:.86em}
+.mono{font-family:var(--font-mono);font-size:max(.86em,14px)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* header: putih, tajuk hijau, garis emas */
@@ -557,7 +557,7 @@ const rNeed=(tid,w)=>{const t=teachers.find(x=>x.id===tid),n=slotsFor(tid,w).len
 /* Sesi ditangguh: guru pilih sebab (cuti umum, program sekolah, guru bercuti, lain-lain). Sesi itu dikira sudah dijelaskan; refleksi dan kehadiran tidak diperlukan. 'Lain-lain' wajib dicatat. */
 const SEBAB_TD=['Cuti umum','Program sekolah','Guru bercuti','Lain-lain'];
 const rTD=x=>!!x.x&&(x.x!=='Lain-lain'||!!(x.n||'').trim());
-const rFull=x=>rTD(x)||!!x.t.trim()&&/^\d{1,3}$/.test(x.h.trim())&&(x.j.trim()===''||(/^\d{1,3}$/.test(x.j.trim())&&+x.h<=+x.j));
+const rFull=x=>x.x?rTD(x):!!x.t.trim()&&/^\d{1,3}$/.test(x.h.trim())&&(x.j.trim()===''||(/^\d{1,3}$/.test(x.j.trim())&&+x.h<=+x.j));
 const rHadir=x=>/^\d{1,3}$/.test(x.h.trim())?x.h.trim()+(/^\d{1,3}$/.test(x.j.trim())?' / '+x.j.trim():''):'';
 /* Hanya baris wajib (indeks 0..wajib-1, ikut jadual) dikira lengkap; kelas tambahan dikira berasingan dan tidak menampung sesi wajib yang kosong. */
 const rDone=(s,tid,w)=>{const a=parseR(s.refleksi),n=(tid!=null&&w!=null)?rNeed(tid,w):a.length;return a.slice(0,n).filter(rFull).length;};
@@ -836,8 +836,8 @@ function guruView(){
   const unread=NOTIFS.filter(n=>!n.readAt);
   const nb=NOTIFS.length?'<div class="card"><span class="lbl">Notifikasi'+(unread.length?' <span class="pill fix">'+unread.length+' baharu</span>':'')+'</span>'+NOTIFS.slice(0,5).map(n=>'<div class="note '+(n.readAt?'info':'fix')+'"><b>Minggu '+n.w+(n.jenis==='pembetulan'?' · Perlu pembetulan':'')+'</b><p>'+esc(n.mesej)+'</p><small>'+fmtDT(new Date(n.createdAt))+'</small>'+(n.readAt?'':' <button class="btn sm" data-act="nread" data-id="'+esc(n.id)+'">Tandakan dibaca</button>')+'</div>').join('')+'</div>':'';
   return '<div class="wrap"><div><h2>RPH Saya</h2><p class="lead" style="margin-top:4px">Muat naik fail RPH setiap minggu (boleh banyak fail, sistem gabungkan menjadi satu), hantar kepada Guru Besar atau PK Kurikulum, dan kemas kini refleksi selepas PdP.</p></div>'+
-    nb+'<p class="flow"><b>Muat naik fail</b><i>→</i><b>Hantar</b><i>→</i><b>Taip refleksi selepas PdP</b><i>→</i><b>Semakan &amp; komen pentadbir</b></p>'+
-    focus+arkibCard()+chipsF+guruWeek(weeks[ui.gw-1])+(ME_PERANAN==='pentadbir'?'':arkibSesiCard())+'<p class="foot">'+(LIVE?'':'Data contoh untuk prototaip.')+'</p></div>';
+    '<p class="flow"><b>Muat naik fail</b><i>→</i><b>Hantar</b><i>→</i><b>Taip refleksi selepas PdP</b><i>→</i><b>Semakan &amp; komen pentadbir</b></p>'+
+    focus+chipsF+guruWeek(weeks[ui.gw-1])+nb+arkibCard()+(ME_PERANAN==='pentadbir'?'':arkibSesiCard())+'<p class="foot">'+(LIVE?'':'Data contoh untuk prototaip.')+'</p></div>';
 }
 
 /* ---------- PENTADBIR: semakan ---------- */
@@ -1340,16 +1340,16 @@ function cetakBulanan(){
 }
 
 /* ---------- Arkib sesi terdahulu (baca sahaja) ---------- */
-ui.ars={years:null,tahun:'',minggu:'',cari:'',rows:null,takwim:[],terpotong:false,busy:false,err:''};
+ui.ars={mg:{},years:null,tahun:'',minggu:'',cari:'',rows:null,takwim:[],terpotong:false,busy:false,err:''};
 const DEMO_ARS=()=>{const L=['disemak','disemak','pembetulan','disemak'];
   return {tahun:'2025',takwim:[1,2,3,4].map(n=>({n,mula:new Date(Date.UTC(2025,0,6+(n-1)*7)).toISOString().slice(0,10),jenis:'sekolah'})),terpotong:false,
-   rows:(ME_PERANAN==='pentadbir'?teachers.slice(0,3):teachers.filter(t=>t.id===ME)).flatMap(t=>[1,2,3,4].map(n=>({nama:t.name,w:n,status:L[(n+t.name.length)%4],file:'RPH_M'+n+'_'+t.name.split(' ')[0].toUpperCase()+'.pdf',
+   rows:(ME_PERANAN==='pentadbir'?teachers.slice(0,3):teachers.filter(t=>t.id===ME)).flatMap(t=>[1,2,3,4].map(n=>({e:t.id,ada:true,versi:n===3?[{versi:1,name:'RPH_M3_V1.pdf',keputusan:'Pembetulan'},{versi:2,name:'RPH_M3_V2.pdf',keputusan:'Disemak'}]:[],nama:t.name,w:n,status:L[(n+t.name.length)%4],file:'RPH_M'+n+'_'+t.name.split(' ')[0].toUpperCase()+'.pdf',
      refleksi:JSON.stringify([{k:'Isnin · 5 Bestari',t:'Murid menguasai kemahiran.',h:'28',j:'30'},{k:'Selasa · 4 Cerdik',t:'',h:'',j:'',x:'Cuti umum'}]),komen:n===3?'Lengkapkan pentaksiran.':'',reviewed:'',reviewer:''})))};};
 async function arsMuat(){
   const a=ui.ars;if(a.busy)return;a.busy=true;a.err='';render();
   try{
-    if(!LIVE){await new Promise(r=>setTimeout(r,250));a.years=['2025'];}
-    else{const r=await api('arkibSenarai',{});a.years=r.tahun||[];}
+    if(!LIVE){await new Promise(r=>setTimeout(r,250));a.years=['2025'];a.mg={'2025':4};}
+    else{const r=await api('arkibSenarai',{});a.years=r.tahun||[];a.mg=r.minggu||{};}
     if(a.years.length&&!a.tahun)a.tahun=a.years[0];
   }catch(e){a.err=e.message||'Senarai arkib tidak dapat dimuatkan.';}
   a.busy=false;render();
@@ -1372,20 +1372,30 @@ function arsRefl(s){
   const rl=parseR(s).filter(x=>x.t.trim()||x.h.trim()||x.x);if(!rl.length)return '<span class="hint">Tiada refleksi.</span>';
   return '<details><summary>'+rl.length+' kelas</summary><ul class="ars-r">'+rl.map(x=>'<li><b>'+esc(x.k||'-')+'</b> · '+(x.x?'<i>PdP ditangguh</i> — '+esc(x.x)+(x.n?': '+esc(x.n):''):(rHadir(x)?'hadir '+esc(rHadir(x))+' · ':'')+esc(x.t))+'</li>').join('')+'</ul></details>';
 }
+async function arsFail(btn){
+  if(!LIVE){toast('Contoh sahaja: tiada fail sebenar untuk dimuat turun.');return;}
+  const a=ui.ars,lbl=btn.textContent;btn.disabled=true;btn.textContent='…';
+  try{const r=await api('arkibFail',{tahun:a.tahun,e:btn.dataset.e,w:+btn.dataset.w,versi:btn.dataset.v||undefined}),bin=atob(r.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+    const ext=/word/.test(r.mime||'')?'docx':'pdf',url=URL.createObjectURL(new Blob([u],{type:r.mime||'application/pdf'})),x=document.createElement('a');
+    x.href=url;x.download='RPH_'+a.tahun+'_M'+btn.dataset.w+(btn.dataset.v?'_V'+btn.dataset.v:'')+'.'+ext;document.body.appendChild(x);x.click();x.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);}
+  catch(e){toast(e.message||'Fail tidak dapat dibuka.',true);}
+  finally{btn.disabled=false;btn.textContent=lbl;}
+}
+document.addEventListener('change',e=>{if(e.target&&e.target.id==='ars-y'){const ci=document.getElementById('ars-c');if(ci)ui.ars.cari=ci.value;ui.ars.tahun=e.target.value;ui.ars.minggu='';ui.ars.rows=null;render();}});
 function arkibSesiCard(){
   const a=ui.ars,adm=ME_PERANAN==='pentadbir';
   let body='';
   if(a.years===null)body='<p class="hint">Rekod sesi yang telah ditutup disimpan dalam arkib dan boleh dibaca semula di sini.</p><div class="actions"><button class="btn" data-act="arsmuat"'+(a.busy?' disabled':'')+'>'+(a.busy?'Memuatkan…':'Buka arkib sesi')+'</button></div>';
   else if(!a.years.length)body='<p class="hint">Belum ada sesi diarkibkan. Arkib dibuat apabila sesi ditutup pada hujung tahun.</p>';
   else{
-    const wn=[''].concat(Array.from({length:45},(_,i)=>i+1));
+    const wn=[''].concat(Array.from({length:a.mg[a.tahun]===undefined?45:+a.mg[a.tahun]},(_,i)=>i+1));
     body='<div class="actions ars-f"><label class="hint">Sesi <select id="ars-y">'+a.years.map(y=>'<option'+(y===a.tahun?' selected':'')+'>'+y+'</option>').join('')+'</select></label>'+
       '<label class="hint">Minggu <select id="ars-w">'+wn.map(n=>'<option value="'+n+'"'+(String(n)===String(a.minggu)?' selected':'')+'>'+(n?'Minggu '+n:'Semua')+'</option>').join('')+'</select></label>'+
       (adm?'<label class="hint">Nama staf <input id="ars-c" type="search" value="'+esc(a.cari)+'" placeholder="Cari nama"></label>':'')+
       '<button class="btn pri" data-act="arspapar"'+(a.busy?' disabled':'')+'>'+(a.busy?'Memuatkan…':'Papar')+'</button></div>';
     if(a.rows){
       const tw={};a.takwim.forEach(x=>tw[x.n]=x);
-      body+=tbl((adm?['Staf']:[]).concat(['Minggu','Status','Fail','Refleksi','Catatan semakan']),a.rows.map(r=>'<tr>'+(adm?'<td>'+esc(r.nama)+'</td>':'')+'<td>M'+r.w+(tw[r.w]&&tw[r.w].mula?'<br><small class="hint">'+esc(String(tw[r.w].mula).slice(0,10))+'</small>':'')+'</td><td>'+esc(ARS_ST[r.status]||r.status)+'</td><td class="mono">'+esc(r.file||'-')+'</td><td>'+arsRefl(r.refleksi)+'</td><td>'+esc(r.komen||'')+(r.reviewer?'<br><small class="hint">'+esc(r.reviewer)+'</small>':'')+'</td></tr>'),'Tiada rekod sepadan.')+
+      body+=tbl((adm?['Staf']:[]).concat(['Minggu','Status','Fail','Refleksi','Catatan semakan']),a.rows.map(r=>'<tr>'+(adm?'<td>'+esc(r.nama)+'</td>':'')+'<td>M'+r.w+(tw[r.w]&&tw[r.w].mula?'<br><small class="hint">'+esc(String(tw[r.w].mula).slice(0,10))+'</small>':'')+'</td><td>'+esc(ARS_ST[r.status]||r.status)+'</td><td class="mono">'+esc(r.file||'-')+(r.ada?'<div class="actions"><button class="btn sm" data-act="arsfail" data-e="'+esc(r.e)+'" data-w="'+r.w+'">Muat turun</button>'+(r.versi||[]).map(v=>'<button class="btn sm" data-act="arsfail" data-e="'+esc(r.e)+'" data-w="'+r.w+'" data-v="'+v.versi+'" title="'+esc(v.keputusan||'')+'">V'+v.versi+'</button>').join('')+'</div>':'')+'</td><td>'+arsRefl(r.refleksi)+'</td><td>'+esc(r.komen||'')+(r.reviewer?'<br><small class="hint">'+esc(r.reviewer)+'</small>':'')+'</td></tr>'),'Tiada rekod sepadan.')+
         (a.terpotong?'<p class="hint">Hanya 400 rekod pertama dipaparkan. Tapis mengikut minggu atau nama untuk mengecilkan carian.</p>':'')+'<p class="hint">Fail RPH asal kekal dalam Google Drive sekolah; di sini hanya nama fail dipaparkan.</p>';
     }
   }
@@ -1468,9 +1478,10 @@ function guruHome(){
   const tl=(k,lab,v,c)=>'<button class="tile '+c+'" data-act="hf" data-f="'+k+'" aria-pressed="'+(f===k)+'"><span>'+lab+'</span><b>'+v+'</b></button>';
   return '<div class="wrap"><div><h2>Dashboard Staf</h2><p class="lead" style="margin-top:4px">Selamat datang, '+esc(MYNAME)+'.</p></div>'+
    (ME_MENGAJAR&&!hasJadual(ME)?'<div class="note fix"><b>Langkah pertama: masukkan jadual waktu anda</b><p>Sistem menjana senarai kelas untuk refleksi dan murid hadir daripada jadual waktu. Isi sekali sahaja; ubah hanya bila jadual berubah.</p><div class="actions"><button class="btn pri" data-act="tab" data-tab="jadual">Masukkan jadual waktu</button></div></div>':'')+
-   heroGuru()+tugasCard()+
+   heroGuru()+
    '<div class="tiles">'+tl('belum','Belum hantar',st.belum,st.belum?'late':'')+tl('dihantar','Menunggu semakan',st.hantar,'sent')+tl('pembetulan','Perlu pembetulan',st.fix,st.fix?'fix':'')+tl('disemak','Disemak',st.disemak,'ok')+'</div>'+
    (st.kec?'<p class="hint">Dikecualikan: '+st.kec+' minggu (tidak dikira tertunggak).</p>':'')+
+   tugasCard()+
    '<div class="card"><span class="lbl">'+(f?'Minggu: '+({belum:'Belum hantar',dihantar:'Menunggu semakan',pembetulan:'Perlu pembetulan',disemak:'Disemak',kec:'Dikecualikan'}[f])+' <button class="btn sm" data-act="hf" data-f="">Papar semua</button>':'Minggu terkini')+'</span>'+tbl(['Minggu','Tarikh','Refleksi','Status','Tindakan'],rows,f?'Tiada minggu dalam kategori ini.':'')+'</div>'+
    (unread.length?'<div class="card"><span class="lbl">Perlu perhatian <span class="pill fix">'+unread.length+' baharu</span></span>'+unread.slice(0,3).map(n=>notifItem(n,true)).join('')+'<div class="actions"><button class="btn sm" data-act="tab" data-tab="notif">Semua notifikasi</button></div></div>':'<p class="hint">Tiada makluman baharu. <button class="btn sm" data-act="tab" data-tab="notif">Semua notifikasi</button></p>')+'</div>';
 }
@@ -1688,7 +1699,7 @@ function profilView(){
 
 /* --- Laporan: carta, mengikut staf, senarai, statistik --- */
 function donut(parts){const tot=parts.reduce((a,p)=>a+p[1],0)||1;let acc=0;const g=parts.map(p=>{const s=acc/tot*100;acc+=p[1];return p[2]+' '+s+'% '+(acc/tot*100)+'%';}).join(',');
-  return '<div class="donut" role="img" aria-label="'+parts.map(p=>p[0]+' '+Math.round(p[1]/tot*100)+'%').join(', ')+'" style="background:conic-gradient('+g+')"><span>'+Math.round((parts[0][1]+(parts[1]?parts[1][1]:0))/tot*100)+'%</span></div>';}
+  return '<div class="donut" role="img" aria-label="'+parts.map(p=>p[0]+' '+Math.round(p[1]/tot*100)+'%').join(', ')+'" style="background:conic-gradient('+g+')"><span title="Peratus telah dihantar (termasuk menunggu semakan dan pembetulan)">'+Math.round((tot-parts[parts.length-1][1])/tot*100)+'%</span></div>';}
 function barChart(parts){const mx=Math.max(1,...parts.map(p=>p[1]));return '<div class="bars" role="img" aria-label="'+parts.map(p=>p[0]+' '+p[1]).join(', ')+'">'+parts.map(p=>'<div class="bcol"><em>'+p[1]+'</em><i style="height:'+Math.round(p[1]/mx*100)+'%;background:'+p[2]+'"></i><span>'+p[0]+'</span></div>').join('')+'</div>';}
 function guruRows(){
   return teachers.map(t=>{let w=0,h=0,d=0,fx=0,lw=0,kc=0;active().forEach(x=>{const k=stOf(t,x.n);if(k==='dikecualikan'){kc++;return;}w++;if(k==='disemak'){h++;d++;}else if(k==='dihantar')h++;else if(k==='pembetulan'){fx++;h++;}else if(k==='lewat')lw++;});
@@ -2050,6 +2061,7 @@ document.addEventListener('click',e=>{
   else if(a==='jwbaca'){jwBaca();}
   else if(a==='jwsave'){
     jwDraftInit();const slots=jwSlots();
+    if(!slots.length){toast('Tambah sekurang-kurangnya satu kelas sebelum menyimpan jadual.',true);return;}
     const ada=jwTersimpan(),bk=ada?+ui.jwBk:0;
     if(ada&&!(bk>=1)){toast('Pilih minggu berkuat kuasa.');return;}
     const done=r=>{JADUAL[ME]=Object.assign({file:null},JADUAL[ME],r.jadual||{slots});const me=teachers.find(x=>x.id===ME);if(me)me.kelas=r.kelas||slots.length||undefined;jwDraftInit(true);ui.jwEdit=false;render();toast('Jadual waktu disimpan. '+slots.length+' kelas seminggu'+(ada?', berkuat kuasa mulai Minggu '+bk:'')+'.');};
@@ -2129,6 +2141,7 @@ document.addEventListener('click',e=>{
   else if(a==='cetakbln'){cetakBulanan();}
   else if(a==='arsmuat'){arsMuat();}
   else if(a==='arspapar'){arsPapar();}
+  else if(a==='arsfail'){arsFail(b);}
   else if(a==='vdl'){const d=b.closest('details.vw-ver');if(d)verMuatTurun(d,+b.dataset.v,b);}
   else if(a==='cetakw'){printWeek(t,w);}
   else if(a==='pup'||a==='pdn'){const q=sub(ME,w),i=+b.dataset.i,j=a==='pup'?i-1:i+1;if(q.parts&&q.parts[j]){[q.parts[i],q.parts[j]]=[q.parts[j],q.parts[i]];mergeParts(w);}}
