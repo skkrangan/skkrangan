@@ -446,6 +446,7 @@ small{font-size:.875rem}
 .side-h{width:100%;background:transparent;border:0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:left;min-height:40px;border-radius:6px}
 .side-h:hover{background:rgba(255,255,255,.08)}.side-h i{font-style:normal;font-size:1rem}
 .side-h:focus-visible{outline:3px solid #E3B85A;outline-offset:1px}
+.side-foot .sf-n{display:block;color:#fff}.side-foot .sf-j{display:block;font-size:.875rem;color:#CFE3D6}
 .mnu{display:inline-flex;align-items:center;gap:6px}
 @media(min-width:761px){.shell.nosb{grid-template-columns:minmax(0,1fr)}.shell.nosb .side{display:none}}
 </style>
@@ -563,6 +564,7 @@ const rNeed=(tid,w)=>{const t=teachers.find(x=>x.id===tid),n=slotsFor(tid,w).len
 const SEBAB_TD=['Cuti umum','Program sekolah','Guru bercuti','Lain-lain'];
 const rTD=x=>!!x.x&&(x.x!=='Lain-lain'||!!(x.n||'').trim());
 const rFull=x=>x.x?rTD(x):!!x.t.trim()&&/^\d{1,3}$/.test(x.h.trim())&&(x.j.trim()===''||(/^\d{1,3}$/.test(x.j.trim())&&+x.h<=+x.j));
+const jwtLabel=s=>/^\s*guru akademik\s*$/i.test(String(s||''))?'Guru Akademik Biasa':String(s||'');
 const rHadir=x=>/^\d{1,3}$/.test(x.h.trim())?x.h.trim()+(/^\d{1,3}$/.test(x.j.trim())?' / '+x.j.trim():''):'';
 /* Hanya baris wajib (indeks 0..wajib-1, ikut jadual) dikira lengkap; kelas tambahan dikira berasingan dan tidak menampung sesi wajib yang kosong. */
 const rDone=(s,tid,w)=>{const a=parseR(s.refleksi),n=(tid!=null&&w!=null)?rNeed(tid,w):a.length;return a.slice(0,n).filter(rFull).length;};
@@ -1758,7 +1760,7 @@ function render(){
   const navHtml=groups.length>1?groups.map(g=>gh(g.name,g.items)).join('')+gh('Akaun',common):groups.map(g=>g.items.map(nb).join('')).join('')+common.map(nb).join('');
   app.innerHTML='<div class="shell'+(ui.sideHide?' nosb':'')+'"><div class="scrim'+(ui.menu?' on':'')+'" data-act="menu"></div><aside class="side'+(ui.menu?' open':'')+'" id="side" aria-label="Menu utama"><div class="side-brand"><img class="lg" src="'+LOGO+'" alt="Logo InRPH" width="46" height="46"><div class="sb-t"><b>In<em>RPH</em></b><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div></div>'+
    '<nav class="side-nav">'+navHtml+'</nav>'+
-   '<div class="side-foot">'+(LIVE?esc(MYNAME):'Data contoh, tidak disimpan')+'</div></aside>'+
+   '<div class="side-foot">'+(LIVE?'<b class="sf-n">'+esc(MYNAME)+'</b>'+(ME_JAWATAN?'<span class="sf-j">'+esc(ME_JAWATAN)+'</span>':''):'Data contoh, tidak disimpan')+'</div></aside>'+
    '<div class="main'+(ui.stale?' stale':'')+'">'+(ui.stale?'<div class="stale-bar" role="status">'+(ui.staleErr?esc(ui.staleErr)+' Paparan di bawah ialah data lama, tindakan dikunci. ':'Memuatkan data terkini… (paparan terakhir ditunjukkan dahulu) ')+'<button class="btn sm" data-act="sambung">Sambung semula</button></div>':'')+'<header class="top"><div class="top-in"><div class="top-l"><button class="mnu" data-act="menu" aria-controls="side" aria-expanded="'+(window.matchMedia('(max-width:760px)').matches?!!ui.menu:!ui.sideHide)+'">☰ Menu</button>'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
    (LIVE?'<div class="hr"><div class="acct"><span>'+esc(MYNAME)+'</span><button data-act="reload">Muat semula</button>'+(EMBED?'':'<button data-act="logout">Log keluar</button>')+'</div></div>':'')+'</div></header>'+body+'</div></div>';
 }
@@ -1924,7 +1926,7 @@ function applyRow(r){
 }
 function setupLive(p){
   SETTINGS=Object.assign({hariSebelum:1,jam:17},p.tetapan||{});ui.setF=null;
-  buildWeeks(p.takwim);teachers=p.guru;setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=p.me.jawatan||'';ME_PERANAN=p.me.peranan;ME_ADMIN=!!p.me.admin;ME_SEM=p.me.sementara||'';ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
+  buildWeeks(p.takwim);teachers=p.guru;teachers.forEach(t=>{t.sub=jwtLabel(t.sub);});setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=jwtLabel(p.me.jawatan);ME_PERANAN=p.me.peranan;ME_ADMIN=!!p.me.admin;ME_SEM=p.me.sementara||'';ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
   const old=subs;subs={};
   const KEEP=['parts','merging','mstage','upErr','mtok','upQ','draft','err','rdirty','rbusy','rver','rrid','rridV','rconflict','srvVer','srvTeks','_t','refleksi','refleksiVersi','file','retryN','offline','sending','upFail'];
   teachers.forEach(t=>weeks.forEach(w=>{const k=key(t.id,w.n),b=blankSub(),o=old[k];
