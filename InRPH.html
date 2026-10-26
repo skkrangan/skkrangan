@@ -451,7 +451,7 @@ small{font-size:.875rem}
 @media(min-width:761px){.shell.nosb{grid-template-columns:minmax(0,1fr)}.shell.nosb .side{display:none}}
 
 /* ---- Paparan mudah untuk guru ---- */
-.ez{max-width:760px;margin:0 auto;font-size:1.15rem}
+.ez{max-width:none;margin:0;font-size:1.15rem}.wrap.ez{max-width:none}
 .ez h2{font-size:1.9rem}
 .ez .btn{min-height:56px;font-size:1.15rem;padding:14px 24px;border-radius:10px}
 .ez .big{width:100%;font-size:1.3rem;min-height:64px;font-weight:700}
@@ -463,7 +463,7 @@ small{font-size:.875rem}
 .ez .stp.now{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,61,43,.12)}.ez .stp.now .no{background:var(--navy);color:#fff}
 .ez .stp.done .no{background:#2E8B57;color:#fff}.ez .stp.done{opacity:.85}
 .ez .stp .tx{flex:1;display:flex;flex-direction:column;gap:10px}.ez .stp .tx b{font-size:1.2rem}
-.ez .stp.wait{opacity:.6}
+.ez .stp.wait{opacity:.6}.ez .stp .tx>.btn:not(.big){align-self:flex-start}
 .ez .lagi-b{display:flex;flex-direction:column;gap:12px}
 .ez .lagi-b .btn{text-align:left;justify-content:flex-start}
 
@@ -1587,7 +1587,7 @@ function mulaView(){
     const st3=kirim?(done>=need?'done':'now'):'wait';
     const mk=(n,cls,t,body)=>'<div class="stp '+cls+'"><span class="no">'+(cls==='done'?'✓':n)+'</span><div class="tx"><b>'+t+'</b>'+body+'</div></div>';
     steps+=mk(1,st1,'Muat naik fail RPH',st1==='now'||(hasF&&!kirim)?fileBlock(w,s,editable):(kirim?'<span class="hint">'+esc(s.file?s.file.name:'')+'</span>':''));
-    steps+=mk(2,st2,'Hantar kepada pentadbir',st2==='now'?hantarBtn:(kirim?'<span class="hint">Sudah dihantar</span>':'<span class="hint">Muat naik fail dahulu</span>'));
+    steps+=mk(2,st2,'Hantar kepada pentadbir',st2==='now'?hantarBtn:(kirim?'<span class="hint">Sudah dihantar. Tersilap atau mahu tukar fail?</span>'+(s.status==='dihantar'?'<button class="btn" data-act="tarik" data-w="'+w+'">Tarik balik hantaran</button>':''):'<span class="hint">Muat naik fail dahulu</span>'));
     steps+=mk(3,st3,'Tulis refleksi selepas mengajar',kirim?rEditor(w,s,false)+'<div class="save" id="sv-'+w+'"></div>':'<span class="hint">Selepas RPH dihantar</span>');
   }
   const tg=tugasTertunggak();
