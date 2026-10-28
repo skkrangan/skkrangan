@@ -1841,6 +1841,7 @@ function enterDashboard(){
   // Log masuk dashboard dikongsi; tiada log masuk Google berasingan untuk InRPH.
   if(!window.__inrphDeepDone && ['irise','inrph'].includes(new URLSearchParams(location.search).get('app'))){
     window.__inrphDeepDone = true;
+    try{ if(new URLSearchParams(location.search).get('app')==='inrph') history.replaceState(null,'',location.pathname+'?app=irise'+location.hash); }catch(e){}
     openErph();
   }
 
