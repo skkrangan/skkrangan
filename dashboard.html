@@ -163,7 +163,7 @@
     #print-area-monthly th:nth-child(6), #print-area-monthly td:nth-child(6) { width: 15% !important; }
     .signature-block { margin-top: 5px !important; padding-top: 3px !important; page-break-inside: avoid !important; }
     .signature-block .w-64 { width: 46mm !important; }
-    .signature-space { height: 20px !important; margin-top: 5px !important; }
+    .signature-space { height: auto !important; margin-top: 30px !important; }
     .signature-block p { font-size: 7.5px !important; line-height: 1.15 !important; margin-top: 0 !important; }
     @page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }
   }
@@ -197,7 +197,7 @@
   #print-area-monthly #report-attention-summary p:last-child { font-size: 7px !important; margin-top: 1px !important; }
   #print-area-monthly .signature-block { margin-top: 5px !important; padding-top: 3px !important; }
   #print-area-monthly .signature-block .w-64 { width: 46mm !important; }
-  #print-area-monthly .signature-space { height: 20px !important; margin-top: 5px !important; }
+  #print-area-monthly .signature-space { height: auto !important; margin-top: 30px !important; }
   #print-area-monthly .signature-block p { font-size: 7.5px !important; line-height: 1.15 !important; margin-top: 0 !important; }
   #mobile-report-view summary::-webkit-details-marker{ display:none; }
   #mobile-report-view details[open] summary i.fa-chevron-down{ transform:rotate(180deg); }
@@ -5127,7 +5127,8 @@ window.onload = async function(){
         // terjejas.
         function kecilkanLaporanBulananUntukCetak() {
             const area = document.getElementById('print-area-monthly');
-            if (!area || area.classList.contains('hidden')) return;
+            // NOTA: class 'hidden' sentiasa ada pada elemen ni (hidden md:block) - jadi JANGAN semak classList; semak display sebenar.
+            if (!area || getComputedStyle(area).display === 'none') return;
             area.style.zoom = '';
             const MM_KE_PX = 96 / 25.4;
             const RUANG_TINGGI_PX = (210 - 16) * MM_KE_PX; // A4 landskap, tolak margin 8mm atas+bawah (@page monthly-page)
@@ -5155,29 +5156,52 @@ window.onload = async function(){
             // tandatangan terpotong) walaupun lebar dah dibetulkan. Jadi neutralkan
             // SEMUA beza (lebar, padding, border, margin) semasa mengukur, bukan
             // lebar sahaja, supaya ukuran ni betul-betul meniru keadaan cetak sebenar.
+            // PENTING: elemen ni ada class Tailwind `transition-all` - bila lebar/padding diubah
+            // melalui JS, penukaran itu dianimasikan, dan scrollHeight yang dibaca serta-merta
+            // masih mengira ikut lebar LAMA (awal animasi). Ini punca ukuran tinggi selama ni
+            // tersasar. Matikan transition semasa mengukur.
+            const transisiAsal = area.style.transition;
+            area.style.transition = 'none';
             const gayaAsal = {
                 width: area.style.width, maxWidth: area.style.maxWidth,
                 padding: area.style.padding, border: area.style.border, margin: area.style.margin
             };
-            area.style.width = LEBAR_CETAK_PX + 'px';
-            area.style.maxWidth = LEBAR_CETAK_PX + 'px';
-            area.style.padding = '0';
-            area.style.border = 'none';
-            area.style.margin = '0';
-            const tinggiSebenarPx = area.scrollHeight;
+            // PENTING (v3): `zoom` bukan sekadar mengecilkan - lebar susun atur (layout) juga
+            // MELEBAR sebanyak 1/zoom (kerana lebar kawasan cetak tetap = lebar muka surat).
+            // Jadi teks kurang wrap, dan tinggi sebenar LEBIH PENDEK daripada yang diukur pada
+            // lebar penuh tanpa zoom. Pengiraan lama (ukur sekali tanpa zoom, kemudian skala
+            // = ruang/tinggi) terlalu pesimis - laporan tertinggal ~25% kosong & tulisan
+            // terlalu kecil. Kini: cari zoom TERBESAR yang masih muat, dengan mengukur tinggi
+            // pada lebar susun atur sebenar (LEBAR/zoom) bagi setiap calon zoom.
+            const SASARAN_PX = RUANG_TINGGI_PX * 0.97; // margin keselamatan 3%
+            const tinggiPadaZoom = (z) => {
+                const w = (LEBAR_CETAK_PX / z) + 'px';
+                area.style.zoom = '';
+                area.style.width = w;
+                area.style.maxWidth = w;
+                area.style.padding = '0';
+                area.style.border = 'none';
+                area.style.margin = '0';
+                return area.scrollHeight * z; // tinggi sebenar bila dicetak pada zoom z
+            };
+            let lo = 0.45, hi = 1.3;
+            if (tinggiPadaZoom(hi) <= SASARAN_PX) {
+                lo = hi; // sedikit staf - muat walaupun dibesarkan
+            } else if (tinggiPadaZoom(lo) > SASARAN_PX) {
+                // terlalu padat walau pada zoom minimum - kekal minimum
+            } else {
+                for (let i = 0; i < 14; i++) {
+                    const mid = (lo + hi) / 2;
+                    if (tinggiPadaZoom(mid) <= SASARAN_PX) lo = mid; else hi = mid;
+                }
+            }
             area.style.width = gayaAsal.width;
             area.style.maxWidth = gayaAsal.maxWidth;
             area.style.padding = gayaAsal.padding;
             area.style.border = gayaAsal.border;
             area.style.margin = gayaAsal.margin;
-            if (tinggiSebenarPx > RUANG_TINGGI_PX) {
-                // Margin keselamatan 5% TAMBAHAN (0.96) di atas nisbah yang dikira -
-                // insurans murah terhadap sebarang anggaran yang masih tersasar
-                // sedikit (cth. beza kecil rendering fon semasa ukur vs cetak
-                // sebenar), supaya tak terlepas pandang sekali lagi.
-                const skala = Math.max(0.45, (RUANG_TINGGI_PX * 0.96) / tinggiSebenarPx);
-                area.style.zoom = skala;
-            }
+            area.style.zoom = (Math.abs(lo - 1) < 0.005) ? '' : lo;
+            area.style.transition = transisiAsal;
         }
         function kembalikanSaizLaporanBulanan() {
             const area = document.getElementById('print-area-monthly');
