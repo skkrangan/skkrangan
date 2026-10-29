@@ -800,7 +800,7 @@ function fileBlock(w,s,editable){
     return '<div>'+lbl+'<div class="file"><span class="ext">'+esc(f.ext)+'</span><div class="nm"><b>'+esc(f.name)+'</b><span>'+fileMeta(f)+'</span></div>'+
       '<button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Buka fail</button><label class="btn sm" for="'+id+'" style="cursor:pointer">Ganti fail'+inp+'</label></div>'+err+'</div>';
   }
-  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+'</span></div>'+
+  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+(p.ext==='PDF'?'<label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px">Halaman dihantar <input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+i+'" value="'+esc(p.range||'')+'" placeholder="semua (cth: 5-8 atau 3,5-7)" aria-label="Halaman yang dihantar" style="flex:1;min-height:40px;font-size:15px"></label>':'')+'</div>'+
     '<span class="pbtn"><button class="btn sm" data-act="pup" data-w="'+w+'" data-i="'+i+'" aria-label="Naikkan '+esc(p.name)+'"'+(i===0?' disabled':'')+'>Naik</button>'+
     '<button class="btn sm" data-act="pdn" data-w="'+w+'" data-i="'+i+'" aria-label="Turunkan '+esc(p.name)+'"'+(i===parts.length-1?' disabled':'')+'>Turun</button>'+
     '<button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+i+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>').join('');
@@ -2079,8 +2079,15 @@ async function mergeParts(w){
     for(const p of parts){
       const buf=await p.blob.arrayBuffer();
       if(p.ext==='PDF'){
-        const d=await L.PDFDocument.load(buf);
-        (await out.copyPages(d,d.getPageIndices())).forEach(pg=>out.addPage(pg));
+        const d=await L.PDFDocument.load(buf),np=d.getPageCount();p.pgs=np;
+        let idx=d.getPageIndices();
+        if((p.range||'').trim()){
+          const sel=[];let okR=true;
+          String(p.range).split(',').forEach(tk=>{tk=tk.trim();if(!tk)return;const m=/^(\d{1,4})(?:\s*-\s*(\d{1,4}))?$/.exec(tk);if(!m){okR=false;return;}const a=+m[1],b=m[2]?+m[2]:a;if(a<1||b<a||b>np){okR=false;return;}for(let i=a;i<=b;i++)if(!sel.includes(i-1))sel.push(i-1);});
+          if(!okR||!sel.length)throw Object.assign(new Error('Halaman tidak sah untuk "'+p.name+'". Fail ini ada '+np+' halaman. Contoh: 5-8 atau 3,5-7.'),{apiMsg:1});
+          idx=sel;
+        }
+        (await out.copyPages(d,idx)).forEach(pg=>out.addPage(pg));
       }else{
         const img=p.ext==='PNG'?await out.embedPng(buf):await out.embedJpg(buf);
         const land=img.width>img.height,pw=land?A4[1]:A4[0],ph=land?A4[0]:A4[1],m=24;
@@ -2397,7 +2404,7 @@ document.addEventListener('click',e=>{
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('Laporan disalin.')).catch(fallback);}else fallback();
   }
 });
-document.addEventListener('change',e=>{if(e.target&&e.target.matches&&e.target.matches('[data-prog]')){const w=+e.target.getAttribute('data-prog'),s=sub(ME,w);{const k=e.target.getAttribute('data-pk'),v=e.target.value,c=PGR(ME,w)||[1,5];s.jenis=k==='on'?(v?'program:1-5':''):k==='m'?'program:'+v+'-'+c[1]:'program:'+c[0]+'-'+v;}render();return;}if(e.target&&e.target.matches&&e.target.matches('[data-mwsel]')){ui.mw=+e.target.value;render();return;}const jf=e.target.closest('[data-jwfile]');if(jf){const f=jf.files[0];jf.value='';if(!f)return;
+document.addEventListener('change',e=>{if(e.target&&e.target.matches&&e.target.matches('[data-prange]')){const w=+e.target.getAttribute('data-prange'),q=sub(ME,w),p=q.parts&&q.parts[+e.target.getAttribute('data-i')];if(p){p.range=e.target.value.trim();q.upErr='';mergeParts(w);}return;}if(e.target&&e.target.matches&&e.target.matches('[data-prog]')){const w=+e.target.getAttribute('data-prog'),s=sub(ME,w);{const k=e.target.getAttribute('data-pk'),v=e.target.value,c=PGR(ME,w)||[1,5];s.jenis=k==='on'?(v?'program:1-5':''):k==='m'?'program:'+v+'-'+c[1]:'program:'+c[0]+'-'+v;}render();return;}if(e.target&&e.target.matches&&e.target.matches('[data-mwsel]')){ui.mw=+e.target.value;render();return;}const jf=e.target.closest('[data-jwfile]');if(jf){const f=jf.files[0];jf.value='';if(!f)return;
   const m=/\.(pdf|jpe?g|png|docx)$/i.exec(f.name);if(!m){toast(/\.doc$/i.test(f.name)?'Fail .doc lama: buka dalam Word, Simpan Sebagai .docx, kemudian muat naik.':'Format: PDF, JPG, PNG atau Word (.docx).');return;}if(f.size>5*1048576){toast('Fail melebihi 5 MB.');return;}
   const ext=m[1].toUpperCase().replace('JPEG','JPG');
   const auto=()=>{jwDraftInit();if((ext==='PDF'||(ext==='DOCX'&&LIVE))&&jwKosong())jwBaca(true);};
