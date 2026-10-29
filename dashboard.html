@@ -5184,9 +5184,10 @@ window.onload = async function(){
                 area.style.margin = '0';
                 return area.scrollHeight * z; // tinggi sebenar bila dicetak pada zoom z
             };
-            let lo = 0.45, hi = 1.3;
+            // hi dinaikkan (1.3 -> 2.4): bulan dengan ramai staf sedikit pun kini dibesarkan memenuhi muka surat, tidak berhenti pada 130% lalu meninggalkan ruang kosong & tulisan kecil.
+            let lo = 0.45, hi = 2.4;
             if (tinggiPadaZoom(hi) <= SASARAN_PX) {
-                lo = hi; // sedikit staf - muat walaupun dibesarkan
+                lo = hi; // sedikit staf - muat walaupun dibesarkan hingga zoom maksimum
             } else if (tinggiPadaZoom(lo) > SASARAN_PX) {
                 // terlalu padat walau pada zoom minimum - kekal minimum
             } else {
