@@ -462,7 +462,7 @@ small{font-size:.875rem}
 .ez .stp .no{flex:0 0 44px;height:44px;border-radius:50%;background:#d9ded9;color:#334;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem}
 .ez .stp.now{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,61,43,.12)}.ez .stp.now .no{background:var(--navy);color:#fff}
 .ez .stp.done .no{background:#2E8B57;color:#fff}.ez .stp.done{opacity:.85}
-.ez .stp .tx{flex:1;display:flex;flex-direction:column;gap:10px}.ez .stp .tx b{font-size:1.2rem}
+.ez .stp{min-width:0}.ez .stp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}.ez .stp .tx>*{max-width:100%;min-width:0}.ez .stp .tx b{font-size:1.2rem}
 .ez .stp.wait{opacity:.6}.ez .stp .tx>.btn:not(.big){align-self:flex-start}
 .ez .lagi-b{display:flex;flex-direction:column;gap:12px}
 .ez .lagi-b .btn{text-align:left;justify-content:flex-start}
@@ -1723,8 +1723,8 @@ function ckView(w){
   const c=ckGet(w);let d=ui.ckd;if(d===undefined||d===null){const wd=new Date().getDay();d=(w===CURRENT&&wd>=1&&wd<=5)?wd-1:0;ui.ckd=d;}
   const tabs=CK_HARI.map((h,i)=>{const [n,t]=ckCount(c,i);return '<button class="btn'+(i===d?' pri':'')+'" data-act="ckhari" data-d="'+i+'" aria-pressed="'+(i===d)+'" style="flex:1;min-width:0;padding:8px 0;line-height:1.2;font-size:.82rem">'+h+'<br><small id="ckb-'+i+'">'+n+'/'+t+'</small></button>';}).join('');
   const sek=CK_SEK.map(s=>'<div class="card" style="padding:0;overflow:hidden"><div style="background:'+s[2]+';padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px"><b>'+s[0]+'. '+esc(s[1])+'</b><button class="btn sm" data-act="cksemua" data-s="'+s[0]+'">Tanda semua</button></div>'+s[3].map((x,i)=>{const k=s[0]+(i+1);return '<label style="display:flex;gap:14px;align-items:center;min-height:56px;padding:8px 14px;border-top:1px solid var(--line);cursor:pointer"><input type="checkbox" data-ck="'+k+'" data-d="'+d+'"'+(c.t[k][d]?' checked':'')+' style="width:28px;height:28px;flex:none"><span style="font-size:1.05rem;font-weight:400;color:var(--fg)">'+esc(x)+'</span></label>';}).join('')+'</div>').join('');
-  const gg='<div class="card" style="padding:0;overflow:hidden"><div style="background:#fbe4f0;padding:12px 14px"><b>G. Tugasan Tambahan Waktu Petang</b><br><span class="hint">Tulis tugasan tambahan jika ada. Kosongkan jika tiada.</span></div>'+c.g.map((g,i)=>'<div style="display:flex;gap:14px;align-items:center;min-height:56px;padding:8px 14px;border-top:1px solid var(--line)"><input type="checkbox" data-ckg="'+i+'" data-d="'+d+'"'+(g.d[d]?' checked':'')+' aria-label="Tanda tugasan tambahan '+(i+1)+'" style="width:28px;height:28px;flex:none"><input type="text" data-ckn="'+i+'" value="'+esc(g.n)+'" maxlength="80" placeholder="Tugasan tambahan '+(i+1)+'" style="flex:1;min-height:48px;font-size:1.05rem"></div>').join('')+'</div>';
-  const jam='<div class="card" style="gap:10px"><b>'+CK_HARI[d]+'</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label>Waktu tiba<input type="time" data-cktiba="'+d+'" value="'+esc(c.tiba[d])+'" style="min-height:52px;font-size:1.1rem;width:100%"></label><label>Waktu pulang<input type="time" data-ckpulang="'+d+'" value="'+esc(c.pulang[d])+'" style="min-height:52px;font-size:1.1rem;width:100%"></label></div><p class="hint" style="margin:0">Waktu bekerja: 7.00 pagi hingga 4.00 petang</p></div>';
+  const gg='<div class="card" style="padding:0;overflow:hidden"><div style="background:#fbe4f0;padding:12px 14px"><b>G. Tugasan Tambahan Waktu Petang</b><br><span class="hint">Tulis tugasan tambahan jika ada. Kosongkan jika tiada.</span></div>'+c.g.map((g,i)=>'<div style="display:flex;gap:14px;align-items:center;min-height:56px;padding:8px 14px;border-top:1px solid var(--line)"><input type="checkbox" data-ckg="'+i+'" data-d="'+d+'"'+(g.d[d]?' checked':'')+' aria-label="Tanda tugasan tambahan '+(i+1)+'" style="width:28px;height:28px;flex:none"><input type="text" data-ckn="'+i+'" value="'+esc(g.n)+'" maxlength="80" placeholder="Tugasan tambahan '+(i+1)+'" style="flex:1;min-width:0;min-height:48px;font-size:1.05rem"></div>').join('')+'</div>';
+  const jam='<div class="card" style="gap:10px"><b>'+CK_HARI[d]+'</b><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px"><label style="min-width:0">Waktu tiba<input type="time" data-cktiba="'+d+'" value="'+esc(c.tiba[d])+'" style="min-height:52px;font-size:1.1rem;width:100%;min-width:0;box-sizing:border-box"></label><label style="min-width:0">Waktu pulang<input type="time" data-ckpulang="'+d+'" value="'+esc(c.pulang[d])+'" style="min-height:52px;font-size:1.1rem;width:100%;min-width:0;box-sizing:border-box"></label></div><p class="hint" style="margin:0">Waktu bekerja: 7.00 pagi hingga 4.00 petang</p></div>';
   const cat='<div class="card"><label><b>Catatan / ulasan</b> <span class="hint">(tidak wajib)</span><textarea data-ckcat="1" rows="3" maxlength="500" style="width:100%;font-size:1.05rem">'+esc(c.cat)+'</textarea></label></div>';
   return '<div class="card" style="gap:8px"><b>Tanda tugasan yang telah dibuat. Pilih hari dahulu.</b><div style="display:flex;gap:6px">'+tabs+'</div></div>'+jam+sek+gg+cat+'<p class="hint">Tanda anda disimpan secara automatik dalam peranti ini. Tekan <b>Hantar Laporan</b> apabila selesai satu minggu.</p>';
 }
@@ -2791,6 +2791,24 @@ document.addEventListener('input',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('input[data-af]')){e.preventDefault();ui.af[e.target.dataset.af]=e.target.value;loadAudit();}});
 
 boot();
+
+/* Pembantu Pengurusan Murid menghantar LAPORAN, bukan RPH: semua perkataan 'RPH' pada skrin mereka dipaparkan sebagai 'laporan' (nama fail tidak diubah). */
+(function(){
+  const ppm=()=>/pengurusan murid/i.test(typeof ME_JAWATAN==='string'?ME_JAWATAN:'');
+  const tuk=t=>t.replace(/(^|[.!?]\s+|:\s+)RPH\b/g,'$1Laporan').replace(/\bRPH\b/g,'laporan');
+  const ATTR=['aria-label','placeholder','title'];
+  function proses(n){
+    if(!ppm()||!n)return;
+    if(n.nodeType===3){if(/\bRPH\b/.test(n.nodeValue)){const p=n.parentNode;if(p&&/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName))return;const v=n.nodeValue,k=tuk(v);n.nodeValue=/^\s*RPH\b/.test(v)&&!/^\s*RPH_/.test(v)?k.replace(/^(\s*)laporan/,'$1Laporan'):k;}return;}
+    if(n.nodeType!==1||/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.nodeName))return;
+    ATTR.forEach(a=>{const v=n.getAttribute&&n.getAttribute(a);if(v&&/\bRPH\b/.test(v))n.setAttribute(a,tuk(v));});
+    for(let c=n.firstChild;c;c=c.nextSibling)proses(c);
+  }
+  let busy=false;
+  const ob=new MutationObserver(ms=>{if(busy||!ppm())return;busy=true;try{ms.forEach(m=>{if(m.type==='characterData')proses(m.target);else m.addedNodes.forEach(proses);});}finally{busy=false;}});
+  ob.observe(document.body,{childList:true,subtree:true,characterData:true});
+  document.title=document.title;
+})();
 </script>
 
 </body>
