@@ -583,13 +583,12 @@ function dlg(html){
   o.addEventListener('click',e=>{if(e.target===o)tutup();});
   document.body.appendChild(o);return {o,tutup};
 }
+const GURU_TAB=['mula','jadual','rekod2'],ADM_TAB=['semak','pantau','exc','laporan','urus','tetapan','audit'];
+function peranBoleh(){if(!(typeof SIMPLEP==='function'&&SIMPLEP()&&ME_MENGAJAR))return false;return !!(jenisJ(ME_POSISI+' '+ME_JAWATAN)||ME_ADMIN);}
 function peranTog(){
-  if(!(typeof SIMPLEP==='function'&&SIMPLEP()&&ME_MENGAJAR))return '';
-  const j=jenisJ(ME_POSISI+' '+ME_JAWATAN);if(!j&&!ME_ADMIN)return '';
-  const lbl2=j?'Saya sebagai Pentadbir':'Saya sebagai Penyelaras';
-  const guruTab=['mula','jadual','rekod2','lagi'].includes(ui.tab);
-  const bt=(p,t,on)=>'<button data-act="peranan" data-p="'+p+'" aria-pressed="'+on+'" style="'+(on?'background:#0F5C36;color:#fff;border-color:#0F5C36':'')+'">'+t+'</button>';
-  return bt('guru','Saya sebagai Guru',guruTab)+bt('admin',lbl2,!guruTab);
+  if(!peranBoleh())return '';
+  const lbl2=jenisJ(ME_POSISI+' '+ME_JAWATAN)?'Saya sebagai Pentadbir':'Saya sebagai Penyelaras',g=ui.pmode==='guru';
+  return '<select class="peran" data-peran aria-label="Pilih peranan anda" style="min-height:40px;border-radius:999px;padding:4px 10px;border:1px solid #0F5C36;background:#0F5C36;color:#fff;font:inherit;font-weight:600;max-width:100%"><option value="guru"'+(g?' selected':'')+'>Saya sebagai Guru</option><option value="admin"'+(g?'':' selected')+'>'+lbl2+'</option></select>';
 }
 function sahHantar(w,s,ok){
   const f=s.file||{};
@@ -1757,7 +1756,7 @@ function ckBadge(c){for(let i=0;i<5;i++){const b=document.getElementById('ckb-'+
 function mulaView(){const PPMU=/pengurusan murid/i.test(ME_JAWATAN),NM=PPMU?'Laporan harian':'RPH';
   const w=(ui.mw&&weeks[ui.mw-1]&&!weeks[ui.mw-1].cuti)?ui.mw:CURRENT,wk=weeks[w-1],s=sub(ME,w),sent=submitted(s),need=rNeed(ME,w),done=rDone(s,ME,w);
   const AW=weeks.filter(x=>!x.cuti),ix=AW.findIndex(x=>x.n===w),pv=AW[ix-1],nx=AW[ix+1];
-  const wsel='<div class="card" style="gap:10px"><div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center"><button class="btn" data-act="mwn" data-w="'+(pv?pv.n:'')+'"'+(pv?'':' disabled')+' aria-label="Minggu sebelum">‹</button><select data-mwsel="1" aria-label="Pilih minggu" style="min-height:56px;font-size:1.1rem">'+AW.map(x=>'<option value="'+x.n+'"'+(x.n===w?' selected':'')+'>Minggu '+x.n+' · '+esc(x.label)+(x.n===CURRENT?' (minggu ini)':'')+'</option>').join('')+'</select><button class="btn" data-act="mwn" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+' aria-label="Minggu seterusnya">›</button></div>'+(w!==CURRENT?'<button class="btn" data-act="mwn" data-w="'+CURRENT+'">Kembali ke minggu ini</button>':'')+'</div>';
+  const wsel='<div class="card" style="gap:10px"><div style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center"><button class="btn" data-act="mwn" data-w="'+(pv?pv.n:'')+'"'+(pv?'':' disabled')+' aria-label="Minggu sebelum">‹</button><select data-mwsel="1" aria-label="Pilih minggu" style="min-width:0;width:100%;min-height:56px;font-size:1.1rem">'+AW.map(x=>'<option value="'+x.n+'"'+(x.n===w?' selected':'')+'>Minggu '+x.n+' · '+esc(x.label)+(x.n===CURRENT?' (minggu ini)':'')+'</option>').join('')+'</select><button class="btn" data-act="mwn" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+' aria-label="Minggu seterusnya">›</button></div>'+(w!==CURRENT?'<button class="btn" data-act="mwn" data-w="'+CURRENT+'">Kembali ke minggu ini</button>':'')+'</div>';
   const head='<div><h2>Selamat datang, '+esc(MYNAME)+'</h2></div>';
   if(!hasJadual(ME)&&!RNG(ME))return '<div class="wrap ez">'+head+'<div class="state todo"><h3>Langkah pertama</h3><p>Isi jadual waktu anda. Buat sekali sahaja. Sistem akan menyediakan senarai RPH untuk anda.</p></div><button class="btn pri big" data-act="tab" data-tab="jadual">Isi jadual waktu</button></div>';
   const editable=s.status==='belum'||s.status==='draf'||s.status==='pembetulan';
@@ -2158,7 +2157,11 @@ function render(){
   if(RNG(ME))GR.guru[1]=GR.guru[1].filter(x=>x[0]!=='jadual');
   const PZ=SIMPLEP();
   let groups=(EZ?['guru']:['guru','dash','admin']).filter(r=>MENU.includes(r)&&GR[r]).map(r=>({r,name:GR[r][0],items:GR[r][1]}));
-  if(PZ)groups=[{r:'admin',name:'Semakan',items:[['semak','Semak RPH']].concat(ME_MENGAJAR?[['mula','RPH Saya']]:[],[['pantau','Dashboard RPH'],['exc','Pengecualian'],['laporan','Laporan'],['staf','Rekod Staf'],['notif','Mesej']])}].concat(ME_ADMIN?[{r:'admin',name:'Tetapan sistem',items:[['urus','Urus iRISE'],['tetapan','Tetapan'],['audit','Log Audit']]}]:[]);
+  const PB=PZ&&peranBoleh();
+  if(PB){if(GURU_TAB.includes(ui.tab))ui.pmode='guru';else if(ADM_TAB.includes(ui.tab))ui.pmode='admin';else if(!ui.pmode)ui.pmode='admin';}
+  const GM=PB&&ui.pmode==='guru';
+  if(PZ)groups=[{r:'admin',name:'Semakan',items:[['semak','Semak RPH']].concat(ME_MENGAJAR&&!PB?[['mula','RPH Saya']]:[],[['pantau','Dashboard RPH'],['exc','Pengecualian'],['laporan','Laporan'],['staf','Rekod Staf'],['notif','Mesej']])}].concat(ME_ADMIN?[{r:'admin',name:'Tetapan sistem',items:[['urus','Urus iRISE'],['tetapan','Tetapan'],['audit','Log Audit']]}]:[]);
+  if(GM)groups=[{r:'guru',name:'Saya',items:[['mula',/pengurusan murid/i.test(ME_JAWATAN)?'Hantar Laporan':'Hantar RPH'],['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['staf','Rekod Staf'],['notif','Mesej']].filter(x=>!(RNG(ME)&&x[0]==='jadual'))}];
   const common=(EZ||PZ)?[]:[['notif','Notifikasi'],['profil','Profil']];
   const HID=EZ?[['home','Ringkasan Saya'],['rph','Semua Minggu'],['dash','Dashboard Sekolah'],['profil','Profil']]:PZ?[['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['home','Ringkasan Saya'],['rph','Semua Minggu'],['dash','Dashboard Sekolah'],['profil','Profil']]:[];
   const allTabs=groups.reduce((a,g)=>a.concat(g.items),[]).concat(common,HID);
@@ -2369,7 +2372,7 @@ function setupLive(p){
   SETTINGS=Object.assign({hariSebelum:1,jam:17},p.tetapan||{});ui.setF=null;
   buildWeeks(p.takwim);teachers=p.guru;teachers.forEach(t=>{t.sub=jwtLabel(t.sub);});setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=jwtLabel(p.me.jawatan);ME_PERANAN=p.me.peranan;ME_POSISI=p.me.posisi||'';ME_ADMIN=!!p.me.admin;ME_SEM=p.me.sementara||'';PM=p.penyemak||null;ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
   const old=subs;subs={};
-  const KEEP=['parts','merging','mstage','upErr','mtok','upQ','draft','err','rdirty','rbusy','rver','rrid','rridV','rconflict','srvVer','srvTeks','_t','refleksi','refleksiVersi','file','retryN','offline','sending','upFail'];
+  const KEEP=['parts','merging','mstage','upErr','mtok','upQ','draft','err','rdirty','rbusy','rver','rrid','rridV','rconflict','srvVer','srvTeks','_t','refleksi','refleksiVersi','file','retryN','offline','sending','upFail','pend','ptChk'];
   teachers.forEach(t=>weeks.forEach(w=>{const k=key(t.id,w.n),b=blankSub(),o=old[k];
     if(o)KEEP.forEach(f=>{if(o[f]!==undefined&&(f!=='refleksi'&&f!=='refleksiVersi'||o.rdirty||o.rbusy))b[f]=o[f];});
     subs[k]=b;}));
@@ -2634,7 +2637,7 @@ document.addEventListener('click',e=>{
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>toast('Laporan disalin.')).catch(fallback);}else fallback();
   }
 });
-document.addEventListener('change',e=>{if(e.target&&e.target.matches&&e.target.matches('[data-prange]')){const w=+e.target.getAttribute('data-prange'),q=sub(ME,w),p=q.parts&&q.parts[+e.target.getAttribute('data-i')];if(p){p.range=e.target.value.trim();pendEdit(w);}return;}if(e.target&&e.target.matches&&e.target.matches('[data-prog]')){const w=+e.target.getAttribute('data-prog'),s=sub(ME,w);{const k=e.target.getAttribute('data-pk'),v=e.target.value,c=PGR(ME,w)||[1,5];s.jenis=k==='on'?(v?'program:1-5':''):k==='m'?'program:'+v+'-'+c[1]:'program:'+c[0]+'-'+v;}render();return;}if(e.target&&e.target.matches&&e.target.matches('[data-mwsel]')){ui.mw=+e.target.value;render();return;}const jf=e.target.closest('[data-jwfile]');if(jf){const f=jf.files[0];jf.value='';if(!f)return;
+document.addEventListener('change',e=>{if(e.target&&e.target.matches&&e.target.matches('[data-peran]')){ui.pmode=e.target.value==='guru'?'guru':'admin';ui.tab=ui.pmode==='guru'?'mula':'semak';ui.menu=false;render();window.scrollTo(0,0);return;}if(e.target&&e.target.matches&&e.target.matches('[data-prange]')){const w=+e.target.getAttribute('data-prange'),q=sub(ME,w),p=q.parts&&q.parts[+e.target.getAttribute('data-i')];if(p){p.range=e.target.value.trim();pendEdit(w);}return;}if(e.target&&e.target.matches&&e.target.matches('[data-prog]')){const w=+e.target.getAttribute('data-prog'),s=sub(ME,w);{const k=e.target.getAttribute('data-pk'),v=e.target.value,c=PGR(ME,w)||[1,5];s.jenis=k==='on'?(v?'program:1-5':''):k==='m'?'program:'+v+'-'+c[1]:'program:'+c[0]+'-'+v;}render();return;}if(e.target&&e.target.matches&&e.target.matches('[data-mwsel]')){ui.mw=+e.target.value;render();return;}const jf=e.target.closest('[data-jwfile]');if(jf){const f=jf.files[0];jf.value='';if(!f)return;
   const m=/\.(pdf|jpe?g|png|docx)$/i.exec(f.name);if(!m){toast(/\.doc$/i.test(f.name)?'Fail .doc lama: buka dalam Word, Simpan Sebagai .docx, kemudian muat naik.':'Format: PDF, JPG, PNG atau Word (.docx).');return;}if(f.size>5*1048576){toast('Fail melebihi 5 MB.');return;}
   const ext=m[1].toUpperCase().replace('JPEG','JPG');
   const auto=()=>{jwDraftInit();if((ext==='PDF'||(ext==='DOCX'&&LIVE))&&jwKosong())jwBaca(true);};
