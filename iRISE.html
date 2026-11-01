@@ -1325,19 +1325,21 @@ async function jwOpen(tid){
   catch(e){handleErr(e);}
 }
 function dashView(){
+  const HS=(typeof CONFIG!=='undefined'&&CONFIG.DASH_HANTAR_SEHINGGA!=null)?+CONFIG.DASH_HANTAR_SEHINGGA:38;
+  const SD=(t,n)=>{const k=stOf(t,n);return(n<=HS&&k!=='dikecualikan')?'disemak':k;};
   const act=active().filter(x=>!x.cuti);if(!act.length)return '<div class="wrap"><h2>Dashboard Sekolah</h2><p class="lead">Belum ada minggu aktif.</p></div>';
   const w=(ui.dw&&act.some(x=>x.n===ui.dw))?ui.dw:CURRENT,ix=act.findIndex(x=>x.n===w),pv=act[ix-1],nx=act[ix+1];
   const F=ui.df&&['disemak','dihantar','pembetulan','belum','dikecualikan'].includes(ui.df)?ui.df:'semua',q=(ui.dq||'').trim().toLowerCase();
-  const c=counts(w),n=c.n,rank={lewat:0,belum:1,pembetulan:2,dihantar:3,disemak:4,dikecualikan:5};
-  const rows=teachers.map(t=>({t,k:stOf(t,w)})).sort((a,b)=>(rank[a.k]-rank[b.k])||a.t.name.localeCompare(b.t.name));
+  const c={sent:0,ok:0,fix:0,miss:0,n:0};reqW(w).forEach(t=>{const k=SD(t,w);c.n++;if(k==='dihantar')c.sent++;else if(k==='disemak')c.ok++;else if(k==='pembetulan')c.fix++;else c.miss++;});const n=c.n,rank={lewat:0,belum:1,pembetulan:2,dihantar:3,disemak:4,dikecualikan:5};
+  const rows=teachers.map(t=>({t,k:SD(t,w)})).sort((a,b)=>(rank[a.k]-rank[b.k])||a.t.name.localeCompare(b.t.name));
   const shown=rows.filter(r=>(!q||(r.t.name+' '+r.t.sub).toLowerCase().includes(q))&&(F==='semua'||(F==='belum'?(r.k==='belum'||r.k==='lewat'):r.k===F)));
   const strip=act.slice(-10);
   const cards=shown.map(r=>{
     const t=r.t,k=r.k,me=t.id===ME,cl={disemak:'ok',dihantar:'sent',pembetulan:'fix',lewat:'late',belum:'late',dikecualikan:''}[k];
-    let wj=0,hh=0;act.forEach(x=>{const z=stOf(t,x.n);if(z==='dikecualikan')return;wj++;if(z==='disemak'||z==='dihantar'||z==='pembetulan')hh++;});
+    let wj=0,hh=0;act.forEach(x=>{const z=SD(t,x.n);if(z==='dikecualikan')return;wj++;if(z==='disemak'||z==='dihantar'||z==='pembetulan')hh++;});
     const pct=wj?Math.round(hh/wj*100):100;
-    const cell=x=>{const z=stOf(t,x.n);return {disemak:'ok',dihantar:'sent',pembetulan:'fix',lewat:'late',belum:'',dikecualikan:'cuti'}[z]+'';};
-    const st=strip.map(x=>'<div title="Minggu '+x.n+' · '+ST[stOf(t,x.n)][1]+'"><i class="'+cell(x)+'"></i><em>'+x.n+'</em></div>').join('');
+    const cell=x=>{const z=SD(t,x.n);return {disemak:'ok',dihantar:'sent',pembetulan:'fix',lewat:'late',belum:'late',dikecualikan:'cuti'}[z]+'';};
+    const st=strip.map(x=>'<div title="Minggu '+x.n+' · '+ST[SD(t,x.n)][1]+'"><i class="'+cell(x)+'"></i><em>'+x.n+'</em></div>').join('');
     const ini=t.name.split(/\s+/).filter(p=>!/^(anak|binti|bin|a\/l|a\/p)$/i.test(p)).slice(0,2).map(p=>p[0]).join('').toUpperCase();
     const sb=sub(t.id,w),canOpen=ME_PERANAN==='pentadbir'&&sb&&sb.file&&submitted(sb);
     return '<div class="tc '+cl+(me?' me':'')+'"><div class="tc-h"><span class="av" aria-hidden="true">'+esc(ini)+'</span><div class="nm"><b>'+esc(t.name)+(me?' <span class="pill ok">Anda</span>':'')+'</b><span>'+esc(t.sub||'')+'</span></div></div>'+
@@ -2221,7 +2223,7 @@ function render(){
   const gh=(n,items)=>{const col=ui.grpC.includes(n),has=items.some(t=>t[0]===ui.tab);
     return '<button class="side-h" data-act="grp" data-g="'+esc(n)+'" aria-expanded="'+(!col)+'"><span>'+n+'</span><i aria-hidden="true">'+(col?'▸':'▾')+'</i></button>'+(col?items.filter(t=>t[0]===ui.tab):items).map(nb).join('');};
   const navHtml=groups.length>1?groups.map(g=>gh(g.name,g.items)).join('')+(common.length?gh('Akaun',common):''):groups.map(g=>g.items.map(nb).join('')).join('')+common.map(nb).join('');
-  app.innerHTML='<div class="shell'+(ui.sideHide?' nosb':'')+(EZ?' ezm':'')+'"><div class="scrim'+(ui.menu?' on':'')+'" data-act="menu"></div><aside class="side'+(ui.menu?' open':'')+'" id="side" aria-label="Menu utama"><div class="side-brand"><img class="lg" src="'+LOGO+'" alt="Logo iRISE" height="48" style="height:40px;width:auto;background:#fff;border-radius:10px;padding:5px 8px"><div class="sb-t"><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div></div>'+
+  app.innerHTML='<div class="shell'+(ui.sideHide?' nosb':'')+(EZ?' ezm':'')+'"><div class="scrim'+(ui.menu?' on':'')+'" data-act="menu"></div><aside class="side'+(ui.menu?' open':'')+'" id="side" aria-label="Menu utama"><div class="side-brand"><img class="lg" src="'+LOGO+'" alt="Logo iRISE" height="48" style="height:44px;width:auto;background:transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"><div class="sb-t"><span>SK Krangan'+(LIVE?'':' · MOD DEMO')+'</span></div></div>'+
    '<nav class="side-nav">'+navHtml+'</nav>'+
    '<div class="side-foot">'+(LIVE?'<b class="sf-n">'+esc(MYNAME)+'</b>'+(ME_JAWATAN?'<span class="sf-j">'+esc(ME_JAWATAN)+'</span>':''):'Data contoh, tidak disimpan')+'</div></aside>'+
    '<div class="main'+(ui.stale?' stale':'')+'">'+(ui.stale?'<div class="stale-bar" role="status">'+(ui.staleErr?esc(ui.staleErr)+' Paparan di bawah ialah data lama, tindakan dikunci. ':'Memuatkan data terkini… (paparan terakhir ditunjukkan dahulu) ')+'<button class="btn sm" data-act="sambung">Sambung semula</button></div>':'')+'<header class="top"><div class="top-in"><div class="top-l"><button class="mnu" data-act="menu" aria-controls="side" aria-expanded="'+(window.matchMedia('(max-width:760px)').matches?!!ui.menu:!ui.sideHide)+'">☰ Menu</button>'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<h1 class="pg">'+title+'</h1></div>'+
