@@ -796,6 +796,17 @@ input:hover,select:hover,textarea:hover{border-color:#9DBBAB}
 .tile.ok::after,.tile.sent::after,.tile.fix::after,.tile.late::after{top:14px;right:14px;transform:none;width:30px;height:30px;font-size:1rem}
 .tile.ok span,.tile.sent span,.tile.fix span,.tile.late span{padding-right:38px}
 </style>
+<style id="emerald7">
+.top3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.top3 .t3{position:relative;display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid #D8E9E0;border-radius:18px;padding:18px 18px 16px;box-shadow:0 6px 18px rgba(11,69,50,.08);overflow:hidden}
+.top3 .t3::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--c,#C49A48)}
+.top3 .t3.r1{--c:linear-gradient(90deg,#F6DE9B,#C49A48)}.top3 .t3.r2{--c:linear-gradient(90deg,#E3E8E5,#9AA8A1)}.top3 .t3.r3{--c:linear-gradient(90deg,#E9C09A,#B9733A)}
+.top3 .t3 .rk{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font:800 1.1rem var(--font-body);color:#0B3B2A;background:var(--c)}
+.top3 .t3 b{font-size:1.05rem;line-height:1.25;overflow-wrap:anywhere}
+.top3 .t3 .tm{font-size:.9rem;color:#4A6155}
+.top3 .t3.kosong{opacity:.55;border-style:dashed;box-shadow:none}
+@media(max-width:760px){.top3{grid-template-columns:1fr}.top3 .t3{flex-direction:row;align-items:center;gap:12px}}
+</style>
 <style id="emerald6">#vdl a.btn{text-decoration:none}#vdl a.btn.pri{color:#fff}.kls.kprog .hint b{font-size:inherit;font-weight:700}.kls.kprog{background:#FFF9E8;border-color:#E8D9A8;border-left-color:#C49A48}</style>
 <style id="emerald5">
 /* nama & jawatan di bawah sidebar: panel hijau pekat supaya jelas di atas lengkung emas */
@@ -1623,7 +1634,7 @@ function dashView(){
   const nav='<div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:center"><button class="btn" data-act="dwn" data-w="'+(pv?pv.n:'')+'"'+(pv?'':' disabled')+' aria-label="Minggu sebelum">‹</button><b>Minggu '+w+'<br><span class="hint">'+esc(weeks[w-1].label)+'</span></b><button class="btn" data-act="dwn" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+' aria-label="Minggu seterusnya">›</button></div>';
   return '<div class="wrap"><div><h2>Dashboard Sekolah</h2><p class="lead" style="margin-top:4px">Kad setiap guru dan status penghantaran RPH mereka.</p></div>'+
     '<div class="card">'+nav+'<p style="margin:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center"><span class="pill ok">'+c.ok+' disemak</span><span class="pill sent">'+c.sent+' menunggu semakan</span><span class="pill fix">'+c.fix+' perlu pembetulan</span><span class="pill late">'+c.miss+' belum hantar</span></p></div>'+
-    '<div class="actions"><input data-dq="1" type="search" placeholder="Cari nama guru" aria-label="Cari guru" value="'+esc(ui.dq||'')+'" style="min-width:220px"><select data-df="1" aria-label="Tapis status">'+fopt+'</select><span class="hint">'+shown.length+' daripada '+rows.length+' guru</span></div>'+
+    top3Kad(w)+'<div class="actions"><input data-dq="1" type="search" placeholder="Cari nama guru" aria-label="Cari guru" value="'+esc(ui.dq||'')+'" style="min-width:220px"><select data-df="1" aria-label="Tapis status">'+fopt+'</select><span class="hint">'+shown.length+' daripada '+rows.length+' guru</span></div>'+
     '<div class="tc-g">'+(cards||'<p class="hint">Tiada guru sepadan dengan tapisan.</p>')+'</div>'+
     '<p class="foot">Petak kecil menunjukkan 10 minggu terkini (hijau disemak, biru menunggu semakan, jingga pembetulan, merah lewat, kelabu belum hantar). Guru yang dikecualikan tidak dikira lewat.'+(ME_PERANAN==='pentadbir'?'':' Paparan ini hanya menunjukkan status. Fail RPH, refleksi dan komen guru lain tidak boleh dibuka.')+(LIVE?'':' Data contoh untuk prototaip.')+'</p></div>';
 }
@@ -2123,8 +2134,8 @@ function mulaView(){const PPMU=/pengurusan murid/i.test(ME_JAWATAN),NM=PPMU?'Lap
       return '<div class="card" style="gap:8px;padding:12px;margin-top:8px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Program '+(PBL.length>1?(n+1):'sekolah')+'</b>'+(PBL.length>1?'<button class="btn sm" data-act="progdel" data-w="'+w+'" data-i="'+n+'" aria-label="Buang program '+(n+1)+'">Buang</button>':'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label class="hint">Dari hari<select data-prog="'+w+'" data-pk="m" data-pi="'+n+'" style="min-height:48px;font-size:1rem">'+op(r[0])+'</select></label><label class="hint">Hingga hari<select data-prog="'+w+'" data-pk="t" data-pi="'+n+'" style="min-height:48px;font-size:1rem">'+op(r[1])+'</select></label></div></div>';};
     const progBox=editable&&!RNG(ME)?'<div style="margin:0 0 12px"><b>Ada program sekolah minggu ini?</b><select data-prog="'+w+'" data-pk="on" style="min-height:52px;font-size:1.05rem;margin-top:6px" aria-label="Program sekolah"><option value=""'+(prog?'':' selected')+'>Tiada program</option><option value="1"'+(prog?' selected':'')+'>Ada program sekolah</option></select>'+(prog?PBL.map(PBR).join('')+(PBL.length<4&&PBF.length?'<button class="btn sm" style="margin-top:8px" data-act="progadd" data-w="'+w+'">+ Tambah program lain (hari berlainan)</button>':'')+'<p class="hint">Setiap program mendapat <b>satu kotak sendiri</b> di bawah, mengikut hari, lengkap dengan <b>lampiran tentatif</b> dan <b>kotak refleksi</b>. Hari tanpa program kekal seperti jadual. Satu program boleh meliputi beberapa hari berturutan.</p>':'')+'</div>':'';
     const KLS=editable&&!kirim&&!RNG(ME)&&!/pengurusan murid/i.test(ME_JAWATAN)&&slotsFor(ME,w).length>0;
-    steps+=mk(1,st1,/pengurusan murid/i.test(ME_JAWATAN)?'Muat naik Log Tugasan Harian':KLS?'Muat naik RPH dan tulis refleksi setiap kelas':prog?'Muat naik fail RPH dan tentatif program':'Muat naik fail RPH',(st1==='now'||(hasF&&!kirim)?progBox+(KLS?kelasKad(w,s):fileBlock(w,s,editable)):(kirim?'<span class="hint">'+esc(s.file?s.file.name:'')+'</span>':'')));
-    steps+=mk(2,st2,'Hantar kepada pentadbir',st2==='now'?hantarBtn:(kirim?'<span class="hint">Sudah dihantar. Tersilap atau mahu tukar fail?</span>'+(s.status==='dihantar'?'<button class="btn" data-act="tarik" data-w="'+w+'">Tarik balik hantaran</button>':''):'<span class="hint">Muat naik fail dahulu</span>'));
+    steps+=mk(1,st1,/pengurusan murid/i.test(ME_JAWATAN)?'Log Tugasan Harian (dijana oleh sistem daripada tanda anda)':KLS?'Muat naik RPH dan tulis refleksi setiap kelas':prog?'Muat naik fail RPH dan tentatif program':'Muat naik fail RPH',(st1==='now'||(hasF&&!kirim)?progBox+(KLS?kelasKad(w,s):fileBlock(w,s,editable)):(kirim?'<span class="hint">'+esc(s.file?s.file.name:'')+'</span>':'')));
+    steps+=mk(2,st2,'Hantar kepada pentadbir',st2==='now'?hantarBtn:(kirim?'<span class="hint">Sudah dihantar. '+(PPMU?'Tersilap tanda? Tarik balik hantaran, betulkan tanda dan hantar semula.':'Tersilap atau mahu tukar fail?')+'</span>'+(s.status==='dihantar'?'<button class="btn" data-act="tarik" data-w="'+w+'">Tarik balik hantaran</button>':''):'<span class="hint">'+(PPMU?'Tanda tugasan dahulu':'Muat naik fail dahulu')+'</span>'));
     if(PSK(ME)&&editable!==undefined)steps+=mk(3,(s.status==='disemak'||done>=need)?'done':'now','Tulis refleksi harian (Isnin hingga Jumaat)',rEditor(w,s,s.status==='disemak')+'<div class="save" id="sv-'+w+'"></div>');
     else if(!RNG(ME))steps+=mk(3,st3,'Tulis refleksi selepas mengajar',kirim?rEditor(w,s,false)+'<div class="save" id="sv-'+w+'"></div>':'<span class="hint">'+(KLS?'Ditulis di setiap kelas di atas.':'Selepas RPH dihantar')+'</span>');
     }
@@ -2144,6 +2155,12 @@ function stafList(){
   const n1=reqW(w).filter(t=>sudah(stOf(t,w))).length,n=reqW(w).length;
   const pl=k=>adm?stPill(k):(sudah(k)?'<span class="pill ok">Sudah hantar</span>':'<span class="pill idle">Belum hantar</span>');
   return '<p class="hint" style="margin:0 0 8px"><b>'+n1+'</b> daripada <b>'+n+'</b> guru sudah hantar untuk Minggu '+w+'.</p>'+(L.length?'<div class="mx-scroll"><table class="tbl"><thead><tr><th scope="col">Nama</th><th scope="col">Jawatan</th><th scope="col">Status</th></tr></thead><tbody>'+L.map(x=>'<tr><td><b>'+esc(x.t.name)+'</b></td><td class="hint">'+esc(x.t.sub||'')+'</td><td>'+pl(x.k)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="hint">Tiada nama sepadan.</p>');
+}
+function top3Kad(w){
+  const L=reqW(w).map(t=>{const q=sub(t.id,w)||{},lg=(q.log||[]).filter(x=>x.act==='Dihantar')[0];return {t,tm:q.hantarPada||(lg&&lg.t)||''};})
+    .filter(x=>x.tm&&['dihantar','disemak','pembetulan'].includes(stOf(x.t,w))).sort((a,b)=>new Date(a.tm)-new Date(b.tm)).slice(0,3);
+  const kad=[0,1,2].map(i=>{const x=L[i];return x?'<div class="t3 r'+(i+1)+'"><span class="rk" aria-hidden="true">'+(i+1)+'</span><div><b>'+esc(x.t.name)+'</b><div class="tm">'+esc(fmtDT(new Date(x.tm)))+'</div></div></div>':'<div class="t3 kosong"><span class="rk" aria-hidden="true">'+(i+1)+'</span><div><b>Belum ada</b><div class="tm">Tempat terbuka</div></div></div>';}).join('');
+  return '<div class="card" style="gap:10px"><span class="lbl">3 penghantar terpantas · Minggu '+w+'</span><div class="top3">'+kad+'</div><p class="hint" style="margin:0">Terima kasih kepada guru yang menghantar awal. Hantar sebelum Khamis supaya semakan tidak tertangguh.</p></div>';
 }
 function pantasKad(w){
   const L=reqW(w).map(t=>{const q=sub(t.id,w)||{},lg=(q.log||[]).filter(x=>x.act==='Dihantar')[0];return {t,tm:q.hantarPada||(lg&&lg.t)||''};})
@@ -2177,7 +2194,7 @@ function semakView(){
     '<p class="hint">Mahu lihat semua staf mengikut minggu? <button class="btn sm" data-act="tab" data-tab="pantau">Dashboard RPH</button></p></div>';
 }
 
-const IC_P={mula:'<path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/>',jadual:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',rekod2:'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4zM5 17a3 3 0 013-3h11"/>',notif:'<path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/>',semak:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',pantau:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6.5 6.5 0 013.5 6"/>',exc:'<path d="M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',laporan:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',urus:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',tetapan:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',audit:'<path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1zM6 6h12a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V7a1 1 0 011-1zM9 12h6M9 16h4"/>'};
+const IC_P={dash:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',mula:'<path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/>',jadual:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',rekod2:'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4zM5 17a3 3 0 013-3h11"/>',notif:'<path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/>',semak:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',pantau:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6.5 6.5 0 013.5 6"/>',exc:'<path d="M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',laporan:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',urus:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',tetapan:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',audit:'<path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1zM6 6h12a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V7a1 1 0 011-1zM9 12h6M9 16h4"/>'};
 const icon=k=>IC_P[k]?'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+IC_P[k]+'</svg>':'';
 function rekodSayaView(){
   const st=myStats(),all=weeks.filter(x=>x.n<=CURRENT&&!x.cuti).reverse(),A=ui.rall?all:all.slice(0,8);
@@ -2496,7 +2513,7 @@ function csvBelum(){const w=ui.selWeek,q=v=>{let t=String(v);if(/^[=+\-@\t\r]/.t
 /* ---------- shell ---------- */
 /* Sejarah paparan: butang Kembali kembali ke paparan iRISE sebelumnya; hanya jika tiada sejarah barulah keluar ke portal. */
 const TABH=[];let tabPrev=null,tabBack=false;
-function tabTrack(){if(!ui.tab)return;const cur={tab:ui.tab,pmode:ui.pmode};
+function tabTrack(){if(ui.tab==='staf')ui.tab='dash';if(!ui.tab)return;const cur={tab:ui.tab,pmode:ui.pmode};
   if(tabPrev&&!tabBack&&(tabPrev.tab!==cur.tab||tabPrev.pmode!==cur.pmode)){const l=TABH[TABH.length-1];if(!l||l.tab!==tabPrev.tab||l.pmode!==tabPrev.pmode)TABH.push(tabPrev);if(TABH.length>20)TABH.shift();}
   tabPrev=cur;tabBack=false;}
 function tabKembali(){if(!TABH.length)return false;const p=TABH.pop();tabBack=true;ui.pmode=p.pmode;ui.tab=p.tab;ui.menu=false;render();window.scrollTo(0,0);return true;}
@@ -2512,15 +2529,15 @@ function render(){
   }
   const GR={admin:['Pentadbir',(ME_ADMIN?[['urus','Urus iRISE'],['tetapan','Tetapan']]:[]).concat([['pantau','Pemantauan'],['exc','Pengecualian'],['laporan','Laporan']],ME_ADMIN?[['audit','Log Audit']]:[])],guru:['Saya',[['home','Dashboard Saya'],['jadual','Jadual Waktu'],['rph','RPH Saya']]],dash:['Sekolah',[['dash','Dashboard Sekolah']]]};
   const EZ=SIMPLE();
-  if(EZ)GR.guru=['Saya',[['mula',/pengurusan murid/i.test(ME_JAWATAN)?'Hantar Laporan':'Hantar RPH'],['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['staf','Rekod Staf'],['notif','Mesej']]];
+  if(EZ)GR.guru=['Saya',[['mula',/pengurusan murid/i.test(ME_JAWATAN)?'Hantar Laporan':'Hantar RPH'],['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['dash','Dashboard Sekolah'],['notif','Mesej']]];
   if(RNG(ME))GR.guru[1]=GR.guru[1].filter(x=>x[0]!=='jadual');
   const PZ=SIMPLEP();
   let groups=(EZ?['guru']:['guru','dash','admin']).filter(r=>MENU.includes(r)&&GR[r]).map(r=>({r,name:GR[r][0],items:GR[r][1]}));
   const PB=PZ&&peranBoleh();
   if(PB){if(GURU_TAB.includes(ui.tab))ui.pmode='guru';else if(ADM_TAB.includes(ui.tab))ui.pmode='admin';else if(!ui.pmode)ui.pmode='admin';}
   const GM=PB&&ui.pmode==='guru';
-  if(PZ)groups=[{r:'admin',name:'Semakan',items:(ME_ICT?[]:[['semak','Semak RPH']]).concat(ME_MENGAJAR&&!PB?[['mula','RPH Saya']]:[],[['pantau','Dashboard RPH'],['exc','Pengecualian'],['laporan','Laporan'],['staf','Rekod Staf'],['notif','Mesej']])}].concat(ME_ADMIN?[{r:'admin',name:'Tetapan sistem',items:[['urus','Urus iRISE'],['tetapan','Tetapan'],['audit','Log Audit']]}]:[]);
-  if(GM)groups=[{r:'guru',name:'Saya',items:[['mula',/pengurusan murid/i.test(ME_JAWATAN)?'Hantar Laporan':'Hantar RPH'],['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['staf','Rekod Staf'],['notif','Mesej']].filter(x=>!(RNG(ME)&&x[0]==='jadual'))}];
+  if(PZ)groups=[{r:'admin',name:'Semakan',items:(ME_ICT?[]:[['semak','Semak RPH']]).concat(ME_MENGAJAR&&!PB?[['mula','RPH Saya']]:[],[['pantau','Dashboard RPH'],['exc','Pengecualian'],['laporan','Laporan'],['dash','Dashboard Sekolah'],['notif','Mesej']])}].concat(ME_ADMIN?[{r:'admin',name:'Tetapan sistem',items:[['urus','Urus iRISE'],['tetapan','Tetapan'],['audit','Log Audit']]}]:[]);
+  if(GM)groups=[{r:'guru',name:'Saya',items:[['mula',/pengurusan murid/i.test(ME_JAWATAN)?'Hantar Laporan':'Hantar RPH'],['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['dash','Dashboard Sekolah'],['notif','Mesej']].filter(x=>!(RNG(ME)&&x[0]==='jadual'))}];
   const common=(EZ||PZ)?[]:[['notif','Notifikasi'],['profil','Profil']];
   const HID=EZ?[['home','Ringkasan Saya'],['rph','Semua Minggu'],['dash','Dashboard Sekolah'],['profil','Profil']]:PZ?[['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['home','Ringkasan Saya'],['rph','Semua Minggu'],['dash','Dashboard Sekolah'],['profil','Profil']]:[];
   const allTabs=groups.reduce((a,g)=>a.concat(g.items),[]).concat(common,HID);
@@ -2528,7 +2545,7 @@ function render(){
   if(PZ&&!ui.ezInit){ui.ezInit=true;if(ui.tab==='home'||ui.tab==='rph'||ui.tab==='pantau')ui.tab=ME_ICT?'pantau':'semak';}
   if(!allTabs.some(t=>t[0]===ui.tab))ui.tab=allTabs[0][0];
   const own=groups.find(g=>g.items.some(t=>t[0]===ui.tab));if(own)ui.role=own.r;
-  const VIEWS={staf:stafView,rekod2:rekodSayaView,semak:semakView,mula:mulaView,lagi:lagiView,home:guruHome,rph:guruView,jadual:jadualView,rekod:rekodView,notif:notifView,profil:profilView,pantau:monitorView,exc:excView,laporan:reportView,audit:auditView,tetapan:tetapanView,urus:urusView,dash:dashView};
+  const VIEWS={staf:dashView,rekod2:rekodSayaView,semak:semakView,mula:mulaView,lagi:lagiView,home:guruHome,rph:guruView,jadual:jadualView,rekod:rekodView,notif:notifView,profil:profilView,pantau:monitorView,exc:excView,laporan:reportView,audit:auditView,tetapan:tetapanView,urus:urusView,dash:dashView};
   const body=VIEWS[ui.tab]();
   const unread=NOTIFS.filter(n=>!n.readAt).length;
   const title=(allTabs.find(t=>t[0]===ui.tab)||[0,''])[1];
