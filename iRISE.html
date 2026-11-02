@@ -1007,7 +1007,7 @@ function lastJ(k){k=String(k||'').trim();if(!k)return '';for(let w=weeks.length;
 const rOk=(s,tid,w)=>rDone(s,tid,w)>=rNeed(tid,w);
 function rHtml(s,tid,w){if(RNG(tid))return '<span class="hint">Tidak perlu refleksi</span>';const a=parseR(s.refleksi).filter(x=>x.t.trim()||x.h.trim()||x.x),n=rNeed(tid,w),d=rDone(s,tid,w);
   if(!a.length)return '<em>Belum diisi</em>';
-  return '<span class="hint">'+d+' / '+n+' kelas lengkap (refleksi dan kehadiran)'+(d<n?' · belum lengkap':'')+'</span>'+a.map((x,i)=>'<span style="display:block;margin-top:6px"><b>'+(esc(x.k||slotLabel(tid,i,w))||'Kelas '+(i+1))+'</b> '+(x.x?'<span class="pill idle">PdP ditangguh</span><br>Sebab: '+esc(x.x)+(x.n?' — '+esc(x.n):''):'<span class="hint">· Murid hadir: '+(rHadir(x)?esc(rHadir(x)):'belum diisi')+'</span><br>'+esc(x.t))+'</span>').join('');}
+  return '<span class="hint">'+d+' / '+n+' kelas lengkap (refleksi dan kehadiran)'+(d<n?' · belum lengkap':'')+'</span>'+a.map((x,i)=>'<span style="display:block;margin-top:6px"><b>'+(esc(slotK(x,tid,i,w))||'Kelas '+(i+1))+'</b> '+(x.x?'<span class="pill idle">PdP ditangguh</span><br>Sebab: '+esc(x.x)+(x.n?' — '+esc(x.n):''):'<span class="hint">· Murid hadir: '+(rHadir(x)?esc(rHadir(x)):'belum diisi')+'</span><br>'+esc(x.t))+'</span>').join('');}
 /* Draf refleksi dalam pelayar: setiap ketukan disalin ke localStorage dan dipadam apabila pelayan mengesahkan simpanan. Jika sambungan terputus atau tab tertutup, draf boleh dipulihkan. */
 const sesiTh=()=>(weeks[0]?weeks[0].s.getFullYear():'x');
 const drKey=w=>'inrph.draf.'+sesiTh()+'.'+ME+'.'+w;
@@ -1025,7 +1025,7 @@ function drBanner(w,s,locked){const dr=locked?null:drGet(w);if(!dr||dr.t===s.ref
 function rRow(w,a,i,locked){
   const x=a[i]||{k:'',t:'',h:'',j:'',x:'',n:''};
     const sl=slotLabel(ME,i,w),bad=x.h.trim()&&x.j.trim()&&+x.h>+x.j;
-    const lab=sl?'<b class="rl-lab">'+esc(x.k||sl)+'</b>':'<input type="text" maxlength="80" data-rw="'+w+'" data-ri="'+i+'" data-rf="k" '+(locked?'disabled':'')+' placeholder="Hari · kelas · mata pelajaran (cth. Isnin · 5 Bestari · PSV)" value="'+esc(x.k)+'" aria-label="Kelas '+(i+1)+'">';
+    const lab=sl?'<b class="rl-lab">'+esc(slotK(x,ME,i,w))+'</b>':'<input type="text" maxlength="80" data-rw="'+w+'" data-ri="'+i+'" data-rf="k" '+(locked?'disabled':'')+' placeholder="Hari · kelas · mata pelajaran (cth. Isnin · 5 Bestari · PSV)" value="'+esc(x.k)+'" aria-label="Kelas '+(i+1)+'">';
     const sel='<label class="rl-td">Status sesi <select data-rw="'+w+'" data-ri="'+i+'" data-rf="x" '+(locked?'disabled':'')+' aria-label="Status sesi kelas '+(i+1)+'"><option value="">PdP dilaksanakan</option>'+SEBAB_TD.map(z=>'<option value="'+esc(z)+'"'+(x.x===z?' selected':'')+'>Ditangguh: '+esc(z)+'</option>').join('')+'</select></label>';
     let rw;
     if(x.x)rw='<div class="rl-row"><span class="rl-n">'+(i+1)+'</span><div class="rl-f">'+lab+sel+
@@ -1061,7 +1061,7 @@ function kelasKad(w,s){
     const ok=adaF(i),PG=!!(sl&&sl.prog),PGT=PG?(sl.pt>1?'Program '+sl.pn:'Program sekolah')+' · '+PGN(sl.pr):'';
     h+='<div class="card kls'+(PG?' kprog':'')+'" style="gap:10px;border-left:6px solid '+(ok&&rFull(x)?'#1d7a46':PG?'#C49A48':'#c9d6cd')+'"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><b style="font-size:1.1rem">'+(PG?esc(PGT)+' ('+esc(dk)+')':esc(dk)+(sl?' · '+esc(sl.k):''))+'</b><span><span class="pill '+(ok?'ok':'idle')+'">'+(PG?'Tentatif ':'RPH ')+(ok?'ada':'belum')+'</span> <span class="pill '+(rFull(x)?'ok':'idle')+'">Refleksi '+(rFull(x)?'siap':'belum')+'</span></span></div>'+
       (PG?'<p class="hint" style="margin:0">Hari program tidak perlu RPH biasa. <b>Lampirkan tentatif '+(sl.pt>1?'program ini':'program')+'</b> di bawah, kemudian tulis <b>satu refleksi</b> untuk semua hari '+(sl.pt>1?'dalam program ini':'program')+'.</p>':'')+'<div class="parts">'+berkas(i)+'</div>'+
-      '<div class="actions"><label class="btn sm pri" style="cursor:pointer" for="f-'+w+'-'+i+'">'+(PG?(ok?'Tambah fail tentatif':'Lampirkan tentatif program'):(ok?'Tambah fail kelas ini':'Muat naik RPH kelas ini'))+'</label><label class="btn sm" style="cursor:pointer;position:relative;display:inline-flex">Kamera'+inFile('c-'+w+'-'+i,i,true)+'</label>'+inFile('f-'+w+'-'+i,i,false)+'</div>'+
+      '<div class="actions"><label class="btn sm pri" style="cursor:pointer" for="f-'+w+'-'+i+'">'+(PG?(ok?'Tambah fail tentatif':'Lampirkan tentatif program'):(ok?'Tambah fail kelas ini':'Muat naik RPH kelas ini'))+'</label>'+inFile('f-'+w+'-'+i,i,false)+'</div>'+
       rRow(w,a,i,false)+'</div>';
   }
   const lain=berkas(-1);
@@ -1147,6 +1147,8 @@ const dayLbl=(h,w)=>{const d=hariTrk(h,w);return HARI[h-1]+' '+d.getDate()+' '+B
 const cakupText=w=>{const a=hariTrk(2,w),b=hariTrk(1,w);return 'Selasa '+a.getDate()+' '+BLNP[a.getMonth()]+' hingga Isnin '+b.getDate()+' '+BLNP[b.getMonth()];};
 const cakup=w=>/pengurusan murid/i.test(ME_JAWATAN||'')?'':'Meliputi <b>'+cakupText(w)+'</b>. ';
 const slotLabel=(tid,i,w)=>{const x=slotsFor(tid,w)[i];return x?dayLbl(x.h,w)+' · '+x.k:'';};
+/* Kotak program: sentiasa guna label program semasa, bukan label kelas lama yang pernah disimpan dalam refleksi. */
+const slotK=(x,tid,i,w)=>{const sl=slotsFor(tid,w)[i];return sl&&sl.prog?slotLabel(tid,i,w):((x&&x.k)||slotLabel(tid,i,w));};
 const hasJadual=tid=>!!(JADUAL[tid]&&JADUAL[tid].slots&&JADUAL[tid].slots.length);
 const exc=(tid,w)=>{const t=teachers.find(x=>x.id===tid);if(t&&t.wajib===false)return true;return EXEMPT.some(x=>x.t===tid&&w>=x.a&&w<=x.b);};
 const reqT=()=>teachers.filter(t=>t.wajib!==false);
@@ -1258,7 +1260,7 @@ async function tambahLaman(blob,w,s){
     const rl=parseR(s.refleksi).filter(x=>x.t.trim()||x.h.trim()||x.x);
     tulis('Refleksi dan kehadiran murid',B,12,4);
     if(!rl.length)tulis('Refleksi tiada.',F,10,6);
-    rl.forEach((x,i)=>{const nm=x.k||slotLabel(ME,i,w)||('Kelas '+(i+1));
+    rl.forEach((x,i)=>{const nm=slotK(x,ME,i,w)||('Kelas '+(i+1));
       if(x.x){tulis(nm+' - PdP ditangguh',B,10.5,1);tulis('Sebab: '+x.x+(x.n?' - '+x.n:''),F,10,8);}
       else{tulis(nm+' - Murid hadir: '+(rHadir(x)||'belum diisi'),B,10.5,1);tulis(x.t||'',F,10,8);}});
     if(s.komen){y-=4;tulis('Catatan semakan',B,12,4);tulis(s.komen,F,10,6);}
@@ -1294,7 +1296,7 @@ function arkibIndex(rows,nama,tarikh){
      return '<section><h2>Minggu '+r.w.n+' <span class="m">· '+esc(r.w.label)+' '+r.w.s.getFullYear()+'</span></h2>'+
       '<p class="m">Disemak: '+esc(r.s.reviewed||'-')+'</p>'+
       '<p>'+(r.path?'Fail RPH: <a href="'+esc(encodeURI(r.path))+'">'+esc(r.s.file.name)+'</a>':'Fail RPH: <i>'+esc(r.catatan||'tiada dalam salinan ini')+'</i>')+'</p>'+
-      (rl.length?rl.map((x,i)=>x.x?'<div class="k"><b>'+esc(x.k||slotLabel(ME,i,r.w.n)||'Kelas '+(i+1))+' · PdP ditangguh</b>Sebab: '+esc(x.x)+(x.n?' — '+esc(x.n):'')+'</div>':'<div class="k"><b>'+esc(x.k||slotLabel(ME,i,r.w.n)||'Kelas '+(i+1))+' · Murid hadir: '+(esc(rHadir(x))||'belum diisi')+'</b>'+esc(x.t)+'</div>').join(''):'<p class="m">Refleksi tiada.</p>')+
+      (rl.length?rl.map((x,i)=>x.x?'<div class="k"><b>'+esc(slotK(x,ME,i,r.w.n)||'Kelas '+(i+1))+' · PdP ditangguh</b>Sebab: '+esc(x.x)+(x.n?' — '+esc(x.n):'')+'</div>':'<div class="k"><b>'+esc(slotK(x,ME,i,r.w.n)||'Kelas '+(i+1))+' · Murid hadir: '+(esc(rHadir(x))||'belum diisi')+'</b>'+esc(x.t)+'</div>').join(''):'<p class="m">Refleksi tiada.</p>')+
       (r.s.komen?'<div class="n"><b>Catatan semakan:</b> '+esc(r.s.komen)+'</div>':'')+'</section>';}).join('')+
    '</body></html>';
 }
@@ -1753,7 +1755,7 @@ function printWeek(tid,w){
   const rl=parseR(q.refleksi).filter(x=>x.t.trim()||x.h.trim()||x.x);
   const st={disemak:'Disemak',dihantar:'Dihantar (menunggu semakan)',pembetulan:'Perlu pembetulan',draf:'Draf (belum dihantar)',belum:'Belum dihantar'}[q.status]||q.status;
   const sent=(q.log||[]).filter(x=>x.act==='Dihantar').slice(-1)[0];
-  const rows=rl.length?rl.map((x,i)=>'<tr><td style="width:6%">'+(i+1)+'</td><td style="width:26%">'+esc(x.k||slotLabel(tid,i,w)||'-')+'</td><td style="width:14%">'+(x.x?'-':esc(rHadir(x))||'-')+'</td><td>'+(x.x?'<i>PdP ditangguh</i> — '+esc(x.x)+(x.n?': '+esc(x.n):''):esc(x.t))+'</td></tr>').join(''):'<tr><td colspan="4"><em>Refleksi belum ditulis.</em></td></tr>';
+  const rows=rl.length?rl.map((x,i)=>'<tr><td style="width:6%">'+(i+1)+'</td><td style="width:26%">'+esc(slotK(x,tid,i,w)||'-')+'</td><td style="width:14%">'+(x.x?'-':esc(rHadir(x))||'-')+'</td><td>'+(x.x?'<i>PdP ditangguh</i> — '+esc(x.x)+(x.n?': '+esc(x.n):''):esc(x.t))+'</td></tr>').join(''):'<tr><td colspan="4"><em>Refleksi belum ditulis.</em></td></tr>';
   const need=rNeed(tid,w);
   let a=document.getElementById('printarea');if(!a){a=document.createElement('div');a.id='printarea';document.body.appendChild(a);}
   a.innerHTML='<h1>SEKOLAH KEBANGSAAN KRANGAN</h1><p class="ps">Rekod RPH dan Refleksi Pengajaran Mingguan</p>'+
@@ -3040,7 +3042,7 @@ document.addEventListener('input',e=>{
   if(r){const w=+r.dataset.rw,i=+r.dataset.ri,f=r.dataset.rf,q=sub(ME,w);
     const arr=parseR(q.refleksi);while(arr.length<=i)arr.push({k:'',t:'',h:'',j:'',x:'',n:''});
     let val=r.value;if(f==='h'||f==='j'){val=val.replace(/\D/g,'').slice(0,3);if(val!==r.value)r.value=val;}
-    arr[i][f]=val;if((f==='t'||f==='h'||f==='x')&&!arr[i].k&&slotLabel(ME,i,w))arr[i].k=slotLabel(ME,i,w);
+    arr[i][f]=val;if((f==='t'||f==='h'||f==='x')&&slotLabel(ME,i,w)&&(!arr[i].k||(slotsFor(ME,w)[i]||{}).prog))arr[i].k=slotLabel(ME,i,w);
     if(f==='x'&&val)arr[i].n=arr[i].n||'';
     if(f==='h'&&val&&!arr[i].j.trim()){const lj=lastJ(arr[i].k||slotLabel(ME,i,w));if(lj){arr[i].j=lj;const ji=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"][data-rf="j"]');if(ji)ji.value=lj;}}
     q.refleksi=serR(arr);drSave(w,q.refleksi,q.refleksiVersi);
