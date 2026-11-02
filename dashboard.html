@@ -1571,6 +1571,7 @@ async function syncStaffFromBackend(){
       // datang dari Sheet atau sandaran.
       const STAFF_TARIKH_OVERRIDE_IKUT_NAMA = {
         'Muliady bin Mahmud': { tarikhMulaKehadiran: '2026-09-29' }, // baru daftar masuk
+        'Hazri bin Mohamad': { tarikhMulaKehadiran: '2026-10-29' },  // baru mula 29 Oktober 2026 - JANGAN kira sebelum tarikh ini
       };
       // Gambar lalai ikut nama - HANYA dipakai jika rekod tiada gambar (Sheet kosong).
       // Jika Gambar diisi dalam Urus Staf / Sheet, nilai itu diutamakan.
@@ -1578,9 +1579,12 @@ async function syncStaffFromBackend(){
         'muliady mahmud': 'staf-muliady.webp',
       };
       const _kunciNama = n => String(n||'').toLowerCase().replace(/\b(bin|binti|anak|ak|a\/l|a\/p)\b/g,' ').replace(/\s+/g,' ').trim();
+      // Padanan toleran (abaikan bin/binti/huruf besar-kecil) supaya ejaan sedikit berbeza dalam Sheet tetap kena.
+      const _petaOverrideTarikh = {};
+      Object.keys(STAFF_TARIKH_OVERRIDE_IKUT_NAMA).forEach(k => { _petaOverrideTarikh[_kunciNama(k)] = STAFF_TARIKH_OVERRIDE_IKUT_NAMA[k]; });
       staffData.length = 0;
       merged.forEach(s => {
-        const ov = STAFF_TARIKH_OVERRIDE_IKUT_NAMA[s.name];
+        const ov = _petaOverrideTarikh[_kunciNama(s.name)];
         let rec = ov ? Object.assign({}, s, ov) : s;
         const gambarLalai = STAFF_GAMBAR_LALAI_IKUT_NAMA[_kunciNama(rec.name)];
         if (gambarLalai && !rec.photo) rec = Object.assign({}, rec, { photo: gambarLalai });
@@ -4850,7 +4854,13 @@ window.onload = async function(){
             // aktif sekarang, tetap dimasukkan (ditanda _departed) - tapi TIDAK disenarai
             // dalam "Jadual Kekerapan Staf Yang Tidak Kemaskini" sebab tiada gunanya
             // ingatkan staf yang dah tiada di sekolah untuk kemas kini kehadiran.
-            const activeStaffList = staffData.filter(staff => !staff.excludeFromAttendance);
+            const activeStaffAll = staffData.filter(staff => !staff.excludeFromAttendance);
+            // Staf yang BARU mula berkhidmat SELEPAS bulan laporan ini (tarikhMulaKehadiran lewat
+            // daripada hari terakhir bulan) tak patut ada dalam laporan bulan tu langsung - dia
+            // belum wujud di sekolah lagi. Dia tetap dikira "aktif" untuk padanan nama (elak
+            // tersilap ditanda "berpindah").
+            const _hariAkhirBulanStr = `${yearFilter}-${String(monthFilter).padStart(2, '0')}-${String(new Date(parseInt(yearFilter), parseInt(monthFilter), 0).getDate()).padStart(2, '0')}`;
+            const activeStaffList = activeStaffAll.filter(staff => !staff.tarikhMulaKehadiran || staff.tarikhMulaKehadiran <= _hariAkhirBulanStr);
             // Padan nama secara TOLERAN - nama staf dalam Sheet "Staf" (staffData) kadang
             // tertulis sedikit berbeza daripada nama dalam Sheet rekod kehadiran. Padanan
             // ketat (===) boleh tersilap anggap staf AKTIF sebagai "dah berpindah" hanya
@@ -4865,7 +4875,7 @@ window.onload = async function(){
                 .trim().toLowerCase().replace(/\s+/g, ' ')
                 .replace(/\b(bin|binti|anak|ak|a\/l|a\/p)\b\.?/g, '')
                 .replace(/\s+/g, ' ').trim();
-            const activeStaffNamesNormalized = new Set(activeStaffList.map(s => normalisasiNama(s.name)));
+            const activeStaffNamesNormalized = new Set(activeStaffAll.map(s => normalisasiNama(s.name)));
             const departedNamesWithRecords = [...new Set(monthlyData.map(r => r.name))].filter(name => !activeStaffNamesNormalized.has(normalisasiNama(name)));
             // Nota debug: kalau ada nama yang masih tersilap ditanda "berpindah" selepas
             // padanan toleran di atas, senarai ni akan tercatat dalam Console pelayar (F12
@@ -5058,7 +5068,7 @@ window.onload = async function(){
             // = ruang/tinggi) terlalu pesimis - laporan tertinggal ~25% kosong & tulisan
             // terlalu kecil. Kini: cari zoom TERBESAR yang masih muat, dengan mengukur tinggi
             // pada lebar susun atur sebenar (LEBAR/zoom) bagi setiap calon zoom.
-            const SASARAN_PX = RUANG_TINGGI_PX * 0.97; // margin keselamatan 3%
+            const SASARAN_PX = RUANG_TINGGI_PX * 0.93; // margin keselamatan 7% - cetakan sebenar boleh tersasar ~4% daripada ukuran skrin; blok tandatangan tak boleh melimpah ke muka surat 2
             const tinggiPadaZoom = (z) => {
                 const w = (LEBAR_CETAK_PX / z) + 'px';
                 area.style.zoom = '';
