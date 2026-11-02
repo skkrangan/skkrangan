@@ -1606,6 +1606,7 @@ async function jwOpen(tid){
     const url=URL.createObjectURL(new Blob([u],{type:r.mime||'application/pdf'}));window.open(url,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(url),60000);}
   catch(e){handleErr(e);}
 }
+const dshTog=cur=>(SIMPLEP()?'<div class="actions" role="group" aria-label="Pilih paparan dashboard" style="margin:6px 0"><button class="btn sm'+(cur==='pantau'?' pri':'')+'" data-act="tab" data-tab="pantau" aria-pressed="'+(cur==='pantau')+'">Mengikut minggu</button><button class="btn sm'+(cur==='dash'?' pri':'')+'" data-act="tab" data-tab="dash" aria-pressed="'+(cur==='dash')+'">Mengikut guru</button></div>':'');
 function dashView(){
   const HS=(typeof CONFIG!=='undefined'&&CONFIG.DASH_HANTAR_SEHINGGA!=null)?+CONFIG.DASH_HANTAR_SEHINGGA:38;
   const SD=(t,n)=>{const k=stOf(t,n);return(n<=HS&&k!=='dikecualikan')?'disemak':k;};
@@ -1632,7 +1633,7 @@ function dashView(){
   }).join('');
   const fopt=[['semua','Semua staf'],['disemak','Disemak'],['dihantar','Dihantar / diterima (menunggu semakan)'],['pembetulan','Perlu pembetulan'],['belum','Belum hantar'],['dikecualikan','Dikecualikan']].map(o=>'<option value="'+o[0]+'"'+(F===o[0]?' selected':'')+'>'+o[1]+'</option>').join('');
   const nav='<div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:center"><button class="btn" data-act="dwn" data-w="'+(pv?pv.n:'')+'"'+(pv?'':' disabled')+' aria-label="Minggu sebelum">‹</button><b>Minggu '+w+'<br><span class="hint">'+esc(weeks[w-1].label)+'</span></b><button class="btn" data-act="dwn" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+' aria-label="Minggu seterusnya">›</button></div>';
-  return '<div class="wrap"><div><h2>Dashboard Sekolah</h2><p class="lead" style="margin-top:4px">Kad setiap guru dan status penghantaran RPH mereka.</p></div>'+
+  return '<div class="wrap"><div><h2>Dashboard Sekolah</h2><p class="lead" style="margin-top:4px">Kad setiap guru dan status penghantaran RPH mereka.</p></div>'+dshTog('dash')+
     '<div class="card">'+nav+'<p style="margin:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center"><span class="pill ok">'+c.ok+' disemak</span><span class="pill sent">'+c.sent+' menunggu semakan</span><span class="pill fix">'+c.fix+' perlu pembetulan</span><span class="pill late">'+c.miss+' belum hantar</span></p></div>'+
     top3Kad(w)+'<div class="actions"><input data-dq="1" type="search" placeholder="Cari nama guru" aria-label="Cari guru" value="'+esc(ui.dq||'')+'" style="min-width:220px"><select data-df="1" aria-label="Tapis status">'+fopt+'</select><span class="hint">'+shown.length+' daripada '+rows.length+' guru</span></div>'+
     '<div class="tc-g">'+(cards||'<p class="hint">Tiada guru sepadan dengan tapisan.</p>')+'</div>'+
@@ -2191,7 +2192,7 @@ function semakView(){
   const lain=(fix.length?'<div class="state fix"><h3>'+fix.length+' perlu pembetulan</h3><p>Menunggu guru membetulkan: '+nm(fix)+'</p></div>':'')+
     (belum.length?'<details class="card"><summary><b>'+belum.length+' guru belum menghantar</b></summary><p>'+nm(belum)+'</p></details>':'');
   return '<div class="wrap ez"><div><h2>Semak RPH</h2>'+pmLine+'</div>'+pmAdm+mudahNav(w)+state+rowT+lain+terlepasBanner(w)+
-    '<p class="hint">Mahu lihat semua staf mengikut minggu? <button class="btn sm" data-act="tab" data-tab="pantau">Dashboard RPH</button></p></div>';
+    '<p class="hint">Mahu lihat ringkasan mengikut minggu? <button class="btn sm" data-act="tab" data-tab="pantau">Dashboard Sekolah</button></p></div>';
 }
 
 const IC_P={dash:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',mula:'<path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/>',jadual:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',rekod2:'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4zM5 17a3 3 0 013-3h11"/>',notif:'<path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/>',semak:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',pantau:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M18 14a6.5 6.5 0 013.5 6"/>',exc:'<path d="M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',laporan:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',urus:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',tetapan:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',audit:'<path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1zM6 6h12a1 1 0 011 1v13a1 1 0 01-1 1H6a1 1 0 01-1-1V7a1 1 0 011-1zM9 12h6M9 16h4"/>'};
@@ -2210,7 +2211,7 @@ function lagiView(){
   const b=(t,tab,d)=>'<button class="btn" data-act="tab" data-tab="'+tab+'"><b>'+t+'</b>'+(d?'<br><span class="hint">'+d+'</span>':'')+'</button>';
   const nu=NOTIFS.filter(n=>!n.readAt).length;
   const P=SIMPLEP();
-  return '<div class="wrap ez"><div><h2>Lagi</h2></div><div class="lagi-b">'+(P?b('Dashboard RPH','pantau','Semua staf mengikut minggu')+b('Pengecualian','exc','Guru yang tidak perlu hantar RPH (kursus, cuti sakit)')+(ME_MENGAJAR?b('Jadual Waktu saya','jadual','Isi atau kemas kini jadual waktu'):''):'')+b('Mesej'+(nu?' ('+nu+' baharu)':''),'notif','Makluman dan catatan semakan')+b('Semua minggu dan salinan RPH','rph','Lihat minggu lepas, muat turun RPH yang sudah disemak')+b('Ringkasan saya','home','Berapa RPH sudah dihantar dan disemak')+(MENU.includes('dash')?b('Dashboard Sekolah','dash','Status penghantaran semua staf'):'')+b('Profil saya','profil','')+'</div></div>';
+  return '<div class="wrap ez"><div><h2>Lagi</h2></div><div class="lagi-b">'+(P?b('Dashboard Sekolah','pantau','Status semua staf mengikut minggu dan mengikut guru')+b('Pengecualian','exc','Guru yang tidak perlu hantar RPH (kursus, cuti sakit)')+(ME_MENGAJAR?b('Jadual Waktu saya','jadual','Isi atau kemas kini jadual waktu'):''):'')+b('Mesej'+(nu?' ('+nu+' baharu)':''),'notif','Makluman dan catatan semakan')+b('Semua minggu dan salinan RPH','rph','Lihat minggu lepas, muat turun RPH yang sudah disemak')+b('Ringkasan saya','home','Berapa RPH sudah dihantar dan disemak')+(MENU.includes('dash')?b('Dashboard Sekolah','dash','Status penghantaran semua staf'):'')+b('Profil saya','profil','')+'</div></div>';
 }
 
 /* --- Notifikasi (semua peranan) + makluman (pentadbir) --- */
@@ -2282,12 +2283,12 @@ function monitorView(){
   const att=(()=>{const T=reqW(w),by=k=>T.filter(t=>stOf(t,w)===k),tg=by('dihantar'),bl=T.filter(t=>{const k=stOf(t,w);return k==='belum'||k==='lewat';});
     const nmList=(a,btn)=>a.length?a.slice(0,8).map(t=>'<div class="nm"><span><b>'+esc(t.name)+'</b><br><small class="hint">'+esc(t.sub||'')+'</small></span>'+(btn?'<button class="btn sm pri" data-act="view" data-t="'+t.id+'" data-w="'+w+'">'+(pmBoleh()?'Semak':'Lihat')+'</button>':'')+'</div>').join('')+(a.length>8?'<p class="hint">Dan '+(a.length-8)+' lagi. Tekan kotak di atas untuk menapis jadual.</p>':''):'<p class="hint">Tiada.</p>';
     return '<div class="att"><div class="card"><span class="lbl">Menunggu semakan <span class="pill sent">'+tg.length+'</span></span>'+nmList(tg,true)+'</div><div class="card"><span class="lbl">Belum menghantar <span class="pill late">'+bl.length+'</span></span>'+nmList(bl,false)+'</div></div>';})();
-  return '<div class="wrap"><div class="dsh-h"><div><h2>Dashboard RPH</h2>'+pm+(ME_SEM?'<p class="hint warnbox" role="status">Akses semakan sementara untuk ujian, tamat selepas '+esc(ME_SEM)+'. Tindakan semakan direkodkan dalam Log Audit.</p>':'')+'</div></div>'+
-   terlepasBanner(w)+wkNav('sw',w,semuaMg(),wkInfoAdmin)+
+  return '<div class="wrap"><div class="dsh-h"><div><h2>Dashboard Sekolah</h2>'+pm+(ME_SEM?'<p class="hint warnbox" role="status">Akses semakan sementara untuk ujian, tamat selepas '+esc(ME_SEM)+'. Tindakan semakan direkodkan dalam Log Audit.</p>':'')+'</div></div>'+
+   dshTog('pantau')+terlepasBanner(w)+wkNav('sw',w,semuaMg(),wkInfoAdmin)+
    '<div class="kpis">'+kp('semua','Staf wajib hantar',n,'','Minggu '+w)+kp('dihantar','Menunggu semakan',c.sent,'sent','perlu disemak')+kp('disemak','Disemak',c.ok,'ok',n?Math.round(c.ok/n*100)+'% daripada staf':'')+kp('pembetulan','Perlu pembetulan',c.fix,c.fix?'fix':'','menunggu guru')+kp('belum','Belum menghantar',c.miss,c.miss?'late':'','termasuk yang lewat')+'</div>'+
    '<div class="dsh-g"><div class="card"><span class="lbl">Status Minggu '+w+'</span><div class="donut-w">'+dshDonut(c,n)+'<div class="dleg"><span><i style="background:var(--ok)"></i>Disemak '+c.ok+'</span><span><i style="background:var(--sent)"></i>Menunggu '+c.sent+'</span><span><i style="background:var(--fix)"></i>Pembetulan '+c.fix+'</span><span><i style="background:var(--late)"></i>Belum '+c.miss+'</span></div></div></div>'+
    '<div class="card"><span class="lbl">Penghantaran 12 minggu terkini <span class="hint">· tekan palang untuk pilih minggu</span></span>'+dshBars(w)+'</div></div>'+att+
-   '<p class="hint">Mahu lihat kad setiap guru? <button class="btn sm" data-act="tab" data-tab="dash">Dashboard Sekolah</button></p>'+
+   
    '<div class="actions">'+wkSelect('data-mw="1"')+'<select data-mf="1" aria-label="Tapis status">'+fopt+'</select><input data-mq="1" type="search" placeholder="Cari nama staf" aria-label="Cari staf" value="'+esc(ui.mq||'')+'" style="min-width:200px"></div>'+
    '<div class="card"><span class="lbl">Minggu '+w+' · '+weeks[w-1].label+' · '+list.length+' daripada '+teachers.length+' staf</span>'+tbl(['Staf','Dihantar','Belum','Pembetulan','Status minggu '+w,'RPH minggu '+w],rows,'Tiada staf sepadan dengan penapis.')+'</div>'+
    '<div><span class="lbl">Matriks Staf × Minggu (tekan petak untuk membuka rekod)'+(TOTAL>14?' · '+(ui.mxAll?'semua '+TOTAL+' minggu':'minggu '+wv[0].n+'–'+wv[wv.length-1].n)+' <button class="btn sm" data-act="mxall">'+(ui.mxAll?'Papar minggu terkini sahaja':'Papar semua minggu')+'</button>':'')+'</span><div class="mx-scroll"><table class="mx"><thead>'+head+'</thead><tbody>'+(mrows||'<tr><td class="hint">Tiada staf sepadan.</td></tr>')+'</tbody></table></div>'+legend+'</div></div>';
@@ -2536,7 +2537,7 @@ function render(){
   const PB=PZ&&peranBoleh();
   if(PB){if(GURU_TAB.includes(ui.tab))ui.pmode='guru';else if(ADM_TAB.includes(ui.tab))ui.pmode='admin';else if(!ui.pmode)ui.pmode='admin';}
   const GM=PB&&ui.pmode==='guru';
-  if(PZ)groups=[{r:'admin',name:'Semakan',items:(ME_ICT?[]:[['semak','Semak RPH']]).concat(ME_MENGAJAR&&!PB?[['mula','RPH Saya']]:[],[['pantau','Dashboard RPH'],['exc','Pengecualian'],['laporan','Laporan'],['dash','Dashboard Sekolah'],['notif','Mesej']])}].concat(ME_ADMIN?[{r:'admin',name:'Tetapan sistem',items:[['urus','Urus iRISE'],['tetapan','Tetapan'],['audit','Log Audit']]}]:[]);
+  if(PZ)groups=[{r:'admin',name:'Semakan',items:(ME_ICT?[]:[['semak','Semak RPH']]).concat(ME_MENGAJAR&&!PB?[['mula','RPH Saya']]:[],[['pantau','Dashboard Sekolah'],['exc','Pengecualian'],['laporan','Laporan'],['notif','Mesej']])}].concat(ME_ADMIN?[{r:'admin',name:'Tetapan sistem',items:[['urus','Urus iRISE'],['tetapan','Tetapan'],['audit','Log Audit']]}]:[]);
   if(GM)groups=[{r:'guru',name:'Saya',items:[['mula',/pengurusan murid/i.test(ME_JAWATAN)?'Hantar Laporan':'Hantar RPH'],['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['dash','Dashboard Sekolah'],['notif','Mesej']].filter(x=>!(RNG(ME)&&x[0]==='jadual'))}];
   const common=(EZ||PZ)?[]:[['notif','Notifikasi'],['profil','Profil']];
   const HID=EZ?[['home','Ringkasan Saya'],['rph','Semua Minggu'],['dash','Dashboard Sekolah'],['profil','Profil']]:PZ?[['jadual','Jadual Waktu'],['rekod2','Rekod Saya'],['home','Ringkasan Saya'],['rph','Semua Minggu'],['dash','Dashboard Sekolah'],['profil','Profil']]:[];
@@ -2549,8 +2550,8 @@ function render(){
   const body=VIEWS[ui.tab]();
   const unread=NOTIFS.filter(n=>!n.readAt).length;
   const title=(allTabs.find(t=>t[0]===ui.tab)||[0,''])[1];
-  const nb=t=>'<button data-act="tab" data-tab="'+t[0]+'"'+(ui.tab===t[0]?' aria-current="page"':'')+'>'+((EZ||PZ)?icon(t[0]):'')+'<span>'+t[1]+'</span>'+(t[0]==='notif'&&unread?'<span class="badge bd">'+unread+'</span>':'')+'</button>';
-  const btm=t=>'<button data-act="tab" data-tab="'+t[0]+'"'+(ui.tab===t[0]?' aria-current="page"':'')+'>'+icon(t[0])+'<span>'+t[1]+'</span>'+(t[0]==='notif'&&unread?'<span class="badge">'+unread+'</span>':'')+'</button>';
+  const nb=t=>'<button data-act="tab" data-tab="'+t[0]+'"'+((ui.tab===t[0]||(PZ&&t[0]==='pantau'&&ui.tab==='dash'))?' aria-current="page"':'')+'>'+((EZ||PZ)?icon(t[0]):'')+'<span>'+t[1]+'</span>'+(t[0]==='notif'&&unread?'<span class="badge bd">'+unread+'</span>':'')+'</button>';
+  const btm=t=>'<button data-act="tab" data-tab="'+t[0]+'"'+((ui.tab===t[0]||(PZ&&t[0]==='pantau'&&ui.tab==='dash'))?' aria-current="page"':'')+'>'+icon(t[0])+'<span>'+t[1]+'</span>'+(t[0]==='notif'&&unread?'<span class="badge">'+unread+'</span>':'')+'</button>';
   const gh=(n,items)=>{const col=ui.grpC.includes(n),has=items.some(t=>t[0]===ui.tab);
     return '<button class="side-h" data-act="grp" data-g="'+esc(n)+'" aria-expanded="'+(!col)+'"><span>'+n+'</span><i aria-hidden="true">'+(col?'▸':'▾')+'</i></button>'+(col?items.filter(t=>t[0]===ui.tab):items).map(nb).join('');};
   const navHtml=groups.length>1?groups.map(g=>gh(g.name,g.items)).join('')+(common.length?gh('Akaun',common):''):groups.map(g=>g.items.map(nb).join('')).join('')+common.map(nb).join('');
@@ -2955,7 +2956,7 @@ document.addEventListener('click',e=>{
   else if(a==='nlihat'){const k='g'+w;ui.role='guru';ui.tab=SIMPLE()?'mula':'rph';if(SIMPLE())ui.mw=+w;ui.gw=+w;ui.open.add(k);render();const el=document.querySelector('[data-k="'+k+'"]');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
   else if(a==='dwn'){if(!w)return;ui.dw=+w;render();}
   else if(a==='mwn'){if(!w)return;ui.mw=+w;render();
-    if(b.dataset.buka){const st=document.querySelector('.wrap.ez .stp');const tg=st||document.querySelector('.wrap.ez .state:not(.fix):not(.todo)');if(st){st.scrollIntoView({behavior:'smooth',block:'start'});st.style.transition='box-shadow .3s';st.style.boxShadow='0 0 0 4px #E3B85A';setTimeout(()=>{st.style.boxShadow='';},2200);}else window.scrollTo(0,0);toast('Minggu '+w+' dibuka. Muat naik fail di bawah.');}
+    if(b.dataset.buka){const st=document.querySelector('.wrap.ez .stp');const tg=st||document.querySelector('.wrap.ez .state:not(.fix):not(.todo)');if(st){st.scrollIntoView({behavior:'smooth',block:'start'});st.style.transition='box-shadow .3s';st.style.boxShadow='0 0 0 4px #E3B85A';setTimeout(()=>{st.style.boxShadow='';},2200);}else window.scrollTo(0,0);toast('Minggu '+w+' dibuka. '+(/pengurusan murid/i.test(ME_JAWATAN)?'Isi senarai semak di bawah.':'Muat naik fail di bawah.'));}
     else window.scrollTo(0,0);}
   else if(a==='mfset'){ui.mf=b.dataset.f;render();}
   else if(a==='rall'){ui.rall=!ui.rall;render();}
