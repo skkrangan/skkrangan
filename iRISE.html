@@ -2490,7 +2490,14 @@ function csvBelum(){const w=ui.selWeek,q=v=>{let t=String(v);if(/^[=+\-@\t\r]/.t
   const rows=[['Minggu','Staf','Mata pelajaran']].concat(reqW(w).filter(t=>!submitted(sub(t.id,w))).map(t=>[w,t.name,t.sub]));return '﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n');}
 
 /* ---------- shell ---------- */
+/* Sejarah paparan: butang Kembali kembali ke paparan iRISE sebelumnya; hanya jika tiada sejarah barulah keluar ke portal. */
+const TABH=[];let tabPrev=null,tabBack=false;
+function tabTrack(){if(!ui.tab)return;const cur={tab:ui.tab,pmode:ui.pmode};
+  if(tabPrev&&!tabBack&&(tabPrev.tab!==cur.tab||tabPrev.pmode!==cur.pmode)){const l=TABH[TABH.length-1];if(!l||l.tab!==tabPrev.tab||l.pmode!==tabPrev.pmode)TABH.push(tabPrev);if(TABH.length>20)TABH.shift();}
+  tabPrev=cur;tabBack=false;}
+function tabKembali(){if(!TABH.length)return false;const p=TABH.pop();tabBack=true;ui.pmode=p.pmode;ui.tab=p.tab;ui.menu=false;render();window.scrollTo(0,0);return true;}
 function render(){
+  tabTrack();
   const app=document.getElementById('app');
   const brand='<div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<img class="lg2" src="'+LOGO+'" alt="Logo iRISE" height="40" style="height:34px;width:auto"><div class="brand"><span>SK Krangan · Intelligent Reporting &amp; Integrated School Ecosystem'+(LIVE?'':' · MOD DEMO')+'</span></div></div>';
   if(ui.screen==='error'){app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:560px;margin:24px auto"><h2>iRISE tidak dapat dimuatkan</h2><p class="err" role="alert">'+esc(ui.loadErr||'Ralat tidak diketahui.')+'</p><p class="hint">Jika masalah berterusan, beritahu Penyelaras ICT dengan menyalin mesej di atas. Semakan untuk admin: versi terkini Code.gs sudah di-deploy (Manage deployments &gt; New version), clientId dan cmsUrl dalam Tetapan betul, dan helaian Takwim sudah diisi.</p><div class="actions"><button class="btn pri" data-act="retryload">Cuba lagi</button></div></div></div>';return;}
@@ -2962,7 +2969,7 @@ document.addEventListener('click',e=>{
   else if(a==='besar'){BESAR=!BESAR;try{localStorage.setItem('irise.besar',BESAR?'1':'0')}catch(e){}document.documentElement.classList.toggle('besar',BESAR);render();}
   else if(a==='reload'){loadInit(ME_ADMIN).then(()=>toast('Data dikemas kini.')).catch(handleErr);}
   else if(a==='logout'){dropToken();try{google.accounts.id.disableAutoSelect()}catch(e){}ui.loginErr='';showLogin();}
-  else if(a==='portalback'){window.parent.postMessage({type:'erph-close'},CONFIG.PARENT_ORIGIN);}
+  else if(a==='portalback'){if(!tabKembali())window.parent.postMessage({type:'erph-close'},CONFIG.PARENT_ORIGIN);}
   else if(a==='csv'){downloadCsv();}
   else if(a==='cetak'){window.print();}
   else if(a==='cetakbln'){cetakBulanan();}
