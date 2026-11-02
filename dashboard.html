@@ -91,10 +91,22 @@
        position:fixed akan ROSAKKAN cetakan (kandungan terpotong 1 muka surat
        sahaja) melainkan ditukar kembali kepada aliran dokumen biasa semasa cetak. */
     #section-ehadir.active { position: static !important; display: block !important; height: auto !important; min-height: 0 !important; overflow: visible !important; inset: auto !important; }
+    /* Buang SEMUA 'lapisan' sekeliling kertas Laporan Bulanan semasa cetak - latar kelabu
+       (#section-ehadir bg-slate-50), bekas berpadding (p-8 = 32px keliling) & jarak tab -
+       supaya kertas putih terus memenuhi muka surat A4 dan HANYA @page margin yang tinggal.
+       Padding bekas ini juga sebelum ini memakan ~17mm tinggi & menolak blok tandatangan
+       ke muka surat 2. */
+    #dashboard-shell, #section-ehadir.active, #section-ehadir.active > div, #tab-laporan {
+      background: #fff !important; padding: 0 !important; margin: 0 !important; border: 0 !important;
+      box-shadow: none !important; border-radius: 0 !important; max-width: none !important;
+      width: 100% !important; min-height: 0 !important; height: auto !important; overflow: visible !important;
+    }
+    #tab-laporan > * + * { margin-top: 0 !important; }
     @page opr-page { size: A4 portrait; margin: 0mm; }
     /* Laporan Bulanan eHadir kini ada 12 lajur (BIL + Nama + 10 status) - guna
        kertas LANDSKAP supaya semua lajur muat dengan selesa tanpa font mikroskopik. */
-    @page monthly-page { size: A4 landscape; margin: 8mm; }
+    /* Margin kertas: kiri 1.5cm, atas/kanan/bawah 1.0cm (atas permintaan SU). */
+    @page monthly-page { size: A4 landscape; margin: 10mm 10mm 10mm 15mm; }
     .print-container {
       page: opr-page;
       -webkit-print-color-adjust: exact !important;
@@ -5026,8 +5038,8 @@ window.onload = async function(){
             if (!area || getComputedStyle(area).display === 'none') return;
             area.style.zoom = '';
             const MM_KE_PX = 96 / 25.4;
-            const RUANG_TINGGI_PX = (210 - 16) * MM_KE_PX; // A4 landskap, tolak margin 8mm atas+bawah (@page monthly-page)
-            const LEBAR_CETAK_PX = (297 - 16) * MM_KE_PX; // lebar sebenar bila dicetak: A4 landskap 297mm, tolak margin 8mm kiri+kanan
+            const RUANG_TINGGI_PX = (210 - 20) * MM_KE_PX; // A4 landskap, tolak margin atas+bawah 10mm+10mm (@page monthly-page)
+            const LEBAR_CETAK_PX = (297 - 25) * MM_KE_PX; // lebar sebenar bila dicetak: A4 landskap 297mm, tolak margin kiri 15mm + kanan 10mm
             // PENTING - PUNCA SEBENAR laporan "1 muka surat tetapi tidak lengkap":
             // di skrin, #print-area-monthly guna class max-w-[1400px] (~1400px, jauh
             // lebih lebar daripada ~1062px lebar sebenar bila dicetak). Kalau tinggi
@@ -5068,7 +5080,7 @@ window.onload = async function(){
             // = ruang/tinggi) terlalu pesimis - laporan tertinggal ~25% kosong & tulisan
             // terlalu kecil. Kini: cari zoom TERBESAR yang masih muat, dengan mengukur tinggi
             // pada lebar susun atur sebenar (LEBAR/zoom) bagi setiap calon zoom.
-            const SASARAN_PX = RUANG_TINGGI_PX * 0.93; // margin keselamatan 7% - cetakan sebenar boleh tersasar ~4% daripada ukuran skrin; blok tandatangan tak boleh melimpah ke muka surat 2
+            const SASARAN_PX = RUANG_TINGGI_PX * 0.96; // margin keselamatan 4% - blok tandatangan tak boleh melimpah ke muka surat 2 (bekas berpadding dah dibuang semasa cetak, jadi ukuran lebih tepat)
             const tinggiPadaZoom = (z) => {
                 const w = (LEBAR_CETAK_PX / z) + 'px';
                 area.style.zoom = '';
