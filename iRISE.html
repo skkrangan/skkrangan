@@ -1057,7 +1057,7 @@ function kelasKad(w,s){
   const SL=slotsFor(ME,w),a=parseR(s.refleksi),need=rNeed(ME,w),n=Math.max(need+(s.rextra||0),a.length,SL.length),parts=s.parts||[];
   const inFile=(id,sl,cam)=>'<input class="sr" type="file" id="'+id+'" data-file="'+w+'" data-slot="'+sl+'" accept="'+(cam?'image/*" capture="environment':'.pdf,.jpg,.jpeg,.png,.docx,.pptx')+'"'+(cam?'':' multiple')+'>';
   const berkas=(sl)=>parts.map((p,gi)=>({p,gi})).filter(o=>(o.p.slot==null?-1:o.p.slot)===sl).map(o=>{const p=o.p,gi=o.gi;
-    return '<div class="file part"><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+(p.ext==='PDF'?'<details style="margin-top:6px"'+(p.range?' open':'')+'><summary class="hint" style="cursor:pointer">Hantar halaman tertentu sahaja?'+(p.range?' ('+esc(p.range)+')':'')+'</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+gi+'" value="'+esc(p.range||'')+'" placeholder="cth. 3-5 atau 1,4" aria-label="Halaman yang dihantar" style="min-height:44px;width:100%"><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+gi+'">Pilih halaman dengan gambar</button></div></details>':'')+'</div>'+
+    return '<div class="file part"><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':''))+(p.ext==='PDF'?'<details style="margin-top:6px"'+(p.range?' open':'')+'><summary class="hint" style="cursor:pointer">Hantar halaman tertentu sahaja?'+(p.range?' ('+esc(p.range)+')':'')+'</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+gi+'" value="'+esc(p.range||'')+'" placeholder="cth. 3-5 atau 1,4" aria-label="Halaman yang dihantar" style="min-height:44px;width:100%"><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+gi+'">Pilih halaman dengan gambar</button></div></details>':'')+'</div>'+
       '<span class="pbtn" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm" data-act="pup" data-w="'+w+'" data-i="'+gi+'" aria-label="Naikkan">Naik</button><button class="btn sm" data-act="pdn" data-w="'+w+'" data-i="'+gi+'" aria-label="Turunkan">Turun</button><button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+gi+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>';}).join('');
   let h='';
   if(s.merging)h+='<div class="merge busy" role="status"><b>'+esc(s.mstage||'Menggabungkan fail…')+'</b></div>';
@@ -1203,7 +1203,7 @@ function fileBlock(w,s,editable){
     return '<div>'+lbl+'<div class="file"><span class="ext">'+esc(f.ext)+'</span><div class="nm"><b>'+esc(f.name)+'</b><span>'+fileMeta(f)+'</span></div>'+
       '<button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Buka fail</button><button class="btn sm warn" data-act="frm" data-w="'+w+'" aria-label="Buang '+esc(f.name)+'">Buang fail</button></div>'+err+'</div>';
   }
-  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+(p.ext==='PDF'?'<label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px">Hantar sebahagian halaman sahaja? (tidak wajib) <input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+i+'" value="'+esc(p.range||'')+'" placeholder="kosongkan untuk hantar semua halaman" aria-label="Halaman yang dihantar" style="flex:1;min-height:40px;font-size:15px"></label><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+i+'" style="margin-top:6px">Lihat dan pilih halaman</button>':'')+'</div>'+
+  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':''))+(p.ext==='PDF'?'<label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px">Hantar sebahagian halaman sahaja? (tidak wajib) <input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+i+'" value="'+esc(p.range||'')+'" placeholder="kosongkan untuk hantar semua halaman" aria-label="Halaman yang dihantar" style="flex:1;min-height:40px;font-size:15px"></label><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+i+'" style="margin-top:6px">Lihat dan pilih halaman</button>':'')+'</div>'+
     '<span class="pbtn"><button class="btn sm" data-act="pup" data-w="'+w+'" data-i="'+i+'" aria-label="Naikkan '+esc(p.name)+'"'+(i===0?' disabled':'')+'>Naik</button>'+
     '<button class="btn sm" data-act="pdn" data-w="'+w+'" data-i="'+i+'" aria-label="Turunkan '+esc(p.name)+'"'+(i===parts.length-1?' disabled':'')+'>Turun</button>'+
     '<button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+i+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>').join('');
@@ -2595,6 +2595,31 @@ function handleFiles(w,list,slot){
   s.parts.push(...good);
   ui.open.add('g'+w);
   pendEdit(w);
+  convertParts(w,good);
+}
+// Tukar Word/PowerPoint kepada PDF semasa muat naik supaya pilihan halaman boleh digunakan
+async function convertParts(w,list){
+  const s=sub(ME,w);
+  const todo=list.filter(p=>p.ext==='DOCX'||p.ext==='PPTX');
+  if(!todo.length)return;
+  if(!LIVE){todo.forEach(p=>{p.convNote='Pilihan halaman tersedia untuk PDF sahaja (dalam sistem sebenar, Word/PowerPoint ditukar kepada PDF secara automatik).';});render();return;}
+  s.conv=(s.conv||0)+todo.length;todo.forEach(p=>{p.conv=true;});render();
+  for(const p of todo){
+    try{
+      if(!s.parts||!s.parts.includes(p))continue;
+      const r=await api('docxPdf',{b64:await blobToB64(p.blob),ext:p.ext});
+      if(!s.parts.includes(p))continue;
+      const bin=atob(r.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+      const blob=new Blob([u],{type:'application/pdf'});
+      try{await loadPdfLib();const d=await window.PDFLib.PDFDocument.load(await blob.arrayBuffer());p.pgs=d.getPageCount();}catch(_){}
+      p.blob=blob;p.ext='PDF';p.size=blob.size;p.name=p.name.replace(/\.(docx|pptx)$/i,'.pdf');p.convNote='';
+      s.mtok=(s.mtok||0)+1;
+    }catch(e){
+      if(e&&e.code==='AUTH'){s.conv=Math.max(0,(s.conv||0)-1);p.conv=false;handleErr(e);return;}
+      p.convNote='Tidak dapat ditukar kepada PDF sekarang. Fail dihantar sebagai Word/PowerPoint (tanpa pilihan halaman) atau simpan sebagai PDF dahulu.';
+    }
+    p.conv=false;s.conv=Math.max(0,(s.conv||0)-1);ptSave(w);render();
+  }
 }
 const blobToB64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('Fail tidak dapat dibaca.'));r.readAsDataURL(b);});
 async function apiSv(s,act,p){
@@ -2630,7 +2655,7 @@ function ptSave(w){const s=sub(ME,w),a=(s.parts||[]).filter(x=>x.blob).map(x=>({
   if(a.length&&s.pend)PT.op('readwrite',o=>o.put(a,ptKey(w)));else PT.op('readwrite',o=>o.delete(ptKey(w)));}
 function ptRestore(w,s){if(s.ptChk)return;s.ptChk=true;PT.op('readonly',o=>o.get(ptKey(w))).then(a=>{if(Array.isArray(a)&&a.length&&!(s.parts&&s.parts.length)&&!s.merging){s.parts=a;s.pend=true;render();}});}
 function pendEdit(w){const s=sub(ME,w);s.pend=true;s.upFail=false;s.upErr='';s.mtok=(s.mtok||0)+1;ptSave(w);render();}
-const bolehH=s=>!s.merging&&!s.sending&&!s.upFail&&((s.pend&&s.parts&&s.parts.length)||(s.file&&(!LIVE||s.file.fileId)));
+const bolehH=s=>!s.merging&&!s.sending&&!s.conv&&!s.upFail&&((s.pend&&s.parts&&s.parts.length)||(s.file&&(!LIVE||s.file.fileId)));
 async function mergeParts(w){
   const s=sub(ME,w),parts=(s.parts||[]).slice().sort((x,y)=>(x.slot==null?9999:x.slot)-(y.slot==null?9999:y.slot)),tok=(s.mtok||0)+1;s.mtok=tok;
   const oldUrl=s.file&&s.file.url,dropOld=()=>{if(oldUrl&&(!s.file||s.file.url!==oldUrl))URL.revokeObjectURL(oldUrl);};
