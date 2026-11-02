@@ -980,13 +980,16 @@ function slotsRaw0(tid,w){const j=JADUAL[tid];if(!j)return[];const v=j.versi;if(
   const ok=v.filter(x=>x.dari<=w),pick=ok.length?ok.reduce((a,b)=>b.dari>a.dari?b:a):v.reduce((a,b)=>b.dari<a.dari?b:a);return pick.slots||[];}
 /* Jadual belum diisi: guna bilangan lalai daripada pelayan. Jadual sudah diisi tetapi versi minggu itu kosong: sekurang-kurangnya 1; bilangan kelas semasa tidak dipinjam untuk minggu lama. */
 const RNG=tid=>{const t=teachers.find(x=>x.id===tid);return !!(t&&t.ringkas);};
+/* Guru prasekolah (alur ringkas tetapi bukan PPM): refleksi dan murid hadir SETIAP HARI (Isnin hingga Jumaat). PPM kekal tanpa refleksi. */
+const PSK=tid=>{const t=teachers.find(x=>x.id===tid);return !!(t&&t.ringkas&&!/pengurusan murid/i.test(t.jw||''));};
+const RFX=tid=>RNG(tid)&&!PSK(tid);
 /* Program sekolah: hari program (dari-hingga) digabung menjadi SATU baris refleksi; hari lain kekal seperti jadual. Disimpan sebagai jenis 'program:M-T' (1=Isnin..5=Jumaat). */
 const PGL=j=>{const m=/^program:((?:[1-5]-[1-5])(?:,[1-5]-[1-5]){0,3})$/.exec(j||'');if(!m)return null;const a=m[1].split(',').map(x=>x.split('-').map(Number)).map(r=>[Math.min(r[0],r[1]),Math.max(r[0],r[1])]).sort((p,q)=>p[0]-q[0]);for(let i=1;i<a.length;i++)if(a[i][0]<=a[i-1][1])return null;return a;};
 const PGR=(tid,w)=>{const q=subs[key(tid,w)];return q?PGL(q.jenis):null;};
 const PGS=a=>'program:'+a.map(r=>r[0]+'-'+r[1]).join(',');
 const PGN=r=>r[0]===r[1]?HARI[r[0]-1]:HARI[r[0]-1]+' hingga '+HARI[r[1]-1];
-function slotsFor(tid,w){const b=slotsRaw(tid,w),R=PGR(tid,w);if(!R)return b;const o=b.filter(x=>!R.some(r=>x.h>=r[0]&&x.h<=r[1]));R.forEach((r,n)=>{let i=o.findIndex(x=>x.h>r[0]);if(i<0)i=o.length;o.splice(i,0,{h:r[0],k:(R.length>1?'Program '+(n+1):'Program sekolah')+' ('+PGN(r)+')',prog:1,pr:r,pn:n+1,pt:R.length});});return o;}
-const rNeed=(tid,w)=>{if(RNG(tid))return 0;const t=teachers.find(x=>x.id===tid),n=slotsFor(tid,w).length;if(n)return n;return hasJadual(tid)||(JADUAL[tid]&&JADUAL[tid].versi&&JADUAL[tid].versi.length)?1:((t&&t.kelas)||KELAS_LALAI);};
+function slotsFor(tid,w){if(PSK(tid))return [2,3,4,5,1].map(h=>({h,k:'Refleksi harian'}));const b=slotsRaw(tid,w),R=PGR(tid,w);if(!R)return b;const o=b.filter(x=>!R.some(r=>x.h>=r[0]&&x.h<=r[1]));R.forEach((r,n)=>{let i=o.findIndex(x=>x.h>r[0]);if(i<0)i=o.length;o.splice(i,0,{h:r[0],k:(R.length>1?'Program '+(n+1):'Program sekolah')+' ('+PGN(r)+')',prog:1,pr:r,pn:n+1,pt:R.length});});return o;}
+const rNeed=(tid,w)=>{if(RFX(tid))return 0;const t=teachers.find(x=>x.id===tid),n=slotsFor(tid,w).length;if(n)return n;return hasJadual(tid)||(JADUAL[tid]&&JADUAL[tid].versi&&JADUAL[tid].versi.length)?1:((t&&t.kelas)||KELAS_LALAI);};
 /* Satu kelas dikira lengkap apabila refleksi ditulis DAN bilangan murid hadir diisi (hadir tidak melebihi jumlah murid jika jumlah diisi). */
 /* Sesi ditangguh: guru pilih sebab (cuti umum, program sekolah, guru bercuti, lain-lain). Sesi itu dikira sudah dijelaskan; refleksi dan kehadiran tidak diperlukan. 'Lain-lain' wajib dicatat. */
 const SEBAB_TD=['Cuti umum','Program sekolah','Guru bercuti','Lain-lain'];
@@ -1001,11 +1004,11 @@ const rTDn=(s,tid,w)=>{const a=parseR(s.refleksi),n=(tid!=null&&w!=null)?rNeed(t
 function statusPisah(s,tid,w){const n=rNeed(tid,w),d=rDone(s,tid,w),td=rTDn(s,tid,w);
   const hn=s.status==='dihantar'||s.status==='disemak'?'RPH sudah dihantar':s.status==='pembetulan'?'RPH dikembalikan':s.status==='draf'?'RPH draf (belum dihantar)':'RPH belum dihantar';
   const sm=s.status==='disemak'?'Disemak':s.status==='pembetulan'?'Perlu pembetulan':s.status==='dihantar'?'Belum disemak':'';
-  if(RNG(tid))return hn+(sm?' · '+sm:'');
+  if(RFX(tid))return hn+(sm?' · '+sm:'');
   return hn+' · Refleksi '+d+'/'+n+(d>=n?' lengkap':'')+(td?' (termasuk '+td+' ditangguh)':'')+(sm?' · '+sm:'');}
 function lastJ(k){k=String(k||'').trim();if(!k)return '';for(let w=weeks.length;w>=1;w--){const q=subs[key(ME,w)];if(!q||!q.refleksi)continue;const x=parseR(q.refleksi).find(y=>y.k.trim()===k&&/^\d{1,3}$/.test(y.j.trim()));if(x)return x.j.trim();}return '';}
 const rOk=(s,tid,w)=>rDone(s,tid,w)>=rNeed(tid,w);
-function rHtml(s,tid,w){if(RNG(tid))return '<span class="hint">Tidak perlu refleksi</span>';const a=parseR(s.refleksi).filter(x=>x.t.trim()||x.h.trim()||x.x),n=rNeed(tid,w),d=rDone(s,tid,w);
+function rHtml(s,tid,w){if(RFX(tid))return '<span class="hint">Tidak perlu refleksi</span>';const a=parseR(s.refleksi).filter(x=>x.t.trim()||x.h.trim()||x.x),n=rNeed(tid,w),d=rDone(s,tid,w);
   if(!a.length)return '<em>Belum diisi</em>';
   return '<span class="hint">'+d+' / '+n+' kelas lengkap (refleksi dan kehadiran)'+(d<n?' · belum lengkap':'')+'</span>'+a.map((x,i)=>'<span style="display:block;margin-top:6px"><b>'+(esc(slotK(x,tid,i,w))||'Kelas '+(i+1))+'</b> '+(x.x?'<span class="pill idle">PdP ditangguh</span><br>Sebab: '+esc(x.x)+(x.n?' — '+esc(x.n):''):'<span class="hint">· Murid hadir: '+(rHadir(x)?esc(rHadir(x)):'belum diisi')+'</span><br>'+esc(x.t))+'</span>').join('');}
 /* Draf refleksi dalam pelayar: setiap ketukan disalin ke localStorage dan dipadam apabila pelayan mengesahkan simpanan. Jika sambungan terputus atau tab tertutup, draf boleh dipulihkan. */
@@ -1071,10 +1074,10 @@ function kelasKad(w,s){
   return h;
 }
 function rEditor(w,s,locked){
-  if(RNG(ME))return '';
+  if(RFX(ME))return '';
   const a=parseR(s.refleksi),n=Math.max(rNeed(ME,w)+(s.rextra||0),a.length),need=rNeed(ME,w),done=a.slice(0,need).filter(rFull).length;
-  let h='<div class="rl-head"><span class="lbl">Refleksi PdP dan kehadiran murid setiap kelas <span class="hint">· ditaip sendiri oleh staf</span></span><span class="pill '+(done>=need?'ok':'idle')+'" id="rp-'+w+'">'+done+' / '+need+' kelas</span></div>'+(!locked&&done<n?'<div class="actions"><button class="btn sm pri" data-act="rnext" data-w="'+w+'">Kelas seterusnya yang belum lengkap</button></div>':'')+
-   (PGR(ME,w)?'<p class="hint">Hari program sekolah hanya perlukan <b>satu refleksi</b> (dari hari mula hingga hari tamat program). Hari lain ditulis seperti biasa.</p>':hasJadual(ME)?'<p class="hint">Senarai kelas dijana daripada jadual waktu anda ('+need+' RPH seminggu; satu RPH boleh meliputi beberapa waktu berturutan). Semakan hanya boleh ditandakan Disemak apabila semua RPH telah ditulis.</p>':'<p class="hint warnbox">Jadual waktu belum diisi, jadi senarai kelas belum dijana. Isi jadual supaya bilangan refleksi sepadan dengan kelas anda. <button class="btn sm" data-act="tab" data-tab="jadual">Isi jadual waktu</button></p>');
+  let h='<div class="rl-head"><span class="lbl">'+(PSK(ME)?'Refleksi harian dan kehadiran murid':'Refleksi PdP dan kehadiran murid setiap kelas')+' <span class="hint">· ditaip sendiri oleh staf</span></span><span class="pill '+(done>=need?'ok':'idle')+'" id="rp-'+w+'">'+done+' / '+need+(PSK(ME)?' hari':' kelas')+'</span></div>'+(!locked&&done<n?'<div class="actions"><button class="btn sm pri" data-act="rnext" data-w="'+w+'">'+(PSK(ME)?'Hari seterusnya yang belum lengkap':'Kelas seterusnya yang belum lengkap')+'</button></div>':'')+
+   (PSK(ME)?'<p class="hint">Tulis refleksi dan bilangan murid hadir <b>setiap hari</b>, Isnin hingga Jumaat. Hari tiada sesi (cuti atau program) pilih <b>Ditangguh</b> pada Status sesi. Semakan hanya boleh ditandakan Disemak apabila kelima-lima hari lengkap.</p>':PGR(ME,w)?'<p class="hint">Hari program sekolah hanya perlukan <b>satu refleksi</b> (dari hari mula hingga hari tamat program). Hari lain ditulis seperti biasa.</p>':hasJadual(ME)?'<p class="hint">Senarai kelas dijana daripada jadual waktu anda ('+need+' RPH seminggu; satu RPH boleh meliputi beberapa waktu berturutan). Semakan hanya boleh ditandakan Disemak apabila semua RPH telah ditulis.</p>':'<p class="hint warnbox">Jadual waktu belum diisi, jadi senarai kelas belum dijana. Isi jadual supaya bilangan refleksi sepadan dengan kelas anda. <button class="btn sm" data-act="tab" data-tab="jadual">Isi jadual waktu</button></p>');
   h+=drBanner(w,s,locked);
   const SL=slotsFor(ME,w),grp=[];
   for(let i=0;i<n;i++){const x=a[i]||{k:'',t:'',h:'',j:'',x:'',n:''};const rw=rRow(w,a,i,locked);
@@ -1083,7 +1086,7 @@ function rEditor(w,s,locked){
   if(grp.length<=1)h+=grp.map(g=>g.rows.join('')).join('');
   else grp.forEach(g=>{const k='d'+w+'-'+g.d,open=k in ui.rdo?ui.rdo[k]:g.ok<g.tot;
     h+='<details class="rday" data-rd="'+k+'"'+(open?' open':'')+'><summary><span>'+esc(g.d)+'</span><span class="pill '+(g.ok>=g.tot?'ok':'idle')+'">'+g.ok+'/'+g.tot+' sesi lengkap</span></summary>'+g.rows.join('')+'</details>';});
-  if(!locked&&n<100)h+='<button class="btn sm" data-act="radd" data-w="'+w+'">+ Tambah kelas</button>';
+  if(!locked&&n<100&&!PSK(ME))h+='<button class="btn sm" data-act="radd" data-w="'+w+'">+ Tambah kelas</button>';
   return h;
 }
 const parseD=x=>{const p=String(x).slice(0,10).split('-');return new Date(+p[0],+p[1]-1,+p[2])};
@@ -1955,7 +1958,7 @@ function heroGuru(){
   if(exc(ME,CURRENT)&&!submitted(cur)){st='Dikecualikan minggu ini';info='Anda dikecualikan daripada menghantar RPH minggu ini.';}
   else if(cur.status==='disemak'){st='Telah disemak';btn=['Lihat semakan','nlihat'];info='RPH anda telah disemak.';}
   else if(cur.status==='pembetulan'){st='Perlu pembetulan';btn=['Betulkan RPH','nlihat'];info='Pentadbir meminta pembetulan. Baca catatan dan hantar semula.';}
-  else if(cur.status==='dihantar'){st='Menunggu semakan';info='RPH sudah dihantar.'+(RNG(ME)?'':done<need?' Refleksi: '+done+' / '+need+' RPH.':' Refleksi lengkap.');btn=done<need?['Lengkapkan Refleksi','nlihat']:['Buka RPH','nlihat'];}
+  else if(cur.status==='dihantar'){st='Menunggu semakan';info='RPH sudah dihantar.'+(RFX(ME)?'':done<need?' Refleksi: '+done+' / '+need+' RPH.':' Refleksi lengkap.');btn=done<need?['Lengkapkan Refleksi','nlihat']:['Buka RPH','nlihat'];}
   else if(!cur.file){st='Belum dihantar';btn=['Muat Naik RPH','nlihat'];info='Fail RPH belum dimuat naik.';}
   else{st='Fail sudah dimuat naik';btn=['Hantar RPH','nlihat'];info='Tekan Hantar untuk menghantar RPH kepada pentadbir.';}
   return '<div class="hero"><div><span class="hs">'+esc(st)+'</span><h3>RPH Minggu '+CURRENT+'</h3><p>'+esc(wk.label)+' '+wk.s.getFullYear()+' · '+cakup(CURRENT)+'Tarikh akhir hantar: <b>'+fmtDL(deadline(CURRENT))+'</b></p><p>'+esc(info)+'</p>'+nudgeDepan()+'</div>'+
@@ -1977,7 +1980,7 @@ function guruHome(){
   const base=weeks.filter(x=>x.n<=CURRENT&&!x.cuti);
   const rowsAll=f?base.filter(x=>hfKat(sub(ME,x.n),x.n)===f).reverse():base.slice(-6).reverse();
   const rows=rowsAll.map(wk=>{const s=sub(ME,wk.n);
-    return '<tr><td><b>Minggu '+wk.n+'</b></td><td class="mono">'+wk.label+'</td><td>'+(RNG(ME)?'-':rDone(s,ME,wk.n)+' / '+rNeed(ME,wk.n)+' kelas'+(rTDn(s,ME,wk.n)?'<br><span class="hint">'+rTDn(s,ME,wk.n)+' ditangguh</span>':''))+'</td><td>'+pill(s,wk.n,ME)+'<br><span class="hint">'+esc(statusPisah(s,ME,wk.n))+'</span></td><td><button class="btn sm'+(!submitted(s)&&!exc(ME,wk.n)?' pri':'')+'" data-act="nlihat" data-w="'+wk.n+'">'+(submitted(s)?'Lihat':'Muat naik')+'</button></td></tr>';});
+    return '<tr><td><b>Minggu '+wk.n+'</b></td><td class="mono">'+wk.label+'</td><td>'+(RFX(ME)?'-':rDone(s,ME,wk.n)+' / '+rNeed(ME,wk.n)+' kelas'+(rTDn(s,ME,wk.n)?'<br><span class="hint">'+rTDn(s,ME,wk.n)+' ditangguh</span>':''))+'</td><td>'+pill(s,wk.n,ME)+'<br><span class="hint">'+esc(statusPisah(s,ME,wk.n))+'</span></td><td><button class="btn sm'+(!submitted(s)&&!exc(ME,wk.n)?' pri':'')+'" data-act="nlihat" data-w="'+wk.n+'">'+(submitted(s)?'Lihat':'Muat naik')+'</button></td></tr>';});
   const unread=NOTIFS.filter(n=>!n.readAt);
   const tl=(k,lab,v,c)=>'<button class="tile '+c+'" data-act="hf" data-f="'+k+'" aria-pressed="'+(f===k)+'"><span>'+lab+'</span><b>'+v+'</b></button>';
   return '<div class="wrap"><div><h2>Dashboard Staf</h2><p class="lead" style="margin-top:4px">Selamat datang, '+esc(MYNAME)+'.</p></div>'+
@@ -2103,7 +2106,7 @@ function mulaView(){const PPMU=/pengurusan murid/i.test(ME_JAWATAN),NM=PPMU?'Lap
   if(exc(ME,w)&&!sent)state='<div class="state ok"><h3>Anda dikecualikan minggu ini</h3><p>Tidak perlu hantar '+NM.toLowerCase()+' untuk Minggu '+w+'.</p></div>';
   else if(s.status==='disemak')state='<div class="state ok"><h3>'+NM+' Minggu '+w+' sudah disemak</h3><p>Terima kasih. Tiada tindakan diperlukan.</p>'+(s.komen?'<p><b>Catatan:</b> '+esc(s.komen)+'</p>':'')+'</div>';
   else if(s.status==='pembetulan')state='<div class="state fix"><h3>Perlu dibetulkan</h3><p>Pentadbir meminta anda membetulkan '+NM.toLowerCase()+' Minggu '+w+'.</p><p><b>Catatan:</b> '+esc(s.komen||'')+'</p><p>Ganti fail, kemudian tekan Hantar semula.</p></div>';
-  else if(s.status==='dihantar')state='<div class="state wait"><h3>'+NM+' Minggu '+w+' sudah dihantar</h3><p>Menunggu semakan pentadbir.'+(RNG(ME)?'':done<need?' Selepas mengajar, tulis refleksi di bawah.':' Refleksi anda sudah lengkap.')+'</p></div>';
+  else if(s.status==='dihantar')state='<div class="state wait"><h3>'+NM+' Minggu '+w+' sudah dihantar</h3><p>Menunggu semakan pentadbir.'+(RFX(ME)?'':done<need?' Selepas mengajar, tulis refleksi di bawah.':' Refleksi anda sudah lengkap.')+'</p></div>';
   else state='<div class="state todo"><h3>'+NM+' Minggu '+w+' belum dihantar</h3><p>'+esc(wk.label)+(w>CURRENT?' (minggu akan datang, boleh dihantar lebih awal)':'')+'. Hantar sebelum <b>'+fmtDL(deadline(w))+'</b>.</p></div>';
   const lagiNot=exc(ME,w)&&!sent;
   let steps='';
@@ -2122,7 +2125,8 @@ function mulaView(){const PPMU=/pengurusan murid/i.test(ME_JAWATAN),NM=PPMU?'Lap
     const KLS=editable&&!kirim&&!RNG(ME)&&!/pengurusan murid/i.test(ME_JAWATAN)&&slotsFor(ME,w).length>0;
     steps+=mk(1,st1,/pengurusan murid/i.test(ME_JAWATAN)?'Muat naik Log Tugasan Harian':KLS?'Muat naik RPH dan tulis refleksi setiap kelas':prog?'Muat naik fail RPH dan tentatif program':'Muat naik fail RPH',(st1==='now'||(hasF&&!kirim)?progBox+(KLS?kelasKad(w,s):fileBlock(w,s,editable)):(kirim?'<span class="hint">'+esc(s.file?s.file.name:'')+'</span>':'')));
     steps+=mk(2,st2,'Hantar kepada pentadbir',st2==='now'?hantarBtn:(kirim?'<span class="hint">Sudah dihantar. Tersilap atau mahu tukar fail?</span>'+(s.status==='dihantar'?'<button class="btn" data-act="tarik" data-w="'+w+'">Tarik balik hantaran</button>':''):'<span class="hint">Muat naik fail dahulu</span>'));
-    if(!RNG(ME))steps+=mk(3,st3,'Tulis refleksi selepas mengajar',kirim?rEditor(w,s,false)+'<div class="save" id="sv-'+w+'"></div>':'<span class="hint">'+(KLS?'Ditulis di setiap kelas di atas.':'Selepas RPH dihantar')+'</span>');
+    if(PSK(ME)&&editable!==undefined)steps+=mk(3,(s.status==='disemak'||done>=need)?'done':'now','Tulis refleksi harian (Isnin hingga Jumaat)',rEditor(w,s,s.status==='disemak')+'<div class="save" id="sv-'+w+'"></div>');
+    else if(!RNG(ME))steps+=mk(3,st3,'Tulis refleksi selepas mengajar',kirim?rEditor(w,s,false)+'<div class="save" id="sv-'+w+'"></div>':'<span class="hint">'+(KLS?'Ditulis di setiap kelas di atas.':'Selepas RPH dihantar')+'</span>');
     }
   }
   const tg=tugasTertunggak();
