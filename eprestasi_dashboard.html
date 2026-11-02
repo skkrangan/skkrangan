@@ -1319,114 +1319,160 @@ function purataSebenar_(arr){
 }
 
 async function lihatSemuaMurid(){
-  const subjek = document.getElementById('subjek-sel-subjek').value;
-  if (!subjek){ showToastEprestasi('Sila pilih Subjek dahulu.', 'error'); return; }
-  const kelasPilihan = document.getElementById('subjek-sel-kelas').value;
-  const taPilihan = document.getElementById('subjek-sel-tahunakademik').value;
-  const tahunAkademik = taPilihan || String(new Date().getFullYear());
+  const subjekAwal = document.getElementById('subjek-sel-subjek').value;
+  if (!subjekAwal){ showToastEprestasi('Sila pilih Subjek dahulu.', 'error'); return; }
+  const kelasAwal = document.getElementById('subjek-sel-kelas').value;
+  const taAwal = document.getElementById('subjek-sel-tahunakademik').value || String(new Date().getFullYear());
 
-  // Lapisan (modal)
+  const muridSemua = state.murid || [];
+  const kelasMeta = state.kelas || [];
+  const tahunSenarai = [...new Set(kelasMeta.map(k => k.Tahun).concat(muridSemua.map(m => m.Tahun)).filter(Boolean))]
+    .sort((x,y)=> String(x).localeCompare(String(y), 'ms', { numeric:true }));
+  const tahunKelas = {}; kelasMeta.forEach(k => { tahunKelas[k.NamaKelas] = k.Tahun; });
+  muridSemua.forEach(m => { if (m.Kelas && m.Tahun && !tahunKelas[m.Kelas]) tahunKelas[m.Kelas] = m.Tahun; });
+  const subjekSenarai = (state.subjek || []).map(x => x.NamaSubjek);
+  const tahunAkademikSenarai = []; for (let y = new Date().getFullYear(); y >= new Date().getFullYear() - 2; y--) tahunAkademikSenarai.push(String(y));
+
+  // Lapisan (modal) - besar, hampir skrin penuh
   let lapis = document.getElementById('lapis-semua-murid');
   if (lapis) lapis.remove();
   lapis = document.createElement('div');
   lapis.id = 'lapis-semua-murid';
-  lapis.style.cssText = 'position:fixed; inset:0; z-index:900; background:rgba(18,39,72,.55); display:flex; align-items:flex-start; justify-content:center; padding:24px 12px; overflow:auto;';
+  lapis.style.cssText = 'position:fixed; inset:0; z-index:900; background:rgba(18,39,72,.6); display:flex; align-items:center; justify-content:center; padding:2.5vh 1.5vw;';
+  const sel = (id, lbl, opts, nilai) => `
+    <label style="display:flex; flex-direction:column; gap:3px; font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.03em;">${lbl}
+      <select id="${id}" style="padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:13px; font-weight:600; color:var(--ink); background:#fff; min-width:150px; text-transform:none; letter-spacing:0;">
+        ${opts.map(o => `<option value="${escH_(o.v)}" ${String(o.v)===String(nilai)?'selected':''}>${escH_(o.t)}</option>`).join('')}
+      </select>
+    </label>`;
   lapis.innerHTML = `
-    <div style="background:#fff; border-radius:18px; width:100%; max-width:1100px; box-shadow:0 24px 60px rgba(0,0,0,.3);">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 22px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
-        <div>
-          <h2 style="margin:0; font-size:18px; color:var(--navy);">👥 Semua Murid — ${escH_(subjek)}</h2>
-          <p id="lsm-sub" style="margin:4px 0 0; font-size:12px; color:var(--muted);">Memuatkan markah murid...</p>
+    <div style="background:#fff; border-radius:20px; width:100%; max-width:1700px; height:95vh; display:flex; flex-direction:column; box-shadow:0 30px 80px rgba(0,0,0,.35); overflow:hidden;">
+      <div style="padding:20px 28px 14px; border-bottom:1px solid var(--border); flex-shrink:0;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+          <div>
+            <h2 style="margin:0; font-size:22px; color:var(--navy);">👥 Semua Murid</h2>
+            <p id="lsm-sub" style="margin:4px 0 0; font-size:13px; color:var(--muted);">Memuatkan markah murid...</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <input id="lsm-cari" placeholder="Cari nama murid..." style="padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:13.5px; min-width:220px;">
+            <button id="lsm-csv" style="padding:10px 18px; border-radius:10px; border:1.5px solid var(--navy); background:#fff; color:var(--navy); font-weight:700; font-size:13.5px; cursor:pointer;">⬇️ CSV</button>
+            <button id="lsm-tutup" style="padding:10px 18px; border-radius:10px; border:none; background:var(--navy); color:#fff; font-weight:700; font-size:13.5px; cursor:pointer;">Tutup ✕</button>
+          </div>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <input id="lsm-cari" placeholder="Cari nama murid..." style="padding:8px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:inherit; font-size:12.5px; min-width:180px;">
-          <button id="lsm-csv" style="padding:8px 14px; border-radius:10px; border:1.5px solid var(--navy); background:#fff; color:var(--navy); font-weight:700; font-size:12.5px; cursor:pointer;">⬇️ CSV</button>
-          <button id="lsm-tutup" style="padding:8px 14px; border-radius:10px; border:none; background:var(--navy); color:#fff; font-weight:700; font-size:12.5px; cursor:pointer;">Tutup ✕</button>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:14px;">
+          ${sel('lsm-f-tahun','Tahun',[{v:'',t:'Semua Tahun (1–6)'}].concat(tahunSenarai.map(t=>({v:t,t:labelTahun_(t)}))),'')}
+          ${sel('lsm-f-kelas','Kelas',[{v:'',t:'Semua Kelas'}],kelasAwal)}
+          ${sel('lsm-f-subjek','Subjek',subjekSenarai.map(x=>({v:x,t:x})),subjekAwal)}
+          ${sel('lsm-f-ta','Tahun Akademik',tahunAkademikSenarai.map(x=>({v:x,t:x})),taAwal)}
         </div>
       </div>
-      <div id="lsm-badan" style="padding:16px 22px 22px; overflow-x:auto;"><div class="empty-hint">Memuatkan...</div></div>
+      <div id="lsm-badan" style="padding:6px 28px 24px; overflow:auto; flex:1;"><div class="empty-hint">Memuatkan...</div></div>
     </div>`;
   document.body.appendChild(lapis);
-  const tutup = () => lapis.remove();
+  const tutup = () => { lapis.remove(); document.removeEventListener('keydown', onEsc); };
+  const onEsc = e => { if (e.key === 'Escape') tutup(); };
+  document.addEventListener('keydown', onEsc);
   lapis.querySelector('#lsm-tutup').addEventListener('click', tutup);
   lapis.addEventListener('click', e => { if (e.target === lapis) tutup(); });
 
-  // Senarai murid ikut kelas
-  const muridSemua = (state.murid || []);
-  const kelasSenarai = kelasPilihan
-    ? [kelasPilihan]
-    : [...new Set(muridSemua.map(m => m.Kelas))].sort();
-  try{
-    const hasil = await Promise.all(kelasSenarai.map(k =>
-      fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=markahSediaAda&kelas=${encodeURIComponent(k)}&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(tahunAkademik)}`)
-        .then(r=>r.json()).then(r=>({ kelas:k, data:(r && r.ok && r.data) ? r.data : {} })).catch(()=>({ kelas:k, data:{}, gagal:true }))
-    ));
-    const markahIkutId = {};
-    hasil.forEach(h => Object.assign(markahIkutId, h.data));
-    const gagal = hasil.filter(h => h.gagal).length;
+  const $ = id => lapis.querySelector(id);
+  const cache = {}; // `${kelas}|${subjek}|${ta}` -> data markah
+  let barisSemasa = [];
 
-    const baris = muridSemua
-      .filter(m => kelasSenarai.includes(m.Kelas))
-      .map(m => {
-        const mk = markahIkutId[m.ID] || {};
-        const n = v => (v === undefined || v === null || v === '') ? null : Number(v);
-        const r = { id:m.ID, nama:m.Nama, kelas:m.Kelas, tov:n(mk[JENIS_LIHAT_.tov]), tengah:n(mk[JENIS_LIHAT_.tengah]), akhir:n(mk[JENIS_LIHAT_.akhir]), etr:n(mk[JENIS_LIHAT_.etr]) };
+  // Isi dropdown Kelas ikut Tahun yang dipilih
+  function isiKelas(pilih){
+    const t = $('#lsm-f-tahun').value;
+    const senarai = [...new Set(muridSemua.map(m => m.Kelas))].filter(k => !t || tahunKelas[k] === t).sort();
+    $('#lsm-f-kelas').innerHTML = '<option value="">Semua Kelas</option>' + senarai.map(k => `<option value="${escH_(k)}" ${k===pilih?'selected':''}>${escH_(k)}</option>`).join('');
+  }
+  isiKelas(kelasAwal);
+
+  const lencana = st => {
+    const merah = st.startsWith('Belum capai') || st.includes('Bawah TOV');
+    const hijau = st.startsWith('Capai');
+    const bg = hijau ? '#E4F5EC' : (merah ? '#FBE9E7' : '#F1F5F9');
+    const fg = hijau ? '#1F8A5F' : (merah ? '#B42318' : '#64748B');
+    return `<span style="background:${bg}; color:${fg}; padding:3px 11px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap;">${escH_(st)}</span>`;
+  };
+  const sl = v => v == null ? '<span style="color:#9AA3B2;">-</span>' : v;
+
+  function lukisJadual(){
+    const q = $('#lsm-cari').value.trim().toLowerCase();
+    const tunjuk = barisSemasa.filter(r => !q || r.nama.toLowerCase().includes(q));
+    const pTov = purataSebenar_(tunjuk.map(r=>r.tov)), pEtr = purataSebenar_(tunjuk.map(r=>r.etr)),
+          pTgh = purataSebenar_(tunjuk.map(r=>r.tengah)), pAkh = purataSebenar_(tunjuk.map(r=>r.akhir));
+    const bilBermarkah = tunjuk.filter(r => r.ada).length;
+    const t = $('#lsm-f-tahun').value, k = $('#lsm-f-kelas').value;
+    $('#lsm-sub').textContent =
+      `${tunjuk.length} murid · ${k || (t ? labelTahun_(t) : 'semua kelas')} · ${$('#lsm-f-subjek').value} · Tahun Akademik ${$('#lsm-f-ta').value} · ${bilBermarkah} murid ada markah`;
+    const pc = p => p.purata != null ? p.purata + '%' : '-';
+    $('#lsm-badan').innerHTML = tunjuk.length === 0
+      ? '<div class="empty-hint" style="margin-top:20px;">Tiada murid untuk pilihan ini.</div>'
+      : `<table class="rank-table" style="font-size:14px;">
+          <thead><tr style="position:sticky; top:0; background:#fff; z-index:2;">${['Bil','Nama Murid','Kelas','TOV','ETR','Pertengahan','Akhir','Status'].map(h=>`<th style="padding:12px 8px; font-size:11.5px; background:#fff; border-bottom:2px solid var(--border);">${h}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${tunjuk.map((r,i)=>`<tr><td style="padding:10px 8px;">${i+1}</td><td style="font-weight:600; padding:10px 8px;">${escH_(r.nama)}</td><td style="padding:10px 8px;">${escH_(r.kelas)}</td><td>${sl(r.tov)}</td><td>${sl(r.etr)}</td><td>${sl(r.tengah)}</td><td>${sl(r.akhir)}</td><td>${lencana(r.status)}</td></tr>`).join('')}
+            <tr style="background:#F5F6FA; font-weight:800;">
+              <td></td><td style="padding:12px 8px;">Purata sebenar</td><td></td>
+              <td>${pc(pTov)}<br><span style="font-size:11px; font-weight:600; color:var(--muted);">${pTov.n} murid</span></td>
+              <td>${pc(pEtr)}<br><span style="font-size:11px; font-weight:600; color:var(--muted);">${pEtr.n} murid</span></td>
+              <td>${pc(pTgh)}<br><span style="font-size:11px; font-weight:600; color:var(--muted);">${pTgh.n} murid</span></td>
+              <td>${pc(pAkh)}<br><span style="font-size:11px; font-weight:600; color:var(--muted);">${pAkh.n} murid</span></td>
+              <td></td>
+            </tr>
+          </tbody></table>
+          <p style="font-size:12px; color:var(--muted); margin-top:12px;">ⓘ Purata sebenar dikira terus daripada markah setiap murid yang dipaparkan (satu murid = satu markah). Jika bilangan di kad ringkasan lebih banyak daripada bilangan murid di sini, kemungkinan ada rekod markah berganda dalam Sheet.</p>`;
+  }
+
+  async function muatData(){
+    const subjek = $('#lsm-f-subjek').value, ta = $('#lsm-f-ta').value;
+    const t = $('#lsm-f-tahun').value, k = $('#lsm-f-kelas').value;
+    const kelasSenarai = [...new Set(muridSemua.map(m => m.Kelas))]
+      .filter(kls => (!k || kls === k) && (!t || tahunKelas[kls] === t)).sort();
+    $('#lsm-badan').innerHTML = '<div class="empty-hint" style="margin-top:20px;">Memuatkan markah...</div>';
+    try{
+      const perlu = kelasSenarai.filter(kls => !cache[`${kls}|${subjek}|${ta}`]);
+      await Promise.all(perlu.map(kls =>
+        fetch(`${EPRESTASI_CONFIG.APPS_SCRIPT_URL}?action=markahSediaAda&kelas=${encodeURIComponent(kls)}&subjek=${encodeURIComponent(subjek)}&tahunAkademik=${encodeURIComponent(ta)}`)
+          .then(r=>r.json()).then(r=>{ cache[`${kls}|${subjek}|${ta}`] = (r && r.ok && r.data) ? r.data : {}; })
+          .catch(()=>{ cache[`${kls}|${subjek}|${ta}`] = {}; })
+      ));
+      const mk = {}; kelasSenarai.forEach(kls => Object.assign(mk, cache[`${kls}|${subjek}|${ta}`] || {}));
+      const num = v => (v === undefined || v === null || v === '') ? null : Number(v);
+      barisSemasa = muridSemua.filter(m => kelasSenarai.includes(m.Kelas)).map(m => {
+        const x = mk[m.ID] || {};
+        const r = { id:m.ID, nama:m.Nama, kelas:m.Kelas, tov:num(x[JENIS_LIHAT_.tov]), tengah:num(x[JENIS_LIHAT_.tengah]), akhir:num(x[JENIS_LIHAT_.akhir]), etr:num(x[JENIS_LIHAT_.etr]) };
         r.ada = [r.tov, r.tengah, r.akhir, r.etr].some(v => v != null);
         if (r.akhir != null && r.etr != null) r.status = r.akhir >= r.etr ? 'Capai ETR' : 'Belum capai ETR';
         else if (r.akhir != null) r.status = 'Tiada ETR';
         else r.status = r.ada ? 'Belum ada markah Akhir' : 'Tiada markah';
         if (r.akhir != null && r.tov != null && r.akhir < r.tov) r.status += ' · Bawah TOV';
         return r;
-      })
-      .sort((a,b)=> a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
-
-    const bilBermarkah = baris.filter(r => r.ada).length;
-    const pTov = purataSebenar_(baris.map(r=>r.tov)), pEtr = purataSebenar_(baris.map(r=>r.etr)),
-          pTgh = purataSebenar_(baris.map(r=>r.tengah)), pAkh = purataSebenar_(baris.map(r=>r.akhir));
-    lapis.querySelector('#lsm-sub').textContent =
-      `${baris.length} murid${kelasPilihan ? ' · ' + kelasPilihan : ' · semua kelas'} · Tahun Akademik ${tahunAkademik} · ${bilBermarkah} murid ada markah` +
-      (gagal ? ` · ⚠️ ${gagal} kelas gagal dimuatkan` : '');
-
-    const sel = v => v == null ? '<span style="color:#9AA3B2;">-</span>' : v;
-    const render = (tapis) => {
-      const q = (tapis||'').trim().toLowerCase();
-      const tunjuk = baris.filter(r => !q || r.nama.toLowerCase().includes(q));
-      const lencana = st => {
-        const bg = st.startsWith('Capai') ? '#E4F5EC' : (st.startsWith('Belum capai') || st.includes('Bawah TOV') ? '#FBE9E7' : '#F1F5F9');
-        const fg = st.startsWith('Capai') ? '#1F8A5F' : (st.startsWith('Belum capai') || st.includes('Bawah TOV') ? '#B42318' : '#64748B');
-        return `<span style="background:${bg}; color:${fg}; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap;">${escH_(st)}</span>`;
-      };
-      lapis.querySelector('#lsm-badan').innerHTML = baris.length === 0
-        ? '<div class="empty-hint">Tiada murid untuk pilihan ini.</div>'
-        : `<table class="rank-table">
-            <thead><tr><th>Bil</th><th>Nama Murid</th><th>Kelas</th><th>TOV</th><th>ETR</th><th>Pertengahan</th><th>Akhir</th><th>Status</th></tr></thead>
-            <tbody>
-              ${tunjuk.map((r,i)=>`<tr><td>${i+1}</td><td style="font-weight:600;">${escH_(r.nama)}</td><td>${escH_(r.kelas)}</td><td>${sel(r.tov)}</td><td>${sel(r.etr)}</td><td>${sel(r.tengah)}</td><td>${sel(r.akhir)}</td><td>${lencana(r.status)}</td></tr>`).join('')}
-              <tr style="background:#F5F6FA; font-weight:800;">
-                <td></td><td>Purata sebenar</td><td></td>
-                <td>${pTov.purata ?? '-'}${pTov.purata!=null?'%':''}<br><span style="font-size:10px; font-weight:600; color:var(--muted);">${pTov.n} murid</span></td>
-                <td>${pEtr.purata ?? '-'}${pEtr.purata!=null?'%':''}<br><span style="font-size:10px; font-weight:600; color:var(--muted);">${pEtr.n} murid</span></td>
-                <td>${pTgh.purata ?? '-'}${pTgh.purata!=null?'%':''}<br><span style="font-size:10px; font-weight:600; color:var(--muted);">${pTgh.n} murid</span></td>
-                <td>${pAkh.purata ?? '-'}${pAkh.purata!=null?'%':''}<br><span style="font-size:10px; font-weight:600; color:var(--muted);">${pAkh.n} murid</span></td>
-                <td></td>
-              </tr>
-            </tbody></table>
-            <p style="font-size:11px; color:var(--muted); margin-top:10px;">ⓘ Purata sebenar dikira terus daripada markah setiap murid di atas (satu murid = satu markah). Jika bilangan di kad ringkasan lebih banyak daripada bilangan murid di sini, kemungkinan ada rekod markah berganda dalam Sheet.</p>`;
-    };
-    render('');
-    lapis.querySelector('#lsm-cari').addEventListener('input', e => render(e.target.value));
-    lapis.querySelector('#lsm-csv').addEventListener('click', () => {
-      const esc = v => '"' + String(v == null ? '' : v).replace(/"/g,'""') + '"';
-      const csv = '﻿' + ['Bil','Nama Murid','Kelas','TOV','ETR','Pertengahan','Akhir','Status'].join(',') + '\n' +
-        baris.map((r,i)=>[i+1,r.nama,r.kelas,r.tov,r.etr,r.tengah,r.akhir,r.status].map(esc).join(',')).join('\n');
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
-      a.download = `Semua_Murid_${subjek.replace(/\s+/g,'_')}_${tahunAkademik}.csv`;
-      a.click(); URL.revokeObjectURL(a.href);
-    });
-  }catch(err){
-    lapis.querySelector('#lsm-badan').innerHTML = '<div class="empty-hint">Gagal memuatkan markah murid. Semak sambungan internet.</div>';
+      }).sort((a,b)=> a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
+      lukisJadual();
+    }catch(err){
+      $('#lsm-badan').innerHTML = '<div class="empty-hint" style="margin-top:20px;">Gagal memuatkan markah murid. Semak sambungan internet.</div>';
+    }
   }
+
+  $('#lsm-f-tahun').addEventListener('change', () => { isiKelas(''); muatData(); });
+  $('#lsm-f-kelas').addEventListener('change', muatData);
+  $('#lsm-f-subjek').addEventListener('change', muatData);
+  $('#lsm-f-ta').addEventListener('change', muatData);
+  $('#lsm-cari').addEventListener('input', lukisJadual);
+  $('#lsm-csv').addEventListener('click', () => {
+    const q = $('#lsm-cari').value.trim().toLowerCase();
+    const tunjuk = barisSemasa.filter(r => !q || r.nama.toLowerCase().includes(q));
+    const esc = v => '"' + String(v == null ? '' : v).replace(/"/g,'""') + '"';
+    const csv = '﻿' + ['Bil','Nama Murid','Kelas','TOV','ETR','Pertengahan','Akhir','Status'].join(',') + '\n' +
+      tunjuk.map((r,i)=>[i+1,r.nama,r.kelas,r.tov,r.etr,r.tengah,r.akhir,r.status].map(esc).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
+    a.download = `Semua_Murid_${$('#lsm-f-subjek').value.replace(/\s+/g,'_')}_${$('#lsm-f-ta').value}.csv`;
+    a.click(); URL.revokeObjectURL(a.href);
+  });
+
+  muatData();
 }
 
 function renderAnalisisSubjek(d){
