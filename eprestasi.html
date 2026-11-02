@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ePrestasi Akademik SK Krangan — Input Markah</title>
+<title>ePrestasi Akademik SK Krangan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -238,8 +238,8 @@
     <div class="brand">
       <div class="badge">SK</div>
       <div>
-        <h1>ePrestasi Akademik — Input Markah</h1>
-        <p class="sub">ePrestasi Akademik SK Krangan · <span style="color:var(--gold); font-weight:700;">Mod Pratonton (tiada log masuk)</span></p>
+        <h1>ePrestasi Akademik</h1>
+        <p class="sub">Sekolah Kebangsaan Krangan</p>
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
@@ -350,7 +350,7 @@
     <p id="draf-status" style="font-size:11.5px; color:var(--muted); margin-top:8px; text-align:right;"></p>
   </div>
 
-  <p class="diag">ePrestasi Akademik SK Krangan · <span id="diag-version"></span></p>
+  <p class="diag">ePrestasi Akademik</p>
 </div>
 
 <div id="toast"></div>
@@ -450,8 +450,6 @@ async function muatSenarai(){
     state.murid = rMurid.data || [];
     state.kelas = rKelas.data || [];
     state.subjek = rSubjek.data || [];
-    document.getElementById('diag-version').textContent =
-      rVersi.scriptVersion ? `Versi Backend: ${rVersi.scriptVersion}` : '';
 
     isiSelectTahun();
     isiSelectSubjek();
@@ -558,6 +556,97 @@ function tukarSubMod(sub){
 }
 
 /* ---------- Papar Grid Input ---------- */
+/* ============================================================
+ * MURID BAHARU - guru boleh tambah murid yang belum ada dalam senarai
+ * ------------------------------------------------------------
+ * Murid baharu disimpan pada peranti guru (localStorage, ikut kelas) supaya
+ * kekal dalam senarai bila halaman dibuka semula. ID dijana tetap daripada
+ * kelas + nama (awalan "BARU-") supaya draf & markah sentiasa padan.
+ * ============================================================ */
+function escHtml_(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function kunciMuridBaru_(kelas){ return 'eprestasi_murid_baru_' + kelas; }
+function normNamaMurid_(n){ return String(n||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+function muatMuridBaru_(kelas){
+  try{ const a = JSON.parse(localStorage.getItem(kunciMuridBaru_(kelas)) || '[]'); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function simpanMuridBaru_(kelas, senarai){
+  try{ localStorage.setItem(kunciMuridBaru_(kelas), JSON.stringify(senarai)); }catch(e){ /* senyap */ }
+}
+function janaIdMuridBaru_(kelas, nama){
+  return 'BARU-' + String(kelas).replace(/[^A-Za-z0-9]+/g,'_') + '-' + normNamaMurid_(nama).replace(/[^a-z0-9]+/g,'_');
+}
+function binaBarisMurid_(m, bil){
+  const inputCell = state.mode === 'peperiksaan'
+    ? PEPERIKSAAN_LAJUR.map(l => `<td><input type="number" min="0" max="100" class="input-markah-baharu" data-jenis="${l.jenis}" data-murid-id="${escHtml_(m.ID)}" data-nama="${escHtml_(m.Nama)}" data-kelas="${escHtml_(m.Kelas)}"></td>`).join('')
+    : `<td>
+         <select class="input-tp" data-murid-id="${escHtml_(m.ID)}" data-nama="${escHtml_(m.Nama)}" data-kelas="${escHtml_(m.Kelas)}">
+           <option value="">-</option>
+           <option value="1">TP1</option><option value="2">TP2</option><option value="3">TP3</option>
+           <option value="4">TP4</option><option value="5">TP5</option><option value="6">TP6</option>
+         </select>
+       </td>`;
+  const lencana = m._baru
+    ? ` <span style="font-size:10px; font-weight:800; color:var(--gold); border:1px solid var(--gold); border-radius:999px; padding:1px 7px; margin-left:6px;">BAHARU</span> <button type="button" class="btn-buang-murid-baru" data-id="${escHtml_(m.ID)}" title="Buang murid baharu ini" style="border:none; background:none; color:#B42318; cursor:pointer; font-size:15px; font-weight:700;">×</button>`
+    : '';
+  return `<tr data-baru="${m._baru ? 1 : 0}"><td class="row-idx">${bil}</td><td>${escHtml_(m.Nama)}${lencana}</td>${inputCell}</tr>`;
+}
+function renomborBaris_(){
+  document.querySelectorAll('table.input-grid tbody tr').forEach((tr,i)=>{ const c = tr.querySelector('.row-idx'); if(c) c.textContent = i+1; });
+}
+function pasangTambahMurid_(kelas){
+  const wrap = document.getElementById('grid-wrap');
+  const kotak = document.createElement('div');
+  kotak.id = 'tambah-murid-wrap';
+  kotak.style.cssText = 'margin-top:14px;';
+  kotak.innerHTML = `
+    <button type="button" class="btn-ghost" id="btn-tambah-murid" style="border-style:dashed;">➕ Tambah Murid Baharu</button>
+    <div id="borang-tambah-murid" style="display:none; margin-top:10px; gap:8px; align-items:center; flex-wrap:wrap;">
+      <input type="text" id="input-murid-baharu" placeholder="Nama penuh murid baharu" maxlength="120" style="flex:1; min-width:220px; padding:10px 12px; border-radius:10px; border:1.5px solid var(--border); font-family:inherit; font-size:13px;">
+      <button type="button" class="btn-primary" id="btn-sahkan-murid-baru">Tambah</button>
+      <button type="button" class="btn-ghost" id="btn-batal-murid-baru">Batal</button>
+    </div>
+    <p style="font-size:11.5px; color:var(--muted); margin-top:8px;">Murid baharu akan muncul di hujung senarai dan dihantar bersama markah apabila anda tekan Hantar.</p>`;
+  wrap.appendChild(kotak);
+
+  const borang = kotak.querySelector('#borang-tambah-murid');
+  const inp = kotak.querySelector('#input-murid-baharu');
+  kotak.querySelector('#btn-tambah-murid').addEventListener('click', ()=>{ borang.style.display = 'flex'; inp.focus(); });
+  kotak.querySelector('#btn-batal-murid-baru').addEventListener('click', ()=>{ inp.value=''; borang.style.display = 'none'; });
+  const tambah = ()=>{
+    const nama = inp.value.replace(/\s+/g,' ').trim();
+    if (!nama){ showToast('Sila taip nama murid dahulu.', 'err'); inp.focus(); return; }
+    const sedia = state.murid.filter(m => m.Kelas === kelas).map(m => normNamaMurid_(m.Nama))
+      .concat(muatMuridBaru_(kelas).map(m => normNamaMurid_(m.Nama)));
+    if (sedia.includes(normNamaMurid_(nama))){ showToast('Murid ini sudah ada dalam senarai kelas.', 'err'); return; }
+    const baru = { ID: janaIdMuridBaru_(kelas, nama), Nama: nama, Kelas: kelas, _baru: true };
+    const senarai = muatMuridBaru_(kelas); senarai.push(baru); simpanMuridBaru_(kelas, senarai);
+    let tbody = document.querySelector('table.input-grid tbody');
+    if (!tbody){ // kelas tiada murid langsung - bina jadual dahulu
+      cubaPaparGrid(); return;
+    }
+    tbody.insertAdjacentHTML('beforeend', binaBarisMurid_(baru, tbody.children.length + 1));
+    const hint = wrap.querySelector('.empty-hint'); if (hint) hint.remove();
+    inp.value = ''; inp.focus();
+    document.getElementById('btn-simpan').disabled = false;
+    showToast('Murid baharu ditambah: ' + nama, 'ok');
+  };
+  kotak.querySelector('#btn-sahkan-murid-baru').addEventListener('click', tambah);
+  inp.addEventListener('keydown', e=>{ if (e.key === 'Enter'){ e.preventDefault(); tambah(); } });
+
+  if (!wrap.dataset.buangPasang){ // pasang SEKALI sahaja (grid dilukis semula berkali-kali)
+    wrap.dataset.buangPasang = '1';
+    wrap.addEventListener('click', e=>{
+      const b = e.target.closest('.btn-buang-murid-baru');
+      if (!b) return;
+      const kls = document.getElementById('sel-kelas').value;
+      simpanMuridBaru_(kls, muatMuridBaru_(kls).filter(m => m.ID !== b.dataset.id));
+      b.closest('tr').remove();
+      renomborBaris_();
+    });
+  }
+}
+
 function cubaPaparGrid(){
   const kelas = document.getElementById('sel-kelas').value;
   const subjek = document.getElementById('sel-subjek').value;
@@ -585,37 +674,32 @@ function cubaPaparGrid(){
     return;
   }
 
-  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas)
+  const senaraiAsas = state.murid.filter(m => m.Kelas === kelas)
     .sort((a,b)=> a.Nama.localeCompare(b.Nama));
-
-  if (senaraiMuridKelas.length === 0){
-    wrap.innerHTML = '<div class="empty-hint">Tiada murid dijumpai untuk kelas ini.</div>';
-    btnSimpan.disabled = true;
-    return;
-  }
+  const namaAsas = new Set(senaraiAsas.map(m => normNamaMurid_(m.Nama)));
+  const senaraiBaru = muatMuridBaru_(kelas)
+    .filter(m => !namaAsas.has(normNamaMurid_(m.Nama)))   // jika admin dah masukkan murid ni, guna rekod rasmi
+    .map(m => Object.assign({}, m, { _baru: true }));
+  const senaraiMuridKelas = senaraiAsas.concat(senaraiBaru);
 
   const kolInput = state.mode === 'peperiksaan'
     ? `<th style="width:100px;" title="TOV = markah Ujian Akhir Tahun tahun sebelumnya">TOV ⓘ</th><th style="width:130px;">Ujian Pertengahan Tahun</th><th style="width:110px;">Ujian Akhir Tahun</th><th style="width:100px;">ETR (Sasaran)</th>`
     : `<th style="width:150px;">Tahap Penguasaan</th>`;
 
-  let rows = senaraiMuridKelas.map((m, i) => {
-    const inputCell = state.mode === 'peperiksaan'
-      ? PEPERIKSAAN_LAJUR.map(l => `<td><input type="number" min="0" max="100" class="input-markah-baharu" data-jenis="${l.jenis}" data-murid-id="${m.ID}" data-nama="${m.Nama}" data-kelas="${m.Kelas}"></td>`).join('')
-      : `<td>
-           <select class="input-tp" data-murid-id="${m.ID}" data-nama="${m.Nama}" data-kelas="${m.Kelas}">
-             <option value="">-</option>
-             <option value="1">TP1</option><option value="2">TP2</option><option value="3">TP3</option>
-             <option value="4">TP4</option><option value="5">TP5</option><option value="6">TP6</option>
-           </select>
-         </td>`;
-    return `<tr><td class="row-idx">${i+1}</td><td>${m.Nama}</td>${inputCell}</tr>`;
-  }).join('');
+  const rows = senaraiMuridKelas.map((m, i) => binaBarisMurid_(m, i+1)).join('');
 
   wrap.innerHTML = `
     <table class="input-grid">
       <thead><tr><th></th><th>Nama Murid</th>${kolInput}</tr></thead>
       <tbody>${rows}</tbody>
-    </table>`;
+    </table>
+    ${senaraiMuridKelas.length === 0 ? '<div class="empty-hint">Tiada murid dijumpai untuk kelas ini. Anda boleh tambah murid di bawah.</div>' : ''}`;
+  pasangTambahMurid_(kelas);
+
+  if (senaraiMuridKelas.length === 0){
+    btnSimpan.disabled = true;
+    return;
+  }
 
   btnSimpan.disabled = false;
   muatDrafJikaAda(); // pulihkan draf tersimpan (jika ada) untuk kombinasi kelas/subjek/tahun ini
