@@ -820,10 +820,20 @@ input:hover,select:hover,textarea:hover{border-color:#9DBBAB}
 /* Mod gelap: terbalikkan warna halaman, kemudian pulihkan imej, kanvas dan pemapar PDF */
 html[data-tema="gelap"][data-masuk]{filter:none!important;color-scheme:light}
 html[data-tema="gelap"][data-masuk] img,html[data-tema="gelap"][data-masuk] canvas{filter:none}
-html[data-tema="gelap"]{filter:invert(.92) hue-rotate(180deg);background:#fff;color-scheme:dark}
+html[data-tema="gelap"]{filter:invert(1) hue-rotate(180deg);background:#D7EBE4;color-scheme:dark;
+ --bg:#D7EBE4;--surface:#BFDDD7;--surface-2:#C9E3DB;--line:#8BBBAD;--line-strong:#6FA597;--green-soft:#A9D2C6;--em-ivory:#D7EBE4;--em-white:#BFDDD7;--em-line:#8BBBAD}
 html[data-tema="gelap"] img,html[data-tema="gelap"] canvas,html[data-tema="gelap"] video,html[data-tema="gelap"] iframe,html[data-tema="gelap"] embed{filter:invert(1) hue-rotate(180deg)}
 html[data-tema="gelap"] aside.side{filter:invert(1) hue-rotate(180deg)}
 html[data-tema="gelap"] aside.side img{filter:none}
+html[data-tema="gelap"] .card,html[data-tema="gelap"] .kpi,html[data-tema="gelap"] .tc,html[data-tema="gelap"] .tile,html[data-tema="gelap"] .gcard,html[data-tema="gelap"] .focus,html[data-tema="gelap"] .dtile,html[data-tema="gelap"] .rk-i,html[data-tema="gelap"] .rday,html[data-tema="gelap"] .cmp>div,html[data-tema="gelap"] .dlist,html[data-tema="gelap"] .vw-in,html[data-tema="gelap"] .mx-scroll,html[data-tema="gelap"] .mx .who,html[data-tema="gelap"] details.week,html[data-tema="gelap"] .ez .state,html[data-tema="gelap"] .ez .stp,html[data-tema="gelap"] .bantu,html[data-tema="gelap"] .shell.ezm .btm,html[data-tema="gelap"] .donut::after{background:#BFDDD7!important}
+html[data-tema="gelap"] input,html[data-tema="gelap"] select,html[data-tema="gelap"] textarea,html[data-tema="gelap"] .card input[type=text],html[data-tema="gelap"] .card select,html[data-tema="gelap"] .wrap select,html[data-tema="gelap"] .wrap input[type=search],html[data-tema="gelap"] .rl-f input,html[data-tema="gelap"] .rl-f textarea,html[data-tema="gelap"] .rl-td input,html[data-tema="gelap"] .rl-td select,html[data-tema="gelap"] .exp select,html[data-tema="gelap"] .jw-ed{background:#C9E3DB!important}
+html[data-tema="gelap"] .acct button,html[data-tema="gelap"] .bk,html[data-tema="gelap"] .mnu,html[data-tema="gelap"] .chip,html[data-tema="gelap"] .btn:not(.pri):not(.ok):not(.warn),html[data-tema="gelap"] .btn.warn,html[data-tema="gelap"] .hr>button{background:#B0D6CD!important}
+html[data-tema="gelap"] .top{background:#C6E3DB!important}
+html[data-tema="gelap"] h1.pg::before{background-color:#B0D6CD!important}
+html[data-tema="gelap"] .acct button,html[data-tema="gelap"] .bk,html[data-tema="gelap"] .mnu{border-color:#9DCAC0!important}
+html[data-tema="gelap"] .kpi,html[data-tema="gelap"] .tc,html[data-tema="gelap"] .card{border-color:#9DCAC0}
+
+html[data-tema="gelap"] .top3 .t3,html[data-tema="gelap"] .t3.vac,html[data-tema="gelap"] [class*="t3"]{background-color:#BFDDD7!important;border-color:#9DCAC0!important}
 .tema-btn{min-width:42px;padding:0 12px}
 @media print{html[data-tema="gelap"],html[data-tema="gelap"] img,html[data-tema="gelap"] canvas{filter:none}}
 </style>
