@@ -818,12 +818,28 @@ input:hover,select:hover,textarea:hover{border-color:#9DBBAB}
 </style>
 <style id="tema">
 /* Mod gelap: terbalikkan warna halaman, kemudian pulihkan imej, kanvas dan pemapar PDF */
+html[data-tema="gelap"][data-masuk]{filter:none!important;color-scheme:light}
+html[data-tema="gelap"][data-masuk] img,html[data-tema="gelap"][data-masuk] canvas{filter:none}
 html[data-tema="gelap"]{filter:invert(.92) hue-rotate(180deg);background:#fff;color-scheme:dark}
 html[data-tema="gelap"] img,html[data-tema="gelap"] canvas,html[data-tema="gelap"] video,html[data-tema="gelap"] iframe,html[data-tema="gelap"] embed{filter:invert(1) hue-rotate(180deg)}
 html[data-tema="gelap"] aside.side{filter:invert(1) hue-rotate(180deg)}
 html[data-tema="gelap"] aside.side img{filter:none}
 .tema-btn{min-width:42px;padding:0 12px}
 @media print{html[data-tema="gelap"],html[data-tema="gelap"] img,html[data-tema="gelap"] canvas{filter:none}}
+</style>
+<style id="hdr1">
+/* Bar atas: kawalan di sebelah kanan, satu baris */
+@media(min-width:761px){
+.top-in{flex-wrap:nowrap;gap:10px;padding:10px 18px}
+.top-l{flex:1 1 auto;min-width:0;gap:10px;flex-wrap:nowrap}.top-l>button,.top-l>img{flex:none}
+h1.pg{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.hr{flex:0 0 auto;flex-wrap:nowrap;gap:6px}
+.acct{flex-wrap:nowrap;gap:6px}
+.acct>span{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:0}
+.acct button,.hr>button{padding:0 11px;font-size:.82rem}
+select.peran{max-width:170px;font-size:.82rem}
+.tema-btn{min-width:38px;padding:0 10px}
+}
 </style>
 </head>
 <body>
@@ -1372,9 +1388,9 @@ function wkNav(kind,sel,list,info){
   return '<div class="card wnav"><div class="wk2">'+
     '<button class="btn" data-act="'+pre+'n" data-w="'+(pv?pv.n:'')+'"'+(pv?'':' disabled')+' aria-label="Minggu sebelum">‹ Sebelum</button>'+
     '<select data-wkb="'+pre+'" aria-label="Pilih bulan">'+bulan.map(b=>'<option value="'+b.n+'"'+(b.k===blnKey(sel)?' selected':'')+'>'+b.t+'</option>').join('')+'</select>'+
-    '<select data-wkw="'+pre+'" aria-label="Pilih minggu">'+dlm.map(x=>{const q=info(x);return '<option value="'+x.n+'"'+(x.n===sel?' selected':'')+'>Minggu '+x.n+' · '+esc(weeks[x.n-1].label)+' · '+esc(q.t)+'</option>';}).join('')+'</select>'+
+    '<select data-wkw="'+pre+'" aria-label="Pilih minggu">'+dlm.map(x=>{const q=info(x);return '<option value="'+x.n+'"'+(x.n===sel?' selected':'')+'>Minggu '+x.n+' · '+esc(weeks[x.n-1].label)+(q.t?' · '+esc(q.t):'')+'</option>';}).join('')+'</select>'+
     '<button class="btn" data-act="'+pre+'n" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+' aria-label="Minggu seterusnya">Seterusnya ›</button></div>'+
-    '<p class="hint" style="margin:8px 0 0"><span class="pill '+(o.c||'idle')+'">'+esc(o.t||'')+'</span> Minggu '+sel+' · '+esc(weeks[sel-1].label)+'</p></div>';
+    '<p class="hint" style="margin:8px 0 0">'+(o.t?'<span class="pill '+(o.c||'idle')+'">'+esc(o.t)+'</span> ':'')+'Minggu '+sel+' · '+esc(weeks[sel-1].label)+'</p></div>';
 }
 function guruView(){
   const mine=weeks.map(w=>sub(ME,w.n)),cnt=st=>mine.filter((s,i)=>s.status===st).length;
@@ -2162,6 +2178,7 @@ function mulaView(){const PPMU=/pengurusan murid/i.test(ME_JAWATAN),NM=PPMU?'Lap
 }
 
 /* ---------- PENYEMAK / ADMIN: paparan mudah ---------- */
+const ADMV=()=>ME_PERANAN==='pentadbir'&&ui.pmode!=='guru';
 const SIMPLEP=()=>!SIMPLE()&&ME_PERANAN==='pentadbir';
 /* ---------- REKOD STAF: semua guru boleh lihat siapa sudah hantar ---------- */
 function stafList(){
@@ -2294,13 +2311,13 @@ function monitorView(){
   const fopt=[['semua','Semua status'],['disemak','Disemak'],['dihantar','Dihantar (menunggu semakan)'],['pembetulan','Perlu pembetulan'],['belum','Belum hantar'],['lewat','Lewat'],['dikecualikan','Dikecualikan']].map(o=>'<option value="'+o[0]+'"'+(F===o[0]?' selected':'')+'>'+o[1]+'</option>').join('');
   const legend='<div class="legend"><span><span class="cell c-ok" style="width:20px;height:20px">✓</span>Disemak</span><span><span class="cell c-sent" style="width:20px;height:20px">●</span>Dihantar</span><span><span class="cell c-fix" style="width:20px;height:20px">▲</span>Pembetulan</span><span><span class="cell c-late" style="width:20px;height:20px">!</span>Lewat</span><span><span class="cell c-now" style="width:20px;height:20px">○</span>Belum hantar</span><span><span class="cell c-exc" style="width:20px;height:20px">×</span>Dikecualikan</span></div>';
   const kp=(k,l,v,cls,sm)=>'<button class="kpi '+cls+'" data-act="dfset" data-f="'+k+'" aria-pressed="'+(F===k)+'"><span>'+l+'</span><b>'+v+'</b><small>'+sm+'</small></button>';
-  const pm=ME_PERANAN==='pentadbir'&&PM&&PM.kini&&PM.kini.id?'<p class="sub">Penyemak minggu ini: <b>'+esc(PM.kini.nama)+'</b></p>':'';
+  const pm=ADMV()&&PM&&PM.kini&&PM.kini.id?'<p class="sub">Penyemak minggu ini: <b>'+esc(PM.kini.nama)+'</b></p>':'';
   const att=(()=>{const T=reqW(w),by=k=>T.filter(t=>stOf(t,w)===k),tg=by('dihantar'),bl=T.filter(t=>{const k=stOf(t,w);return k==='belum'||k==='lewat';});
     const nmList=(a,btn)=>a.length?a.slice(0,8).map(t=>'<div class="nm"><span><b>'+esc(t.name)+'</b><br><small class="hint">'+esc(t.sub||'')+'</small></span>'+(btn?'<button class="btn sm pri" data-act="view" data-t="'+t.id+'" data-w="'+w+'">'+(pmBoleh()?'Semak':'Lihat')+'</button>':'')+'</div>').join('')+(a.length>8?'<p class="hint">Dan '+(a.length-8)+' lagi. Tekan kotak di atas untuk menapis kad di bawah.</p>':''):'<p class="hint">Tiada.</p>';
     return '<div class="att"><div class="card"><span class="lbl">Menunggu semakan <span class="pill sent">'+tg.length+'</span></span>'+nmList(tg,ME_PERANAN==='pentadbir')+'</div><div class="card"><span class="lbl">Belum menghantar <span class="pill late">'+bl.length+'</span></span>'+nmList(bl,false)+'</div></div>';})();
   return '<div class="wrap"><div class="dsh-h"><div><h2>Dashboard Sekolah</h2>'+pm+(ME_SEM?'<p class="hint warnbox" role="status">Akses semakan sementara untuk ujian, tamat selepas '+esc(ME_SEM)+'. Tindakan semakan direkodkan dalam Log Audit.</p>':'')+'</div></div>'+
-   dshTog('pantau')+terlepasBanner(w)+wkNav('sw',w,semuaMg(),wkInfoAdmin)+top3Kad(w)+
-   (ME_PERANAN==='pentadbir'?('<div class="kpis">'+kp('semua','Staf wajib hantar',n,'','Minggu '+w)+kp('dihantar','Menunggu semakan',c.sent,'sent','perlu disemak')+kp('disemak','Disemak',c.ok,'ok',n?Math.round(c.ok/n*100)+'% daripada staf':'')+kp('pembetulan','Perlu pembetulan',c.fix,c.fix?'fix':'','menunggu guru')+kp('belum','Belum menghantar',c.miss,c.miss?'late':'','termasuk yang lewat')+'</div>'+
+   dshTog('pantau')+terlepasBanner(w)+wkNav('sw',w,semuaMg(),ADMV()?wkInfoAdmin:(()=>({})))+top3Kad(w)+
+   (ADMV()?('<div class="kpis">'+kp('semua','Staf wajib hantar',n,'','Minggu '+w)+kp('dihantar','Menunggu semakan',c.sent,'sent','perlu disemak')+kp('disemak','Disemak',c.ok,'ok',n?Math.round(c.ok/n*100)+'% daripada staf':'')+kp('pembetulan','Perlu pembetulan',c.fix,c.fix?'fix':'','menunggu guru')+kp('belum','Belum menghantar',c.miss,c.miss?'late':'','termasuk yang lewat')+'</div>'+
    '<div class="dsh-g"><div class="card"><span class="lbl">Status Minggu '+w+'</span><div class="donut-w">'+dshDonut(c,n)+'<div class="dleg"><span><i style="background:var(--ok)"></i>Disemak '+c.ok+'</span><span><i style="background:var(--sent)"></i>Menunggu '+c.sent+'</span><span><i style="background:var(--fix)"></i>Pembetulan '+c.fix+'</span><span><i style="background:var(--late)"></i>Belum '+c.miss+'</span></div></div></div>'+
    '<div class="card"><span class="lbl">Penghantaran 12 minggu terkini <span class="hint">· tekan palang untuk pilih minggu</span></span>'+dshBars(w)+'</div></div>'+att):'')+
    
@@ -2531,7 +2548,7 @@ function tabTrack(){if(ui.tab==='staf')ui.tab='dash';if(!ui.tab)return;const cur
   if(tabPrev&&!tabBack&&(tabPrev.tab!==cur.tab||tabPrev.pmode!==cur.pmode)){const l=TABH[TABH.length-1];if(!l||l.tab!==tabPrev.tab||l.pmode!==tabPrev.pmode)TABH.push(tabPrev);if(TABH.length>20)TABH.shift();}
   tabPrev=cur;tabBack=false;}
 function tabKembali(){if(!TABH.length)return false;const p=TABH.pop();tabBack=true;ui.pmode=p.pmode;ui.tab=p.tab;ui.menu=false;render();window.scrollTo(0,0);return true;}
-function render(){
+function render(){document.documentElement.toggleAttribute('data-masuk',['login','loading','error'].includes(ui.screen));
   tabTrack();
   const app=document.getElementById('app');
   const brand='<div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<img class="lg2" src="'+LOGO+'" alt="Logo iRISE" height="40" style="height:34px;width:auto"><div class="brand"><span>SK Krangan · Intelligent Reporting &amp; Integrated School Ecosystem'+(LIVE?'':' · MOD DEMO')+'</span></div></div>';
