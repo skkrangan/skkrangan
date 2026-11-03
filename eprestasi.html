@@ -595,6 +595,30 @@ function kunciMuridBaru_(kelas){
   return 'eprestasi_murid_baru_' + kelas + (adalahPI_(sj) ? '::PI' : '');
 }
 function normNamaMurid_(n){ return String(n||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+/* Murid DIBUANG daripada senarai input (ikut kelas + subjek, pada peranti ini sahaja).
+   Data murid & markah dalam Sheet TIDAK dipadam - murid hanya disembunyikan dan boleh dipulihkan. */
+function kunciDibuang_(kelas, subjek){ return 'eprestasi_murid_dibuang_' + kelas + '::' + normNamaMurid_(subjek); }
+function muatDibuang_(kelas, subjek){
+  try{ const a = JSON.parse(localStorage.getItem(kunciDibuang_(kelas, subjek)) || '[]'); return Array.isArray(a) ? a.map(String) : []; }
+  catch(e){ return []; }
+}
+function simpanDibuang_(kelas, subjek, senarai){
+  try{ localStorage.setItem(kunciDibuang_(kelas, subjek), JSON.stringify(senarai)); }catch(e){ /* senyap */ }
+}
+function pasangNotaDibuang_(kelas, subjek){
+  const kotak = document.getElementById('tambah-murid-wrap'); if (!kotak) return;
+  let nota = document.getElementById('nota-murid-dibuang'); if (nota) nota.remove();
+  const n = muatDibuang_(kelas, subjek).length;
+  if (!n) return;
+  nota = document.createElement('p');
+  nota.id = 'nota-murid-dibuang';
+  nota.style.cssText = 'font-size:12px; color:var(--muted); margin-top:8px;';
+  nota.innerHTML = `${n} murid dibuang daripada senarai ini. <a href="#" id="pulih-murid-dibuang" style="color:var(--navy); font-weight:700;">Pulihkan semua</a>`;
+  kotak.appendChild(nota);
+  nota.querySelector('#pulih-murid-dibuang').addEventListener('click', e => {
+    e.preventDefault(); simpanDibuang_(kelas, subjek, []); cubaPaparGrid();
+  });
+}
 function muatMuridBaru_(kelas){
   try{ const a = JSON.parse(localStorage.getItem(kunciMuridBaru_(kelas)) || '[]'); return Array.isArray(a) ? a : []; }
   catch(e){ return []; }
@@ -617,7 +641,7 @@ function binaBarisMurid_(m, bil){
        </td>`;
   const lencana = m._baru
     ? ` <span style="font-size:10px; font-weight:800; color:var(--gold); border:1px solid var(--gold); border-radius:999px; padding:1px 7px; margin-left:6px;">BAHARU</span> <button type="button" class="btn-buang-murid-baru" data-id="${escHtml_(m.ID)}" title="Buang murid baharu ini" style="border:none; background:none; color:#B42318; cursor:pointer; font-size:15px; font-weight:700;">×</button>`
-    : '';
+    : ` <button type="button" class="btn-buang-murid" data-id="${escHtml_(m.ID)}" title="Buang murid ini daripada senarai" style="border:none; background:none; color:#B42318; cursor:pointer; font-size:13px; font-weight:700; margin-left:6px;">🗑 Buang</button>`;
   return `<tr data-baru="${m._baru ? 1 : 0}"><td class="row-idx">${bil}</td><td>${escHtml_(m.Nama)}${lencana}</td>${inputCell}</tr>`;
 }
 function renomborBaris_(){
@@ -666,6 +690,17 @@ function pasangTambahMurid_(kelas){
   if (!wrap.dataset.buangPasang){ // pasang SEKALI sahaja (grid dilukis semula berkali-kali)
     wrap.dataset.buangPasang = '1';
     wrap.addEventListener('click', e=>{
+      const bb = e.target.closest('.btn-buang-murid');
+      if (bb){
+        const kls = document.getElementById('sel-kelas').value, sj = document.getElementById('sel-subjek').value;
+        const nama = (bb.closest('tr').children[1].childNodes[0] || {}).textContent || 'Murid';
+        const senarai = muatDibuang_(kls, sj); if (!senarai.includes(String(bb.dataset.id))) senarai.push(String(bb.dataset.id));
+        simpanDibuang_(kls, sj, senarai);
+        bb.closest('tr').remove(); renomborBaris_(); pasangNotaDibuang_(kls, sj);
+        if (!document.querySelector('table.input-grid tbody tr')) document.getElementById('btn-simpan').disabled = true;
+        showToast('Dibuang daripada senarai: ' + String(nama).trim(), 'ok');
+        return;
+      }
       const b = e.target.closest('.btn-buang-murid-baru');
       if (!b) return;
       const kls = document.getElementById('sel-kelas').value;
@@ -703,7 +738,9 @@ function cubaPaparGrid(){
     return;
   }
 
+  const idDibuang = new Set(muatDibuang_(kelas, subjek));
   const senaraiAsas = muridKelasUntukSubjek_(kelas, subjek)
+    .filter(m => !idDibuang.has(String(m.ID)))
     .sort((a,b)=> a.Nama.localeCompare(b.Nama));
   const namaAsas = new Set(senaraiAsas.map(m => normNamaMurid_(m.Nama)));
   const senaraiBaru = muatMuridBaru_(kelas)
@@ -724,6 +761,7 @@ function cubaPaparGrid(){
     </table>
     ${senaraiMuridKelas.length === 0 ? '<div class="empty-hint">Tiada murid dijumpai untuk kelas ini. Anda boleh tambah murid di bawah.</div>' : ''}`;
   pasangTambahMurid_(kelas);
+  pasangNotaDibuang_(kelas, subjek);
 
   if (senaraiMuridKelas.length === 0){
     btnSimpan.disabled = true;
