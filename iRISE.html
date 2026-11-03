@@ -2207,7 +2207,7 @@ function mulaView(){const PPMU=/pengurusan murid/i.test(ME_JAWATAN),NM=PPMU?'Lap
     steps+=mk(1,st1,/pengurusan murid/i.test(ME_JAWATAN)?'Log Tugasan Harian (dijana oleh sistem daripada tanda anda)':KLS?'Muat naik RPH dan tulis refleksi setiap kelas':prog?'Muat naik fail RPH dan tentatif program':'Muat naik fail RPH',(st1==='now'||(hasF&&!kirim)||klsAll?progBox+(KLS?kelasKad(w,s):fileBlock(w,s,editable)):(kirim?'<span class="hint">'+esc(s.file?s.file.name:'')+'</span>':'')));
     if(!KLS||s.status==='pembetulan')steps+=mk(2,st2,'Hantar kepada pentadbir',st2==='now'?(partial?pbox:hantarBtn):(kirim?'<span class="hint">Sudah dihantar. '+(PPMU?'Tersilap tanda? Tarik balik hantaran, betulkan tanda dan hantar semula.':'Tersilap atau mahu tukar fail?')+'</span>'+(s.status==='dihantar'?'<button class="btn" data-act="tarik" data-w="'+w+'">Tarik balik hantaran</button>':''):'<span class="hint">'+(PPMU?'Tanda tugasan dahulu':'Muat naik fail dahulu')+'</span>'));
     if(PSK(ME)&&editable!==undefined)steps+=mk(3,(s.status==='disemak'||done>=need)?'done':'now','Tulis refleksi harian (Isnin hingga Jumaat)',rEditor(w,s,s.status==='disemak')+'<div class="save" id="sv-'+w+'"></div>');
-    else if(!RNG(ME))steps+=mk(KLS&&s.status!=='pembetulan'?2:3,st3,'Tulis refleksi selepas mengajar',kirim&&!klsAll?rEditor(w,s,false)+'<div class="save" id="sv-'+w+'"></div>':'<span class="hint">'+(KLS?'Ditulis di setiap kelas di atas.':'Selepas RPH dihantar')+'</span>');
+    else if(!RNG(ME)&&!KLS)steps+=mk(3,st3,'Tulis refleksi selepas mengajar',kirim&&!klsAll?rEditor(w,s,false)+'<div class="save" id="sv-'+w+'"></div>':'<span class="hint">'+(KLS?'Ditulis di setiap kelas di atas.':'Selepas RPH dihantar')+'</span>');
     }
   }
   const tg=tugasTertunggak();
