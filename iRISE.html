@@ -1090,6 +1090,7 @@ function rRow(w,a,i,locked,no){
       (x.x==='Lain-lain'&&!(x.n||'').trim()?'<span class="err">Nyatakan sebab.</span>':'')+'</div></div>';
     else rw='<div class="rl-row"><span class="rl-n">'+(no||i+1)+'</span><div class="rl-f">'+lab+
      '<textarea data-rw="'+w+'" data-ri="'+i+'" data-rf="t" maxlength="1000" rows="2" '+(locked?'disabled':'')+' placeholder="Cth: 26 daripada 28 murid menguasai objektif. Dua murid perlu bimbingan tambahan." aria-label="Refleksi kelas '+(i+1)+'">'+esc(x.t)+'</textarea>'+
+     (BANTU_AI?'<div class="rl-ai" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn sm" data-act="airefl" data-w="'+w+'" data-i="'+i+'"'+(locked||ui.aiBusy?' disabled':'')+'>'+(ui.aiBusy===w+'-'+i?'Menulis…':'✨ Bantu tulis refleksi')+'</button>'+(ui.aiUndo&&ui.aiUndo[w+'-'+i]!=null&&!locked?'<button type="button" class="btn sm" data-act="aiundo" data-w="'+w+'" data-i="'+i+'">Buat asal</button><span class="hint">Draf AI. Semak dan ubah sebelum hantar.</span>':'<span class="hint">Taip nota ringkas dahulu, kemudian tekan butang ini.</span>')+'</div>':'')+
      '<div class="rl-att"><label>Murid hadir <input type="number" inputmode="numeric" min="0" max="999" step="1" data-rw="'+w+'" data-ri="'+i+'" data-rf="h" '+(locked?'disabled':'')+' value="'+esc(x.h)+'" aria-label="Murid hadir kelas '+(i+1)+'"></label>'+
      '<label>daripada <input type="number" inputmode="numeric" min="0" max="999" step="1" data-rw="'+w+'" data-ri="'+i+'" data-rf="j" '+(locked?'disabled':'')+' value="'+esc(x.j)+'" aria-label="Jumlah murid kelas '+(i+1)+'"></label>'+
      (bad?'<span class="err">Hadir melebihi jumlah murid.</span>':'')+'</div>'+sel+'</div></div>';
@@ -2917,6 +2918,19 @@ async function api(action,data,_retry){
     const x=new Error(j.code==='STALE'?'Rekod anda baru sahaja dikemas kini. Sila cuba sekali lagi.':(j.error||'Ralat pelayan. Sila cuba lagi.'));x.code=j.code;x.versi=j.versi;x.teks=j.teks;x.semakVersi=j.semakVersi;x.apiMsg=true;throw x;}
   return j;
 }
+const BANTU_AI=false; /* Bantu tulis refleksi (Gemini) dimatikan; tukar kepada true untuk aktifkan semula */
+async function bantuRefl(w,i){
+  const k=w+'-'+i,ta=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"][data-rf="t"]');if(!ta||ui.aiBusy)return;
+  const nota=ta.value.trim();if(nota.length<8){toast('Taip nota ringkas dahulu. Contoh: 20 daripada 25 murid capai objektif, 5 perlu bimbingan.',true);ta.focus();return;}
+  const a=parseR(sub(ME,w).refleksi),x=a[i]||{};ui.aiBusy=k;render();
+  try{
+    let teks;
+    if(LIVE){const r=await api('bantuRefleksi',{nota,kelas:slotLabel(ME,i,w)||x.k||'',hadir:x.h||'',jumlah:x.j||''});teks=r.teks;}
+    else{await new Promise(r=>setTimeout(r,500));teks='Pengajaran dan pembelajaran berjalan seperti yang dirancang. '+nota.replace(/[.\s]+$/,'')+'. Tindakan susulan akan dibuat pada sesi akan datang. (Contoh draf demo; dalam sistem sebenar draf dijana oleh Gemini.)';}
+    ui.aiBusy=null;ui.aiUndo=ui.aiUndo||{};ui.aiUndo[k]=nota;render();
+    const t2=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"][data-rf="t"]');if(t2){t2.value=String(teks).slice(0,1000);t2.dispatchEvent(new Event('input',{bubbles:true}));}
+  }catch(e){ui.aiBusy=null;render();toast(e.message||'Bantuan AI tidak berjaya.',true);if(e.code==='AUTH')handleErr(e);}
+}
 function applyRow(r){
   const k=key(r.t,r.w),q=subs[k]||(subs[k]=blankSub()),old=q.file;
   q.hantarPada=r.hantarPada||q.hantarPada||'';q.recordVersion=r.recordVersion||0;q.semakVersi=r.semakVersi||0;if(!q.rdirty&&!q.rbusy&&r.refleksiVersi!==undefined)q.refleksiVersi=r.refleksiVersi;q.status=r.status;if(r.status==='dihantar'||r.status==='disemak'||q.jenis===undefined)q.jenis=r.jenis||'';if(!(q.rdirty&&r.t===ME&&r.status!=='disemak'))q.refleksi=r.refleksi||'';q.komen=r.komen||'';q.prevKomen=r.prevKomen||'';
@@ -3091,6 +3105,8 @@ document.addEventListener('click',e=>{
       const el=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"]');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.focus(),350);}}}
   else if(a==='toastx'){const t=document.getElementById('toast');t.classList.remove('show','err');}
   else if(a==='rretry'){const q=sub(ME,w);q.retryN=0;clearTimeout(q._t);saveRefl(w);}
+  else if(a==='airefl'){bantuRefl(w,+b.dataset.i);}
+  else if(a==='aiundo'){const i=+b.dataset.i,k=w+'-'+i,ta=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"][data-rf="t"]');if(ta&&ui.aiUndo&&ui.aiUndo[k]!=null){ta.value=ui.aiUndo[k];ta.dispatchEvent(new Event('input',{bubbles:true}));delete ui.aiUndo[k];render();}}
   else if(a==='upretry'){const q=sub(ME,w);q.upErr='';mergeParts(w);render();}
   else if(a==='upkeep'){const q=sub(ME,w);q.upErr='';q.upFail=false;q.parts=[];q.pend=false;ptSave(w);q.mtok=(q.mtok||0)+1;render();toast('Fail terdahulu digunakan semula.');}
   else if(a==='sambung'){sambungSemula();}
