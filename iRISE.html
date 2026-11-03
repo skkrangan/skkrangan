@@ -904,9 +904,9 @@ function sahHantar(w,s,ok){
 function rangeStr(a){a.sort((x,y)=>x-y);const o=[];for(let i=0;i<a.length;){let j=i;while(j+1<a.length&&a[j+1]===a[j]+1)j++;o.push(j>i?a[i]+'-'+a[j]:''+a[i]);i=j+1;}return o.join(',');}
 async function pilihHalaman(w,i){
   const s=sub(ME,w),p=(s.parts||[])[i];if(!p||!p.blob)return;
-  const d=dlg('<h2>Pilih halaman</h2><p class="hint">Tekan gambar untuk tanda (hijau) halaman yang mahu dihantar. Tiada tanda bermaksud hantar semua.</p><div id="ph-g" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin:10px 0">Memuatkan halaman…</div><div class="actions"><button class="btn pri big" data-x="ok">Guna halaman ini</button><button class="btn big" data-x="semua">Hantar semua</button></div>');
+  const d=dlg('<h2>Pilih halaman</h2><p class="hint">Tekan gambar untuk tanda (hijau) halaman yang mahu dihantar. Tiada tanda bermaksud hantar semua.</p><div id="ph-g" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px;margin:12px 0">Memuatkan halaman…</div><div class="actions"><button class="btn pri big" data-x="ok">Guna halaman ini</button><button class="btn big" data-x="semua">Hantar semua</button></div>');
   const g=d.o.querySelector('#ph-g'),pilih=new Set();
-  d.o.querySelector('.bantu').style.maxWidth='720px';
+  {const bt=d.o.querySelector('.bantu');bt.style.maxWidth='1200px';bt.style.width='96vw';bt.style.maxHeight='94vh';bt.style.overflowY='auto';}
   d.o.addEventListener('click',e=>{
     const x=e.target.closest('[data-x]');
     if(x){d.tutup();p.range=x.dataset.x==='ok'?rangeStr([...pilih]):'';pendEdit(w);return;}
@@ -918,10 +918,10 @@ async function pilihHalaman(w,i){
     g.innerHTML='';
     String(p.range||'').split(',').forEach(tk=>{const m=/^(\d+)(?:-(\d+))?$/.exec(tk.trim());if(m){const a=+m[1],b=m[2]?+m[2]:a;for(let n=a;n<=b;n++)pilih.add(n);}});
     for(let n=1;n<=doc.numPages;n++){
-      const pg=await doc.getPage(n),vp=pg.getViewport({scale:.35}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;cv.style.cssText='width:100%;display:block';
+      const pg=await doc.getPage(n),vp=pg.getViewport({scale:.7}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;cv.style.cssText='width:100%;display:block';
       await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
       const c=document.createElement('button');c.type='button';c.dataset.pg=n;c.setAttribute('aria-label','Halaman '+n);c.style.cssText='position:relative;padding:0;border:0;background:#fff;cursor:pointer;outline:'+(pilih.has(n)?'4px solid #1a7f4b':'2px solid #ccc');
-      c.innerHTML='<b style="position:absolute;left:4px;top:4px;background:#000a;color:#fff;border-radius:6px;padding:0 6px">'+n+'</b><i style="display:'+(pilih.has(n)?'block':'none')+';position:absolute;right:4px;top:4px;background:#1a7f4b;color:#fff;border-radius:50%;width:22px;height:22px;font-style:normal;text-align:center">✓</i>';
+      c.innerHTML='<b style="position:absolute;left:4px;top:4px;background:#000a;color:#fff;border-radius:6px;padding:2px 10px;font-size:1.2rem">'+n+'</b><i style="display:'+(pilih.has(n)?'block':'none')+';position:absolute;right:4px;top:4px;background:#1a7f4b;color:#fff;border-radius:50%;width:22px;height:22px;font-style:normal;text-align:center">✓</i>';
       c.appendChild(cv);g.appendChild(c);
     }
   }catch(e){g.textContent='Tidak dapat memaparkan halaman. Anda masih boleh taip nombor halaman, contohnya 5-8.';}
@@ -3128,10 +3128,19 @@ document.addEventListener('click',e=>{
   else if(a==='sw'||a==='swn'){if(!w)return;ui.selWeek=w;ui.pasteText='';render();}
   else if(a==='hantar'&&!b.dataset.sah){const s0=sub(ME,w);if((!s0.file&&!(s0.parts&&s0.parts.length))||s0.merging||s0.sending||s0.upFail)return;
     sahHantar(w,s0,()=>{b.dataset.sah='1';b.click();delete b.dataset.sah;});}
-  else if(a==='pbuka'){const s=sub(ME,w),p=s.parts&&s.parts[+b.dataset.i];if(!p||!p.blob)return;const u=URL.createObjectURL(p.blob);
-    if(p.ext==='PDF'||p.ext==='JPG'||p.ext==='PNG'){const nw=window.open(u,'_blank');if(!nw){const a2=document.createElement('a');a2.href=u;a2.download=p.name;document.body.appendChild(a2);a2.click();a2.remove();}}
-    else{const a2=document.createElement('a');a2.href=u;a2.download=p.name;document.body.appendChild(a2);a2.click();a2.remove();toast('Fail Word/PowerPoint dimuat turun untuk dibuka dalam aplikasinya.');}
-    setTimeout(()=>URL.revokeObjectURL(u),60000);}
+  else if(a==='pbuka'){const s=sub(ME,w),p=s.parts&&s.parts[+b.dataset.i];if(!p||!p.blob)return;
+    const dl=(u)=>{const a2=document.createElement('a');a2.href=u;a2.download=p.name;document.body.appendChild(a2);a2.click();a2.remove();};
+    if(p.ext==='PDF'||p.ext==='JPG'||p.ext==='PNG'){
+      const nw=window.open('','_blank');  // dibuka serta-merta supaya tidak disekat pelayar
+      (async()=>{let bl=p.blob;
+        if(p.ext==='PDF'&&(p.range||'').trim()){ // hanya halaman yang dipilih
+          try{await loadPdfLib();const L=window.PDFLib,d=await L.PDFDocument.load(await p.blob.arrayBuffer()),np=d.getPageCount(),sel=[];
+            String(p.range).split(',').forEach(tk=>{tk=tk.trim();const m=/^(\d{1,4})(?:\s*-\s*(\d{1,4}))?$/.exec(tk);if(!m)return;const x=+m[1],y=m[2]?+m[2]:x;for(let i=x;i<=y&&i<=np;i++)if(i>=1&&sel.indexOf(i-1)<0)sel.push(i-1);});
+            if(sel.length){const o=await L.PDFDocument.create();(await o.copyPages(d,sel)).forEach(pg=>o.addPage(pg));bl=new Blob([await o.save()],{type:'application/pdf'});}
+          }catch(e){}
+        }
+        const u=URL.createObjectURL(bl);if(nw)nw.location.href=u;else dl(u);setTimeout(()=>URL.revokeObjectURL(u),120000);})();
+    }else{const u=URL.createObjectURL(p.blob);dl(u);toast('Fail Word/PowerPoint dimuat turun untuk dibuka dalam aplikasinya.');setTimeout(()=>URL.revokeObjectURL(u),60000);}}
   else if(a==='dtog'){ui.dOpen=ui.dOpen||{};const k=b.dataset.k;ui.dOpen[k]=!ui.dOpen[k];render();}
   else if(a==='redit'){ui.rEd=ui.rEd||{};ui.rEd[w+'-'+b.dataset.g]=true;ui.dOpen=ui.dOpen||{};ui.dOpen[w+'-'+b.dataset.g]=true;render();}
   else if(a==='rsimpan'){const gk=b.dataset.g;b.disabled=true;(LIVE?flushRefl(w):Promise.resolve(true)).then(ok=>{b.disabled=false;if(ok&&gk&&ui.rEd)ui.rEd[w+'-'+gk]=false;toast(ok?'Refleksi dan kehadiran dikemas kini.':'Belum berjaya disimpan. Cuba lagi.',!ok);render();});}
