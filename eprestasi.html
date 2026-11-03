@@ -564,7 +564,36 @@ function tukarSubMod(sub){
  * kelas + nama (awalan "BARU-") supaya draf & markah sentiasa padan.
  * ============================================================ */
 function escHtml_(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function kunciMuridBaru_(kelas){ return 'eprestasi_murid_baru_' + kelas; }
+/* ------------------------------------------------------------
+ * PENDIDIKAN ISLAM - senarai murid khas (bukan semua murid kelas)
+ * Tahun 1: Nur Fajriyah sahaja; Tahun 2: Nur Fatihah sahaja; Tahun 3-6: tiada nama
+ * (guru tambah sendiri). Murid yang ditambah untuk Pendidikan Islam ditanda
+ * KhususSubjek='Pendidikan Islam' dalam Sheet supaya TIDAK muncul pada subjek lain.
+ * ------------------------------------------------------------ */
+const SUBJEK_PI_ = 'Pendidikan Islam';
+function adalahPI_(subjek){ return normNamaMurid_(subjek) === 'pendidikan islam'; }
+function tahunAngkaKelas_(kelas){
+  const k = (state.kelas || []).find(x => x.NamaKelas === kelas);
+  let t = k && k.Tahun ? String(k.Tahun) : '';
+  if (!t){ const m = (state.murid || []).find(x => x.Kelas === kelas && x.Tahun); t = m ? String(m.Tahun) : ''; }
+  let d = (t.match(/\d/) || [])[0];
+  if (!d){ d = (String(kelas).match(/\d/) || [])[0]; }
+  return d ? Number(d) : 0;
+}
+function muridKelasUntukSubjek_(kelas, subjek){
+  const semua = (state.murid || []).filter(m => m.Kelas === kelas);
+  const khusus = m => String(m.KhususSubjek || '').trim();
+  if (adalahPI_(subjek)){
+    const t = tahunAngkaKelas_(kelas);
+    const re = t === 1 ? /nur\s+fajri/i : (t === 2 ? /nur\s+fatih/i : null);
+    return semua.filter(m => khusus(m) === SUBJEK_PI_ || (re && re.test(String(m.Nama || ''))));
+  }
+  return semua.filter(m => khusus(m) !== SUBJEK_PI_);
+}
+function kunciMuridBaru_(kelas){
+  const sj = (document.getElementById('sel-subjek') || {}).value;
+  return 'eprestasi_murid_baru_' + kelas + (adalahPI_(sj) ? '::PI' : '');
+}
 function normNamaMurid_(n){ return String(n||'').toLowerCase().replace(/\s+/g,' ').trim(); }
 function muatMuridBaru_(kelas){
   try{ const a = JSON.parse(localStorage.getItem(kunciMuridBaru_(kelas)) || '[]'); return Array.isArray(a) ? a : []; }
@@ -616,7 +645,7 @@ function pasangTambahMurid_(kelas){
   const tambah = ()=>{
     const nama = inp.value.replace(/\s+/g,' ').trim();
     if (!nama){ showToast('Sila taip nama murid dahulu.', 'err'); inp.focus(); return; }
-    const sedia = state.murid.filter(m => m.Kelas === kelas).map(m => normNamaMurid_(m.Nama))
+    const sedia = muridKelasUntukSubjek_(kelas, document.getElementById('sel-subjek').value).map(m => normNamaMurid_(m.Nama))
       .concat(muatMuridBaru_(kelas).map(m => normNamaMurid_(m.Nama)));
     if (sedia.includes(normNamaMurid_(nama))){ showToast('Murid ini sudah ada dalam senarai kelas.', 'err'); return; }
     const baru = { ID: janaIdMuridBaru_(kelas, nama), Nama: nama, Kelas: kelas, _baru: true };
@@ -674,7 +703,7 @@ function cubaPaparGrid(){
     return;
   }
 
-  const senaraiAsas = state.murid.filter(m => m.Kelas === kelas)
+  const senaraiAsas = muridKelasUntukSubjek_(kelas, subjek)
     .sort((a,b)=> a.Nama.localeCompare(b.Nama));
   const namaAsas = new Set(senaraiAsas.map(m => normNamaMurid_(m.Nama)));
   const senaraiBaru = muatMuridBaru_(kelas)
@@ -749,7 +778,7 @@ function renderUploadPanel(){
 function muatTurunTemplatPBD(){
   const kelas = document.getElementById('sel-kelas').value;
   const subjek = document.getElementById('sel-subjek').value;
-  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas)
+  const senaraiMuridKelas = muridKelasUntukSubjek_(kelas, subjek)
     .sort((a,b)=> a.Nama.localeCompare(b.Nama));
 
   let csv = 'ID Murid,Nama Murid,Kelas,Subjek,Tahap Penguasaan (TP1-TP6)\n';
@@ -787,7 +816,7 @@ function prosesFailPBD(file){
 function padankanDanPaparkan(rows, namaFail){
   const kelas = document.getElementById('sel-kelas').value;
   const subjek = document.getElementById('sel-subjek').value;
-  const senaraiMuridKelas = state.murid.filter(m => m.Kelas === kelas);
+  const senaraiMuridKelas = muridKelasUntukSubjek_(kelas, subjek);
 
   const hasil = rows.map(r=>{
     const idFail = String(r['ID Murid'] ?? r['ID'] ?? '').trim();
