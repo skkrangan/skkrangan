@@ -556,6 +556,15 @@ html.besar body{zoom:1.2}
 .ringkas3 .ok b{color:#1d7a46}.ringkas3 .todo b{color:#b26a00}
 details.lagi{position:relative}details.lagi>summary{list-style:none;cursor:pointer;min-width:44px;text-align:center}details.lagi>summary::-webkit-details-marker{display:none}
 details.lagi .lagi-m{position:absolute;right:0;top:calc(100% + 6px);z-index:20;background:var(--card,#fff);border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:10px;display:grid;gap:6px;width:240px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+
+.sahbox{margin-top:8px;padding:10px 12px;border-radius:12px;background:#fff4d6;border-left:6px solid #c98a00;color:#4a3400;display:grid;gap:6px}.sahbox p{margin:0}
+.sahbtn{display:flex;gap:8px;flex-wrap:wrap}.panduan ol{margin:6px 0 6px 18px;padding:0}.panduan li{margin:4px 0}
+.cmp-ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:12px}
+.cmp{background:var(--card,#fff);color:inherit;border-radius:16px;width:min(1200px,100%);max-height:96vh;display:flex;flex-direction:column;overflow:hidden}
+.cmp-h,.cmp-f{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;flex-wrap:wrap}.cmp-f{justify-content:flex-end;border-top:1px solid rgba(0,0,0,.1)}
+.cmp-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 12px;overflow:auto;flex:1}.cmp-g h4{margin:0 0 6px}
+.cmp-p{width:100%;height:62vh;border:1px solid rgba(0,0,0,.15);border-radius:10px;overflow:auto;background:#fff}
+@media (max-width:760px){.cmp-g{grid-template-columns:1fr}.cmp-p{height:48vh}}
 </style>
 <style id="emerald">
 /* ===== Emerald Executive: lapisan visual sahaja (tiada perubahan fungsi, menu, teks atau JavaScript) ===== */
@@ -1119,14 +1128,14 @@ const nkLbl=x=>String(x||'').toLowerCase().replace(/(isnin|selasa|rabu|khamis|ju
 /* Refleksi disimpan mengikut kedudukan kelas. Jika jadual, program atau Isnin berubah selepas refleksi ditulis, susunan kelas berubah dan
    refleksi akan muncul di bawah kelas yang salah. Selaraskan semula mengikut label kelas yang disimpan bersama setiap refleksi.
    Tiada teks diubah, hanya dipindah ke kelas yang betul; refleksi yang tiada padanan dikekalkan di hujung (tidak dibuang). */
-function alignR(w,s){if(!s||s.status==='belum'||s.status==='disemak'||s.rdirty)return;const SL=slotsFor(ME,w),a=parseR(s.refleksi);if(!SL.length||!a.some(x=>x&&x.k))return;
+function alignR(w,s){if(!s||s.status==='belum'||s.status==='disemak'||s.rdirty||s.rbusy||s.rconflict)return;const SL=slotsFor(ME,w),a=parseR(s.refleksi);if(!SL.length||!a.some(x=>x&&x.k))return;
   const lab=SL.map((_,i)=>slotLabel(ME,i,w)),nl=lab.map(nkLbl),nkA=a.map(x=>x&&x.k?nkLbl(x.k):'');
   if(!a.some((x,i)=>nkA[i]&&i<SL.length&&nkA[i]!==nl[i]))return;
   const used={},isi=x=>!!(x&&(x.t||x.h||x.j||x.x||x.n)),blank=()=>({k:'',t:'',h:'',j:'',x:'',n:''}),out=new Array(SL.length).fill(null);
   /* 1) baris yang sudah di tempat betul kekal */
-  SL.forEach((_,i)=>{if(nkA[i]&&nkA[i]===nl[i]){out[i]=Object.assign({},a[i],{k:lab[i]});used[i]=1;}});
+  SL.forEach((_,i)=>{if(nkA[i]&&nkA[i]===nl[i]&&(isi(a[i])||!a.some((x,q)=>q!==i&&nkA[q]===nl[i]&&isi(x)))){out[i]=Object.assign({},a[i],{k:lab[i]});used[i]=1;}});
   /* 2) baris yang labelnya sepadan dengan kelas lain dipindah ke kelas itu */
-  SL.forEach((_,i)=>{if(out[i])return;const j=nkA.findIndex((k,q)=>!used[q]&&k&&k===nl[i]);if(j>=0){out[i]=Object.assign({},a[j],{k:lab[i]});used[j]=1;}});
+  SL.forEach((_,i)=>{if(out[i])return;let j=nkA.findIndex((k,q)=>!used[q]&&k&&k===nl[i]&&isi(a[q]));if(j<0)j=nkA.findIndex((k,q)=>!used[q]&&k&&k===nl[i]);if(j>=0){out[i]=Object.assign({},a[j],{k:lab[i]});used[j]=1;}});
   /* 3) baris tanpa label, atau labelnya tidak sepadan dengan mana-mana kelas: kekal di kedudukan asal jika masih kosong */
   SL.forEach((_,i)=>{if(out[i])return;if(a[i]&&!used[i]&&(!nkA[i]||nl.indexOf(nkA[i])<0)){out[i]=a[i];used[i]=1;}else out[i]=blank();});
   /* 4) baki yang berisi tidak dibuang: disimpan di hujung */
@@ -1140,7 +1149,7 @@ function kelasKad(w,s,mode){
   const SL=slotsFor(ME,w),a=parseR(s.refleksi),need=rNeed(ME,w),n=Math.max(need+(s.rextra||0),a.length,SL.length),parts=s.parts||[];
   const inFile=(id,sl,cam)=>'<input class="sr" type="file" id="'+id+'" data-file="'+w+'" data-slot="'+sl+'" accept="'+(cam?'image/*" capture="environment':'.pdf,.jpg,.jpeg,.png,.docx,.pptx')+'"'+(cam?'':' multiple')+'>';
   const berkas=(sl)=>parts.map((p,gi)=>({p,gi})).filter(o=>(o.p.slot==null?-1:o.p.slot)===sl).map(o=>{const p=o.p,gi=o.gi;
-    return '<div class="file part"><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':''))+(p.ext==='PDF'?'<details style="margin-top:6px"'+(p.range?' open':'')+'><summary class="hint" style="cursor:pointer">Hantar halaman tertentu sahaja?'+(p.range?' ('+esc(p.range)+')':'')+'</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+gi+'" value="'+esc(p.range||'')+'" placeholder="cth. 3-5 atau 1,4" aria-label="Halaman yang dihantar" style="min-height:44px;width:100%"><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+gi+'">Pilih halaman dengan gambar</button></div></details>':'')+'</div>'+
+    return '<div class="file part"><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+sahBox(w,gi,p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':''))+(p.ext==='PDF'?'<details style="margin-top:6px"'+(p.range?' open':'')+'><summary class="hint" style="cursor:pointer">Hantar halaman tertentu sahaja?'+(p.range?' ('+esc(p.range)+')':'')+'</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+gi+'" value="'+esc(p.range||'')+'" placeholder="cth. 3-5 atau 1,4" aria-label="Halaman yang dihantar" style="min-height:44px;width:100%"><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+gi+'">Pilih halaman dengan gambar</button></div></details>':'')+'</div>'+
       '<span class="pbtn" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm pri" data-act="pbuka" data-w="'+w+'" data-i="'+gi+'" aria-label="Lihat '+esc(p.name)+'">Lihat</button><button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+gi+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>';}).join('');
   let h='';
   if(s.merging)h+='<div class="merge busy" role="status"><b>'+esc(s.mstage||'Menggabungkan fail…')+'</b></div>';
@@ -1154,9 +1163,9 @@ function kelasKad(w,s,mode){
     h+='<div class="ringkas3" role="status"><div><b>'+SL.length+'</b><span>kelas dijadualkan</span></div><div class="ok"><b>'+nHantar+'</b><span>sudah dihantar</span></div><div class="'+(nTindak?'todo':'ok')+'"><b>'+nTindak+'</b><span>perlu tindakan</span></div></div>';}
   if(FULL)h+='<div class="rl-head"><span class="lbl">'+'Refleksi &amp; kehadiran siap</span><span class="pill '+(done>=need?'ok':'idle')+'" id="rp-'+w+'">'+done+' / '+need+' kelas</span></div>';
   if(FULL&&s.drPulih)h+='<div class="note" role="status"><b>Memulihkan '+s.drPulih+' fail draf daripada pelayan…</b></div>';
-  if(FULL&&s.pend&&(s.parts||[]).length){const PP=s.parts,sv=LIVE&&PP.every(p=>p.dId||p.dDone),gl=LIVE&&PP.some(p=>p.dGagal);
+  if(FULL&&s.pend&&(s.parts||[]).length){const PP=s.parts,sv=LIVE&&!DRAF_OFF&&PP.every(p=>p.dId||p.dDone),gl=LIVE&&!DRAF_OFF&&PP.some(p=>p.dGagal);
     h+=sv?'<div class="note" role="status" style="background:#e8f5ec;border-left:6px solid #1d7a46;color:#123d24;padding:12px 14px;border-radius:12px"><b>Fail anda disimpan dengan selamat sebagai draf di pelayan.</b><p style="margin:4px 0 0">Ia tidak akan hilang walaupun anda tutup halaman atau buka di peranti lain. Fail ini <b>belum dihantar</b>: tekan <b>Hantar</b> pada tajuk hari apabila sedia.</p></div>'
-    :'<div class="note" role="alert" style="background:#fff4d6;border-left:6px solid #c98a00;color:#4a3400;padding:12px 14px;border-radius:12px"><b>'+(gl?'Sebahagian fail belum disimpan ke pelayan.':LIVE?'Menyimpan fail ke pelayan…':'Fail anda belum dihantar.')+'</b><p style="margin:4px 0 0">'+(gl?'Semak sambungan internet, kemudian tekan <b>Cuba lagi</b> pada fail tersebut. Jangan tutup halaman ini sehingga semua fail bertanda ✓.':LIVE?'Jangan tutup halaman ini sehingga semua fail bertanda ✓ Disimpan di pelayan.':'Fail yang dipilih hanya tersimpan dalam pelayar ini. Tekan <b>Hantar</b> pada tajuk hari supaya fail selamat.')+'</p></div>';}
+    :'<div class="note" role="alert" style="background:#fff4d6;border-left:6px solid #c98a00;color:#4a3400;padding:12px 14px;border-radius:12px"><b>'+(gl?'Sebahagian fail belum disimpan ke pelayan.':LIVE&&!DRAF_OFF?'Menyimpan fail ke pelayan…':'Fail anda belum dihantar.')+'</b><p style="margin:4px 0 0">'+(gl?'Semak sambungan internet, kemudian tekan <b>Cuba lagi</b> pada fail tersebut. Jangan tutup halaman ini sehingga semua fail bertanda ✓.':LIVE&&!DRAF_OFF?'Jangan tutup halaman ini sehingga semua fail bertanda ✓ Disimpan di pelayan.':'Fail yang dipilih hanya tersimpan dalam pelayar ini. Tekan <b>Hantar</b> pada tajuk hari supaya fail selamat.')+'</p></div>';}
   if(FULL)h+=drBanner(w,s,false);
   const HM=s.hari||{},HOK=!RNG(ME)&&!/pengurusan murid/i.test(ME_JAWATAN)&&(s.status==='belum'||s.status==='draf'||s.status==='dihantar'),GR={};
   SL.forEach((sl,i)=>{const g=GR[sl.h]||(GR[sl.h]={h:sl.h,ix:[],ds:[]});g.ix.push(i);if(sl.prog&&sl.pr){for(let d=sl.pr[0];d<=sl.pr[1];d++)if(g.ds.indexOf(d)<0)g.ds.push(d);}else if(g.ds.indexOf(sl.h)<0)g.ds.push(sl.h);});
@@ -1168,7 +1177,7 @@ function kelasKad(w,s,mode){
   const gHead=g=>{const sent=g.ds.every(d=>HM[d]),da=Math.min.apply(null,g.ds),db=Math.max.apply(null,g.ds),nm=HARI[da-1]+(db>da?' hingga '+HARI[db-1]:''),ada=g.ix.some(adaF)||tdAll(g)||(LIVE&&s.status==='draf'&&!!(s.file&&s.file.fileId)),bz=s.merging||s.sending||s.upFail||s.conv||parts.some(p=>p.conv);
     const when=sent?(HM[Math.min.apply(null,g.ds)]||HM[g.ds[0]]):'',ed=!!(ui.rEd&&ui.rEd[w+'-'+g.h]),addG=!!(ui.dAdd&&ui.dAdd[w+'-'+g.h]),op=opOf(g),nAda=g.ix.filter(adaF).length;
     return '<div class="dayhd" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--panel2,#eef4ef)"><span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button type="button" class="btn sm dtg" data-act="dtog" data-k="'+w+'-'+g.h+'" aria-expanded="'+(op?'true':'false')+'" aria-label="'+(op?'Tutup':'Buka')+' kelas '+esc(dayLbl(g.h,w))+'" style="min-width:44px;font-size:1.1rem;line-height:1">'+(op?'▲':'▼')+'</button><span><b style="font-size:1.12rem">'+esc(dayLbl(g.h,w))+(db>da?' (hingga '+HARI[db-1]+')':'')+'</b>'+(g.h===1?(()=>{const dm=hariTrk(1,w),wm=weeks.find(x=>x.s.getTime()===new Date(dm.getFullYear(),dm.getMonth(),dm.getDate()).getTime());return wm&&wm.n!==w?' <span class="pill" style="background:#C49A48;color:#1b1b1b;font-weight:700" title="Isnin ini jatuh dalam Minggu '+wm.n+' di takwim, tetapi RPH-nya dihantar bersama Minggu '+w+'">Minggu '+wm.n+'</span>':'';})():'')+'<br><span class="hint">'+g.ix.length+' kelas · '+(sent?('RPH sudah dihantar'+(nAda?' · '+nAda+' fail baharu belum dihantar':'')):(nAda+' kelas sudah ada fail'))+'</span></span></span>'+
-      (sent&&!addG?'<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill ok">✓ Dihantar '+esc(fmtDT(new Date(when)))+'</span>'+(s.status==='dihantar'?'<button class="btn pri sm" data-act="kem" data-w="'+w+'" data-g="'+g.h+'">Kemaskini</button>':'')+(s.file?'<button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Lihat RPH</button>':'')+(s.status==='dihantar'?'<details class="lagi"><summary class="btn sm" aria-label="Tindakan lain untuk '+esc(dayLbl(g.h,w))+'">⋯</summary><div class="lagi-m"><button class="btn sm warn" data-act="tarikhari" data-w="'+w+'" data-d="'+g.ds.join(',')+'">Tarik balik hari ini</button><span class="hint">Membuang RPH hari ini daripada fail. Untuk menambah atau membetulkan, guna <b>Kemaskini</b>.</span></div></details>':'')+'</span>':(HOK?'<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+(ada?'':'<span class="hint">Muat naik RPH hari ini dahulu</span>')+(addG?'<button class="btn sm" data-act="kbatal" data-w="'+w+'" data-g="'+g.h+'">Batal</button><button class="btn pri" data-act="ksimpan" data-w="'+w+'" data-g="'+g.h+'" data-d="'+g.ds.join(',')+'"'+(bz?' disabled':'')+'>'+(s.sending?'Menyimpan…':'Simpan kemaskini')+'</button>':'<button class="btn pri" data-act="hantarhari" data-w="'+w+'" data-d="'+g.ds.join(',')+'"'+(ada&&!bz?'':' disabled')+'>'+(s.sending?'Menghantar…':'Hantar '+esc(nm))+'</button>')+'</span>':''))+'</div>';};
+      (sent&&!addG?'<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill ok">✓ Dihantar '+esc(fmtDT(new Date(when)))+'</span>'+(s.status==='dihantar'?'<button class="btn pri sm" data-act="kem" data-w="'+w+'" data-g="'+g.h+'">Kemaskini</button>':'')+(s.file?'<button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Lihat RPH</button>':'')+(s.status==='dihantar'?'<details class="lagi"><summary class="btn sm" aria-label="Tindakan lain untuk '+esc(dayLbl(g.h,w))+'">⋯</summary><div class="lagi-m"><button class="btn sm warn" data-act="tarikhari" data-w="'+w+'" data-d="'+g.ds.join(',')+'">Tarik balik hari ini</button><span class="hint">Membuang RPH hari ini daripada fail. Untuk menambah atau membetulkan, guna <b>Kemaskini</b>.</span></div></details>':'')+'</span>':(HOK?'<span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+(ada?(g.ix.some(i=>parts.some(p=>p.slot===i&&p.perluSah))?'<span class="hint" style="color:#b26a00">Sahkan penukaran Word dahulu</span>':''):'<span class="hint">Muat naik RPH hari ini dahulu</span>')+(addG?'<button class="btn sm" data-act="kbatal" data-w="'+w+'" data-g="'+g.h+'">Batal</button><button class="btn pri" data-act="ksimpan" data-w="'+w+'" data-g="'+g.h+'" data-d="'+g.ds.join(',')+'"'+(bz?' disabled':'')+'>'+(s.sending?'Menyimpan…':'Simpan kemaskini')+'</button>':'<button class="btn pri" data-act="hantarhari" data-w="'+w+'" data-d="'+g.ds.join(',')+'"'+(ada&&!bz?'':' disabled')+'>'+(s.sending?'Menghantar…':'Hantar '+esc(nm))+'</button>')+'</span>':''))+'</div>';};
   let MN='';
   if(GR[1]){const dm=hariTrk(1,w),wm=weeks.find(x=>x.s.getTime()===new Date(dm.getFullYear(),dm.getMonth(),dm.getDate()).getTime()),tr=dm.getDate()+' '+BLNP[dm.getMonth()];
     if(wm&&wm.n!==w){
@@ -1194,7 +1203,7 @@ function kelasKad(w,s,mode){
   const lain=berkas(-1);
   h+='<details class="card" style="gap:8px"'+(lain?' open':'')+'><summary><b>Fail lain (bukan untuk kelas tertentu)</b></summary><div class="parts">'+lain+'</div><div class="actions"><label class="btn sm" style="cursor:pointer" for="f-'+w+'-x">Muat naik fail lain</label>'+inFile('f-'+w+'-x',-1,false)+'</div></details>';
   if(n<100)h+='<button class="btn sm" data-act="radd" data-w="'+w+'">+ Tambah kelas</button>';
-  h+='<p class="hint" style="margin:6px 0 0">Fail disimpan sementara dalam pelayar ini sehingga anda tekan Hantar.</p><div class="save" id="sv-'+w+'"></div>';
+  h+='<p class="hint" style="margin:6px 0 0">'+(LIVE&&!DRAF_OFF?'Fail disimpan sebagai draf di pelayan sehingga anda tekan Hantar.':'Fail disimpan sementara dalam pelayar ini sehingga anda tekan Hantar.')+'</p><div class="save" id="sv-'+w+'"></div>';
   return h;
 }
 function rEditor(w,s,locked){
@@ -1321,7 +1330,7 @@ function fileBlock(w,s,editable){
     return '<div>'+lbl+'<div class="file"><span class="ext">'+esc(f.ext)+'</span><div class="nm"><b>'+esc(f.name)+'</b><span>'+fileMeta(f)+'</span></div>'+
       '<button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Buka fail</button><button class="btn sm warn" data-act="frm" data-w="'+w+'" aria-label="Buang '+esc(f.name)+'">Buang fail</button></div>'+err+'</div>';
   }
-  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':''))+(p.ext==='PDF'?'<label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px">Hantar sebahagian halaman sahaja? (tidak wajib) <input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+i+'" value="'+esc(p.range||'')+'" placeholder="kosongkan untuk hantar semua halaman" aria-label="Halaman yang dihantar" style="flex:1;min-height:40px;font-size:15px"></label><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+i+'" style="margin-top:6px">Lihat dan pilih halaman</button>':'')+'</div>'+
+  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+sahBox(w,i,p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':''))+(p.ext==='PDF'?'<label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px">Hantar sebahagian halaman sahaja? (tidak wajib) <input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+i+'" value="'+esc(p.range||'')+'" placeholder="kosongkan untuk hantar semua halaman" aria-label="Halaman yang dihantar" style="flex:1;min-height:40px;font-size:15px"></label><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+i+'" style="margin-top:6px">Lihat dan pilih halaman</button>':'')+'</div>'+
     '<span class="pbtn"><button class="btn sm pri" data-act="pbuka" data-w="'+w+'" data-i="'+i+'" aria-label="Lihat '+esc(p.name)+'">Lihat</button>'+
     '<button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+i+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>').join('');
   let res='';
@@ -2753,6 +2762,18 @@ function handleFiles(w,list,slot){
   convertParts(w,good);
 }
 // Tukar Word/PowerPoint kepada PDF semasa muat naik supaya pilihan halaman boleh digunakan
+/* Banding fail asal (paparan anggaran dalam pelayar) dengan PDF hasil penukaran, sebelum guru mengesahkan. */
+async function bandingBuka(w,i){const s=sub(ME,w),p=s.parts&&s.parts[i];if(!p||!p.blob)return;
+  const old=document.getElementById('cmpov');if(old)old.remove();
+  const u=URL.createObjectURL(p.blob),ov=document.createElement('div');ov.id='cmpov';ov.className='cmp-ov';ov._u=[u];ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','Semak hasil penukaran');
+  const pp=p.asal&&p.asal.ext==='PPTX';
+  ov.innerHTML='<div class="cmp"><div class="cmp-h"><b>Semak hasil penukaran: '+esc(p.name)+'</b><button class="btn sm" data-act="cmptutup">Tutup</button></div>'+
+    '<div class="cmp-g"><section><h4>Fail asal'+(pp?'':' (paparan anggaran)')+'</h4><div id="cmp-asal" class="cmp-p">'+(p.asal&&p.asal.blob?(pp?'<p class="hint">Paparan PowerPoint tidak tersedia dalam pelayar. Bandingkan dengan fail anda dalam PowerPoint.</p>':'<p class="hint">Memuatkan…</p>'):'<p class="hint">Fail asal tiada pada peranti ini. Bandingkan dengan fail Word anda sendiri.</p>')+'</div></section>'+
+    '<section><h4>Hasil PDF (yang akan dihantar)</h4><iframe class="cmp-p" src="'+u+'" title="Hasil PDF"></iframe><a class="hint" href="'+u+'" target="_blank" rel="noopener">Buka PDF penuh di tab baharu</a></section></div>'+
+    '<div class="cmp-f"><button class="btn warn" data-act="tidaksah" data-w="'+w+'" data-i="'+i+'">Susunan tidak betul</button><button class="btn pri" data-act="sahpdf" data-w="'+w+'" data-i="'+i+'">Sahkan &amp; gunakan PDF</button></div></div>';
+  document.body.appendChild(ov);
+  if(p.asal&&p.asal.blob&&!pp){try{await loadDocxLib();const h=document.getElementById('cmp-asal');if(!h)return;h.innerHTML='';await window.docx.renderAsync(p.asal.blob,h,null,{inWrapper:false,breakPages:true,ignoreLastRenderedPageBreak:true});}
+    catch(e){const h=document.getElementById('cmp-asal');if(h)h.innerHTML='<p class="hint">Paparan asal tidak dapat dimuatkan. Bandingkan dengan fail Word anda sendiri.</p>';}}}
 async function convertParts(w,list){
   const s=sub(ME,w);
   const todo=list.filter(p=>p.ext==='DOCX'||p.ext==='PPTX');
@@ -2767,6 +2788,7 @@ async function convertParts(w,list){
       const bin=atob(r.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
       const blob=new Blob([u],{type:'application/pdf'});
       try{await loadPdfLib();const d=await window.PDFLib.PDFDocument.load(await blob.arrayBuffer());p.pgs=d.getPageCount();}catch(_){}
+      p.asal={blob:p.blob,name:p.name,ext:p.ext};p.perluSah=true;
       p.blob=blob;p.ext='PDF';p.size=blob.size;p.name=p.name.replace(/\.(docx|pptx)$/i,'.pdf');p.convNote='';
       s.mtok=(s.mtok||0)+1;
     }catch(e){
@@ -2806,38 +2828,41 @@ async function finishFile(w,s,tok,blob,meta){
 const PT={db:null,open(){if(PT.db)return PT.db;PT.db=new Promise((res,rej)=>{try{const r=indexedDB.open('irise-parts',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});return PT.db;},
   async op(m,f){try{const d=await PT.open();return await new Promise((res,rej)=>{const t=d.transaction('p',m),o=f(t.objectStore('p'));t.oncomplete=()=>res(o&&o.result);t.onerror=()=>rej(t.error);});}catch(e){return null;}}};
 const ptKey=w=>(ME||'')+'|'+(LIVE?'L':'D')+'|'+w;
-function ptSave(w){const s=sub(ME,w),a=(s.parts||[]).filter(x=>x.blob).map(x=>({name:x.name,ext:x.ext,size:x.size,range:x.range||'',slot:x.slot==null?null:x.slot,blob:x.blob,pgs:x.pgs||0,cid:x.cid||'',dId:x.dId||''}));
+function ptSave(w){const s=sub(ME,w),a=(s.parts||[]).filter(x=>x.blob).map(x=>({name:x.name,ext:x.ext,size:x.size,range:x.range||'',slot:x.slot==null?null:x.slot,blob:x.blob,pgs:x.pgs||0,cid:x.cid||'',dId:x.dId||'',perluSah:!!x.perluSah,asal:x.asal||null}));
   if(a.length&&s.pend)PT.op('readwrite',o=>o.put(a,ptKey(w)));else PT.op('readwrite',o=>o.delete(ptKey(w)));drafSync(w);}
 /* ===== Draf di pelayan: setiap fail dipilih terus disimpan ke Drive (Minggu NN/_draf). Fail tidak hilang walaupun guru menukar peranti,
    pelayar, atau data pelayar dipadam. Draf dibuang selepas fail itu digabung dan dimuat naik sebagai fail minggu. ===== */
-let DQ=Promise.resolve();
+let DQ=Promise.resolve(),DRAF_OFF=false;
 const cidBaru=()=>'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const drafK=(w,p)=>{const SL=slotsFor(ME,w);return p.slot!=null&&p.slot>=0&&SL[p.slot]?slotLabel(ME,p.slot,w):'';};
-function drafUpAll(w){if(!LIVE)return;const s=sub(ME,w);let n=0;(s.parts||[]).forEach(p=>{if(!p.dId&&!p.dDone&&!p.conv&&!p.dBusy&&p.blob){p.cid=p.cid||cidBaru();p.dBusy=true;p.dGagal=false;n++;DQ=DQ.then(()=>drafUp1(w,p));}});if(n)render();}
+function drafUpAll(w){if(!LIVE||DRAF_OFF)return;const s=sub(ME,w);let n=0;(s.parts||[]).forEach(p=>{if(!p.dId&&!p.dDone&&!p.conv&&!p.dBusy&&p.blob){p.cid=p.cid||cidBaru();p.dBusy=true;p.dGagal=false;n++;DQ=DQ.then(()=>drafUp1(w,p));}});if(n)render();}
 async function drafUp1(w,p){const s=sub(ME,w);
   try{if(!(s.parts||[]).includes(p))return;
-    const r=await api('drafSimpan',{w,cid:p.cid,slot:p.slot==null?-1:p.slot,k:drafK(w,p),range:p.range||'',name:p.name,ext:p.ext,pgs:p.pgs||0,b64:await blobToB64(p.blob)});
-    p.dId=r.id;p.dSig=(p.range||'')+'|'+p.slot;s.dKnown=(s.dKnown||[]).concat([r.id]);
+    const r=await api('drafSimpan',{w,cid:p.cid,slot:p.slot==null?-1:p.slot,k:drafK(w,p),range:p.range||'',name:p.name,ext:p.ext,pgs:p.pgs||0,perluSah:p.perluSah?1:0,b64:await blobToB64(p.blob)});
+    p.dId=r.id;p.dSig=(p.range||'')+'|'+p.slot+'|'+(p.perluSah?1:0);s.dKnown=(s.dKnown||[]).concat([r.id]);
     if(!(s.parts||[]).includes(p)||p.dDone){api('drafBuang',{w,ids:[r.id]}).catch(()=>{});p.dId=null;}
-  }catch(e){p.dGagal=true;if(e&&e.code==='AUTH')handleErr(e);}
+  }catch(e){p.dGagal=true;p.dErr=(e&&e.message)||'';if(/tindakan tidak sah/i.test(p.dErr)){DRAF_OFF=true;}if(e&&e.code==='AUTH')handleErr(e);}
   finally{p.dBusy=false;ptSave(w);render();}}
-function drafSync(w){if(!LIVE)return;const s=sub(ME,w),now=(s.parts||[]).map(p=>p.dId).filter(Boolean),hilang=(s.dKnown||[]).filter(id=>now.indexOf(id)<0);s.dKnown=now;
+function drafSync(w){if(!LIVE||DRAF_OFF)return;const s=sub(ME,w),now=(s.parts||[]).map(p=>p.dId).filter(Boolean),hilang=(s.dKnown||[]).filter(id=>now.indexOf(id)<0);s.dKnown=now;
   if(hilang.length)api('drafBuang',{w,ids:hilang}).catch(()=>{});
-  (s.parts||[]).forEach(p=>{if(!p.dId)return;const sig=(p.range||'')+'|'+p.slot;if(p.dSig!==sig){p.dSig=sig;api('drafKemas',{w,id:p.dId,range:p.range||'',slot:p.slot==null?-1:p.slot,k:drafK(w,p)}).catch(()=>{});}});}
+  (s.parts||[]).forEach(p=>{if(!p.dId)return;const sig=(p.range||'')+'|'+p.slot+'|'+(p.perluSah?1:0);if(p.dSig!==sig){p.dSig=sig;api('drafKemas',{w,id:p.dId,range:p.range||'',slot:p.slot==null?-1:p.slot,k:drafK(w,p),perluSah:p.perluSah?1:0}).catch(()=>{});}});}
 /* Fail sudah digabung ke dalam fail minggu di pelayan: draf tidak diperlukan lagi. */
-function drafSelesai(w,ps){if(!LIVE)return;const s=sub(ME,w),ids=ps.map(p=>p.dId).filter(Boolean);ps.forEach(p=>{p.dId=null;p.dDone=true;});s.dKnown=(s.dKnown||[]).filter(i=>ids.indexOf(i)<0);if(ids.length)api('drafBuang',{w,ids}).catch(()=>{});}
-async function drafPulih(w,s){if(!LIVE||s.drChk||s.status==='disemak')return;s.drChk=true;
+function drafSelesai(w,ps){if(!LIVE)return;ps.forEach(p=>{if(p.asal&&p.asal.blob&&!p.asalOk){p.asalOk=1;const ak=drafK(w,p);blobToB64(p.asal.blob).then(b64=>api('asalSimpan',{w,name:p.asal.name,ext:p.asal.ext,k:ak,b64})).catch(()=>{p.asalOk=0;});}});const s=sub(ME,w),ids=ps.map(p=>p.dId).filter(Boolean);ps.forEach(p=>{p.dId=null;p.dDone=true;});s.dKnown=(s.dKnown||[]).filter(i=>ids.indexOf(i)<0);if(ids.length)api('drafBuang',{w,ids}).catch(()=>{});}
+async function drafPulih(w,s){if(!LIVE||DRAF_OFF||s.drChk||s.status==='disemak')return;s.drChk=true;
   try{const r=await api('drafSenarai',{w}),L=(r&&r.draf)||[];if(!L.length)return;
     const ada=new Set();(s.parts||[]).forEach(p=>{if(p.dId)ada.add(p.dId);if(p.cid)ada.add(p.cid);});
     const baru=L.filter(d=>!ada.has(d.id)&&!(d.cid&&ada.has(d.cid)));if(!baru.length)return;
     s.drPulih=baru.length;render();const SL=slotsFor(ME,w);let n=0;
     for(const d of baru){try{const g=await api('drafAmbil',{w,id:d.id}),bin=atob(g.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
       let slot=null;if(d.k){const i=SL.findIndex((x,j)=>slotLabel(ME,j,w)===d.k);if(i>=0)slot=i;}if(slot==null&&d.slot>=0&&d.slot<SL.length)slot=d.slot;
-      if(!s.parts)s.parts=[];s.parts.push({name:d.name,ext:d.ext,size:d.size||u.length,blob:new Blob([u],{type:g.mime||''}),slot,range:d.range||'',pgs:d.pgs||undefined,dId:d.id,cid:d.cid,dSig:(d.range||'')+'|'+slot});n++;}catch(e){}}
+      if(!s.parts)s.parts=[];s.parts.push({name:d.name,ext:d.ext,size:d.size||u.length,blob:new Blob([u],{type:g.mime||''}),slot,range:d.range||'',pgs:d.pgs||undefined,dId:d.id,cid:d.cid,perluSah:!!d.perluSah,dSig:(d.range||'')+'|'+slot+'|'+(d.perluSah?1:0)});n++;}catch(e){}}
     s.dKnown=(s.parts||[]).map(p=>p.dId).filter(Boolean);s.drPulih=0;if(n){s.pend=true;ptSave(w);toast(n+' fail draf dipulihkan daripada pelayan. Fail itu belum dihantar.');}render();
   }catch(e){s.drChk=false;s.drPulih=0;render();}}
-const dStat=p=>!LIVE?'':p.dBusy?'<span class="hint" role="status">Menyimpan ke pelayan…</span>':p.dId?'<span class="hint" style="color:#1d7a46">✓ Disimpan di pelayan (belum dihantar)</span>':p.dGagal?'<span class="hint" style="color:#b3261e">Belum disimpan ke pelayan. <button class="btn sm" data-act="drafcuba">Cuba lagi</button></span>':'';
-function ptRestore(w,s){if(s.ptChk)return;s.ptChk=true;PT.op('readonly',o=>o.get(ptKey(w))).then(a=>{if(Array.isArray(a)&&a.length&&!(s.parts&&s.parts.length)&&!s.merging){a.forEach(p=>{if(!p.dId)delete p.dId;if(!p.cid)delete p.cid;p.dSig=(p.range||'')+'|'+p.slot;});s.parts=a;s.pend=true;s.dKnown=a.map(p=>p.dId).filter(Boolean);render();}}).finally(()=>drafPulih(w,s).then(()=>drafUpAll(w)));}
+const sahBox=(w,gi,p)=>!p.perluSah?'':'<div class="sahbox" role="alert"><b>Semak hasil penukaran '+(p.asal&&p.asal.ext==='PPTX'?'PowerPoint':'Word')+' ke PDF</b><p>Pastikan jadual dan susunan sama seperti fail asal sebelum dihantar.</p>'+
+  (p.panduan?'<div class="panduan"><b>Cara simpan sebagai PDF sendiri (susunan 100% sama):</b><ol><li><b>Komputer (Word):</b> Fail → Simpan Sebagai → jenis fail <b>PDF</b> → Simpan. (Atau Fail → Eksport → Cipta PDF.)</li><li><b>Telefon (aplikasi Word):</b> ⋯ → Eksport / Kongsi → <b>PDF</b>.</li><li><b>Google Docs:</b> Fail → Muat turun → <b>PDF</b>.</li></ol><p>Kemudian buang fail ini dan muat naik PDF tersebut.</p><div class="sahbtn"><button class="btn sm warn" data-act="prm" data-w="'+w+'" data-i="'+gi+'">Buang fail ini</button><button class="btn sm" data-act="sahpdf" data-w="'+w+'" data-i="'+gi+'">Tetap guna PDF ini</button></div></div>'
+  :'<div class="sahbtn"><button class="btn sm" data-act="banding" data-w="'+w+'" data-i="'+gi+'">Bandingkan</button><button class="btn sm warn" data-act="tidaksah" data-w="'+w+'" data-i="'+gi+'">Susunan tidak betul</button><button class="btn sm pri" data-act="sahpdf" data-w="'+w+'" data-i="'+gi+'">Sahkan &amp; gunakan PDF</button></div>')+'</div>';
+const dStat=p=>!LIVE?'':p.dBusy?'<span class="hint" role="status">Menyimpan ke pelayan…</span>':p.dId?'<span class="hint" style="color:#1d7a46">✓ Disimpan di pelayan (belum dihantar)</span>':DRAF_OFF?'<span class="hint" style="color:#8a5a00">Disimpan dalam pelayar ini sahaja (simpanan draf di pelayan belum diaktifkan). Tekan <b>Hantar</b> supaya selamat.</span>':p.dGagal?'<span class="hint" style="color:#b3261e">Belum disimpan ke pelayan'+(p.dErr?' ('+esc(p.dErr.slice(0,120))+')':'')+'. <button class="btn sm" data-act="drafcuba">Cuba lagi</button></span>':'';
+function ptRestore(w,s){if(s.ptChk)return;s.ptChk=true;PT.op('readonly',o=>o.get(ptKey(w))).then(a=>{if(Array.isArray(a)&&a.length&&!(s.parts&&s.parts.length)&&!s.merging){a.forEach(p=>{if(!p.dId)delete p.dId;if(!p.cid)delete p.cid;if(!p.asal)delete p.asal;p.dSig=(p.range||'')+'|'+p.slot+'|'+(p.perluSah?1:0);});s.parts=a;s.pend=true;s.dKnown=a.map(p=>p.dId).filter(Boolean);render();}}).finally(()=>drafPulih(w,s).then(()=>drafUpAll(w)));}
 function pendEdit(w){const s=sub(ME,w);s.pend=true;s.upFail=false;s.upErr='';s.mtok=(s.mtok||0)+1;ptSave(w);render();}
 const bolehH=s=>!s.merging&&!s.sending&&!s.conv&&!s.upFail&&((s.pend&&s.parts&&s.parts.length)||(s.file&&(!LIVE||s.file.fileId)));
 /* Hantar satu atau beberapa hari: fail hari itu digabung, ditambah pada fail minggu yang sudah ada di pelayan, kemudian hari ditanda dihantar. */
@@ -2859,6 +2884,7 @@ async function hariKirim(w,ds){
     }
   }
   const sel=(s.parts||[]).filter(p=>p.slot==null||p.slot<0||idx.indexOf(p.slot)>=0);
+  const blmSah=sel.filter(p=>p.perluSah);if(blmSah.length){toast('Sahkan hasil penukaran Word/PowerPoint dahulu: '+blmSah.map(p=>p.name).join(', ')+'. Tekan "Sahkan & gunakan PDF" pada fail tersebut.',true);return;}
   const sudah=ds.every(d=>(s.hari||{})[d]);let ganti=null;
   const adaHari=sel.some(p=>p.slot!=null&&p.slot>=0&&idx.indexOf(p.slot)>=0);
   /* Fail sudah ada di pelayan (draf, cth. selepas tarik balik atau hantar yang terputus): hari boleh dihantar terus tanpa muat naik semula. */
@@ -2872,7 +2898,7 @@ async function hariKirim(w,ds){
     if(lain&&!confirm(lain+' daripada '+jum+' kelas '+hariTxt(ds)+' belum ada RPH. Hantar yang siap dahulu? Kelas lain boleh ditambah kemudian dengan butang Kemaskini RPH.'))return;}
   s.sending=true;render();
   try{
-    if(LIVE){const f=await flushRefl(w);if(!f){toast('Refleksi belum berjaya disimpan. Hari belum dihantar. Cuba lagi.',true);return;}}
+    if(LIVE){const f=await flushReflSah(w,'Hari');if(!f)return;}
     if(!(LIVE&&s.dayUp===key)){
       const mo={sel,ds:ds.slice(),append:LIVE&&!!(s.file&&s.file.fileId),tambah:LIVE&&s.status==='dihantar',ganti};const ok=await mergeParts(w,mo);s.dayHal=mo.hal;s.dayHalAll=mo.halAll||null;
       if(!ok||s.upFail){s.upFail=false;s.merging=false;toast(s.upErr||'Fail belum berjaya dimuat naik. Hari belum dihantar.',true);return;}
@@ -3332,12 +3358,16 @@ document.addEventListener('click',e=>{
     }else{const u=URL.createObjectURL(p.blob);dl(u);toast('Fail Word/PowerPoint dimuat turun untuk dibuka dalam aplikasinya.');setTimeout(()=>URL.revokeObjectURL(u),60000);}}
   else if(a==='dtog'){ui.dOpen=ui.dOpen||{};const k=b.dataset.k;ui.dOpen[k]=b.getAttribute('aria-expanded')!=='true';render();}
   else if(a==='drafcuba'){const ww=ui.mw||CURRENT;const s0=sub(ME,ww);(s0.parts||[]).forEach(p=>{if(p.dGagal)p.dGagal=false;});drafUpAll(ww);}
+  else if(a==='sahpdf'){const s=sub(ME,w),p=s.parts&&s.parts[+b.dataset.i];if(p){p.perluSah=false;p.panduan=false;}const ov=document.getElementById('cmpov');if(ov)ov.remove();ptSave(w);render();toast('PDF disahkan.');}
+  else if(a==='tidaksah'){const s=sub(ME,w),p=s.parts&&s.parts[+b.dataset.i];if(p)p.panduan=true;const ov=document.getElementById('cmpov');if(ov)ov.remove();render();}
+  else if(a==='banding'){bandingBuka(w,+b.dataset.i);}
+  else if(a==='cmptutup'){const ov=document.getElementById('cmpov');if(ov){(ov._u||[]).forEach(u=>URL.revokeObjectURL(u));ov.remove();}}
   else if(a==='kem'){const k=w+'-'+b.dataset.g;ui.rEd=ui.rEd||{};ui.rEd[k]=true;ui.dAdd=ui.dAdd||{};ui.dAdd[k]=true;ui.dOpen=ui.dOpen||{};ui.dOpen[k]=true;render();}
   else if(a==='kbatal'){const k=w+'-'+b.dataset.g;if(ui.rEd)ui.rEd[k]=false;if(ui.dAdd)ui.dAdd[k]=false;render();}
   else if(a==='ksimpan'){const k=w+'-'+b.dataset.g,ds=(b.dataset.d||'').split(',').map(Number).filter(Boolean),SLk=slotsFor(ME,w),sk=sub(ME,w),baru=(sk.parts||[]).some(p=>p.slot!=null&&p.slot>=0&&SLk[p.slot]&&ds.indexOf(SLk[p.slot].h)>=0);
     const tamat=()=>{if(ui.rEd)ui.rEd[k]=false;if(ui.dAdd)ui.dAdd[k]=false;render();};
     if(baru&&ds.length){Promise.resolve(hariKirim(w,ds)).then(()=>{const s2=sub(ME,w);if(!(s2.parts||[]).some(p=>p.slot!=null&&SLk[p.slot]&&ds.indexOf(SLk[p.slot].h)>=0))tamat();});}
-    else{b.disabled=true;(LIVE?flushRefl(w):Promise.resolve(true)).then(ok=>{b.disabled=false;toast(ok?'Kemaskini disimpan.':'Belum berjaya disimpan. Cuba lagi.',!ok);if(ok)tamat();else render();});}}
+    else{b.disabled=true;(LIVE?flushReflSah(w,'Kemaskini'):Promise.resolve(true)).then(ok=>{b.disabled=false;if(ok)toast('Kemaskini disimpan.');if(ok)tamat();else render();});}}
   else if(a==='redit'){ui.rEd=ui.rEd||{};ui.rEd[w+'-'+b.dataset.g]=true;ui.dOpen=ui.dOpen||{};ui.dOpen[w+'-'+b.dataset.g]=true;render();}
   else if(a==='rsimpan'){const gk=b.dataset.g;b.disabled=true;(LIVE?flushRefl(w):Promise.resolve(true)).then(ok=>{b.disabled=false;if(ok&&gk&&ui.rEd)ui.rEd[w+'-'+gk]=false;toast(ok?'Refleksi dan kehadiran dikemas kini.':'Belum berjaya disimpan. Cuba lagi.',!ok);render();});}
   else if(a==='dadd'){ui.dAdd=ui.dAdd||{};const k=b.dataset.k;ui.dAdd[k]=!ui.dAdd[k];ui.dOpen=ui.dOpen||{};ui.dOpen[k]=true;render();}
@@ -3347,8 +3377,9 @@ document.addEventListener('click',e=>{
   else if(a==='salinwa'){salinWa(w);}
   else if(a==='hantar'){const s=sub(ME,w);if((!s.file&&!(s.parts&&s.parts.length))||s.merging)return;
     if(s.sending||s.upFail)return;
-    if(s.pend){s.sending=true;render();const kls=!/pengurusan murid/i.test(ME_JAWATAN)&&slotsFor(ME,w).length>0,mo=LIVE&&kls&&s.file&&s.file.fileId?{sel:(s.parts||[]).slice(),append:true,tambah:false,ganti:null}:undefined;mergeParts(w,mo).then(ok=>{if(mo&&ok&&!s.upFail){s.parts=[];s.pend=false;ptSave(w);}s.sending=false;if(s.pend||!s.file||s.upFail||(LIVE&&!s.file.fileId)){toast('Fail belum berjaya digabungkan. RPH belum dihantar.',true);render();return;}const bt=document.createElement('button');bt.dataset.act='hantar';bt.dataset.w=w;bt.dataset.sah='1';bt.style.display='none';document.body.appendChild(bt);bt.click();bt.remove();});return;}
-    if(LIVE){s.sending=true;render();flushRefl(w).then(ok=>{if(!ok){toast('Refleksi belum berjaya disimpan. RPH belum dihantar. Cuba lagi.',true);s.sending=false;render();return;}srv('hantar',{w,sv:s.semakVersi||0,jenis:PGL(s.jenis)?PGS(PGL(s.jenis)):''},'Minggu '+w+' berjaya dihantar untuk semakan.').then(()=>{s.sending=false;render();});});return;}
+    if(s.pend&&(s.parts||[]).some(p=>p.perluSah)){toast('Sahkan hasil penukaran Word/PowerPoint dahulu. Tekan "Sahkan & gunakan PDF" pada fail tersebut.',true);return;}
+      if(s.pend){s.sending=true;render();const kls=!/pengurusan murid/i.test(ME_JAWATAN)&&slotsFor(ME,w).length>0,mo=LIVE&&kls&&s.file&&s.file.fileId?{sel:(s.parts||[]).slice(),append:true,tambah:false,ganti:null}:undefined;mergeParts(w,mo).then(ok=>{if(mo&&ok&&!s.upFail){s.parts=[];s.pend=false;ptSave(w);}s.sending=false;if(s.pend||!s.file||s.upFail||(LIVE&&!s.file.fileId)){toast('Fail belum berjaya digabungkan. RPH belum dihantar.',true);render();return;}const bt=document.createElement('button');bt.dataset.act='hantar';bt.dataset.w=w;bt.dataset.sah='1';bt.style.display='none';document.body.appendChild(bt);bt.click();bt.remove();});return;}
+    if(LIVE){s.sending=true;render();flushReflSah(w,'RPH').then(ok=>{if(!ok){s.sending=false;render();return;}srv('hantar',{w,sv:s.semakVersi||0,jenis:PGL(s.jenis)?PGS(PGL(s.jenis)):''},'Minggu '+w+' berjaya dihantar untuk semakan.').then(()=>{s.sending=false;render();});});return;}
     s.prevKomen=s.status==='pembetulan'?s.komen:'';s.komen='';s.status='dihantar';s.diterima='';s.log.push({t:new Date().toISOString(),who:MYNAME,act:'Dihantar'});render();toast('Minggu '+w+' dihantar untuk semakan.');}
   else if(a==='tarik'){const s=sub(ME,w);
     if(LIVE){srv('tarik',{w,sv:s.semakVersi||0},'Hantaran ditarik balik. Anda boleh menggantikan fail.');return;}
@@ -3427,7 +3458,7 @@ async function saveRefl(w){
   try{
     if(LIVE){if(!q.rrid||q.rridV!==ver){q.rrid='rf'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);q.rridV=ver;}
       const r=await api('refleksi',{w,text:txt,expectedVersion:q.refleksiVersi||0,reqId:q.rrid});q.refleksiVersi=r.row.refleksiVersi;}
-    q.rbusy=false;q.retryN=0;q.offline=false;
+    q.rbusy=false;q.retryN=0;q.offline=false;q.rErrMsg='';
     if(q.rver===ver){q.rdirty=false;drClear(w);set('Semua perubahan disimpan · '+fmtDT(new Date()));}
     else saveRefl(w);
   }catch(err){
@@ -3438,12 +3469,19 @@ async function saveRefl(w){
       if(sv)sv.innerHTML='Konflik: refleksi diubah dalam sesi lain. <button class="btn sm" data-act="rkeep" data-w="'+w+'">Kekalkan teks saya</button> <button class="btn sm" data-act="rsrv" data-w="'+w+'">Guna versi pelayan</button>';
       return;}
     if(err.code==='AUTH'){posSimpan();handleErr(err);return;}
-    q.retryN=(q.retryN||0)+1;
+    q.rErrMsg=String(err.message||'');q.retryN=(q.retryN||0)+1;
     if(err.code==='NET'&&navigator.onLine===false){q.offline=true;const sv0=document.getElementById('sv-'+w);if(sv0)sv0.textContent=OFFMSG;return;}
     {const sv=document.getElementById('sv-'+w);if(sv){sv.textContent='Gagal disimpan: '+String(err.message||'cuba lagi').replace(/\.$/,'')+'. Teks anda masih ada di sini. Cuba semula automatik dalam '+Math.round(bkOff(q.retryN)/1000)+' saat. ';const bt=document.createElement('button');bt.className='btn sm';bt.dataset.act='rretry';bt.dataset.w=w;bt.textContent='Cuba lagi';sv.appendChild(bt);}}
     clearTimeout(q._t);q._t=setTimeout(()=>saveRefl(w),bkOff(q.retryN));
   }
 }
+/* Sebelum hantar: pastikan refleksi tersimpan. Jika konflik (refleksi juga disimpan dari tab/peranti lain), tanya guru terus. */
+async function flushReflSah(w,apa){
+  let ok=await flushRefl(w);if(ok)return true;const q=sub(ME,w);
+  if(q.rconflict){
+    if(!confirm('Refleksi minggu ini juga telah disimpan dari tab atau peranti lain.\n\nGunakan refleksi yang dipaparkan pada skrin ini sekarang?\n\n(Tekan Batal jika anda mahu menyemak versi lain dahulu.)'))return false;
+    q.refleksiVersi=q.srvVer||0;q.rconflict=false;q.rver=(q.rver||0)+1;q.rdirty=true;ok=await flushRefl(w);if(ok)return true;}
+  toast('Refleksi belum berjaya disimpan'+(q.rErrMsg?': '+q.rErrMsg.replace(/\.$/,''):'')+'. '+apa+' belum dihantar. Semak internet dan cuba lagi.',true);return false;}
 async function flushRefl(w){
   const q=sub(ME,w);clearTimeout(q._t);if(q.rconflict)return false;
   for(let i=0;i<30&&(q.rdirty||q.rbusy);i++){if(!q.rbusy)await saveRefl(w);await new Promise(r=>setTimeout(r,150));}
@@ -3456,7 +3494,7 @@ window.addEventListener('online',()=>{if(!LIVE)return;netBar().classList.remove(
   Object.keys(subs).forEach(k=>{const q=subs[k];if(q&&(q.rdirty||q.offline)&&!q.rbusy&&k.indexOf(ME+'-')===0){q.retryN=0;q.offline=false;const w=+k.slice(ME.length+1);saveRefl(w);}});
   if(ui.stale)loadInit().catch(handleErr);});
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_){}
-window.addEventListener('beforeunload',e=>{if(Object.values(subs).some(x=>x.rdirty||(x.pend&&(x.parts||[]).some(p=>!(LIVE&&(p.dId||p.dDone)))))){e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(Object.values(subs).some(x=>x.rdirty||(x.pend&&(x.parts||[]).some(p=>!(LIVE&&!DRAF_OFF&&(p.dId||p.dDone)))))){e.preventDefault();e.returnValue='';}});
 document.addEventListener('input',e=>{
   const r=e.target.closest('[data-rw]');
   if(r){const w=+r.dataset.rw,i=+r.dataset.ri,f=r.dataset.rf,q=sub(ME,w);
