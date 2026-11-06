@@ -1119,15 +1119,18 @@ const nkLbl=x=>String(x||'').toLowerCase().replace(/(isnin|selasa|rabu|khamis|ju
 /* Refleksi disimpan mengikut kedudukan kelas. Jika jadual, program atau Isnin berubah selepas refleksi ditulis, susunan kelas berubah dan
    refleksi akan muncul di bawah kelas yang salah. Selaraskan semula mengikut label kelas yang disimpan bersama setiap refleksi.
    Tiada teks diubah, hanya dipindah ke kelas yang betul; refleksi yang tiada padanan dikekalkan di hujung (tidak dibuang). */
-function alignR(w,s){if(!s||s.status==='belum'||s.status==='disemak'||s.rdirty||s.rSaving)return;const SL=slotsFor(ME,w),a=parseR(s.refleksi);if(!SL.length||!a.some(x=>x&&x.k))return;
-  const lab=SL.map((_,i)=>slotLabel(ME,i,w)),nl=lab.map(nkLbl);
-  if(!a.some((x,i)=>x&&x.k&&i<SL.length&&nkLbl(x.k)!==nl[i]))return;
-  const used={},isi=x=>!!(x&&(x.t||x.h||x.j||x.x||x.n)),blank=()=>({k:'',t:'',h:'',j:'',x:'',n:''});
-  const out=SL.map((sl,i)=>{let j=a.findIndex((x,q)=>!used[q]&&x&&x.k&&x.k===lab[i]);if(j<0)j=a.findIndex((x,q)=>!used[q]&&x&&x.k&&nkLbl(x.k)===nl[i]);
-    if(j<0&&a[i]&&!a[i].k&&!used[i])j=i;
-    if(j>=0){used[j]=1;return Object.assign({},a[j],{k:lab[i]});}return blank();});
-  const sisa=a.filter((x,q)=>!used[q]&&isi(x)),padan=a.filter((x,q)=>used[q]&&isi(x)).length;
-  if(sisa.length&&sisa.length>padan)return; /* kebanyakan tidak sepadan (cth. nama kelas ditukar): jangan sentuh */
+function alignR(w,s){if(!s||s.status==='belum'||s.status==='disemak'||s.rdirty)return;const SL=slotsFor(ME,w),a=parseR(s.refleksi);if(!SL.length||!a.some(x=>x&&x.k))return;
+  const lab=SL.map((_,i)=>slotLabel(ME,i,w)),nl=lab.map(nkLbl),nkA=a.map(x=>x&&x.k?nkLbl(x.k):'');
+  if(!a.some((x,i)=>nkA[i]&&i<SL.length&&nkA[i]!==nl[i]))return;
+  const used={},isi=x=>!!(x&&(x.t||x.h||x.j||x.x||x.n)),blank=()=>({k:'',t:'',h:'',j:'',x:'',n:''}),out=new Array(SL.length).fill(null);
+  /* 1) baris yang sudah di tempat betul kekal */
+  SL.forEach((_,i)=>{if(nkA[i]&&nkA[i]===nl[i]){out[i]=Object.assign({},a[i],{k:lab[i]});used[i]=1;}});
+  /* 2) baris yang labelnya sepadan dengan kelas lain dipindah ke kelas itu */
+  SL.forEach((_,i)=>{if(out[i])return;const j=nkA.findIndex((k,q)=>!used[q]&&k&&k===nl[i]);if(j>=0){out[i]=Object.assign({},a[j],{k:lab[i]});used[j]=1;}});
+  /* 3) baris tanpa label, atau labelnya tidak sepadan dengan mana-mana kelas: kekal di kedudukan asal jika masih kosong */
+  SL.forEach((_,i)=>{if(out[i])return;if(a[i]&&!used[i]&&(!nkA[i]||nl.indexOf(nkA[i])<0)){out[i]=a[i];used[i]=1;}else out[i]=blank();});
+  /* 4) baki yang berisi tidak dibuang: disimpan di hujung */
+  const sisa=a.filter((x,q)=>!used[q]&&isi(x));
   const ns=serR(out.concat(sisa));if(ns===s.refleksi)return;
   s.refleksi=ns;s.rdirty=true;s.rver=(s.rver||0)+1;saveRefl(w);}
 function kelasKad(w,s,mode){
