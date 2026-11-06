@@ -1112,6 +1112,7 @@ function alignR(w,s){if(!submitted(s)||s.rdirty)return;const SL=slotsFor(ME,w),a
 function kelasKad(w,s,mode){
   const FULL=mode!=='isnin',MP=monPindah(w);
   alignR(w,s);
+  if(FULL&&(s.status==='belum'||s.status==='draf'||s.status==='dihantar'||s.status==='pembetulan'))ptRestore(w,s);
   const SL=slotsFor(ME,w),a=parseR(s.refleksi),need=rNeed(ME,w),n=Math.max(need+(s.rextra||0),a.length,SL.length),parts=s.parts||[];
   const inFile=(id,sl,cam)=>'<input class="sr" type="file" id="'+id+'" data-file="'+w+'" data-slot="'+sl+'" accept="'+(cam?'image/*" capture="environment':'.pdf,.jpg,.jpeg,.png,.docx,.pptx')+'"'+(cam?'':' multiple')+'>';
   const berkas=(sl)=>parts.map((p,gi)=>({p,gi})).filter(o=>(o.p.slot==null?-1:o.p.slot)===sl).map(o=>{const p=o.p,gi=o.gi;
@@ -1125,6 +1126,7 @@ function kelasKad(w,s,mode){
   const adaF=sl=>parts.some(p=>(p.slot==null?-1:p.slot)===sl);
   const nF=SL.filter((_,i)=>adaF(i)).length,done=a.slice(0,need).filter(rFull).length;
   if(FULL)h+='<div class="rl-head"><span class="lbl">'+nF+' / '+SL.length+' kelas ada RPH · refleksi</span><span class="pill '+(done>=need?'ok':'idle')+'" id="rp-'+w+'">'+done+' / '+need+' kelas</span></div>';
+  if(FULL&&s.pend&&(s.parts||[]).length)h+='<div class="note" role="alert" style="background:#fff4d6;border-left:6px solid #c98a00;color:#4a3400;padding:12px 14px;border-radius:12px"><b>Fail anda belum dihantar.</b><p style="margin:4px 0 0">Fail yang dipilih hanya tersimpan dalam pelayar pada telefon atau komputer ini. Ia belum sampai ke pelayan. Jangan tukar peranti atau pelayar, dan jangan padam data pelayar. Tekan <b>Hantar</b> pada tajuk hari supaya fail selamat.</p></div>';
   if(FULL)h+=drBanner(w,s,false);
   const HM=s.hari||{},HOK=!RNG(ME)&&!/pengurusan murid/i.test(ME_JAWATAN)&&(s.status==='belum'||s.status==='draf'||s.status==='dihantar'),GR={};
   SL.forEach((sl,i)=>{const g=GR[sl.h]||(GR[sl.h]={h:sl.h,ix:[],ds:[]});g.ix.push(i);if(sl.prog&&sl.pr){for(let d=sl.pr[0];d<=sl.pr[1];d++)if(g.ds.indexOf(d)<0)g.ds.push(d);}else if(g.ds.indexOf(sl.h)<0)g.ds.push(sl.h);});
@@ -2872,6 +2874,13 @@ async function mergeParts(w,opt){
       s.merging=false;s.upFail=true;s.upErr='Fail Word atau PowerPoint tidak dapat ditukar kepada PDF sekarang. Cuba lagi, atau simpan fail itu sebagai PDF dahulu.';
       render();return;
     }
+    if(!(opt&&opt.append)&&parts.length===1&&parts[0].ext==='PDF'&&!String(parts[0].range||'').trim()&&parts[0].pgs&&parts[0].blob&&parts[0].blob.size<=20*1048576){
+      /* Satu fail PDF sahaja, tiada julat halaman: hantar fail asal sebagaimana ada, tanpa diproses semula. */
+      const p0=parts[0];if(opt)opt.hal=[1,p0.pgs];
+      const ok0=await finishFile(w,s,tok,p0.blob,{name:(/pengurusan murid/i.test(ME_JAWATAN)?'Laporan_M':'RPH_M')+w+'_'+first+'.pdf',ext:'PDF',size:p0.blob.size,date:fmtDT(new Date()),pages:p0.pgs,from:1,tambah:!!(opt&&opt.tambah),tarikHari:undefined,ganti:false});
+      if(ok0){dropOld();render();if(!opt)toast('Fail berjaya dimuat naik. Belum dihantar kepada pentadbir.');}
+      return !!ok0;
+    }
     render();
     if(parts.length>20)throw Object.assign(new Error('Terlalu banyak fail (maksimum 20). Gabungkan sebahagian dahulu.'),{apiMsg:1});
     await loadPdfLib();
@@ -3350,7 +3359,8 @@ window.addEventListener('offline',()=>{if(!LIVE)return;netBar().classList.add('s
 window.addEventListener('online',()=>{if(!LIVE)return;netBar().classList.remove('show');
   Object.keys(subs).forEach(k=>{const q=subs[k];if(q&&(q.rdirty||q.offline)&&!q.rbusy&&k.indexOf(ME+'-')===0){q.retryN=0;q.offline=false;const w=+k.slice(ME.length+1);saveRefl(w);}});
   if(ui.stale)loadInit().catch(handleErr);});
-window.addEventListener('beforeunload',e=>{if(Object.values(subs).some(x=>x.rdirty)){e.preventDefault();e.returnValue='';}});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_){}
+window.addEventListener('beforeunload',e=>{if(Object.values(subs).some(x=>x.rdirty||(x.pend&&(x.parts||[]).length))){e.preventDefault();e.returnValue='';}});
 document.addEventListener('input',e=>{
   const r=e.target.closest('[data-rw]');
   if(r){const w=+r.dataset.rw,i=+r.dataset.ri,f=r.dataset.rf,q=sub(ME,w);
