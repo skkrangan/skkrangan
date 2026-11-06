@@ -3887,7 +3887,8 @@ window.addEventListener('message', function(e){
 function openErph(){
   showModule('erph');
   const fr = erphFrame();
-  if(!fr.getAttribute('src')) fr.setAttribute('src', 'iRISE.html');
+  // ?v= memaksa pelayar/GitHub memuatkan versi iRISE terkini (berubah setiap 5 minit) supaya kemas kini terus sampai kepada staf.
+  if(!fr.getAttribute('src')) fr.setAttribute('src', 'iRISE.html?v=' + Math.floor(Date.now()/300000));
   else if(!erphSendToken() && !erphCredValid()) erphNeedAuth();
 }
 
