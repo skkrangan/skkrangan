@@ -3084,11 +3084,38 @@ async function docxMount(t,w,f){
     const bb=body();if(bb)bb.innerHTML=viewBody(t,w,f);
   }
 }
+/* Pratonton pantas: satu permintaan bagi setiap fail pada satu masa.
+   PDF dimuat turun sekali sahaja dalam sesi ini; DOCX menggunakan getfilePdf terus
+   agar tidak menghantar Word penuh dahulu dan PDF sekali lagi tanpa keperluan.
+   Kebenaran fail tetap diperiksa oleh Code.gs pada SETIAP panggilan pelayan. */
+const IRISE_PREVIEW_PENDING=new Map();
+async function irisePreviewAmbil(tid,w,f){
+  const word=String(f.ext||'').toUpperCase()==='DOCX';
+  if(word&&f.pdfUrl)return {url:f.pdfUrl,mime:'application/pdf',converted:true};
+  if(!word&&f.url)return {url:f.url,mime:f.mime||'application/pdf',converted:false};
+  const k=String(tid)+'|'+String(w)+'|'+String(f.fileId||'')+'|'+(word?'wordpdf':'asal');
+  if(IRISE_PREVIEW_PENDING.has(k))return IRISE_PREVIEW_PENDING.get(k);
+  const fetchOne=async action=>{
+    const r=await api(action,{t:tid,w});
+    if(!r||!r.b64)throw new Error('Pelayan tidak memulangkan kandungan fail.');
+    const bin=atob(r.b64),u=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+    const mime=r.mime||'application/pdf';
+    return {url:URL.createObjectURL(new Blob([u],{type:mime})),mime,converted:action==='getfilePdf'};
+  };
+  const task=(async()=>{
+    if(word){try{return await fetchOne('getfilePdf');}
+      catch(e){const original=await fetchOne('getfile');original.conversionError=e.message||'Penukaran PDF gagal';return original;}}
+    return fetchOne('getfile');
+  })();
+  IRISE_PREVIEW_PENDING.set(k,task);
+  try{return await task;}finally{if(IRISE_PREVIEW_PENDING.get(k)===task)IRISE_PREVIEW_PENDING.delete(k);}
+}
 function openViewer(tid,w,btn){
   const t=tName(tid),s=sub(tid,w),f=s.file;if(!f)return;
   vwReturn=btn||document.activeElement;
   const p=pillFor(s,w,tid),wk=weeks[w-1];
-  const needFetch=LIVE&&f.fileId&&!f.url;
+  const needFetch=LIVE&&f.fileId&&!(f.url||f.pdfUrl);
   const note=(!LIVE&&!f.url)?'<div class="vw-note">Paparan contoh. Dalam sistem sebenar, fail yang dimuat naik staf dipaparkan di sini daripada Google Drive.</div>':'';
   const dl=f.url?'<a class="btn sm" href="'+f.url+'" download="'+esc(f.name)+'">Muat turun</a><a class="btn sm" href="'+f.url+'" target="_blank" rel="noopener">Tab baharu</a>':'';
   const ft=[];
@@ -3116,21 +3143,27 @@ function openViewer(tid,w,btn){
       '<label class="lbl" for="vk-'+id+'">Catatan semakan <span class="hint">· wajib</span></label><textarea id="vk-'+id+'" data-kom="'+id+'" placeholder="Tulis catatan untuk staf (cth. RPH lengkap, tahniah).">'+esc(s.draft)+'</textarea><p class="err" id="vk-err" role="alert" hidden>Tulis catatan semakan dahulu sebelum meneruskan.</p><div class="actions"><button class="btn ok" data-act="semak" data-vw="1" data-t="'+tid+'" data-w="'+w+'">Tandakan Disemak</button><button class="btn warn" data-act="betul" data-vw="1" data-t="'+tid+'" data-w="'+w+'">Perlu pembetulan</button></div>');
     ft.unshift('<div class="vw-dec"><b>Keputusan semakan · ikut langkah</b>'+(hariChips(tid,w)?'<p style="margin:6px 0">'+hariChips(tid,w)+'</p>':'')+'<ol style="list-style:none;padding:0;margin:10px 0 0">'+l1+l2+l3+'</ol></div>');}
   let v=document.getElementById('viewer');if(!v){v=document.createElement('div');v.id='viewer';document.body.appendChild(v);}
+  const tokenPaparan='pv-'+Date.now()+'-'+Math.random().toString(36).slice(2);v.dataset.viewToken=tokenPaparan;
   v.innerHTML='<div class="vw" data-act="vclose" data-bg="1"><div class="vw-in dua" role="dialog" aria-modal="true" aria-label="Fail RPH">'+
    '<div class="vw-h"><div class="t"><b>'+esc(t.name)+' · Minggu '+w+'</b><span class="mono">'+wk.label+' · '+esc(f.name)+'</span></div><span class="pill '+p[0]+'">'+p[1]+'</span><span id="vdl">'+dl+'</span><button class="btn sm" data-act="vclose" id="vclose">Tutup</button></div>'+
-   note+'<div class="vw-b" id="vbody">'+(needFetch?'<div class="paper"><p>Memuatkan fail…</p></div>':viewBody(t,w,f))+'</div><div class="vw-f">'+ft.join('')+'</div></div></div>';
+   note+'<div class="vw-b" id="vbody">'+(needFetch?'<div class="paper" role="status"><p><b>Sedang mengambil fail RPH daripada Google Drive…</b></p><p>Fail besar mungkin mengambil masa. Fail asal kekal selamat; jangan tekan Hantar berulang kali.</p></div>':viewBody(t,w,f))+'</div><div class="vw-f">'+ft.join('')+'</div></div></div>';
   document.body.style.overflow='hidden';
   document.getElementById('vclose').focus();
   if(!needFetch&&f.url&&f.ext==='DOCX'&&!f.pdfUrl&&!f.pdfErr)docxMount(tid,w,f);
   if(needFetch){
-    api('getfile',{t:tid,w}).then(r=>{
-      const bin=atob(r.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
-      f.url=URL.createObjectURL(new Blob([u],{type:r.mime||'application/pdf'}));
+    irisePreviewAmbil(tid,w,f).then(pr=>{
+      if(pr.converted){f.pdfUrl=pr.url;}
+      else {f.url=pr.url;f.mime=pr.mime;}
+      const vv=document.getElementById('viewer');
+      if(!vv||vv.dataset.viewToken!==tokenPaparan)return; // Elak respons lama menimpa fail lain.
       const b=document.getElementById('vbody');if(!b)return;
       b.innerHTML=viewBody(t,w,f);
-      const d=document.getElementById('vdl');if(d)d.innerHTML='<a class="btn sm" href="'+f.url+'" download="'+esc(f.name)+'">Muat turun</a><a class="btn sm" href="'+f.url+'" target="_blank" rel="noopener">Tab baharu</a>';
-      if(f.ext==='DOCX')docxMount(tid,w,f);
-    }).catch(e=>{const b=document.getElementById('vbody');if(b)b.innerHTML='<div class="paper"><p>'+esc(e.message||'Fail tidak dapat dibuka.')+'</p></div>';});
+      const url=pr.converted?f.pdfUrl:f.url;
+      const nama=pr.converted?f.name.replace(/\.docx$/i,'.pdf'):f.name;
+      const d=document.getElementById('vdl');if(d)d.innerHTML='<a class="btn sm" href="'+url+'" download="'+esc(nama)+'">'+(pr.converted?'Simpan PDF pratonton':'Muat turun')+'</a><a class="btn sm" href="'+url+'" target="_blank" rel="noopener">Tab baharu</a>';
+      if(String(f.ext||'').toUpperCase()==='DOCX'&&!pr.converted)docxMount(tid,w,f);
+    }).catch(e=>{const v=document.getElementById('viewer');if(!v||v.dataset.viewToken!==tokenPaparan)return;
+      const b=document.getElementById('vbody');if(b)b.innerHTML='<div class="paper"><p>Fail belum berjaya dipaparkan: '+esc(e.message||'cuba lagi')+'</p><p>Fail asal tidak diubah. Tutup dan tekan Semak Fail sekali lagi.</p></div>';});
   }
 }
 /* Satu tetingkap untuk satu minggu: RPH minggu itu digabung dengan halaman refleksi, kehadiran dan catatan semakan menjadi 1 PDF; guru boleh simpan PDF itu dari atas tetingkap. */
@@ -3166,7 +3199,7 @@ async function openGabung(btn,w){
   gbBusy=false;
 }
 function closeViewer(){
-  const v=document.getElementById('viewer');if(v)v.innerHTML='';
+  const v=document.getElementById('viewer');if(v){v.dataset.viewToken='';v.innerHTML='';}
   document.body.style.overflow='';
   if(vwReturn&&document.contains(vwReturn))vwReturn.focus();vwReturn=null;
 }
@@ -5117,7 +5150,15 @@ async function hariKirim(w,ds,onlySlot){
       ds.forEach(d=>{const lama=Array.isArray(KH0[d])?KH0[d]:(HM0[d]?idx.filter(i=>SL[i].h===d&&!SL[i].prog).map(i=>nkLbl(slotLabel(ME,i,w))):[]);lama.forEach(k=>{const f0=KF_0[d]&&KF_0[d][k];o.push(Array.isArray(f0)&&f0.length?{d,k,f:f0}:{d,k});});});  /* nama fail kelas lama dikekalkan */
       idx.forEach(i=>{if(SL[i].prog)return;{const fn=(s.parts||[]).filter(p=>p.slot===i).map(p=>String(p.name||'')).filter(Boolean);if(fn.length)o.push({d:SL[i].h,k:nkLbl(slotLabel(ME,i,w)),f:fn});}});
       return o;})();
-    if(LIVE){const r=await srv('hantarHari',{w,hari:ds,hal:s.dayHal,halSemua:s.dayHalAll||undefined,kelas:kelasK,sv:s.semakVersi||0,jenis:PGL(s.jenis)?PGS(PGL(s.jenis)):''});if(!r)return;}
+    if(LIVE){const r=await srv('hantarHari',{w,hari:ds,hal:s.dayHal,halSemua:s.dayHalAll||undefined,kelas:kelasK,sv:s.semakVersi||0,jenis:PGL(s.jenis)?PGS(PGL(s.jenis)):''});
+      if(!r)return;
+      // Jangan bersihkan draf atau paparkan berjaya jika pelayan tidak mengesahkan
+      // rekod Hantaran, status dan fail yang betul.
+      if(!r.row||r.row.w!==w||r.row.status!=='dihantar'||!r.row.file||!r.row.file.fileId){
+        toast('Respons penghantaran tidak lengkap. Semak Rekod Saya atau muat semula sebelum cuba lagi; jangan hantar berulang kali.',true);
+        return;
+      }
+    }
     else{const hm=Object.assign({},s.hari||{});ds.forEach(d=>{if(!hm[d])hm[d]=new Date().toISOString();});s.hari=hm;
       if(kelasK){const kh=Object.assign({},s.kh||{}),kf=Object.assign({},s.kf||{});ds.forEach(d=>{kh[d]=[...new Set(kelasK.filter(x=>x.d===d).map(x=>x.k))];const nk=Object.assign({},kf[d]||{});kelasK.filter(x=>x.d===d&&Array.isArray(x.f)&&x.f.length).forEach(x=>{nk[x.k]=x.f;});kf[d]=nk;});s.kh=kh;s.kf=kf;}
       if(s.status!=='dihantar'){s.prevKomen=s.status==='pembetulan'?s.komen:'';s.komen='';s.status='dihantar';s.diterima='';}
@@ -5322,7 +5363,11 @@ window.addEventListener('message',e=>{
   else if(ui.screen==='loading'||ui.screen==='login'||ui.stale){if(!ui.stale)ui.screen='loading';render();loadInit().catch(handleErr);}
 });
 async function api(action,data,_retry){
-  const body=JSON.stringify(Object.assign({action,idToken:ID_TOKEN,reqId:'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)},data||{}));
+  // Kekalkan reqId sama semasa semua percubaan semula (termasuk pembaharuan token)
+  // agar operasi tulis yang mungkin sudah berjaya tidak dilaksanakan dua kali.
+  const payload=Object.assign({},data||{});
+  const requestId=payload.reqId||('r'+Date.now().toString(36)+Math.random().toString(36).slice(2,7));
+  const body=JSON.stringify(Object.assign({action,idToken:ID_TOKEN,reqId:requestId},payload));
   let r;
   const had=Math.min(240000,100000+Math.round(body.length/1048576)*12000);/* > masa menunggu giliran di pelayan (90 s) supaya permintaan tidak dibatalkan semasa beratur *//* fail besar di internet perlahan perlukan masa lebih */
   const GET=()=>{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),had);
@@ -5341,7 +5386,7 @@ async function api(action,data,_retry){
     await new Promise(res=>setTimeout(res,2500*(n+1)+Math.round(Math.random()*1500)));
     try{r=await GET();j=await r.json();}catch(e){break;}
   }
-  if(!j.ok){if(j.code==='AUTH'&&EMBED&&!_retry){await askParentToken();return api(action,data,true);}
+  if(!j.ok){if(j.code==='AUTH'&&EMBED&&!_retry){await askParentToken();return api(action,Object.assign({},payload,{reqId:requestId}),true);}
     const x=new Error(j.code==='STALE'?'Rekod anda baru sahaja dikemas kini. Sila cuba sekali lagi.':(j.error||'Ralat pelayan. Sila cuba lagi.'));x.code=j.code;x.versi=j.versi;x.teks=j.teks;x.semakVersi=j.semakVersi;x.apiMsg=true;throw x;}
   return j;
 }
@@ -5378,7 +5423,8 @@ function applyRow(r){
   if(Object.prototype.hasOwnProperty.call(r,'file')){
     q.file=r.file?Object.assign({},r.file,{date:fmtDT(new Date(r.file.date||Date.now()))}):null;
   }
-  if(q.file&&old&&old.url&&old.fileId===q.file.fileId)q.file.url=old.url;
+  if(q.file&&old&&old.fileId===q.file.fileId){if(old.url)q.file.url=old.url;if(old.pdfUrl)q.file.pdfUrl=old.pdfUrl;}
+  // Paparan fail dan PDF Word yang sama dikekalkan pada sesi semasa supaya Drive tidak dimuat turun berulang.
   if(r.log)q.log=r.log;
 }
 function setupLive(p){
@@ -5836,10 +5882,10 @@ async function saveRefl(w){
       const r=await api('refleksi',{w,text:txt,expectedVersion:q.refleksiVersi||0,reqId:q.rrid});q.refleksiVersi=r.row.refleksiVersi;}
     q.rbusy=false;q.retryN=0;q.offline=false;q.rErrMsg='';
     if(q.rver===ver){q.rdirty=false;drClear(w);q.rSavedAt=new Date();set('Disimpan pada '+jamMs(q.rSavedAt));}
-    else saveRefl(w);
+    else {clearTimeout(q._t);q._t=setTimeout(()=>saveRefl(w),1800);}
   }catch(err){
     q.rbusy=false;
-    if(err.code==='CONFLICT'&&err.teks===txt){q.refleksiVersi=err.versi;if(q.rver===ver){q.rdirty=false;drClear(w);q.rSavedAt=new Date();set('Disimpan pada '+jamMs(q.rSavedAt));}else saveRefl(w);return;}
+    if(err.code==='CONFLICT'&&err.teks===txt){q.refleksiVersi=err.versi;if(q.rver===ver){q.rdirty=false;drClear(w);q.rSavedAt=new Date();set('Disimpan pada '+jamMs(q.rSavedAt));}else{clearTimeout(q._t);q._t=setTimeout(()=>saveRefl(w),1800);}return;}
     if(err.code==='CONFLICT'){q.rconflict=true;q.srvVer=err.versi;q.srvTeks=err.teks||'';clearTimeout(q._t);
       const sv=document.getElementById('sv-'+w);
       if(sv)sv.innerHTML='Konflik: refleksi diubah dalam sesi lain. <button class="btn sm" data-act="rkeep" data-w="'+w+'">Kekalkan teks saya</button> <button class="btn sm" data-act="rsrv" data-w="'+w+'">Guna versi pelayan</button>';
@@ -5894,7 +5940,7 @@ document.addEventListener('input',e=>{
     const sv=document.getElementById('sv-'+w);if(sv&&!q.rconflict)sv.textContent='Menyimpan…';
     const pl=document.getElementById('rp-'+w);if(pl){const d=rDone(q,ME,w),n=rNeed(ME,w);pl.textContent=d+' / '+n+' kelas';pl.className='pill '+(d>=n?'ok':'idle');}
     const dg=r.closest('details.rday');if(dg){const ar=parseR(q.refleksi),ids=[...new Set([...dg.querySelectorAll('[data-ri]')].map(x=>+x.dataset.ri))],ok=ids.filter(ix=>ar[ix]&&rFull(ar[ix])).length,sp=dg.querySelector('summary .pill');if(sp){sp.textContent=ok+'/'+ids.length+' sesi lengkap';sp.className='pill '+(ok>=ids.length?'ok':'idle');}}
-    if(!q.rconflict){clearTimeout(q._t);q._t=setTimeout(()=>saveRefl(w),LIVE?2000:450);}if(f==='x')render();else if(f==='n'){const bx=r.closest('.rl-f');if(bx){let er=bx.querySelector('.err');const bad=arr[i].x==='Lain-lain'&&!val.trim();if(bad&&!er){er=document.createElement('span');er.className='err';er.textContent='Nyatakan sebab.';bx.appendChild(er);}else if(!bad&&er)er.remove();}}return;}
+    if(!q.rconflict){clearTimeout(q._t);q._t=setTimeout(()=>saveRefl(w),LIVE?4500:450);}if(f==='x')render();else if(f==='n'){const bx=r.closest('.rl-f');if(bx){let er=bx.querySelector('.err');const bad=arr[i].x==='Lain-lain'&&!val.trim();if(bad&&!er){er=document.createElement('span');er.className='err';er.textContent='Nyatakan sebab.';bx.appendChild(er);}else if(!bad&&er)er.remove();}}return;}
   const je=e.target.closest('[data-jwe]');if(je&&ui.jwe){const k=je.dataset.jwe,E=ui.jwe;
     if(k==='a'||k==='b'){E[k]=+je.value;if(k==='a'&&E.b<E.a){E.b=E.a;const sb=document.querySelector('[data-jwe=b]');if(sb)sb.value=String(E.b);}}
     else if(k==='kelas'&&je.tagName==='SELECT'&&je.value==='__lain'){E.lain=true;E.kelas='';render();return;}
