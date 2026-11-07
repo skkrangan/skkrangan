@@ -539,10 +539,9 @@ small{font-size:.875rem}
 .side-brand b .wm,.brand b .wm{display:inline;font-family:'Rubik','Arial Black','Arial Rounded MT Bold',Impact,Arial,sans-serif;font-style:italic;font-weight:900;text-transform:none;letter-spacing:-.03em;margin:0;font-size:1.3em;color:#0B4EB0}
 .side-brand b .wm.sd{-webkit-text-stroke:2px #fff;paint-order:stroke fill}
 
-/* kemudahan: tiada huruf besar penuh, tulisan boleh dibesarkan */
+/* kemudahan: tiada huruf besar penuh; saiz teks mengikut reka bentuk standard */
 body *{text-transform:none!important}
 .wrap.ez .stp{scroll-margin-top:84px}
-html.besar body{zoom:1.2}
 .acct{flex-wrap:wrap;justify-content:flex-end}.acct button{white-space:nowrap}
 .hr{max-width:100%}
 .wrap.ez .state.wait,.wrap.ez .state.ok{border-width:3px;text-align:center;padding:22px 16px}
@@ -723,7 +722,6 @@ h1.pg.pg2{display:block!important;white-space:normal!important;font-size:1.15rem
 .acct.ac2{gap:10px;align-items:center}
 .acct.ac2 .ib{width:46px;height:46px!important;padding:0!important;border-radius:50%!important;display:inline-flex;align-items:center;justify-content:center;background:#F1F6F3;border:1px solid #DCE8E1;color:#1b1b1b;position:relative;flex:none}
 .acct.ac2 .ib svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.acct.ac2 .ib-a{font-weight:800!important;font-size:1rem!important}
 .ib-bd{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#DC2626;color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
 .av-w{position:relative}
 .acct.ac2 .av-b{display:inline-flex;align-items:center;gap:8px;height:48px!important;padding:0 10px 0 2px!important;border-radius:99px!important;background:transparent;border:0;color:#1b1b1b;font-weight:700}
@@ -1280,6 +1278,70 @@ body .hr2.ppsl .hr-cols.dengan-panel .kc2-c{overflow-x:visible;flex-wrap:wrap}
  body .hr2.ppsl .hr-kanan .rp-l textarea{min-height:220px}
  body .hr2.ppsl .hr-kanan .rp-filemeta{padding:0 2px}
 }
+
+/* ===== PENAMBAHBAIKAN: NAVIGASI HARI MEMENUHI LEBAR PAPARAN =====
+   Hari mengembang sama rata dan anak panah kekal di kedua-dua hujung.
+   Tiada perubahan pada fungsi pemilihan hari atau data RPH. */
+body .hr2.ppsl .dt3 {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 12px;
+}
+body .hr2.ppsl .dt3-l {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scrollbar-width: thin;
+}
+body .hr2.ppsl .dt3-t {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  min-height: 66px;
+  padding: 10px 8px;
+  text-align: center;
+  box-sizing: border-box;
+}
+body .hr2.ppsl .dt3-a {
+  width: 48px;
+  height: 60px;
+  margin-bottom: 0;
+  align-self: center;
+}
+/* Pada ruang sempit, hari kekal boleh dipilih dengan menatal mendatar. */
+@media (max-width: 1050px) {
+  body .hr2.ppsl .dt3-t { flex: 1 0 100px; }
+}
+@media (max-width: 600px) {
+  body .hr2.ppsl .dt3 {
+    grid-template-columns: 38px minmax(0, 1fr) 38px;
+    gap: 6px;
+  }
+  body .hr2.ppsl .dt3-l { gap: 6px; }
+  body .hr2.ppsl .dt3-t { flex: 0 0 102px; min-height: 58px; }
+  body .hr2.ppsl .dt3-a { width: 38px; height: 54px; }
+}
+
+/* iRISE — Footer global seragam pada semua halaman, tidak menutup kandungan. */
+.main{display:flex;flex-direction:column;min-height:100vh}
+.irise-global-footer{
+  margin-top:auto;flex-shrink:0;text-align:center;
+  padding:16px 20px 18px;border-top:1px solid var(--line);
+  background:var(--surface);color:var(--muted);
+  font-family:var(--font-body);font-size:.82rem;font-weight:600;
+  letter-spacing:.055em;
+}
+.irise-start{display:flex;flex-direction:column;min-height:100vh}
+.irise-start>.wrap{flex:1;width:100%}
+@media(max-width:760px){.irise-global-footer{padding:12px 10px 16px;font-size:.76rem}}
 </style>
 <style id="emerald">
 /* ===== Emerald Executive: lapisan visual sahaja (tiada perubahan fungsi, menu, teks atau JavaScript) ===== */
@@ -1591,6 +1653,23 @@ select.peran{max-width:170px;font-size:.82rem}
 .tema-btn{min-width:38px;padding:0 10px}
 }
 </style>
+
+<style id="irise-pilih-halaman-jelas">
+/* Kotak pemilih halaman: dipaparkan terus, tidak lagi tersembunyi dalam details. */
+body .hr2.ppsl .kc2-pages {grid-column:1/-1;min-width:0;padding:0 0 12px}
+body .hr2.ppsl .hp-card,.hp-card {width:100%;min-width:0;box-sizing:border-box;border:2px solid #b5d9c2;border-left:6px solid #0f704a;border-radius:15px;background:linear-gradient(110deg,#edf8f0,#fff);padding:15px 18px;display:grid;gap:12px}
+.hp-title{font-size:1.08rem;font-weight:800;color:#0c5337;display:flex;align-items:center;gap:9px}
+.hp-title svg{width:24px;height:24px;flex:none;stroke:#0c5337;fill:none;stroke-width:2}
+.hp-desc{font-size:.93rem;color:#385a49;line-height:1.5;margin:0}
+.hp-current{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid #d8e9dc;border-radius:10px;padding:10px 12px;color:#194731;font-weight:700}
+.hp-actions{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.hp-actions .hp-open{flex:1 1 215px;min-height:51px!important;font-size:1.01rem!important;font-weight:800!important;background:#0d6541!important;color:#fff!important;border-color:#0d6541!important;border-radius:10px!important}
+.hp-actions label{display:flex;flex-direction:column;gap:4px;flex:1 1 150px;min-width:0;font-size:.84rem;font-weight:700;color:#365545}
+.hp-actions input{width:100%;min-height:51px;padding:9px 12px;border:1px solid #a9c7b4;border-radius:10px;background:#fff;font:inherit;color:#193f2b}
+.hp-card.hp-wait{background:#f7f8f4;border-color:#dadfda;border-left-color:#8d9d93}
+.hp-card.hp-wait .hp-title{color:#55685c}
+@media(max-width:650px){.hp-actions{flex-direction:column}.hp-actions .hp-open{flex:initial;width:100%}.hp-actions label{width:100%}}
+</style>
 </head>
 <body>
 
@@ -1611,8 +1690,7 @@ const LIVE=!!CONFIG.API_URL;
 const EMBED=LIVE&&!!CONFIG.PARENT_ORIGIN&&window.parent!==window;
 let NOW=new Date();
 let ME_POSISI='';
-let TEMA=document.documentElement.getAttribute('data-tema')||'terang';let BESAR=false;try{BESAR=localStorage.getItem('irise.besar')==='1'}catch(e){}
-document.documentElement.classList.toggle('besar',BESAR);
+let TEMA=document.documentElement.getAttribute('data-tema')||'terang';
 const BANTUAN={nama:'Pn. Ajek anak Sumping / Pentadbir iRISE',tel:''};
 function bukaBantuan(){
   const o=document.createElement('div');o.className='bantu-ov';o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Bantuan');
@@ -1646,7 +1724,7 @@ function sahHantar(w,s,ok){
 function rangeStr(a){a.sort((x,y)=>x-y);const o=[];for(let i=0;i<a.length;){let j=i;while(j+1<a.length&&a[j+1]===a[j]+1)j++;o.push(j>i?a[i]+'-'+a[j]:''+a[i]);i=j+1;}return o.join(',');}
 async function pilihHalaman(w,i){
   const s=sub(ME,w),p=(s.parts||[])[i];if(!p||!p.blob)return;
-  const d=dlg('<h2>Pilih halaman</h2><p class="hint">Tekan gambar untuk tanda (hijau) halaman yang mahu dihantar. Tiada tanda bermaksud hantar semua.</p><div id="ph-g" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px;margin:12px 0">Memuatkan halaman…</div><div class="actions"><button class="btn pri big" data-x="ok">Guna halaman ini</button><button class="btn big" data-x="semua">Hantar semua</button></div>');
+  const d=dlg('<h2>Pilih halaman RPH kelas ini</h2><p class="hint">Tekan gambar untuk tanda (hijau) halaman yang mahu dihantar. Tiada tanda bermaksud hantar semua.</p><div id="ph-g" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px;margin:12px 0">Memuatkan halaman…</div><div class="actions"><button class="btn pri big" data-x="ok">Guna halaman ini</button><button class="btn big" data-x="semua">Hantar semua</button></div>');
   const g=d.o.querySelector('#ph-g'),pilih=new Set();
   {const bt=d.o.querySelector('.bantu');bt.style.maxWidth='1200px';bt.style.width='96vw';bt.style.maxHeight='94vh';bt.style.overflowY='auto';}
   d.o.addEventListener('click',e=>{
@@ -2017,7 +2095,7 @@ function ppsTop2(w,s,pv,nx,AW){
     '<button class="wn-b nx" data-act="mwn" data-w="'+(nx?nx.n:'')+'"'+(nx?'':' disabled')+' aria-label="Minggu seterusnya"><span><small>Seterusnya</small><b>'+(nx?'Minggu '+nx.n:'Tiada')+'</b></span><span class="wn-ar">›</span></button></div>';
   /* Kelas lengkap = RPH dihantar + refleksi + kehadiran lengkap (atau tiada sesi). */
   const nL=ix.filter(i=>td(i)||(slotRph(ME,s,w,i)&&rFull(a[i]||BLK))).length,pL=N?Math.round(nL*100/N):100;
-  const kj='<div class="kj kj2" title="RPH dihantar '+nR+'/'+N+' · Refleksi '+nF+'/'+N+' · Kehadiran '+nK+'/'+N+' · Tarikh akhir: '+esc(fmtDL(dl))+'"><span class="kj-ic">'+KJ_IK+'</span><div class="kj-m"><b>Kemajuan Minggu '+w+'</b><span>'+nL+' / '+N+' kelas lengkap</span><i class="kj-bar"><i style="width:'+pL+'%"></i></i></div><b class="kj-pc">'+pL+'%</b></div>';
+  const kj='<div class="kj kj2" title="RPH dihantar '+nR+'/'+N+' · Refleksi '+nF+'/'+N+' · Kehadiran '+nK+'/'+N+' · Tarikh akhir: '+esc(fmtDL(dl))+'"><span class="kj-ic">'+KJ_IK+'</span><div class="kj-m"><b>Minggu '+w+'</b><span>'+nL+' / '+N+' kelas lengkap</span><i class="kj-bar"><i style="width:'+pL+'%"></i></i></div><b class="kj-pc">'+pL+'%</b></div>';
   return lm+'<div class="wn-row">'+nav+kj+'</div>';
 }
 const KJ_IK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="13" width="3.2" height="7" rx="1" fill="currentColor" stroke="none"/><rect x="10.4" y="8" width="3.2" height="12" rx="1" fill="currentColor" stroke="none"/><rect x="16.8" y="4" width="3.2" height="16" rx="1" fill="currentColor" stroke="none"/><path d="M3 21h18"/></svg>';
@@ -2088,7 +2166,7 @@ function kelasKad(w,s,mode){
   const SL=slotsFor(ME,w),a=parseR(s.refleksi),need=rNeed(ME,w),n=Math.max(need+(s.rextra||0),a.length,SL.length),parts=s.parts||[];
   const inFile=(id,sl,cam)=>'<input class="sr" type="file" id="'+id+'" data-file="'+w+'" data-slot="'+sl+'" accept="'+(cam?'image/*" capture="environment':'.pdf,.jpg,.jpeg,.png,.docx,.doc,.pptx')+'"'+(cam?'':' multiple')+'>';
   const berkas=(sl)=>parts.map((p,gi)=>({p,gi})).filter(o=>(o.p.slot==null?-1:o.p.slot)===sl).map(o=>{const p=o.p,gi=o.gi;
-    return '<div class="file part"><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+sahBox(w,gi,p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':(p.asal?'<span class="hint" style="color:#945000">Ditukar daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'. Jika susun atur berubah, buang fail ini dan muat naik PDF yang dieksport terus daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'.</span>':'')))+(p.ext==='PDF'?'<details style="margin-top:6px"'+(p.range?' open':'')+'><summary class="hint" style="cursor:pointer">Hantar halaman tertentu sahaja?'+(p.range?' ('+esc(p.range)+')':'')+'</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+gi+'" value="'+esc(p.range||'')+'" placeholder="cth. 3-5 atau 1,4" aria-label="Halaman yang dihantar" style="min-height:44px;width:100%"><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+gi+'">Pilih halaman dengan gambar</button></div></details>':'')+'</div>'+
+    return '<div class="file part"><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+sahBox(w,gi,p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':(p.asal?'<span class="hint" style="color:#945000">Ditukar daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'. Jika susun atur berubah, buang fail ini dan muat naik PDF yang dieksport terus daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'.</span>':'')))+halPilihKad(w,gi,p)+'</div>'+
       '<span class="pbtn" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn sm pri" data-act="pbuka" data-w="'+w+'" data-i="'+gi+'" aria-label="Lihat '+esc(p.name)+'">Lihat</button><button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+gi+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>';}).join('');
   let h='';
   if(s.merging)h+='<div class="merge busy" role="status"><b>'+esc(s.mstage||'Menggabungkan fail…')+'</b></div>';
@@ -2188,7 +2266,7 @@ const rk=i=>i<SL.length?(SL[i].h===1?6:SL[i].h):10+i;ORD.sort((x,y)=>rk(x)-rk(y)
   const kadHari=g=>{const sentD=gSent(g),kunciW=s.status==='disemak',terima=!!(s.diterima||s.reviewed),bzy=s.merging||s.sending||s.upFail||s.conv||parts.some(p=>p.conv);
     const cards=selOrd.map((i,n)=>{const sl=SL[i],r=a[i]||BB,PG=!!(sl&&sl.prog),nt=!!(PG&&sl.tp&&sl.tp!=='p'),tdv=!nt&&tdSlot(sl,r),inf=kmInfo(sl),pp=parts.map((p,gi)=>({p,gi})).filter(o=>o.p.slot===i);
       const sent=sentD&&!nt&&slotRph(ME,s,w,i),fn=sent?namaFailRphKelas(ME,s,w,i):null,boleh=sent&&!terima&&!kunciW&&bolehTindakanKelas(s,sl,w,i);
-      let pill,fail='',btn='',sahKelas='';
+      let pill,fail='',btn='',sahKelas='',halKelas='';
       if(nt){pill='<span class="kc2-p">Tiada RPH diperlukan</span>';fail='<span class="kc2-h">'+esc(PGN(sl.pr))+'</span>';}
       else if(sent){pill='<span class="kc2-p ok"><i class="kc2-pc">'+PI.tick+'</i>'+(kunciW?'RPH disemak':'RPH dihantar')+'</span>';
         fail='<details class="kc2-f" data-act="lbl"><summary>'+PI.file+'<span>'+esc(fn.nama.join(', ')||'RPH dihantar')+'</span></summary><div class="kc2-fd">'+(fn.gabungan?'Kelas ini dihantar dalam <b>PDF gabungan mingguan</b> (nama fail asal kelas tidak direkodkan dalam hantaran lama).':'Nama fail asal: <b>'+esc(fn.nama.join(', '))+'</b>')+'<br>Dihantar: '+esc(fmtDT(new Date((s.hari||{})[g.ds[0]]||Date.now())))+(s.file&&s.file.name?'<br>Fail mingguan: '+esc(s.file.name):'')+'</div></details>';
@@ -2200,6 +2278,7 @@ const rk=i=>i<SL.length?(SL[i].h===1?6:SL[i].h):10+i;ORD.sort((x,y)=>rk(x)-rk(y)
         const diPelayan=LIVE&&pp.every(o=>!!o.p.dId&&!o.p.dBusy),sedang=pp.some(o=>o.p.conv||o.p.dBusy),gagal=pp.some(o=>o.p.dGagal);
         pill='<span class="kc2-p '+(diPelayan?'ok':'sd')+'"><i class="kc2-pd"></i>'+(diPelayan?'✓ Dimuat naik sebagai draf · belum dihantar':sedang?'Sedang memuat naik…':gagal?'Simpanan draf gagal':'Fail dipilih · belum dihantar')+'</span>';fail=pp.map(o=>'<span class="kc2-f">'+PI.file+'<span>'+esc(o.p.name)+'</span></span>'+dStat(o.p)+(o.p.conv?'<div class="kc2-h" role="status">Menukar Word kepada PDF…</div>':'')+(o.p.convNote?'<div class="kc2-h" role="alert" style="color:#a02a22">'+esc(o.p.convNote)+'</div>':'')+(['DOCX','DOC','PPTX'].includes(o.p.ext)&&!o.p.conv?'<button type="button" class="btn sm" data-act="wordcuba" data-w="'+w+'" data-i="'+o.gi+'">Cuba Tukar Word ke PDF</button>':'')).join('');
         // Letakkan arahan pengesahan di bawah MAKLUMAT KELAS dan FAIL, merentasi seluruh kad.
+        halKelas=pp.map(o=>halPilihKad(w,o.gi,o.p)).join('');
         sahKelas=pp.map(o=>sahBox(w,o.gi,o.p)).join('');
         btn='<button class="btn sm" data-act="pbuka" data-w="'+w+'" data-i="'+pp[0].gi+'">'+PI.eye+'Semak Fail</button><button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+pp[0].gi+'">Buang</button>'+(HOK?'<button class="btn sm pri" data-act="khantar" data-w="'+w+'" data-slot="'+i+'" data-g="'+g.h+'" data-d="'+g.ds.join(',')+'"'+(bzy||pp.some(o=>o.p.perluSah||o.p.dBusy||o.p.dGagal||(LIVE&&!DRAF_OFF&&!o.p.dId)||['DOCX','DOC','PPTX'].includes(o.p.ext))?' disabled':'')+'>'+PI.up+(s.sending?'Menghantar…':pp.some(o=>o.p.perluSah)?'Sahkan PDF dahulu':pp.some(o=>['DOCX','DOC','PPTX'].includes(o.p.ext))?'Tunggu PDF':pp.some(o=>o.p.dBusy)?'Memuat naik…':'Hantar RPH Kelas Ini')+'</button>':'');}
       else if(tdv){pill='<span class="kc2-p"><i class="kc2-pd"></i>Tiada sesi</span>';fail='<span class="kc2-h">'+esc(TDLBL(r.x))+'</span>';}
@@ -2213,7 +2292,7 @@ const rk=i=>i<SL.length?(SL[i].h===1?6:SL[i].h):10+i;ORD.sort((x,y)=>rk(x)-rk(y)
       return '<article class="kc2'+(on?' on':'')+(sent?' st-ok':pp.length?' st-sd':' st-bh')+'">'+
         '<div class="kc2-a"><span class="kc2-n">'+(n+1)+'</span><span class="kc2-ic '+mpWarna(inf.sj)+'">'+(PG?PI.cal:MP_IKON[mpIkon(inf.sj)])+'</span>'+
         '<div class="kc2-t"><b>'+esc(inf.nama)+'</b><span>'+esc(inf.kl)+(inf.wkt?' &nbsp;·&nbsp; '+esc(inf.wkt):'')+'</span>'+(inf.masa?'<span class="kc2-m">'+PI.jam+esc(inf.masa)+'</span>':'')+'</div></div>'+
-        '<div class="kc2-b">'+pill+fail+(sent||pp.length?'':(btn?'<div class="kc2-x">'+btn+'</div>':''))+'</div>'+ (sahKelas?'<div class="kc2-verify">'+sahKelas+'</div>':'')+
+        '<div class="kc2-b">'+pill+fail+(sent||pp.length?'':(btn?'<div class="kc2-x">'+btn+'</div>':''))+'</div>'+ (halKelas?'<div class="kc2-pages">'+halKelas+'</div>':'')+ (sahKelas?'<div class="kc2-verify">'+sahKelas+'</div>':'')+
         ((sent||pp.length)&&btn?'<div class="kc2-x kc2-xr">'+btn+'</div>':'')+
         '<div class="kc2-c"><span class="kc2-ci">'+PI.pen+'<b>Refleksi:</b>'+rPill+'</span><span class="kc2-ci">'+PI.users+'<b>Kehadiran:</b>'+kh+'</span><span class="kc2-ci">'+PI.clip+'<b>Status:</b>'+st+'</span>'+
         (bisa?'<button type="button" class="btn sm kc2-ref" data-act="rmbuka" data-w="'+w+'" data-i="'+i+'" aria-controls="rmo">'+PI.pen+(rFull(r)?'Kemas Kini Refleksi':'Isi Refleksi &amp; Kehadiran')+'</button>':'')+
@@ -2441,7 +2520,7 @@ function fileBlock(w,s,editable){
     return '<div>'+lbl+'<div class="file"><span class="ext">'+esc(f.ext)+'</span><div class="nm"><b>'+esc(f.name)+'</b><span>'+fileMeta(f)+'</span></div>'+
       '<button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Buka fail</button><button class="btn sm warn" data-act="frm" data-w="'+w+'" aria-label="Buang '+esc(f.name)+'">Buang fail</button></div>'+err+'</div>';
   }
-  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+sahBox(w,i,p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':(p.asal?'<span class="hint" style="color:#945000">Ditukar daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'. Jika susun atur berubah, buang fail ini dan muat naik PDF yang dieksport terus daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'.</span>':'')))+(p.ext==='PDF'?'<label class="hint" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px">Hantar sebahagian halaman sahaja? (tidak wajib) <input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+i+'" value="'+esc(p.range||'')+'" placeholder="kosongkan untuk hantar semua halaman" aria-label="Halaman yang dihantar" style="flex:1;min-height:40px;font-size:15px"></label><button class="btn sm" data-act="pilihhal" data-w="'+w+'" data-i="'+i+'" style="margin-top:6px">Lihat dan pilih halaman</button>':'')+'</div>'+
+  const rows=parts.map((p,i)=>'<div class="file part"><span class="ext">'+(i+1)+'</span><div class="nm"><b>'+esc(p.name)+'</b><span>'+p.ext+' · '+fmtSize(p.size)+(p.pgs?' · '+p.pgs+' halaman':'')+'</span>'+dStat(p)+sahBox(w,i,p)+(p.conv?'<span class="hint" role="status">Menukar kepada PDF… sila tunggu</span>':(p.convNote?'<span class="hint">'+esc(p.convNote)+'</span>':(p.asal?'<span class="hint" style="color:#945000">Ditukar daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'. Jika susun atur berubah, buang fail ini dan muat naik PDF yang dieksport terus daripada '+(p.asal.ext==='PPTX'?'PowerPoint':'Word')+'.</span>':'')))+halPilihKad(w,i,p)+'</div>'+
     '<span class="pbtn"><button class="btn sm pri" data-act="pbuka" data-w="'+w+'" data-i="'+i+'" aria-label="Lihat '+esc(p.name)+'">Lihat</button>'+
     '<button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+i+'" aria-label="Buang '+esc(p.name)+'">Buang</button></span></div>').join('');
   let res='';
@@ -4258,7 +4337,7 @@ function tabTrack(){if(ui.tab==='staf')ui.tab='dash';if(!ui.tab)return;const cur
   if(tabPrev&&!tabBack&&(tabPrev.tab!==cur.tab||tabPrev.pmode!==cur.pmode)){const l=TABH[TABH.length-1];if(!l||l.tab!==tabPrev.tab||l.pmode!==tabPrev.pmode)TABH.push(tabPrev);if(TABH.length>20)TABH.shift();}
   tabPrev=cur;tabBack=false;}
 function tabKembali(){if(!TABH.length)return false;const p=TABH.pop();tabBack=true;ui.pmode=p.pmode;ui.tab=p.tab;ui.menu=false;render();window.scrollTo(0,0);return true;}
-/* Bahagian kanan pengepala: peranan, Bantuan (?), mod gelap, A+, loceng Mesej, avatar + menu akaun */
+/* Bahagian kanan pengepala: peranan, Bantuan (?), mod gelap, loceng Mesej, avatar + menu akaun */
 function hdrKanan(unread,salam){
   const I=(p)=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';
   const nama=MYNAME.replace(/^Cg\.\s*/,'');
@@ -4266,18 +4345,18 @@ function hdrKanan(unread,salam){
   return '<div class="hr"><div class="acct ac2">'+peranTog()+
     '<button class="ib" data-act="bantu" aria-label="Bantuan" title="Bantuan">'+I('<circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 015.4 1c0 1.9-2.7 2.3-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/>')+'</button>'+
     '<button class="ib tema-btn" data-act="tema" aria-pressed="'+(TEMA==='gelap'?'true':'false')+'" aria-label="Tukar mod gelap atau terang" title="Mod gelap / terang">'+(TEMA==='gelap'?I('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'):I('<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z" fill="currentColor"/>'))+'</button>'+
-    '<button class="ib ib-a" data-act="besar" aria-pressed="'+(BESAR?'true':'false')+'" aria-label="Besarkan tulisan" title="Saiz tulisan">'+(BESAR?'A−':'A+')+'</button>'+
     '<button class="ib ib-bell" data-act="tab" data-tab="notif" aria-label="Mesej'+(unread?' ('+unread+' belum dibaca)':'')+'" title="Mesej">'+I('<path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/>')+(unread?'<span class="ib-bd">'+unread+'</span>':'')+'</button>'+
     '<div class="av-w"><button class="av-b" data-act="akaun" aria-haspopup="menu" aria-expanded="'+(!!ui.akaun)+'" aria-label="Akaun: '+esc(nama)+'"><span class="av-c">'+I('<circle cx="12" cy="8.5" r="4"/><path d="M4 21a8 8 0 0116 0"/>')+'</span>'+(salam?'':'<span class="av-n">'+esc(nama)+'</span>'+I('<path d="M6 9l6 6 6-6"/>'))+'</button>'+menu+'</div></div></div>';
 }
+const FOOTER_IRISE='<footer class="irise-global-footer" role="contentinfo">iRISE | SK KRANGAN | 2026</footer>';
 function render(){document.documentElement.toggleAttribute('data-masuk',['login','loading','error'].includes(ui.screen));
   tabTrack();
   const app=document.getElementById('app');
   const brand='<div class="top-l">'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+'<img class="lg2" src="'+LOGO+'" alt="Logo iRISE" height="40" style="height:34px;width:auto"><div class="brand"><span>SK Krangan · Intelligent Reporting &amp; Integrated School Ecosystem'+(LIVE?'':' · MOD DEMO')+'</span></div></div>';
-  if(ui.screen==='error'){app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:560px;margin:24px auto"><h2>iRISE tidak dapat dimuatkan</h2><p class="err" role="alert">'+esc(ui.loadErr||'Ralat tidak diketahui.')+'</p><p class="hint">Jika masalah berterusan, beritahu Penyelaras ICT dengan menyalin mesej di atas. Semakan untuk admin: versi terkini Code.gs sudah di-deploy (Manage deployments &gt; New version), clientId dan cmsUrl dalam Tetapan betul, dan helaian Takwim sudah diisi.</p><div class="actions"><button class="btn pri" data-act="retryload">Cuba lagi</button></div></div></div>';return;}
-  if(ui.screen==='loading'){app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><p class="lead">Memuatkan data…</p></div>';return;}
+  if(ui.screen==='error'){app.innerHTML='<div class="irise-start"><header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:560px;margin:24px auto"><h2>iRISE tidak dapat dimuatkan</h2><p class="err" role="alert">'+esc(ui.loadErr||'Ralat tidak diketahui.')+'</p><p class="hint">Jika masalah berterusan, beritahu Penyelaras ICT dengan menyalin mesej di atas. Semakan untuk admin: versi terkini Code.gs sudah di-deploy (Manage deployments &gt; New version), clientId dan cmsUrl dalam Tetapan betul, dan helaian Takwim sudah diisi.</p><div class="actions"><button class="btn pri" data-act="retryload">Cuba lagi</button></div></div></div>'+FOOTER_IRISE+'</div>';return;}
+  if(ui.screen==='loading'){app.innerHTML='<div class="irise-start"><header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><p class="lead">Memuatkan data…</p></div>'+FOOTER_IRISE+'</div>';return;}
   if(ui.screen==='login'){
-    app.innerHTML='<header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:460px;margin:24px auto"><img class="lg3" src="'+LOGO+'" alt="Logo iRISE" style="width:min(260px,76%);height:auto"><h2>'+(ui.embedMsg?'iRISE tidak dapat dibuka':'Log masuk DELIMa')+'</h2>'+(ui.embedMsg?'':'<p class="lead">Log masuk dengan akaun <b>DELIMa</b> anda (g-xxxxxxxx@'+esc(CONFIG.DOMAIN||'moe-dl.edu.my')+'). Akaun peribadi seperti Gmail tidak diterima. Jika akaun anda tidak dikenali, hubungi Penyelaras ICT.</p>')+(ui.loginErr?'<p class="err" role="alert">'+esc(ui.loginErr)+'</p>':'')+'<div id="gbtn" style="margin-top:12px"></div></div></div>';
+    app.innerHTML='<div class="irise-start"><header class="top"><div class="top-in">'+brand+'</div></header><div class="wrap"><div class="card" style="max-width:460px;margin:24px auto"><img class="lg3" src="'+LOGO+'" alt="Logo iRISE" style="width:min(260px,76%);height:auto"><h2>'+(ui.embedMsg?'iRISE tidak dapat dibuka':'Log masuk DELIMa')+'</h2>'+(ui.embedMsg?'':'<p class="lead">Log masuk dengan akaun <b>DELIMa</b> anda (g-xxxxxxxx@'+esc(CONFIG.DOMAIN||'moe-dl.edu.my')+'). Akaun peribadi seperti Gmail tidak diterima. Jika akaun anda tidak dikenali, hubungi Penyelaras ICT.</p>')+(ui.loginErr?'<p class="err" role="alert">'+esc(ui.loginErr)+'</p>':'')+'<div id="gbtn" style="margin-top:12px"></div></div></div>'+FOOTER_IRISE+'</div>';
     return;
   }
   const GR={admin:['Pentadbir',(ME_ADMIN?[['urus','Urus iRISE'],['tetapan','Tetapan']]:[]).concat([['pantau','Pemantauan'],['exc','Pengecualian'],['laporan','Laporan']],ME_ADMIN?[['audit','Log Audit']]:[])],guru:['Saya',[['home','Dashboard Saya'],['jadual','Jadual Waktu'],['rph','RPH Saya']]],dash:['Sekolah',[['dash','Dashboard Sekolah']]]};
@@ -4311,7 +4390,7 @@ function render(){document.documentElement.toggleAttribute('data-masuk',['login'
    '<nav class="side-nav">'+navHtml+'</nav>'+
    '<div class="side-foot">'+(LIVE?'<b class="sf-n">'+esc(MYNAME)+'</b>'+(ME_JAWATAN?'<span class="sf-j">'+esc(ME_JAWATAN)+'</span>':''):'Data contoh, tidak disimpan')+'</div></aside>'+
    '<div class="main'+(ui.stale?' stale':'')+'">'+(ui.stale?'<div class="stale-bar" role="status">'+(ui.staleErr?esc(ui.staleErr)+' Paparan di bawah ialah data lama, tindakan dikunci. ':'Memuatkan data terkini… (paparan terakhir ditunjukkan dahulu) ')+'<button class="btn sm" data-act="sambung">Sambung semula</button></div>':'')+'<header class="top"><div class="top-in"><div class="top-l"><button class="mnu" data-act="menu" aria-controls="side" aria-expanded="'+(window.matchMedia('(max-width:760px)').matches?!!ui.menu:!ui.sideHide)+'">☰ Menu</button>'+(EMBED?'<button class="bk" data-act="portalback" aria-label="Kembali">← Kembali</button>':'')+(['rekod2','dash','pantau','jadual'].includes(ui.tab)?'<h1 class="pg pg2"><span>Selamat datang,</span>'+esc(MYNAME.replace(/^Cg\.\s*/,''))+'</h1>':'<h1 class="pg">'+title+'</h1>')+'</div>'+
-   ((LIVE||EZ||PZ)?hdrKanan(unread,['rekod2','dash','pantau','jadual'].includes(ui.tab)):'')+'</div></header>'+((EZ||PZ)&&HID.some(t=>t[0]===ui.tab)&&!groups.some(g=>g.items.some(x=>x[0]===ui.tab))?'<div class="wrap ez" style="padding-bottom:0"><button class="btn" data-act="tab" data-tab="'+((EZ||GM)?'mula':'semak')+'">← Kembali ke '+((EZ||GM)?'Hantar RPH':'Semak RPH')+'</button></div>':'')+body+'</div>'+(EZ?'<nav class="btm" aria-label="Menu utama">'+groups[0].items.filter(t=>t[0]!=='staf').map(btm).join('')+'</nav>':'')+'</div>';
+   ((LIVE||EZ||PZ)?hdrKanan(unread,['rekod2','dash','pantau','jadual'].includes(ui.tab)):'')+'</div></header>'+((EZ||PZ)&&HID.some(t=>t[0]===ui.tab)&&!groups.some(g=>g.items.some(x=>x[0]===ui.tab))?'<div class="wrap ez" style="padding-bottom:0"><button class="btn" data-act="tab" data-tab="'+((EZ||GM)?'mula':'semak')+'">← Kembali ke '+((EZ||GM)?'Hantar RPH':'Semak RPH')+'</button></div>':'')+body+FOOTER_IRISE+'</div>'+(EZ?'<nav class="btm" aria-label="Menu utama">'+groups[0].items.filter(t=>t[0]!=='staf').map(btm).join('')+'</nav>':'')+'</div>';
   if(ui.tab==='semak')svMount();
 }
 document.addEventListener('wk-go',e=>{const {k,w}=e.detail;
@@ -4902,6 +4981,26 @@ async function drafPulih(w,s){if(!LIVE||DRAF_OFF||s.drChk||s.status==='disemak')
 const sahBox=(w,gi,p)=>!p.perluSah?'':'<div class="sahbox" role="alert"><b>Semak hasil penukaran '+(p.asal&&p.asal.ext==='PPTX'?'PowerPoint':'Word')+' ke PDF</b><p>Pastikan jadual dan susunan sama seperti fail asal sebelum dihantar.</p>'+
   (p.panduan?'<div class="panduan"><b>Cara simpan sebagai PDF sendiri (susunan 100% sama):</b><ol><li><b>Komputer (Word):</b> Fail → Simpan Sebagai → jenis fail <b>PDF</b> → Simpan. (Atau Fail → Eksport → Cipta PDF.)</li><li><b>Telefon (aplikasi Word):</b> ⋯ → Eksport / Kongsi → <b>PDF</b>.</li><li><b>Google Docs:</b> Fail → Muat turun → <b>PDF</b>.</li></ol><p>Kemudian buang fail ini dan muat naik PDF tersebut.</p><div class="sahbtn"><button class="btn sm warn" data-act="prm" data-w="'+w+'" data-i="'+gi+'">Buang fail ini</button><button class="btn sm" data-act="sahpdf" data-w="'+w+'" data-i="'+gi+'">Tetap guna PDF ini</button></div></div>'
   :'<div class="sahbtn"><button class="btn sm" data-act="banding" data-w="'+w+'" data-i="'+gi+'">Bandingkan</button><button class="btn sm warn" data-act="tidaksah" data-w="'+w+'" data-i="'+gi+'">Susunan tidak betul</button><button class="btn sm pri" data-act="sahpdf" data-w="'+w+'" data-i="'+gi+'">Sahkan &amp; gunakan PDF</button></div>')+'</div>';
+
+/** Pilih halaman kelihatan terus di bawah fail, sebelum pengesahan PDF. */
+const halPilihKad=(w,gi,p)=>{
+  const ext=String(p.ext||'').toUpperCase();
+  if(ext!=='PDF'||!p.blob){
+    if(['DOCX','DOC','PPTX'].includes(ext))return '<div class="hp-card hp-wait" role="status"><div class="hp-title">Pilih halaman RPH</div><p class="hp-desc">Tunggu penukaran Word/PowerPoint kepada PDF selesai. Butang pilih halaman akan muncul di sini secara automatik.</p></div>';
+    return '';
+  }
+  const jumlah=Number(p.pgs)||0;
+  const dipilih=String(p.range||'').trim();
+  const status=dipilih?'Halaman dipilih: '+esc(dipilih):'Pilihan semasa: Semua halaman'+(jumlah?' ('+jumlah+' halaman)':'');
+  const panduan=p.asal?'Fail Word telah ditukar kepada PDF. Pilih halaman RPH kelas ini dahulu, kemudian semak susun atur dan sahkan PDF.':'Pilih halaman yang berkaitan dengan kelas ini. Jika mahu menghantar seluruh fail, biarkan pilihan kosong.';
+  return '<section class="hp-card" aria-label="Pilih halaman RPH"><div class="hp-title">'+
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="14" height="18" rx="2"/><path d="M8 8h6M8 12h6M8 16h4"/><path d="M19 8v9"/></svg>LANGKAH 2 · PILIH HALAMAN RPH</div>'+
+    '<p class="hp-desc">'+panduan+'</p>'+
+    '<div class="hp-current" role="status">'+status+'</div>'+
+    '<div class="hp-actions"><button type="button" class="btn pri hp-open" data-act="pilihhal" data-w="'+w+'" data-i="'+gi+'">▦ Lihat &amp; Pilih Halaman</button>'+
+    '<label>Atau taip nombor halaman<input type="text" inputmode="numeric" maxlength="40" data-prange="'+w+'" data-i="'+gi+'" value="'+esc(dipilih)+'" placeholder="Contoh: 3-5 atau 1,4" aria-label="Julat halaman RPH"></label></div>'+
+    '</section>';
+};
 const dStat=p=>!LIVE?'':p.dBusy?'<span class="hint" role="status">Menyimpan ke pelayan…</span>':p.dId?'<span class="hint" style="color:#1d7a46">✓ Disimpan di pelayan (belum dihantar)</span>':DRAF_OFF?'<span class="hint" style="color:#8a5a00">Disimpan dalam pelayar ini sahaja (simpanan draf di pelayan belum diaktifkan). Tekan <b>Hantar</b> supaya selamat.</span>':p.dGagal?'<span class="hint" style="color:#b3261e">Belum disimpan ke pelayan'+(p.dErr?' ('+esc(p.dErr.slice(0,120))+')':'')+'. <button class="btn sm" data-act="drafcuba">Cuba lagi</button></span>':'';
 function ptRestore(w,s){if(s.ptChk)return;s.ptChk=true;PT.op('readonly',o=>o.get(ptKey(w))).then(a=>{if(Array.isArray(a)&&a.length&&!(s.parts&&s.parts.length)&&!s.merging){a.forEach(p=>{if(!p.dId)delete p.dId;if(!p.cid)delete p.cid;if(!p.asal)delete p.asal;p.dSig=(p.range||'')+'|'+p.slot+'|'+(p.perluSah?1:0);});s.parts=a;s.pend=true;s.dKnown=a.map(p=>p.dId).filter(Boolean);render();}}).finally(()=>drafPulih(w,s).then(()=>drafUpAll(w)));}
 function pendEdit(w){const s=sub(ME,w);s.pend=true;s.upFail=false;s.upErr='';s.mtok=(s.mtok||0)+1;ptSave(w);render();}
@@ -5675,7 +5774,6 @@ document.addEventListener('click',e=>{
   else if(a==='akaun'){ui.akaun=!ui.akaun;render();const m=document.querySelector('.av-m button');if(ui.akaun&&m)m.focus();}
   else if(a==='bantu'){bukaBantuan();}
   else if(a==='tema'){TEMA=TEMA==='gelap'?'terang':'gelap';try{localStorage.setItem('irise.tema',TEMA)}catch(e){}document.documentElement.setAttribute('data-tema',TEMA);render();}
-  else if(a==='besar'){BESAR=!BESAR;try{localStorage.setItem('irise.besar',BESAR?'1':'0')}catch(e){}document.documentElement.classList.toggle('besar',BESAR);render();}
   else if(a==='reload'){loadInit(ME_ADMIN).then(()=>toast('Data dikemas kini.')).catch(handleErr);}
   else if(a==='logout'){dropToken();try{google.accounts.id.disableAutoSelect()}catch(e){}ui.loginErr='';showLogin();}
   else if(a==='portalback'){if(!tabKembali())window.parent.postMessage({type:'erph-close'},CONFIG.PARENT_ORIGIN);}
