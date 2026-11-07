@@ -1253,6 +1253,33 @@ body .hr2.ppsl .kc2 .kc2-x {flex-wrap:wrap}
   body .hr2.ppsl .hr-kanan{top:0;left:0;width:100%;z-index:9500}
   body .hr2.ppsl .hr-kanan .hr-pn{border-radius:0}
 }
+/* KEMAS KINI AKHIR: panel kanan refleksi dan semakan PDF kelas penuh lebar */
+body .hr2.ppsl .kc2-verify{grid-column:1/-1;min-width:0;padding:0 0 10px;max-width:100%}
+body .hr2.ppsl .kc2-verify .sahbox{width:100%;max-width:100%;margin:8px 0 2px;box-sizing:border-box}
+body .hr2.ppsl .hr-kanan .rp-filemeta{display:flex;flex-direction:column;gap:7px;padding:0 12px 6px;overflow-wrap:anywhere}
+body .hr2.ppsl .hr-kanan .rp-fstatus{display:block;background:#f0f3f0;color:#425d51;border-radius:9px;padding:8px 10px;font-size:.92rem;font-weight:700}
+body .hr2.ppsl .hr-kanan .rp-fstatus.sudah{background:#ddf3e6;color:#0e6541}
+body .hr2.ppsl .hr-kanan .rp-fstatus.draf{background:#fff4d6;color:#78510d}
+body .hr2.ppsl .hr-kanan .rp-filename{display:flex;align-items:flex-start;gap:8px;font-size:.9rem;font-weight:650;word-break:break-word}
+body .hr2.ppsl .hr-kanan .rp-filename svg{width:18px;height:18px;flex:none;stroke:#0c6442;fill:none}
+body .hr2.ppsl .hr-kanan .rp-filemeta small{color:var(--muted)}
+body .hr2.ppsl .hr-kanan .rp-c{min-width:0}
+body .hr2.ppsl .hr-kanan .rp-l textarea{min-height:210px;resize:vertical}
+body .hr2.ppsl .hr-cols.dengan-panel .kc2{grid-template-columns:minmax(0,1fr)}
+body .hr2.ppsl .hr-cols.dengan-panel .kc2-b{border-left:0;padding-left:0;min-width:0}
+body .hr2.ppsl .hr-cols.dengan-panel .kc2-xr{padding-left:0;justify-content:flex-start}
+body .hr2.ppsl .hr-cols.dengan-panel .kc2-c{overflow-x:visible;flex-wrap:wrap}
+/* Gunakan panel bersebelahan pada skrin komputer sederhana, bukan melayang di atas kad. */
+@media (min-width:1180px) and (max-width:1390px){
+ body .hr2.ppsl .hr-cols.dengan-panel{grid-template-columns:minmax(0,1fr) minmax(360px,.98fr)}
+ body .hr2.ppsl .hr-kanan{position:static;inset:auto;width:auto;z-index:auto;background:transparent;box-shadow:none}
+ body .hr2.ppsl .hr-kanan .hr-pn{position:sticky;top:84px;max-height:calc(100dvh - 100px);height:auto;border-radius:18px}
+ body .hr2.ppsl .hr-kanan .rp-c{max-height:calc(100dvh - 182px);flex:initial}
+}
+@media (max-width:760px){
+ body .hr2.ppsl .hr-kanan .rp-l textarea{min-height:220px}
+ body .hr2.ppsl .hr-kanan .rp-filemeta{padding:0 2px}
+}
 </style>
 <style id="emerald">
 /* ===== Emerald Executive: lapisan visual sahaja (tiada perubahan fungsi, menu, teks atau JavaScript) ===== */
@@ -1956,7 +1983,7 @@ function rmStatus(w){const q=sub(ME,w);
   if(q.offline)return esc(OFFMSG);
   if(q.rdirty||q.rbusy)return q.rErrMsg?'Gagal disimpan: '+esc(q.rErrMsg.replace(/\.$/,''))+'. Teks anda masih ada di sini dan akan dicuba semula.':'Menyimpan…';
   if(q.rSavedAt)return 'Disimpan pada '+jamMs(q.rSavedAt);
-  return 'Disimpan secara automatik semasa anda menaip.';}
+  return 'Perubahan refleksi akan disimpan secara automatik selepas disahkan oleh pelayan.';}
 /* Tetingkap besar Isi Refleksi & Kehadiran. Medan menggunakan atribut data-rw/ri/rf yang sama, jadi simpanan automatik sedia ada (disahkan pelayan) digunakan. */
 function rModal(w,s){
   const R=ui.rm;if(!R||R.w!==w)return '';
@@ -2006,6 +2033,16 @@ function rPanel(w,s,i,auto){
   const SL=slotsFor(ME,w),sl=SL[i],a=parseR(s.refleksi),x=a[i]||{k:'',t:'',h:'',j:'',x:'',n:''},inf=kmInfo(sl),kunci=s.status==='disemak',dis=kunci?' disabled':'';
   const d0=sl?(sl.prog&&sl.pr?sl.pr[0]:sl.h):0,t0=sl?hariTrk(d0,w):null,tgl=t0?HARI[d0-1]+', '+t0.getDate()+' '+BLN[t0.getMonth()]+' '+t0.getFullYear():'';
   const bad=x.h.trim()&&x.j.trim()&&+x.h>+x.j,lab=n=>' aria-label="'+n+'"';
+  // Satu sumber kebenaran: status RPH slot ini, bukan status hari/minggu.
+  const telahHantar=slotRph(ME,s,w,i);
+  const failHantar=telahHantar?namaFailRphKelas(ME,s,w,i):null;
+  const drafKelas=(s.parts||[]).filter(p=>Number(p.slot)===i);
+  const namaAktif=telahHantar?(failHantar?failHantar.nama:[]):drafKelas.map(p=>(p.asal&&p.asal.name)||p.name).filter(Boolean);
+  const drafPelayan=drafKelas.length&&drafKelas.every(p=>p.dId&&!p.dBusy&&!p.dGagal);
+  const statusRph=kunci?'RPH telah disemak — suntingan dikunci':telahHantar?'RPH telah dihantar':drafPelayan?'Fail disimpan sebagai draf di pelayan — belum dihantar':drafKelas.length?'Fail dipilih — belum dihantar':'RPH belum dimuat naik';
+  const ringkasFail='<div class="rp-filemeta" role="status"><span class="rp-fstatus'+(telahHantar?' sudah':drafKelas.length?' draf':'')+'">'+esc(statusRph)+'</span>'+
+    (namaAktif.length?'<span class="rp-filename" title="'+esc(namaAktif.join(', '))+'">'+PI.file+' '+esc(namaAktif.join(', '))+'</span>':'')+
+    (failHantar&&failHantar.gabungan?'<small>Nama fail asal kelas tidak tersedia bagi rekod lama; ini nama PDF gabungan.</small>':'')+'</div>';
   const sel='<label class="rp-l"><span class="rp-lt">'+PI.clip+'Status sesi <b class="rq">*</b></span><select data-rw="'+w+'" data-ri="'+i+'" data-rf="x"'+dis+lab('Status sesi')+'><option value="">PdP dilaksanakan</option>'+SEBAB_TD.map(z=>'<option value="'+esc(z)+'"'+(x.x===z?' selected':'')+'>'+esc(TDLBL(z))+'</option>').join('')+'</select></label>';
   const isi=x.x?sel+'<label class="rp-l"><span class="rp-lt">Catatan sebab'+(x.x==='Lain-lain'?' <b class="rq">*</b>':' <span class="hint">(pilihan)</span>')+'</span><input type="text" maxlength="200" data-rw="'+w+'" data-ri="'+i+'" data-rf="n" value="'+esc(x.n)+'" placeholder="Cth: Karnival STEM, murid terlibat"'+dis+lab('Catatan sebab')+'></label>'
     :'<label class="rp-l"><span class="rp-lt">Refleksi PdP <b class="rq">*</b></span><textarea id="rmo-ta" data-rw="'+w+'" data-ri="'+i+'" data-rf="t" maxlength="1000" rows="10" placeholder="Cth: 26 daripada 28 murid menguasai objektif pembelajaran. Dua murid masih perlu bimbingan tambahan."'+dis+lab('Refleksi PdP')+'>'+esc(x.t)+'</textarea><span class="rp-cnt" id="rmo-cnt">'+String(x.t||'').length+' / 1000</span></label>'+
@@ -2013,7 +2050,7 @@ function rPanel(w,s,i,auto){
       '<div class="rp-g"><label class="rp-l"><span class="rp-lt">'+MP_SVG_HADIR+'Murid hadir <b class="rq">*</b></span><input type="number" inputmode="numeric" min="0" max="999" data-rw="'+w+'" data-ri="'+i+'" data-rf="h" value="'+esc(x.h)+'"'+dis+lab('Murid hadir')+'></label>'+
       '<label class="rp-l"><span class="rp-lt">'+MP_SVG_HADIR+'Daripada <b class="rq">*</b></span><input type="number" inputmode="numeric" min="0" max="999" data-rw="'+w+'" data-ri="'+i+'" data-rf="j" value="'+esc(x.j)+'"'+dis+lab('Jumlah murid')+'></label></div>'+(bad?'<span class="err">Murid hadir melebihi jumlah murid.</span>':'')+sel;
   return '<aside class="hr-pn'+(auto?' auto':'')+'" id="rmo" aria-label="Isi Refleksi dan Kehadiran"><div class="rp-h">'+PI.pen+'<h3>Isi Refleksi &amp; Kehadiran</h3><button type="button" class="rp-x" data-act="rmtutup" data-w="'+w+'" aria-label="Tutup panel">✕</button></div>'+
-    '<div class="rp-c"><div class="rp-k"><span class="kc2-ic '+mpWarna(inf.sj)+'">'+(sl&&sl.prog?PI.cal:MP_IKON[mpIkon(inf.sj)])+'</span><div class="rp-ki"><b>'+esc(inf.nama)+'</b><span>'+esc(inf.kl)+(inf.wkt?' &nbsp;·&nbsp; '+esc(inf.wkt):'')+'</span><span>'+esc(tgl)+(inf.masa?' &nbsp;|&nbsp; '+esc(inf.masa):'')+'</span></div></div>'+isi+
+    '<div class="rp-c"><div class="rp-k"><span class="kc2-ic '+mpWarna(inf.sj)+'">'+(sl&&sl.prog?PI.cal:MP_IKON[mpIkon(inf.sj)])+'</span><div class="rp-ki"><b>'+esc(inf.nama)+'</b><span>'+esc(inf.kl)+(inf.wkt?' &nbsp;·&nbsp; '+esc(inf.wkt):'')+'</span><span>'+esc(tgl)+(inf.masa?' &nbsp;|&nbsp; '+esc(inf.masa):'')+'</span></div></div>'+ringkasFail+isi+
     '<div class="rp-f">'+(kunci?'<span class="hint">Minggu ini sudah disemak. Refleksi tidak boleh diubah.</span>':'<button type="button" class="btn rp-b" data-act="rmbatal" data-w="'+w+'">✕ Batal</button><button type="button" class="btn pri rp-b" data-act="rmselesai" data-w="'+w+'">'+RP_SIMPAN+'Simpan &amp; Tutup</button>')+'</div>'+
     '<p class="save rp-sv" id="sv-'+w+'" role="status">'+(kunci?'':rmStatus(w))+'</p></div></aside>';
 }
@@ -2024,6 +2061,12 @@ function rmLalai(w,s,ord){
   return ord.find(i=>ok(i)&&slotRph(ME,s,w,i)&&!tdSlot(SL[i],a[i]||B)&&!rFull(a[i]||B))??ord.find(i=>ok(i)&&!tdSlot(SL[i],a[i]||B)&&!rFull(a[i]||B))??ord.find(ok);
 }
 function rmSnap(w,i){const a=parseR(sub(ME,w).refleksi);ui.rmSnap={w,i,v:JSON.stringify(a[i]||null)};}
+function iriseBukaPanelRefleksi(w,i){
+  if(!(ui.rm&&ui.rm.w===w&&ui.rm.i===i))rmSnap(w,i);
+  ui.rm={w,i};ui.rmTutup=ui.rmTutup||{};ui.rmTutup[w]=false;
+  render();
+  setTimeout(()=>{const el=document.getElementById('rmo-ta')||document.querySelector('#rmo select,#rmo input');if(el)el.focus({preventScroll:true});},30);
+}
 /* Muat Naik & Hantar RPH bagi satu kelas: fail PDF/gambar yang dipilih terus dihantar (hari belum dihantar = Hantar hari; hari sudah dihantar = Simpan kemaskini). */
 function kirimKelas(w,g,ds,onlySlot){
   const sk=sub(ME,w),SL=slotsFor(ME,w),si=Number(onlySlot);
@@ -2145,7 +2188,7 @@ const rk=i=>i<SL.length?(SL[i].h===1?6:SL[i].h):10+i;ORD.sort((x,y)=>rk(x)-rk(y)
   const kadHari=g=>{const sentD=gSent(g),kunciW=s.status==='disemak',terima=!!(s.diterima||s.reviewed),bzy=s.merging||s.sending||s.upFail||s.conv||parts.some(p=>p.conv);
     const cards=selOrd.map((i,n)=>{const sl=SL[i],r=a[i]||BB,PG=!!(sl&&sl.prog),nt=!!(PG&&sl.tp&&sl.tp!=='p'),tdv=!nt&&tdSlot(sl,r),inf=kmInfo(sl),pp=parts.map((p,gi)=>({p,gi})).filter(o=>o.p.slot===i);
       const sent=sentD&&!nt&&slotRph(ME,s,w,i),fn=sent?namaFailRphKelas(ME,s,w,i):null,boleh=sent&&!terima&&!kunciW&&bolehTindakanKelas(s,sl,w,i);
-      let pill,fail='',btn='';
+      let pill,fail='',btn='',sahKelas='';
       if(nt){pill='<span class="kc2-p">Tiada RPH diperlukan</span>';fail='<span class="kc2-h">'+esc(PGN(sl.pr))+'</span>';}
       else if(sent){pill='<span class="kc2-p ok"><i class="kc2-pc">'+PI.tick+'</i>'+(kunciW?'RPH disemak':'RPH dihantar')+'</span>';
         fail='<details class="kc2-f" data-act="lbl"><summary>'+PI.file+'<span>'+esc(fn.nama.join(', ')||'RPH dihantar')+'</span></summary><div class="kc2-fd">'+(fn.gabungan?'Kelas ini dihantar dalam <b>PDF gabungan mingguan</b> (nama fail asal kelas tidak direkodkan dalam hantaran lama).':'Nama fail asal: <b>'+esc(fn.nama.join(', '))+'</b>')+'<br>Dihantar: '+esc(fmtDT(new Date((s.hari||{})[g.ds[0]]||Date.now())))+(s.file&&s.file.name?'<br>Fail mingguan: '+esc(s.file.name):'')+'</div></details>';
@@ -2155,7 +2198,9 @@ const rk=i=>i<SL.length?(SL[i].h===1?6:SL[i].h):10+i;ORD.sort((x,y)=>rk(x)-rk(y)
             :'<button class="btn sm" disabled title="RPH ini dihantar sebelum peta halaman kelas direkodkan. Ganti fail kelas tidak dibenarkan supaya RPH kelas lain tidak terjejas.">'+KC_IK.ganti+'Ganti Fail</button><button class="btn sm kc2-tb" disabled title="Fail lama tiada peta halaman kelas. Gunakan menu ⋯ hari ini untuk tarik balik keseluruhan hari.">'+KC_IK.tarik+'Tarik Balik</button>');}
       else if(pp.length){
         const diPelayan=LIVE&&pp.every(o=>!!o.p.dId&&!o.p.dBusy),sedang=pp.some(o=>o.p.conv||o.p.dBusy),gagal=pp.some(o=>o.p.dGagal);
-        pill='<span class="kc2-p '+(diPelayan?'ok':'sd')+'"><i class="kc2-pd"></i>'+(diPelayan?'✓ Dimuat naik sebagai draf · belum dihantar':sedang?'Sedang memuat naik…':gagal?'Simpanan draf gagal':'Fail dipilih · belum dihantar')+'</span>';fail=pp.map(o=>'<span class="kc2-f">'+PI.file+'<span>'+esc(o.p.name)+'</span></span>'+dStat(o.p)+(o.p.conv?'<div class="kc2-h" role="status">Menukar Word kepada PDF…</div>':'')+(o.p.convNote?'<div class="kc2-h" role="alert" style="color:#a02a22">'+esc(o.p.convNote)+'</div>':'')+(['DOCX','DOC','PPTX'].includes(o.p.ext)&&!o.p.conv?'<button type="button" class="btn sm" data-act="wordcuba" data-w="'+w+'" data-i="'+o.gi+'">Cuba Tukar Word ke PDF</button>':'')+sahBox(w,o.gi,o.p)).join('');
+        pill='<span class="kc2-p '+(diPelayan?'ok':'sd')+'"><i class="kc2-pd"></i>'+(diPelayan?'✓ Dimuat naik sebagai draf · belum dihantar':sedang?'Sedang memuat naik…':gagal?'Simpanan draf gagal':'Fail dipilih · belum dihantar')+'</span>';fail=pp.map(o=>'<span class="kc2-f">'+PI.file+'<span>'+esc(o.p.name)+'</span></span>'+dStat(o.p)+(o.p.conv?'<div class="kc2-h" role="status">Menukar Word kepada PDF…</div>':'')+(o.p.convNote?'<div class="kc2-h" role="alert" style="color:#a02a22">'+esc(o.p.convNote)+'</div>':'')+(['DOCX','DOC','PPTX'].includes(o.p.ext)&&!o.p.conv?'<button type="button" class="btn sm" data-act="wordcuba" data-w="'+w+'" data-i="'+o.gi+'">Cuba Tukar Word ke PDF</button>':'')).join('');
+        // Letakkan arahan pengesahan di bawah MAKLUMAT KELAS dan FAIL, merentasi seluruh kad.
+        sahKelas=pp.map(o=>sahBox(w,o.gi,o.p)).join('');
         btn='<button class="btn sm" data-act="pbuka" data-w="'+w+'" data-i="'+pp[0].gi+'">'+PI.eye+'Semak Fail</button><button class="btn sm" data-act="prm" data-w="'+w+'" data-i="'+pp[0].gi+'">Buang</button>'+(HOK?'<button class="btn sm pri" data-act="khantar" data-w="'+w+'" data-slot="'+i+'" data-g="'+g.h+'" data-d="'+g.ds.join(',')+'"'+(bzy||pp.some(o=>o.p.perluSah||o.p.dBusy||o.p.dGagal||(LIVE&&!DRAF_OFF&&!o.p.dId)||['DOCX','DOC','PPTX'].includes(o.p.ext))?' disabled':'')+'>'+PI.up+(s.sending?'Menghantar…':pp.some(o=>o.p.perluSah)?'Sahkan PDF dahulu':pp.some(o=>['DOCX','DOC','PPTX'].includes(o.p.ext))?'Tunggu PDF':pp.some(o=>o.p.dBusy)?'Memuat naik…':'Hantar RPH Kelas Ini')+'</button>':'');}
       else if(tdv){pill='<span class="kc2-p"><i class="kc2-pd"></i>Tiada sesi</span>';fail='<span class="kc2-h">'+esc(TDLBL(r.x))+'</span>';}
       else{pill='<span class="kc2-p bh"><i class="kc2-pd"></i>Belum hantar</span>';fail='<span class="kc2-h">'+(PG?'Lampirkan tentatif program (pilihan).':'Muat naik RPH bagi kelas ini.')+'</span>';
@@ -2168,7 +2213,7 @@ const rk=i=>i<SL.length?(SL[i].h===1?6:SL[i].h):10+i;ORD.sort((x,y)=>rk(x)-rk(y)
       return '<article class="kc2'+(on?' on':'')+(sent?' st-ok':pp.length?' st-sd':' st-bh')+'">'+
         '<div class="kc2-a"><span class="kc2-n">'+(n+1)+'</span><span class="kc2-ic '+mpWarna(inf.sj)+'">'+(PG?PI.cal:MP_IKON[mpIkon(inf.sj)])+'</span>'+
         '<div class="kc2-t"><b>'+esc(inf.nama)+'</b><span>'+esc(inf.kl)+(inf.wkt?' &nbsp;·&nbsp; '+esc(inf.wkt):'')+'</span>'+(inf.masa?'<span class="kc2-m">'+PI.jam+esc(inf.masa)+'</span>':'')+'</div></div>'+
-        '<div class="kc2-b">'+pill+fail+(sent||pp.length?'':(btn?'<div class="kc2-x">'+btn+'</div>':''))+'</div>'+
+        '<div class="kc2-b">'+pill+fail+(sent||pp.length?'':(btn?'<div class="kc2-x">'+btn+'</div>':''))+'</div>'+ (sahKelas?'<div class="kc2-verify">'+sahKelas+'</div>':'')+
         ((sent||pp.length)&&btn?'<div class="kc2-x kc2-xr">'+btn+'</div>':'')+
         '<div class="kc2-c"><span class="kc2-ci">'+PI.pen+'<b>Refleksi:</b>'+rPill+'</span><span class="kc2-ci">'+PI.users+'<b>Kehadiran:</b>'+kh+'</span><span class="kc2-ci">'+PI.clip+'<b>Status:</b>'+st+'</span>'+
         (bisa?'<button type="button" class="btn sm kc2-ref" data-act="rmbuka" data-w="'+w+'" data-i="'+i+'" aria-controls="rmo">'+PI.pen+(rFull(r)?'Kemas Kini Refleksi':'Isi Refleksi &amp; Kehadiran')+'</button>':'')+
@@ -5515,11 +5560,15 @@ document.addEventListener('click',e=>{
   else if(a==='kx'){ui.kx=ui.kx||{};const k=b.dataset.k;ui.kx[k]=!ui.kx[k];render();if(ui.kx[k])setTimeout(()=>{const el=document.querySelectorAll('.kxw');const L=el[el.length-1];},0);}
   else if(a==='dtab3'){const k=b.dataset.k;if(!k)return;ui.dTab=ui.dTab||{};ui.dTab[k.split('-')[0]]=k;render();}
   else if(a==='rmbuka'){
-    const ii=+b.dataset.i;
-    if(!(ui.rm&&ui.rm.w===w&&ui.rm.i===ii))rmSnap(w,ii);
-    ui.rm={w,i:ii};ui.rmTutup=ui.rmTutup||{};ui.rmTutup[w]=false;
-    render();
-    setTimeout(()=>{const el=document.getElementById('rmo-ta')||document.querySelector('#rmo select,#rmo input');if(el)el.focus({preventScroll:true});},30);
+    const ii=+b.dataset.i,lama=ui.rm,q=sub(ME,w);
+    if(lama&&lama.w===w&&lama.i!==ii&&LIVE&&(q.rdirty||q.rbusy||q.rconflict)){
+      b.disabled=true;
+      flushRefl(w).then(ok=>{
+        b.disabled=false;
+        if(ok)iriseBukaPanelRefleksi(w,ii);
+        else toast('Refleksi kelas sebelumnya belum dapat disimpan. Semak status simpanan dahulu.',true);
+      });
+    } else iriseBukaPanelRefleksi(w,ii);
   }
   else if(a==='rmtutup'){
     const q=sub(ME,w);
