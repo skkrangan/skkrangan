@@ -172,58 +172,270 @@
   label.field-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); display:block; margin-bottom:6px; }
   #etr-editor input{ width:100%; padding:9px 10px; border-radius:9px; border:1.5px solid var(--border); font-family:inherit; font-size:13px; }
   .upload-summary{ font-size:12px; color:var(--muted); }
+
+
+  /* =====================================================================
+     TEMA BIRU NAVY + EMAS (ikut lampiran) - dikongsi Input Markah & Analisis Subjek
+     ===================================================================== */
+  :root{ --navy:#0B1F4F; --navy-dark:#081738; --gold:#E0A92F; --bg:#EEF3FB; --ink:#10234D; --muted:#4A5C7D; --border:#D5DEEE; --tajuk:#0B1F55; }
+  body{ background:#EEF3FB; color:var(--ink); font-variation-settings:normal; }
+  #shell{ display:flex; background:#EEF3FB; min-height:calc(100vh - 92px); }
+
+  #topbar{ position:relative; z-index:40; height:92px; display:flex; align-items:center; justify-content:space-between; padding:0 30px 0 24px; color:#fff; overflow:hidden;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 170 92%22 preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 x2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23E5B53F%22/%3E%3Cstop offset=%221%22 stop-color=%22%23FFE08A%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M170 6C140 20 130 62 84 92L170 92Z%22 fill=%22url(%23g)%22/%3E%3Cpath d=%22M170 0C128 26 118 64 62 92%22 stroke=%22%23FFD86B%22 stroke-width=%222.5%22 fill=%22none%22/%3E%3C/svg%3E"), linear-gradient(100deg,#0A1B47 0%,#0E2B6B 45%,#0A2155 75%,#0A1B47 100%);
+    background-repeat:no-repeat; background-size:170px 92px, 100% 100%; background-position:right bottom, 0 0;
+    border-bottom:4px solid #F2B930; box-shadow:0 4px 14px rgba(0,0,0,.2); }
+  #topbar::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.06) 40%, transparent 48%, rgba(255,255,255,.05) 60%, transparent 70%); }
+  .tb-brand, .tb-actions{ position:relative; display:flex; align-items:center; gap:18px; }
+  #tb-burger{ width:62px; height:58px; border-radius:14px; border:2px solid rgba(255,255,255,.85); background:rgba(255,255,255,.04); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  #tb-burger:hover{ background:rgba(255,255,255,.14); }
+  .tb-logo{ width:70px; height:62px; border-radius:15px; display:flex; align-items:center; justify-content:center; color:#0B1F4F; background:linear-gradient(180deg,#FFD866,#F2B02A); box-shadow:0 4px 12px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.6); }
+  .tb-brand h1{ font-family:'Plus Jakarta Sans',sans-serif; font-size:35px; font-weight:800; line-height:1; margin:0; letter-spacing:-.01em; color:#fff; }
+  .tb-sep{ width:2px; height:44px; background:rgba(255,255,255,.6); border-radius:2px; }
+  .tb-actions{ gap:26px; padding-right:62px; }
+  .tb-actions .tb-sep{ margin-right:8px; }
+  .tb-act{ display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; color:#fff; font-family:inherit; font-size:16.5px; font-weight:600; cursor:pointer; padding:4px 6px; }
+  .tb-act:hover{ color:#FFD866; }
+
+  #sidebar{ position:sticky; top:92px; width:260px; flex-shrink:0; height:calc(100vh - 92px); overflow:hidden; padding:80px 14px 24px; color:#fff; display:flex; flex-direction:column; transition:width .2s;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 260 120%22 preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 x2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFE08A%22/%3E%3Cstop offset=%22.55%22 stop-color=%22%23E0A92F%22/%3E%3Cstop offset=%221%22 stop-color=%22%239C6D10%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M0 18C50 14 110 62 260 104L260 120 0 120Z%22 fill=%22url(%23g)%22/%3E%3Cpath d=%22M0 40C70 30 140 80 260 112%22 stroke=%22%23FFE08A%22 stroke-width=%222.2%22 fill=%22none%22/%3E%3C/svg%3E"), linear-gradient(180deg,#0B2260 0%,#091B4C 55%,#07163D 100%);
+    background-repeat:no-repeat; background-size:100% 120px, 100% 100%; background-position:left bottom, 0 0; }
+  #sidebar .nav-list{ display:flex; flex-direction:column; gap:8px; }
+  #sidebar .nav-item{ display:flex; align-items:center; gap:18px; padding:13px 18px; border-radius:15px; margin:0; font-size:20px; font-weight:600; color:#fff; cursor:pointer; white-space:nowrap; transition:background .15s; }
+  #sidebar .nav-item svg{ flex-shrink:0; width:30px; height:30px; }
+  #sidebar .nav-item:hover{ background:rgba(255,255,255,.1); }
+  #sidebar .nav-item.active{ background:linear-gradient(180deg,#FFE27D 0%,#F7BE2E 100%); color:#0B1F4F; font-weight:800; box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.7); }
+  #sb-toggle{ position:fixed; left:236px; top:450px; z-index:50; width:44px; height:44px; border-radius:50%; background:#0B1F4F; color:#fff; border:3px solid #F2B930; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.35); transition:left .2s; }
+  body.sb-collapsed #sidebar{ width:84px; }
+  body.sb-collapsed #sidebar .nav-item{ justify-content:center; padding:13px 0; }
+  body.sb-collapsed #sidebar .nav-item span{ display:none; }
+  body.sb-collapsed #sb-toggle{ left:62px; }
+  body.sb-collapsed #sb-toggle svg{ transform:rotate(180deg); }
+
+  header.topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+  header.topbar .brand{ display:flex; align-items:center; gap:18px; }
+  header.topbar .brand-ic{ width:60px; height:60px; border-radius:15px; background:linear-gradient(180deg,#10286B,#0B1F4F); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(11,31,79,.3); flex-shrink:0; }
+  header.topbar .brand-txt{ border:none; padding:0; }
+  header.topbar h1{ font-family:'Plus Jakarta Sans',sans-serif; font-size:34px; font-weight:800; color:var(--tajuk); letter-spacing:-.02em; line-height:1.05; margin:0; }
+  header.topbar .sub{ font-size:17.5px; color:#2F4470; margin:2px 0 0; font-weight:500; }
+  .btn-kembali{ display:inline-flex; align-items:center; gap:12px; padding:12px 24px; border-radius:13px; background:#fff; color:#0B1F4F; border:2px solid #0B1F4F; font-weight:800; font-size:17.5px; text-decoration:none; white-space:nowrap; box-shadow:0 2px 8px rgba(11,31,79,.1); transition:.15s; }
+  .btn-kembali:hover{ background:#0B1F4F; color:#fff; }
+
+  .card-box{ background:#fff; border:1px solid #DDE5F3; border-radius:20px; padding:12px 18px 14px; margin-bottom:14px; box-shadow:0 6px 20px rgba(11,31,79,.08); }
+  .card-head{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .card-head h2{ font-family:'Plus Jakarta Sans',sans-serif; font-size:21px; font-weight:800; color:#0B1F55; margin:0; letter-spacing:-.01em; display:block; }
+  .card-head .ch-ic{ display:flex; color:#0B1F55; width:auto; height:auto; margin:0; padding:0; background:none; }
+  .card-head .ch-ic.ch-gold{ color:#E2A02A; }
+  .card-head .ch-sub{ margin:0; font-size:16.5px; color:#2F4470; font-weight:500; }
+
+  .fb-row, .grid-4{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:30px; }
+  .field-label, .fld label{ font-size:17px; font-weight:500; text-transform:none; letter-spacing:0; color:#10234D; margin:0 0 2px; display:block; }
+  .sel-wrap{ position:relative; }
+  .sel-wrap .sel-ic{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#0B1F55; pointer-events:none; width:22px; height:22px; }
+  .sel-wrap select{ width:100%; height:38px; padding:0 38px 0 44px; font-family:inherit; font-size:16.5px; font-weight:600; color:#10234D; border:1.6px solid #C5D0E6; border-radius:10px;
+    background:#fff url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%230B1F4F%22 stroke-width=%222.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22m6 9 6 6 6-6%22/%3E%3C/svg%3E") no-repeat right 12px center / 18px; -webkit-appearance:none; appearance:none; cursor:pointer; text-overflow:ellipsis; }
+  .sel-wrap select:focus{ outline:none; border-color:#0B1F4F; box-shadow:0 0 0 3px rgba(11,31,79,.13); }
+
+  .footer-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background:#E4ECF8; border-radius:14px; padding:9px 16px; margin-top:2px; font-size:15px; color:#10234D; }
+  .footer-bar .fb-nota{ display:flex; align-items:center; gap:12px; }
+  .footer-bar svg{ flex-shrink:0; width:24px; height:24px; }
+
+  @media (max-width:1100px){ .fb-row, .grid-4{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; } }
+  @media (max-width:560px){ .fb-row, .grid-4{ grid-template-columns:1fr; } }
+  @media (max-width:900px){
+    #topbar{ height:auto; min-height:70px; padding:8px 12px; flex-wrap:wrap; background-size:90px 70px, 100% 100%; }
+    #tb-burger{ width:46px; height:44px; } .tb-logo{ width:48px; height:44px; } .tb-logo svg{ width:26px; height:26px; }
+    .tb-brand{ gap:10px; } .tb-brand h1{ font-size:19px; } .tb-sep{ display:none; }
+    .tb-actions{ gap:6px; padding-right:0; } .tb-act{ font-size:11px; } .tb-act svg{ width:22px; height:22px; }
+    #shell{ flex-direction:column; }
+    #sidebar{ position:relative; top:auto; width:100%; height:auto; flex-direction:row; padding:8px 10px; background-image:linear-gradient(180deg,#0B2260,#091B4C); }
+    #sidebar .nav-list{ flex-direction:row; flex-wrap:wrap; gap:6px; }
+    #sidebar .nav-item{ padding:9px 12px; font-size:14px; gap:8px; } #sidebar .nav-item svg{ width:20px; height:20px; }
+    #sb-toggle{ display:none; }
+    body.sb-collapsed #sidebar{ display:none; }
+    header.topbar h1{ font-size:24px; } header.topbar .sub{ font-size:14px; }
+  }
+
+  /* ---------- Halaman Analisis Subjek ---------- */
+  #main{ flex:1; min-width:0; background:#EEF3FB; }
+  .filter-bar-subjek .fld{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .filter-bar-subjek .fld label{ font-size:15.5px !important; font-weight:500 !important; text-transform:none !important; }
+  .filter-bar-subjek .fld select{ height:38px !important; padding:0 38px 0 44px !important; font-size:16px !important; }
+  .fb-title{ display:flex; align-items:center; gap:12px; margin-bottom:8px; color:#0B1F55; }
+  .fb-title h2{ font-family:'Plus Jakarta Sans',sans-serif; font-size:21px; font-weight:800; margin:0; color:#0B1F55; display:block; }
+  .fb-title svg{ width:26px; height:26px; }
+  .tindakan-subjek .btn-utama{ background:linear-gradient(180deg,#10286B,#0A1F55); }
+  #wrap{ padding:16px 24px 18px 28px; }
+  .diag{ display:none; }
+  /* =====================================================================
+     REKA BENTUK BAHARU - Analisis Subjek (tema hijau zamrud + emas, ikut lampiran)
+     ===================================================================== */
+  :root{ --navy:#0B1F4F; --navy-dark:#093629; --gold:#D0A24A; --bg:#EEF3FB; --ink:#10234D; --muted:#5B6B7A; --border:#E1E8E5; --tajuk:#10234D; }
+  body{ background:#EEF3FB; color:var(--ink); }
+  #shell{ background:#EEF3FB; min-height:calc(100vh - 94px); }
+
+  /* ---- Kandungan ---- */
+  #main{ background:#EEF3FB; }
+  #wrap{ padding:20px 22px 24px 28px; }
+  .page-section{ }
+  .card-box{ background:#fff; border:1px solid #DDE5F3; border-radius:22px; padding:20px 24px; margin-bottom:16px; box-shadow:0 6px 22px rgba(11,31,79,.08); }
+
+  /* filter */
+  .filter-bar-subjek{ display:block; background:#fff; border:1px solid #DDE5F3; border-radius:22px; padding:16px 22px 14px; margin-bottom:16px; box-shadow:0 6px 22px rgba(11,31,79,.08); }
+  .fb-row{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px; }
+  .filter-bar-subjek .fld{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .filter-bar-subjek .fld label{ font-size:17px; font-weight:800; text-transform:none; letter-spacing:0; color:#10234D; }
+  .sel-wrap{ position:relative; }
+  .sel-wrap .sel-ic{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#10234D; pointer-events:none; width:22px; height:22px; }
+  .filter-bar-subjek .fld select{ width:100%; height:46px; padding:0 40px 0 48px; border:1.8px solid #C5D0E6; border-radius:12px; font-family:inherit; font-size:17px; font-weight:700; color:#10234D;
+    background:#fff url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2310234D%22 stroke-width=%222.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22m6 9 6 6 6-6%22/%3E%3C/svg%3E") no-repeat right 14px center / 18px; -webkit-appearance:none; appearance:none; cursor:pointer; text-overflow:ellipsis; }
+  .filter-bar-subjek .fld select:focus{ outline:none; border-color:#0B1F4F; box-shadow:0 0 0 3px rgba(11,31,79,.14); }
+  .fb-bawah{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:14px; padding-top:12px; border-top:1px solid #E6ECF6; }
+  .filter-bar-subjek .kemaskini-terakhir{ margin:0; display:flex; align-items:center; gap:12px; font-size:17px; color:#10234D; font-weight:500; white-space:normal; }
+  .tindakan-subjek{ display:flex; gap:14px; margin:0; }
+  .tindakan-subjek button{ display:inline-flex; align-items:center; gap:10px; height:48px; padding:0 24px; border-radius:12px; font-family:inherit; font-size:17px; font-weight:800; cursor:pointer; transition:.15s; }
+  .tindakan-subjek .btn-sekunder{ background:#fff; color:#0B1F4F; border:2px solid #0B1F4F; }
+  .tindakan-subjek .btn-sekunder:hover{ background:#F0F5F3; }
+  .tindakan-subjek .btn-utama{ background:linear-gradient(180deg,#10286B,#0A1F55); color:#fff; border:none; box-shadow:0 6px 14px rgba(11,31,79,.3); }
+  .tindakan-subjek .btn-utama:hover{ filter:brightness(1.1); }
+  @media (max-width:1100px){ .fb-row{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:560px){ .fb-row{ grid-template-columns:1fr; } }
+
+  /* kad ringkas */
+  .stat-row-ringkas{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:16px; margin-bottom:16px; padding:2px; }
+  @media (max-width:1100px){ .stat-row-ringkas{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  .kad-ringkas{ position:relative; border-radius:22px; padding:16px 18px 18px; border:none; min-height:118px; box-shadow:0 6px 18px rgba(11,31,79,.08); }
+  .kad-ringkas.tema-biru{ background:linear-gradient(135deg,#D6E8FB 0%,#EAF3FD 100%); --tc:#2F7FE0; }
+  .kad-ringkas.tema-kuning{ background:linear-gradient(135deg,#FCE8B5 0%,#FFF3D6 100%); --tc:#E09A14; }
+  .kad-ringkas.tema-ungu{ background:linear-gradient(135deg,#E5D9FA 0%,#F3ECFD 100%); --tc:#8B4FE8; }
+  .kad-ringkas.tema-hijau{ background:linear-gradient(135deg,#D3F2D6 0%,#E9F8EA 100%); --tc:#22A04B; }
+  .kad-ringkas.tema-merah{ background:linear-gradient(135deg,#FBD9D9 0%,#FDEBEB 100%); --tc:#E0393E; }
+  .kr-head{ display:flex; align-items:flex-start; gap:12px; }
+  .kr-ic{ color:var(--tc); flex-shrink:0; display:flex; }
+  .kad-ringkas .kr-lbl{ font-size:18px; font-weight:800; color:#10234D; text-transform:none; letter-spacing:0; line-height:1.25; display:block; margin:0; }
+  .kr-info-btn{ display:inline-flex; vertical-align:-3px; width:auto; height:auto; background:none; color:#10234D; border-radius:0; cursor:help; margin-left:2px; }
+  .kr-info-btn:hover{ background:none; color:var(--tc); }
+  .kad-ringkas .kr-val{ text-align:center; font-family:'Plus Jakarta Sans',sans-serif; font-size:34px; font-weight:800; color:#10234D; margin-top:6px; line-height:1.1; }
+  .kad-ringkas .kr-val small{ font-size:15px; font-weight:700; color:#415566; }
+  .kr-tooltip{ background:#0A1F55; border-radius:14px; width:300px; z-index:60; }
+  .kr-tooltip::before{ border-bottom-color:#0A1F55; }
+  .kr-tooltip b{ color:#F6D27A; }
+
+  /* kad besar */
+  .kad-besar{ padding:14px 22px 18px; }
+  .kb-tajuk{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .kb-tajuk h2{ font-family:'Plus Jakarta Sans',sans-serif; font-size:24px; font-weight:800; color:#10234D; margin:0; letter-spacing:-.01em; display:block; }
+  .kb-ic{ color:#E09A14; display:flex; }
+  .alir-baris{ display:flex; align-items:center; gap:0; padding:2px 8px 4px; }
+  .alir-kotak{ border-radius:18px; padding:14px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:80px; }
+  .alir-kotak.tema-biru{ background:#D5E8FA; flex:1.7; } .alir-kotak.tema-kuning{ background:#FBEAB9; flex:1.9; }
+  .alir-kotak.tema-ungu{ background:#E9DDFB; flex:1.7; } .alir-kotak.tema-hijau{ background:#D4F2D8; flex:2.1; }
+  .alir-kotak .alir-val{ font-size:30px; font-weight:800; color:#10234D; line-height:1; font-family:'Plus Jakarta Sans',sans-serif; }
+  .alir-kotak .alir-lbl{ font-size:19px; color:#10234D; font-weight:500; margin:0; }
+  .alir-ap{ flex:1; display:flex; justify-content:center; color:#8A99A4; min-width:50px; }
+  .alir-nota-baris{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+
+  .grid-subjek-bawah{ display:grid; grid-template-columns:1.45fr 1fr; gap:16px; margin-bottom:12px; align-items:stretch; }
+  @media (max-width:1000px){ .grid-subjek-bawah{ grid-template-columns:1fr; } }
+  .kosong-kotak{ background:#F3F6F8; border-radius:16px; min-height:140px; padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .kosong-kotak p{ margin:6px 0 0; font-size:19px; font-weight:600; color:#10234D; }
+  .kosong-ic{ color:#9AA5AE; opacity:.9; display:flex; }
+  .rumusan-grid{ display:flex; align-items:stretch; gap:20px; }
+  .rumusan-tile{ flex:0 0 140px; border-radius:16px; background:linear-gradient(180deg,#E2EEFB,#DCE9F8); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px 8px; position:relative; gap:2px; }
+  .rumusan-tile .rt-ic{ color:#7C8CA3; display:flex; }
+  #rumusan-murid-tengah{ display:flex; flex-direction:column; align-items:center; line-height:1.05; }
+  .rt-num{ font-size:46px; font-weight:800; color:#10234D; font-family:'Plus Jakarta Sans',sans-serif; }
+  .rt-lbl{ font-size:20px; font-weight:600; color:#10234D; }
+  .rumusan-grid::after{ content:none; }
+  .rumusan-list{ flex:1; min-width:0; border-left:1.5px solid #D3DBD8; padding-left:20px; display:flex; flex-direction:column; justify-content:center; font-size:17.5px; }
+  .rl-baris{ display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid #DDE5E1; color:#10234D; }
+  .rl-baris:last-child{ border-bottom:none; }
+  .rl-titik{ width:24px; height:24px; border-radius:50%; flex-shrink:0; }
+  .rl-teks{ flex:1; font-weight:500; } .rl-baris b{ font-weight:800; white-space:nowrap; }
+
+  table.jadual-tahun th{ background:#EEF3FB; color:#2F4470; }
+  table.jadual-tahun td.label{ color:#10234D; }
+
+  .footer-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background:#E4ECF8; border-radius:14px; padding:12px 18px; margin-top:6px; font-size:16.5px; color:#10234D; }
+  .footer-bar .fb-nota{ display:flex; align-items:center; gap:12px; }
+  .footer-bar svg{ flex-shrink:0; }
+  .diag{ display:none; }
+
+  @media (max-width:900px){
+    #wrap{ padding:16px 14px 20px; }
+    .alir-baris{ flex-wrap:wrap; justify-content:center; gap:8px; } .alir-kotak{ flex:1 1 40% !important; } .alir-ap{ display:none; }
+    .rumusan-grid{ flex-direction:column; } .rumusan-list{ border-left:none; padding-left:0; }
+    .kb-tajuk h2{ font-size:19px; } .footer-bar{ font-size:13px; }
+  }
+
+  /* ---- penalaan halus (padat seperti lampiran) ---- */
+  #wrap{ padding:16px 22px 18px 26px; }
+  header.topbar{ margin-bottom:14px; }
+  header.topbar h1{ font-size:34px; } header.topbar .sub{ font-size:17.5px; margin-top:2px; }
+  header.topbar .brand-ic{ width:58px; height:58px; }
+  .filter-bar-subjek{ padding:12px 20px 12px; margin-bottom:14px; }
+  .filter-bar-subjek .fld label{ font-size:15.5px; }
+  .filter-bar-subjek .fld select{ height:42px; font-size:16px; }
+  .fb-bawah{ margin-top:10px; padding-top:10px; }
+  .filter-bar-subjek .kemaskini-terakhir{ font-size:16px; }
+  .tindakan-subjek .btn-sekunder, .tindakan-subjek .btn-utama{ height:44px; padding:0 22px; font-size:16px; border-radius:12px; }
+  .stat-row-ringkas{ gap:14px; margin-bottom:14px; }
+  .kad-ringkas{ min-height:0; padding:14px 16px 12px; border-radius:20px; }
+  .kr-ic svg{ width:38px; height:38px; }
+  .kad-ringkas .kr-lbl{ font-size:16px; }
+  .kr-info-btn svg{ width:18px; height:18px; }
+  .kad-ringkas .kr-val{ font-size:30px; margin-top:2px; }
+  .kad-besar{ padding:12px 20px 14px; margin-bottom:14px; }
+  .kb-tajuk{ margin-bottom:10px; } .kb-tajuk h2{ font-size:21px; } .kb-ic svg{ width:30px; height:30px; }
+  .alir-kotak{ min-height:68px; padding:10px; gap:4px; border-radius:16px; }
+  .alir-kotak .alir-val{ font-size:26px; } .alir-kotak .alir-lbl{ font-size:17px; }
+  .alir-ap svg{ width:38px; height:38px; }
+  .kosong-kotak{ min-height:120px; } .kosong-kotak p{ font-size:17px; } .kosong-ic svg{ width:60px; height:60px; }
+  .rumusan-tile{ flex-basis:130px; } .rt-num{ font-size:40px; } .rt-lbl{ font-size:18px; }
+  .rumusan-list{ font-size:16px; } .rl-baris{ padding:7px 0; } .rl-titik{ width:22px; height:22px; }
+  .footer-bar{ padding:10px 16px; font-size:15px; margin-top:0; }
+  .footer-bar svg{ width:24px; height:24px; }
+  table.jadual-tahun, table.jadual-perhatian{ font-size:14px; } table.jadual-tahun th, table.jadual-perhatian th{ font-size:11.5px; padding:9px 10px; } table.jadual-tahun td, table.jadual-perhatian td{ padding:9px 10px; }
 </style>
 </head>
 <body>
+<header id="topbar">
+  <div class="tb-brand">
+    <button type="button" id="tb-burger" aria-label="Buka/tutup menu"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="tb-logo"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 10v6"/></svg></div>
+    <h1>ePrestasi Akademik</h1>
+    <span class="tb-sep"></span>
+  </div>
+  <div class="tb-actions">
+    <span class="tb-sep"></span>
+    <button type="button" class="tb-act" data-soon="1"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Tetapan</span></button>
+    <button type="button" class="tb-act" data-soon="1"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Pengguna</span></button>
+    <button type="button" class="tb-act" data-soon="1"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span>Bantuan</span></button>
+  </div>
+</header>
+<button type="button" id="sb-toggle" aria-label="Kecilkan menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+
 <div id="shell">
   <nav id="sidebar">
-    <div class="side-brand">
-      <div class="badge2">KAD</div>
-      <div>
-        <h1>ePrestasi Akademik</h1>
-        <p>SK Krangan, Serian</p>
-      </div>
+    <div class="nav-list">
+      <div class="nav-item" data-href="eprestasi.html"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>Input Markah</span></div>
+      <div class="nav-item" data-href="eprestasi.html?mode=peperiksaan"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>Peperiksaan</span></div>
+      <div class="nav-item active" data-target="anchor-subjek"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V10M12 21V4M19 21v-7"/></svg><span>Analisis Subjek</span></div>
     </div>
-
-    <!-- Dashboard/"top" disorok buat masa ini - fokus penuh kepada Input Markah. -->
-    <div class="nav-item active" data-target="top" style="display:none;"><span class="ic">🏠</span>Dashboard</div>
-    <div class="nav-item" data-href="eprestasi.html"><span class="ic">✏️</span>Input Markah</div>
-    <div class="nav-item sub" data-href="eprestasi.html?mode=peperiksaan"><span class="ic">1.</span>Peperiksaan</div>
-    <!-- PBD disorok buat masa ini - konsisten dengan eprestasi.html. -->
-    <div class="nav-item sub" data-href="eprestasi.html?mode=pbd" style="display:none;"><span class="ic">2.</span>PBD</div>
-
-    <div class="nav-section-lbl">Analisis Akademik</div>
-    <!-- Analisis Peperiksaan/PBD/Murid/Kelas disorok buat masa ini - Analisis Subjek dikekalkan. -->
-    <div class="nav-item" data-target="anchor-peperiksaan" style="display:none;"><span class="ic">📈</span>Analisis Peperiksaan</div>
-    <div class="nav-item" data-target="anchor-pbd" style="display:none;"><span class="ic">📊</span>Analisis PBD</div>
-    <div class="nav-item" data-target="anchor-murid" style="display:none;"><span class="ic">🧑‍🎓</span>Analisis Murid</div>
-    <div class="nav-item" data-target="anchor-subjek"><span class="ic">📘</span>Analisis Subjek</div>
-    <div class="nav-item" data-target="anchor-kelas" style="display:none;"><span class="ic">🏫</span>Analisis Kelas</div>
-
-    <!-- Bahagian Laporan disorok sepenuhnya buat masa ini. -->
-    <div class="nav-section-lbl" style="display:none;">Laporan</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">📄</span>Laporan Individu</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">👥</span>Laporan Kelas</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">🏫</span>Laporan Tingkatan</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">⬇️</span>Muat Turun (PDF/Excel)</div>
-
-    <div class="nav-section-lbl">Sistem</div>
-    <div class="nav-item" data-soon="1"><span class="ic">⚙️</span>Tetapan</div>
-    <div class="nav-item" data-soon="1"><span class="ic">👤</span>Pengguna</div>
-    <div class="nav-item" data-soon="1"><span class="ic">❓</span>Bantuan</div>
   </nav>
 
   <div id="main">
 <div id="wrap">
   <header class="topbar">
     <div class="brand">
-      <div class="badge">SK</div>
-      <div>
-        <h1>Dashboard ePrestasi Akademik</h1>
-        <p class="sub">ePrestasi Akademik SK Krangan, Serian</p>
+      <div class="brand-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V10M12 21V4M19 21v-7"/></svg></div>
+      <div class="brand-txt">
+        <h1>Analisis Subjek</h1>
+        <p class="sub">Ringkasan pencapaian keseluruhan subjek bagi semua tahun.</p>
       </div>
     </div>
-    <a href="dashboard.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; background:var(--navy); color:#fff; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap;">← Kembali ke Portal Staf</a>
+    <a href="dashboard.html" class="btn-kembali"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Kembali ke Portal Staf</span></a>
   </header>
 
   <!-- Filter global lama (Tapis/Reset) disorok - khusus untuk halaman Analisis
@@ -238,7 +450,7 @@
     <button class="ghost" id="btn-reset">Reset</button>
   </div>
 
-  <div id="anchor-peperiksaan" class="page-section active">
+  <div id="anchor-peperiksaan" class="page-section">
     <h2 class="section-title">📈 Analisis Peperiksaan</h2>
 
     <div class="stat-row-ringkas" id="stat-row-ringkas-peperiksaan"></div>
@@ -360,26 +572,31 @@
     </div>
   </div>
 
-  <div id="anchor-subjek" class="page-section">
-    <h2 class="section-title">📘 Analisis Subjek</h2>
-    <p class="section-subtitle">Ringkasan pencapaian keseluruhan subjek bagi semua tahun</p>
-
+  <div id="anchor-subjek" class="page-section active">
     <div class="filter-bar-subjek">
-      <div class="fld"><label>Subjek</label><select id="subjek-sel-subjek"><option value="">Pilih Subjek...</option></select></div>
-      <div class="fld"><label>Peperiksaan</label><select id="subjek-sel-peperiksaan">
+      <div class="fb-title"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></svg><h2>Maklumat Analisis</h2></div>
+      <div class="fb-row">
+      <div class="fld"><label for="subjek-sel-subjek">Subjek</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><select id="subjek-sel-subjek"><option value="">Pilih Subjek...</option></select></div></div>
+      <div class="fld"><label for="subjek-sel-peperiksaan">Peperiksaan</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><select id="subjek-sel-peperiksaan">
         <option value="">Semua Peperiksaan</option>
         <option value="Ujian Diagnostik (Awal Tahun / TOV)">TOV (Akhir Tahun Sebelumnya)</option>
         <option value="Peperiksaan Pertengahan Tahun">Ujian Pertengahan Tahun</option>
         <option value="Peperiksaan Akhir Tahun">Ujian Akhir Tahun</option>
-      </select></div>
-      <div class="fld"><label>Kelas</label><select id="subjek-sel-kelas"><option value="">Semua Kelas</option></select></div>
-      <div class="fld"><label>Tahun Akademik</label><select id="subjek-sel-tahunakademik"><option value="">Semua Tahun</option></select></div>
-      <div class="kemaskini-terakhir">📅 <span id="subjek-kemaskini-label">Kemaskini Terakhir: -</span></div>
-    </div>
-
-    <div class="tindakan-subjek">
-      <button class="btn-sekunder" id="btn-lihat-semua-murid">👥 Lihat Semua Murid</button>
-      <button class="btn-utama" id="btn-jana-laporan-panitia">📄 Jana Laporan Panitia</button>
+      </select></div></div>
+      <div class="fld"><label for="subjek-sel-kelas">Kelas</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><select id="subjek-sel-kelas"><option value="">Semua Kelas</option></select></div></div>
+      <div class="fld"><label for="subjek-sel-tahunakademik">Tahun Akademik</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><select id="subjek-sel-tahunakademik"><option value="">Semua Tahun</option></select></div></div>
+      </div>
+      <div class="fb-row fb-bawah">
+        <div class="kemaskini-terakhir"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="subjek-kemaskini-label">Kemaskini Terakhir: -</span></div>
+        <div class="tindakan-subjek">
+          <button class="btn-sekunder" id="btn-lihat-semua-murid"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Lihat Semua Murid</span></button>
+          <button class="btn-utama" id="btn-jana-laporan-panitia"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>Jana Laporan Panitia</span></button>
+        </div>
+      </div>
     </div>
 
     <div id="subjek-detail-wrap">
@@ -416,7 +633,7 @@
     </div>
   </div>
 
-  <p class="diag" id="diag-version">ePrestasi Akademik</p>
+  <div class="footer-bar"><span class="fb-nota"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span><b>Nota:</b> Data dikira berdasarkan markah yang telah dihantar oleh guru.</span></span><span id="diag-version">ePrestasi Akademik</span></div>
 </div>
 
 <script>
@@ -450,6 +667,19 @@ document.querySelectorAll('#sidebar .nav-item').forEach(item=>{
     document.getElementById('main')?.scrollTo({ top:0, behavior:'smooth' });
   });
 });
+
+
+/* ---------- Kecilkan / besarkan menu kiri (butang hamburger & butang bulat) ---------- */
+(function(){
+  const togol = () => {
+    document.body.classList.toggle('sb-collapsed');
+    try{ localStorage.setItem('eprestasi_sb', document.body.classList.contains('sb-collapsed') ? '1' : '0'); }catch(e){}
+  };
+  ['tb-burger','sb-toggle'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('click', togol); });
+  try{ if (localStorage.getItem('eprestasi_sb') === '1') document.body.classList.add('sb-collapsed'); }catch(e){}
+})();
+
+document.querySelectorAll('#topbar .tb-act').forEach(b=> b.addEventListener('click', ()=> tunjukToastSoon(b.textContent.trim())));
 
 // Papar HANYA seksyen sasaran; sembunyikan seksyen analisis lain sepenuhnya.
 function tukarTab(idSasaran){
@@ -572,6 +802,10 @@ async function muatSenaraiFilter(){
     const o = document.createElement('option'); o.value = y; o.textContent = y; subjekSelTA.appendChild(o);
   }
   subjekSel.addEventListener('change', muatAnalisisSubjek);
+  // Paparan lalai: subjek pertama + tahun akademik semasa (supaya halaman tidak kosong)
+  if (subjekSel.options.length > 1){ subjekSel.selectedIndex = 1; }
+  if (subjekSelTA.querySelector('option[value="' + now + '"]')){ subjekSelTA.value = String(now); }
+  if (subjekSel.value) setTimeout(muatAnalisisSubjek, 0);
   subjekSelKelas.addEventListener('change', muatAnalisisSubjek);
   subjekSelTA.addEventListener('change', muatAnalisisSubjek);
   document.getElementById('subjek-sel-peperiksaan').addEventListener('change', muatAnalisisSubjek);
@@ -724,7 +958,7 @@ function fmtPct_(n){ return n == null ? '-' : n + '%'; }
 function renderJadualPencapaianTahun(rows){
   const wrap = document.getElementById('tbl-pencapaian-tahun');
   if (!wrap) return;
-  if (!rows.length){ wrap.innerHTML = '<div class="empty-hint">Tiada data ikut tahun untuk subjek ini.</div>'; return; }
+  if (!rows.length){ wrap.innerHTML = '<div class="kosong-kotak"><span class="kosong-ic"><svg width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1"/><rect x="9.8" y="8" width="4.5" height="13" rx="1"/><rect x="16.5" y="3" width="4.5" height="18" rx="1"/></svg></span><p>Tiada data ikut tahun untuk subjek ini.</p></div>'; return; }
 
   // Baris jumlah/purata keseluruhan (pemberat ikut bilangan murid setiap tahun)
   const jumlahMurid = rows.reduce((s,r)=>s+r.bilMurid, 0);
@@ -776,23 +1010,10 @@ function renderRumusanMurid(rm){
   const meningkat = rm.meningkatBelumCapai || { bil:0, peratus:null };
   const menurun = rm.menurunBawahTov || { bil:0, peratus:null };
 
-  tengah.innerHTML = `<span style="font-size:22px; font-weight:800; color:var(--navy);">${jumlah}</span><span style="font-size:10px; color:var(--muted);">Murid</span>`;
-
-  legenda.innerHTML = `
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#16A34A; flex-shrink:0;"></span><span style="flex:1;">Mencapai / Melebihi ETR</span><b>${mencapai.bil} murid (${fmtPct_(mencapai.peratus)})</b></div>
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#D97706; flex-shrink:0;"></span><span style="flex:1;">Meningkat, Belum Capai ETR</span><b>${meningkat.bil} murid (${fmtPct_(meningkat.peratus)})</b></div>
-    <div style="display:flex; align-items:center; gap:8px;"><span style="width:11px; height:11px; border-radius:50%; background:#DC2626; flex-shrink:0;"></span><span style="flex:1;">Menurun (Bawah TOV)</span><b>${menurun.bil} murid (${fmtPct_(menurun.peratus)})</b></div>
-  `;
-
-  if (state.charts.rumusanMurid) state.charts.rumusanMurid.destroy();
-  state.charts.rumusanMurid = new Chart(document.getElementById('chart-rumusan-murid'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Mencapai/Melebihi ETR', 'Meningkat, Belum Capai', 'Menurun (Bawah TOV)'],
-      datasets: [{ data: [mencapai.bil, meningkat.bil, menurun.bil], backgroundColor: ['#16A34A','#D97706','#DC2626'], borderWidth:0 }],
-    },
-    options: { responsive:true, maintainAspectRatio:false, cutout:'72%', plugins:{ legend:{ display:false }, tooltip:{ enabled:true } } },
-  });
+  tengah.innerHTML = `<span class="rt-num">${jumlah}</span><span class="rt-lbl">Murid</span>`;
+  const baris = (warna, teks, o) => `<div class="rl-baris"><span class="rl-titik" style="background:${warna};"></span><span class="rl-teks">${teks}</span><b>${o.bil} murid (${o.peratus != null ? o.peratus + '%' : '\u2013'})</b></div>`;
+  legenda.innerHTML = baris('#16A34A','Mencapai / Melebihi ETR',mencapai) + baris('#F59E0B','Meningkat, Belum Capai ETR',meningkat) + baris('#EF4444','Menurun (Bawah TOV)',menurun);
+  if (state.charts.rumusanMurid){ state.charts.rumusanMurid.destroy(); state.charts.rumusanMurid = null; }
 
   const senarai = rm.muridPerluPerhatian || [];
   if (senarai.length === 0){
@@ -825,17 +1046,24 @@ function renderKadRingkasPeperiksaan(d, targetId){
   const wrap = document.getElementById(targetId || 'stat-row-ringkas-peperiksaan');
   if (!wrap) return;
 
+  const IKON_KAD = {
+    biru:   `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="13" r="8"/><circle cx="11" cy="13" r="4.5"/><circle cx="11" cy="13" r="1" fill="currentColor"/><path d="M11 13 21 3M16 3h5v5"/></svg>`,
+    kuning: `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1"/><rect x="9.8" y="8" width="4.5" height="13" rx="1"/><rect x="16.5" y="3" width="4.5" height="18" rx="1"/></svg>`,
+    ungu:   `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1"/><rect x="9.8" y="8" width="4.5" height="13" rx="1"/><rect x="16.5" y="3" width="4.5" height="18" rx="1"/></svg>`,
+    hijau:  `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="13" r="8"/><circle cx="11" cy="13" r="4.5"/><path d="m8.8 13 1.7 1.7 3-3.2"/><path d="M16 8l5-5M16 3h5v5"/></svg>`,
+    merah:  `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6.5"/><path d="m9.3 9.2 2 2 3.6-3.8"/><path d="M8.5 14.5 7 22l5-2.6 5 2.6-1.5-7.5"/></svg>`,
+  };
   const kad = (opt) => {
-    const { lbl, nilaiUtama, nilaiKecil, judulTooltip, isiTooltip, formula, contoh } = opt;
+    const { lbl, tema, nilaiUtama, nilaiKecil, judulTooltip, isiTooltip, formula, contoh } = opt;
     return `
-      <div class="kad-ringkas">
-        <div class="kr-lbl">${lbl} <span class="kr-info-btn">ⓘ</span></div>
+      <div class="kad-ringkas tema-${tema}">
+        <div class="kr-head"><span class="kr-ic">${IKON_KAD[tema]}</span><div class="kr-lbl">${lbl} <span class="kr-info-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span></div></div>
         <div class="kr-val">${nilaiUtama}${nilaiKecil ? ` <small>${nilaiKecil}</small>` : ''}</div>
         <div class="kr-tooltip">
           <div>${judulTooltip}</div>
-          <div style="margin-top:4px; color:#D9E2EF;">${isiTooltip}</div>
+          <div style="margin-top:4px; color:#D9E8E0;">${isiTooltip}</div>
           ${formula ? `<div class="kr-formula">${formula}</div>` : ''}
-          ${contoh ? `<div style="color:#B9C6D9;">${contoh}</div>` : ''}
+          ${contoh ? `<div style="color:#BFD6CB;">${contoh}</div>` : ''}
         </div>
       </div>`;
   };
@@ -845,6 +1073,7 @@ function renderKadRingkasPeperiksaan(d, targetId){
   wrap.innerHTML = [
     kad({
       lbl: 'Purata Asas (TOV)',
+      tema: 'biru',
       nilaiUtama: asas ? asas.purata + '%' : '-',
       judulTooltip: '📍 <b>TOV = Markah Asas Murid</b>',
       isiTooltip: 'Purata markah <b>Ujian Akhir Tahun tahun sebelumnya</b> bagi semua murid — dijadikan titik permulaan (asas) untuk lihat perkembangan pencapaian pada tahun semasa.',
@@ -852,15 +1081,8 @@ function renderKadRingkasPeperiksaan(d, targetId){
       contoh: asas ? `Dikira daripada: ${asas.jumlahMarkah} ÷ ${asas.bilangan} rekod markah = <b>${asas.purata}%</b><br><span style="font-size:10.5px;">Tekan <b>👥 Lihat Semua Murid</b> untuk semak markah setiap murid.</span>` : 'Tiada data TOV lagi.',
     }),
     kad({
-      lbl: 'Purata Sasaran (ETR)',
-      nilaiUtama: sasaran ? sasaran.purata + '%' : '-',
-      judulTooltip: '🎯 <b>ETR = Sasaran Murid</b>',
-      isiTooltip: 'Purata sasaran pencapaian yang ditetapkan guru bagi <b>setiap murid</b> (sasaran setiap murid boleh berbeza-beza).',
-      formula: 'Jumlah ETR semua murid ÷ bilangan murid',
-      contoh: sasaran ? `Dikira daripada: ${sasaran.jumlahMarkah} ÷ ${sasaran.bilangan} rekod markah = <b>${sasaran.purata}%</b><br><span style="font-size:10.5px;">Tekan <b>👥 Lihat Semua Murid</b> untuk semak markah setiap murid.</span>` : 'Tiada sasaran ETR ditetapkan lagi.',
-    }),
-    kad({
-      lbl: 'Purata Pertengahan',
+      lbl: 'Purata Pertengahan Tahun',
+      tema: 'kuning',
       nilaiUtama: tengah ? tengah.purata + '%' : '-',
       judulTooltip: '📘 <b>Ujian Pertengahan Tahun</b>',
       isiTooltip: 'Purata markah Ujian Pertengahan Tahun bagi murid yang mempunyai markah direkodkan.',
@@ -868,7 +1090,8 @@ function renderKadRingkasPeperiksaan(d, targetId){
       contoh: tengah ? `Dikira daripada: ${tengah.jumlahMarkah} ÷ ${tengah.bilangan} rekod markah = <b>${tengah.purata}%</b><br><span style="font-size:10.5px;">Tekan <b>👥 Lihat Semua Murid</b> untuk semak markah setiap murid.</span>` : 'Tiada markah Pertengahan Tahun lagi.',
     }),
     kad({
-      lbl: 'Purata Akhir',
+      lbl: 'Purata Akhir Tahun',
+      tema: 'ungu',
       nilaiUtama: akhir ? akhir.purata + '%' : '-',
       judulTooltip: '📗 <b>Ujian Akhir Tahun</b>',
       isiTooltip: 'Purata markah Ujian Akhir Tahun bagi murid yang mempunyai markah direkodkan.',
@@ -876,7 +1099,17 @@ function renderKadRingkasPeperiksaan(d, targetId){
       contoh: akhir ? `Dikira daripada: ${akhir.jumlahMarkah} ÷ ${akhir.bilangan} rekod markah = <b>${akhir.purata}%</b><br><span style="font-size:10.5px;">Tekan <b>👥 Lihat Semua Murid</b> untuk semak markah setiap murid.</span>` : 'Tiada markah Akhir Tahun lagi.',
     }),
     kad({
+      lbl: 'Purata Sasaran (ETR)',
+      tema: 'hijau',
+      nilaiUtama: sasaran ? sasaran.purata + '%' : '-',
+      judulTooltip: '🎯 <b>ETR = Sasaran Murid</b>',
+      isiTooltip: 'Purata sasaran pencapaian yang ditetapkan guru bagi <b>setiap murid</b> (sasaran setiap murid boleh berbeza-beza).',
+      formula: 'Jumlah ETR semua murid ÷ bilangan murid',
+      contoh: sasaran ? `Dikira daripada: ${sasaran.jumlahMarkah} ÷ ${sasaran.bilangan} rekod markah = <b>${sasaran.purata}%</b><br><span style="font-size:10.5px;">Tekan <b>👥 Lihat Semua Murid</b> untuk semak markah setiap murid.</span>` : 'Tiada sasaran ETR ditetapkan lagi.',
+    }),
+    kad({
       lbl: 'Mencapai Sasaran (ETR)',
+      tema: 'merah',
       nilaiUtama: capai.bilKeseluruhan ? `${capai.bilCapai} / ${capai.bilKeseluruhan}` : '-',
       nilaiKecil: capai.peratus != null ? capai.peratus + '%' : '',
       judulTooltip: '✅ <b>Bilangan Murid Capai Sasaran Sendiri</b>',
@@ -1500,37 +1733,33 @@ function renderAnalisisSubjek(d){
   wrap.innerHTML = `
     <div class="stat-row-ringkas" id="stat-row-ringkas-subjek"></div>
 
-    <div class="card-box">
-      <h2><span class="dot"></span>Ringkasan Pencapaian Subjek</h2>
-      <div class="ringkasan-alir">
-        <div class="alir-titik"><span class="alir-val" style="color:#2563EB;">${tov ?? '-'}${tov!=null?'%':''}</span><span class="alir-lbl">TOV (Asas)</span></div>
-        <div class="alir-anak-panah">→</div>
-        <div class="alir-titik"><span class="alir-val" style="color:#D97706;">${tengah ?? '-'}${tengah!=null?'%':''}</span><span class="alir-lbl">Pertengahan Tahun</span></div>
-        <div class="alir-anak-panah">→</div>
-        <div class="alir-titik"><span class="alir-val" style="color:#7C3AED;">${akhir ?? '-'}${akhir!=null?'%':''}</span><span class="alir-lbl">Akhir Tahun</span></div>
-        <div class="alir-pemisah"></div>
-        <div class="alir-titik"><span class="alir-val" style="color:#059669;">${sasaran ?? '-'}${sasaran!=null?'%':''}</span><span class="alir-lbl">Sasaran (ETR)</span></div>
-        <div class="alir-nota">
+    <div class="card-box kad-besar">
+      <div class="kb-tajuk"><span class="kb-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1"/><rect x="9.8" y="8" width="4.5" height="13" rx="1"/><rect x="16.5" y="3" width="4.5" height="18" rx="1"/></svg></span><h2>Ringkasan Pencapaian Subjek</h2></div>
+      <div class="alir-baris">
+        <div class="alir-kotak tema-biru"><span class="alir-val">${tov ?? '-'}${tov!=null?'%':''}</span><span class="alir-lbl">TOV (Asas)</span></div>
+        <span class="alir-ap"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        <div class="alir-kotak tema-kuning"><span class="alir-val">${tengah ?? '-'}${tengah!=null?'%':''}</span><span class="alir-lbl">Pertengahan Tahun</span></div>
+        <span class="alir-ap"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        <div class="alir-kotak tema-ungu"><span class="alir-val">${akhir ?? '-'}${akhir!=null?'%':''}</span><span class="alir-lbl">Akhir Tahun</span></div>
+        <span class="alir-ap"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        <div class="alir-kotak tema-hijau"><span class="alir-val">${sasaran ?? '-'}${sasaran!=null?'%':''}</span><span class="alir-lbl">Sasaran (ETR)</span></div>
+      </div>
+      ${(naikDrpTov != null || bandingSasaran != null) ? `<div class="alir-nota-baris">
           ${naikDrpTov != null ? `<div class="alir-check ${naikDrpTov >= 0 ? 'positif' : 'negatif'}">${naikDrpTov >= 0 ? '✅' : '⚠️'} ${naikDrpTov >= 0 ? 'Meningkat' : 'Menurun'} <b>${Math.abs(naikDrpTov)} mata</b> daripada TOV</div>` : ''}
           ${bandingSasaran != null ? `<div class="alir-check ${bandingSasaran >= 0 ? 'positif' : 'negatif'}">${bandingSasaran >= 0 ? '✅' : '⚠️'} ${bandingSasaran >= 0 ? 'Melebihi' : 'Bawah'} sasaran ETR sebanyak <b>${Math.abs(bandingSasaran)} mata</b></div>` : ''}
-        </div>
-      </div>
+      </div>` : ''}
     </div>
 
     <div class="grid-subjek-bawah">
-      <div class="card-box">
-        <h2><span class="dot"></span>Pencapaian Mengikut Tahun</h2>
+      <div class="card-box kad-besar">
+        <div class="kb-tajuk"><span class="kb-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1"/><rect x="9.8" y="8" width="4.5" height="13" rx="1"/><rect x="16.5" y="3" width="4.5" height="18" rx="1"/></svg></span><h2>Pencapaian Mengikut Tahun</h2></div>
         <div id="tbl-pencapaian-tahun"></div>
-        <p style="font-size:11px; color:var(--muted); margin-top:10px;">ⓘ Nota: Data dikira berdasarkan markah yang telah dihantar oleh guru.</p>
       </div>
-      <div class="card-box">
-        <h2><span class="dot"></span>Rumusan Murid</h2>
-        <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
-          <div style="position:relative; width:150px; height:150px; flex-shrink:0;">
-            <canvas id="chart-rumusan-murid"></canvas>
-            <div id="rumusan-murid-tengah" style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;"></div>
-          </div>
-          <div id="legenda-rumusan-murid" style="flex:1; min-width:180px; font-size:12.5px;"></div>
+      <div class="card-box kad-besar">
+        <div class="kb-tajuk"><span class="kb-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h2>Rumusan Murid</h2></div>
+        <div class="rumusan-grid">
+          <div class="rumusan-tile"><span class="rt-ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div id="rumusan-murid-tengah"></div></div>
+          <div id="legenda-rumusan-murid" class="rumusan-list"></div>
         </div>
         <div id="tbl-murid-perlu-perhatian" style="margin-top:16px;"></div>
       </div>
