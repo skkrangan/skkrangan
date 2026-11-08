@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ePrestasi Akademik SK Krangan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -27,10 +27,12 @@
     margin:0; background:var(--bg); color:var(--ink);
     font-family:'Plus Jakarta Sans', sans-serif;
   }
-  h1,h2,h3,.font-display{ font-family:'Fraunces', serif; }
+  h1,h2,h3,.font-display{ font-family:'Fraunces', serif; font-weight:600; }
+  /* sama seperti Portal Staf: Fraunces guna paksi optical-size 32 */
+  body{ font-variation-settings:'opsz' 32; }
 
   /* ---------- Layout ---------- */
-  #app{ display:block; max-width:1180px; margin:0 auto; padding:24px 20px 80px; }
+  #app{ display:block; width:100%; max-width:none; margin:0; padding:24px 32px 80px; }
   header.topbar{
     display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; gap:16px; flex-wrap:wrap;
   }
@@ -184,50 +186,184 @@
 
   .upload-summary{ font-size:12px; color:var(--muted); }
   .upload-summary b{ color:var(--ink); }
+
+
+  /* =====================================================================
+     TEMA BIRU NAVY + EMAS (ikut lampiran) - dikongsi Input Markah & Analisis Subjek
+     ===================================================================== */
+  :root{ --navy:#0B1F4F; --navy-dark:#081738; --gold:#E0A92F; --bg:#EEF3FB; --ink:#10234D; --muted:#4A5C7D; --border:#D5DEEE; --tajuk:#0B1F55; }
+  body{ background:#EEF3FB; color:var(--ink); font-variation-settings:normal; }
+  #shell{ display:flex; background:#EEF3FB; min-height:calc(100vh - 92px); }
+
+  #topbar{ position:relative; z-index:40; height:92px; display:flex; align-items:center; justify-content:space-between; padding:0 30px 0 24px; color:#fff; overflow:hidden;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 170 92%22 preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 x2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23E5B53F%22/%3E%3Cstop offset=%221%22 stop-color=%22%23FFE08A%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M170 6C140 20 130 62 84 92L170 92Z%22 fill=%22url(%23g)%22/%3E%3Cpath d=%22M170 0C128 26 118 64 62 92%22 stroke=%22%23FFD86B%22 stroke-width=%222.5%22 fill=%22none%22/%3E%3C/svg%3E"), linear-gradient(100deg,#0A1B47 0%,#0E2B6B 45%,#0A2155 75%,#0A1B47 100%);
+    background-repeat:no-repeat; background-size:170px 92px, 100% 100%; background-position:right bottom, 0 0;
+    border-bottom:4px solid #F2B930; box-shadow:0 4px 14px rgba(0,0,0,.2); }
+  #topbar::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.06) 40%, transparent 48%, rgba(255,255,255,.05) 60%, transparent 70%); }
+  .tb-brand, .tb-actions{ position:relative; display:flex; align-items:center; gap:18px; }
+  #tb-burger{ width:62px; height:58px; border-radius:14px; border:2px solid rgba(255,255,255,.85); background:rgba(255,255,255,.04); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  #tb-burger:hover{ background:rgba(255,255,255,.14); }
+  .tb-logo{ width:70px; height:62px; border-radius:15px; display:flex; align-items:center; justify-content:center; color:#0B1F4F; background:linear-gradient(180deg,#FFD866,#F2B02A); box-shadow:0 4px 12px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.6); }
+  .tb-brand h1{ font-family:'Plus Jakarta Sans',sans-serif; font-size:35px; font-weight:800; line-height:1; margin:0; letter-spacing:-.01em; color:#fff; }
+  .tb-sep{ width:2px; height:44px; background:rgba(255,255,255,.6); border-radius:2px; }
+  .tb-actions{ gap:26px; padding-right:62px; }
+  .tb-actions .tb-sep{ margin-right:8px; }
+  .tb-act{ display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; color:#fff; font-family:inherit; font-size:16.5px; font-weight:600; cursor:pointer; padding:4px 6px; }
+  .tb-act:hover{ color:#FFD866; }
+
+  #sidebar{ position:sticky; top:92px; width:260px; flex-shrink:0; height:calc(100vh - 92px); overflow:hidden; padding:80px 14px 24px; color:#fff; display:flex; flex-direction:column; transition:width .2s;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 260 120%22 preserveAspectRatio=%22none%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 x2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFE08A%22/%3E%3Cstop offset=%22.55%22 stop-color=%22%23E0A92F%22/%3E%3Cstop offset=%221%22 stop-color=%22%239C6D10%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%22M0 18C50 14 110 62 260 104L260 120 0 120Z%22 fill=%22url(%23g)%22/%3E%3Cpath d=%22M0 40C70 30 140 80 260 112%22 stroke=%22%23FFE08A%22 stroke-width=%222.2%22 fill=%22none%22/%3E%3C/svg%3E"), linear-gradient(180deg,#0B2260 0%,#091B4C 55%,#07163D 100%);
+    background-repeat:no-repeat; background-size:100% 120px, 100% 100%; background-position:left bottom, 0 0; }
+  #sidebar .nav-list{ display:flex; flex-direction:column; gap:8px; }
+  #sidebar .nav-item{ display:flex; align-items:center; gap:18px; padding:13px 18px; border-radius:15px; margin:0; font-size:20px; font-weight:600; color:#fff; cursor:pointer; white-space:nowrap; transition:background .15s; }
+  #sidebar .nav-item svg{ flex-shrink:0; width:30px; height:30px; }
+  #sidebar .nav-item:hover{ background:rgba(255,255,255,.1); }
+  #sidebar .nav-item.active{ background:linear-gradient(180deg,#FFE27D 0%,#F7BE2E 100%); color:#0B1F4F; font-weight:800; box-shadow:0 5px 14px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.7); }
+  #sb-toggle{ position:fixed; left:236px; top:450px; z-index:50; width:44px; height:44px; border-radius:50%; background:#0B1F4F; color:#fff; border:3px solid #F2B930; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.35); transition:left .2s; }
+  body.sb-collapsed #sidebar{ width:84px; }
+  body.sb-collapsed #sidebar .nav-item{ justify-content:center; padding:13px 0; }
+  body.sb-collapsed #sidebar .nav-item span{ display:none; }
+  body.sb-collapsed #sb-toggle{ left:62px; }
+  body.sb-collapsed #sb-toggle svg{ transform:rotate(180deg); }
+
+  header.topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+  header.topbar .brand{ display:flex; align-items:center; gap:18px; }
+  header.topbar .brand-ic{ width:60px; height:60px; border-radius:15px; background:linear-gradient(180deg,#10286B,#0B1F4F); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(11,31,79,.3); flex-shrink:0; }
+  header.topbar .brand-txt{ border:none; padding:0; }
+  header.topbar h1{ font-family:'Plus Jakarta Sans',sans-serif; font-size:34px; font-weight:800; color:var(--tajuk); letter-spacing:-.02em; line-height:1.05; margin:0; }
+  header.topbar .sub{ font-size:17.5px; color:#2F4470; margin:2px 0 0; font-weight:500; }
+  .btn-kembali{ display:inline-flex; align-items:center; gap:12px; padding:12px 24px; border-radius:13px; background:#fff; color:#0B1F4F; border:2px solid #0B1F4F; font-weight:800; font-size:17.5px; text-decoration:none; white-space:nowrap; box-shadow:0 2px 8px rgba(11,31,79,.1); transition:.15s; }
+  .btn-kembali:hover{ background:#0B1F4F; color:#fff; }
+
+  .card-box{ background:#fff; border:1px solid #DDE5F3; border-radius:20px; padding:12px 18px 14px; margin-bottom:14px; box-shadow:0 6px 20px rgba(11,31,79,.08); }
+  .card-head{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .card-head h2{ font-family:'Plus Jakarta Sans',sans-serif; font-size:21px; font-weight:800; color:#0B1F55; margin:0; letter-spacing:-.01em; display:block; }
+  .card-head .ch-ic{ display:flex; color:#0B1F55; width:auto; height:auto; margin:0; padding:0; background:none; }
+  .card-head .ch-ic.ch-gold{ color:#E2A02A; }
+  .card-head .ch-sub{ margin:0; font-size:16.5px; color:#2F4470; font-weight:500; }
+
+  .fb-row, .grid-4{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:30px; }
+  .field-label, .fld label{ font-size:17px; font-weight:500; text-transform:none; letter-spacing:0; color:#10234D; margin:0 0 2px; display:block; }
+  .sel-wrap{ position:relative; }
+  .sel-wrap .sel-ic{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#0B1F55; pointer-events:none; width:22px; height:22px; }
+  .sel-wrap select{ width:100%; height:38px; padding:0 38px 0 44px; font-family:inherit; font-size:16.5px; font-weight:600; color:#10234D; border:1.6px solid #C5D0E6; border-radius:10px;
+    background:#fff url("data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%230B1F4F%22 stroke-width=%222.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22m6 9 6 6 6-6%22/%3E%3C/svg%3E") no-repeat right 12px center / 18px; -webkit-appearance:none; appearance:none; cursor:pointer; text-overflow:ellipsis; }
+  .sel-wrap select:focus{ outline:none; border-color:#0B1F4F; box-shadow:0 0 0 3px rgba(11,31,79,.13); }
+
+  .footer-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background:#E4ECF8; border-radius:14px; padding:9px 16px; margin-top:2px; font-size:15px; color:#10234D; }
+  .footer-bar .fb-nota{ display:flex; align-items:center; gap:12px; }
+  .footer-bar svg{ flex-shrink:0; width:24px; height:24px; }
+
+  @media (max-width:1100px){ .fb-row, .grid-4{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; } }
+  @media (max-width:560px){ .fb-row, .grid-4{ grid-template-columns:1fr; } }
+  @media (max-width:900px){
+    #topbar{ height:auto; min-height:70px; padding:8px 12px; flex-wrap:wrap; background-size:90px 70px, 100% 100%; }
+    #tb-burger{ width:46px; height:44px; } .tb-logo{ width:48px; height:44px; } .tb-logo svg{ width:26px; height:26px; }
+    .tb-brand{ gap:10px; } .tb-brand h1{ font-size:19px; } .tb-sep{ display:none; }
+    .tb-actions{ gap:6px; padding-right:0; } .tb-act{ font-size:11px; } .tb-act svg{ width:22px; height:22px; }
+    #shell{ flex-direction:column; }
+    #sidebar{ position:relative; top:auto; width:100%; height:auto; flex-direction:row; padding:8px 10px; background-image:linear-gradient(180deg,#0B2260,#091B4C); }
+    #sidebar .nav-list{ flex-direction:row; flex-wrap:wrap; gap:6px; }
+    #sidebar .nav-item{ padding:9px 12px; font-size:14px; gap:8px; } #sidebar .nav-item svg{ width:20px; height:20px; }
+    #sb-toggle{ display:none; }
+    body.sb-collapsed #sidebar{ display:none; }
+    header.topbar h1{ font-size:24px; } header.topbar .sub{ font-size:14px; }
+  }
+
+  /* ---------- Halaman Input Markah ---------- */
+  #sidebar .nav-item svg.ic{ width:30px; height:30px; }
+  body.sb-collapsed #sidebar .nav-item svg.ic{ width:30px; height:30px; }
+  #sidebar .nav-item[data-set-mode].active{ background:transparent; color:#fff; box-shadow:none; font-weight:600; }
+  .card-pengisian label.field-label, label.field-label{ text-transform:none !important; font-size:15.5px !important; font-weight:500 !important; letter-spacing:0 !important; color:#10234D !important; }
+
+  #main-area{ flex:1; min-width:0; background:none; }
+  #app{ padding:18px 26px 40px 28px; max-width:none; }
+  .card-pengisian .guru-row{ display:flex; align-items:center; gap:12px; margin-top:10px; padding-top:9px; border-top:1px solid #E6ECF6; font-size:16.5px; font-weight:600; color:#10234D; }
+  .guru-row svg{ width:24px; height:24px; color:#0B1F55; flex-shrink:0; }
+  .guru-row label{ white-space:nowrap; font-weight:600; }
+  .guru-row input{ flex:1; min-width:0; border:none; background:transparent; font-family:inherit; font-size:16.5px; padding:3px 4px; color:#10234D; }
+  .guru-row input:focus{ outline:none; }
+
+  table.input-grid{ width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; border-radius:10px; overflow:hidden; border:1px solid #D5DEEE; }
+  table.input-grid thead th{ background:linear-gradient(180deg,#0E2A6B,#0A1F55); color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:14.5px; font-weight:700; text-transform:none; letter-spacing:0; padding:5px 8px; height:32px; text-align:left; border:none; border-right:1px solid rgba(255,255,255,.28); border-bottom:1px solid rgba(255,255,255,.28); line-height:1.2; }
+  table.input-grid thead th:last-child{ border-right:none; }
+  table.input-grid thead tr:last-child th{ border-bottom:none; }
+  table.input-grid thead th.c{ text-align:center; }
+  table.input-grid thead th .info-ic{ display:inline-flex; vertical-align:-3px; margin-left:4px; opacity:.95; cursor:help; }
+  table.input-grid thead th .info-ic svg{ width:15px; height:15px; }
+  table.input-grid tbody td{ padding:1px 10px; font-size:15px; color:#10234D; border-bottom:1px solid #E6ECF6; vertical-align:middle; height:30px; background:#fff; }
+  table.input-grid tbody tr:nth-child(even) td{ background:#F4F7FD; }
+  table.input-grid tbody tr:hover td{ background:#EAF1FC; }
+  table.input-grid tbody tr:last-child td{ border-bottom:none; }
+  table.input-grid tbody td.row-idx{ text-align:center; }
+  table.input-grid tbody td.nama-murid{ font-weight:500; overflow-wrap:anywhere; }
+  table.input-grid td input[type=number], table.input-grid td select.input-tp{ display:block; margin:0 auto; width:100%; max-width:108px; height:22px; padding:0 6px; text-align:center; font-size:13.5px; font-weight:600; border:1.3px solid #C5D0E6; border-radius:7px; background:#fff; }
+  table.input-grid td input[type=number]:focus, table.input-grid td select.input-tp:focus{ outline:none; border-color:#0B1F4F; box-shadow:0 0 0 2px rgba(11,31,79,.14); }
+  table.input-grid td.aksi{ text-align:center; }
+  .btn-aksi{ width:30px; height:22px; border-radius:7px; border:none; background:#FDE6E8; color:#D62F3A; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:.15s; padding:0; }
+  .btn-aksi:hover{ background:#D62F3A; color:#fff; }
+  .btn-aksi svg{ width:14px; height:14px; }
+  .lencana-baru{ font-size:10.5px; font-weight:800; color:#B9831F; border:1px solid #D9A441; border-radius:999px; padding:0 7px; margin-left:8px; vertical-align:1px; }
+
+  .tambah-baris{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-top:12px; }
+  button.btn-tambah{ display:inline-flex; align-items:center; gap:10px; padding:8px 20px; border-radius:11px; border:1.8px solid #0B1F4F; color:#0B1F4F; background:#fff; font-size:16.5px; font-weight:800; cursor:pointer; }
+  button.btn-tambah svg{ width:24px; height:24px; color:#0B1F4F; }
+  button.btn-tambah:hover{ background:#EEF3FC; }
+  .tambah-sep{ width:1.5px; height:34px; background:#CFD6E6; }
+  .tambah-nota{ margin:0; font-size:15px; color:#2F4470; }
+  #nota-murid-dibuang{ font-size:14px !important; }
+
+  .actions-card{ display:flex !important; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:12px 22px; margin-top:0; }
+  .status-wrap{ display:flex; align-items:center; gap:12px; font-size:17px; color:#10234D; font-weight:600; }
+  .status-wrap svg{ color:#0B1F55; width:28px; height:28px; }
+  .status-pill{ background:#FBE8C2; color:#4F3500; font-weight:800; padding:5px 18px; border-radius:999px; font-size:16px; }
+  .status-pill.draf{ background:#E3ECFB; color:#0B1F55; }
+  .status-pill.ok{ background:#DDF3E8; color:#17724E; }
+  .actions-btns{ display:flex; gap:14px; flex-wrap:wrap; }
+  button.btn-lg{ display:inline-flex; align-items:center; gap:10px; padding:0 24px; height:46px; border-radius:12px; font-size:17px; font-weight:800; cursor:pointer; font-family:inherit; }
+  button.btn-ghost.btn-lg{ background:#fff; color:#0B1F4F; border:2px solid #0B1F4F; }
+  button.btn-ghost.btn-lg:hover{ background:#F0F4FC; }
+  button.btn-ghost.btn-gold{ color:#B07A14; border-color:#D9A441; }
+  button.btn-ghost.btn-gold:hover{ background:#FFF7E8; }
+  button.btn-primary.btn-lg{ background:linear-gradient(180deg,#10286B,#0A1F55); color:#fff; border:none; box-shadow:0 6px 14px rgba(11,31,79,.3); }
+  button.btn-primary.btn-lg:disabled{ opacity:.6; cursor:not-allowed; }
+  #draf-status{ font-size:13px; color:#5A6988; margin:-6px 4px 0; text-align:right; }
+  #draf-status:empty{ display:none; }
+  .diag{ display:none; }
+  @media (max-width:900px){
+    #app{ padding:14px 14px 36px; }
+    .guru-row{ flex-wrap:wrap; } .guru-row input{ width:100%; }
+    table.input-grid thead th{ font-size:12px; } table.input-grid tbody td{ font-size:13px; }
+  }
 </style>
 </head>
 <body>
 
+<header id="topbar">
+  <div class="tb-brand">
+    <button type="button" id="tb-burger" aria-label="Buka/tutup menu"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="tb-logo"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 10v6"/></svg></div>
+    <h1>ePrestasi Akademik</h1>
+    <span class="tb-sep"></span>
+  </div>
+  <div class="tb-actions">
+    <span class="tb-sep"></span>
+    <button type="button" class="tb-act" data-soon="1"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Tetapan</span></button>
+    <button type="button" class="tb-act" data-soon="1"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Pengguna</span></button>
+    <button type="button" class="tb-act" data-soon="1"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span>Bantuan</span></button>
+  </div>
+</header>
+<button type="button" id="sb-toggle" aria-label="Kecilkan menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+
 <div id="shell">
   <nav id="sidebar">
-    <div class="side-brand">
-      <div class="badge2">KAD</div>
-      <div>
-        <h1>ePrestasi Akademik</h1>
-        <p>SK Krangan, Serian</p>
-      </div>
+    <div class="nav-list">
+      <div class="nav-item active" data-href="eprestasi.html"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg><span>Input Markah</span></div>
+      <div class="nav-item" data-set-mode="peperiksaan"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>Peperiksaan</span></div>
+      <div class="nav-item" data-set-mode="pbd" style="display:none;"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>PBD</span></div>
+      <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-subjek"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V10M12 21V4M19 21v-7"/></svg><span>Analisis Subjek</span></div>
     </div>
-
-    <!-- Dashboard disorok buat masa ini - fokus penuh kepada Input Markah. -->
-    <div class="nav-item" data-href="eprestasi_dashboard.html" style="display:none;"><span class="ic">🏠</span>Dashboard</div>
-    <div class="nav-item active" data-href="eprestasi.html"><span class="ic">✏️</span>Input Markah</div>
-    <div class="nav-item sub" data-set-mode="peperiksaan"><span class="ic">1.</span>Peperiksaan</div>
-    <!-- PBD disorok buat masa ini - fokus penuh kepada Peperiksaan dahulu.
-         Format eksport MOEIS belum disahkan/disesuaikan dengan pemproses fail
-         PBD, jadi ciri ni dipendekkan sementara supaya tak keliru guru dengan
-         ciri yang belum tentu berfungsi betul dengan fail sebenar mereka. -->
-    <div class="nav-item sub" data-set-mode="pbd" style="display:none;"><span class="ic">2.</span>PBD</div>
-
-    <div class="nav-section-lbl">Analisis Akademik</div>
-    <!-- Analisis Peperiksaan/PBD/Murid/Kelas disorok buat masa ini - fokus
-         penuh kepada Input Markah dahulu. Analisis Subjek dikekalkan. -->
-    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-peperiksaan" style="display:none;"><span class="ic">📈</span>Analisis Peperiksaan</div>
-    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-pbd" style="display:none;"><span class="ic">📊</span>Analisis PBD</div>
-    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-murid" style="display:none;"><span class="ic">🧑‍🎓</span>Analisis Murid</div>
-    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-subjek"><span class="ic">📘</span>Analisis Subjek</div>
-    <div class="nav-item" data-href="eprestasi_dashboard.html#anchor-kelas" style="display:none;"><span class="ic">🏫</span>Analisis Kelas</div>
-
-    <!-- Bahagian Laporan disorok sepenuhnya buat masa ini. -->
-    <div class="nav-section-lbl" style="display:none;">Laporan</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">📄</span>Laporan Individu</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">👥</span>Laporan Kelas</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">🏫</span>Laporan Tingkatan</div>
-    <div class="nav-item" data-soon="1" style="display:none;"><span class="ic">⬇️</span>Muat Turun (PDF/Excel)</div>
-
-    <div class="nav-section-lbl">Sistem</div>
-    <div class="nav-item" data-soon="1"><span class="ic">⚙️</span>Tetapan</div>
-    <div class="nav-item" data-soon="1"><span class="ic">👤</span>Pengguna</div>
-    <div class="nav-item" data-soon="1"><span class="ic">❓</span>Bantuan</div>
   </nav>
 
   <div id="main-area">
@@ -236,19 +372,13 @@
 <div id="app">
   <header class="topbar">
     <div class="brand">
-      <div class="badge">SK</div>
-      <div>
-        <h1>ePrestasi Akademik</h1>
-        <p class="sub">Sekolah Kebangsaan Krangan</p>
+      <div class="brand-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+      <div class="brand-txt">
+        <h1>Input Markah</h1>
+        <p class="sub">Pengurusan markah peperiksaan dan sasaran pencapaian murid.</p>
       </div>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <a href="dashboard.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; background:var(--navy); color:#fff; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap;">← Kembali ke Portal Staf</a>
-      <div id="user-chip">
-        <label class="field-label" style="margin:0; white-space:nowrap;">Nama Guru:</label>
-        <input type="text" id="input-nama-guru" placeholder="Cth: Cikgu Aimuni" style="width:160px; padding:6px 10px; border-radius:8px; border:1.5px solid var(--border); font-family:inherit; font-size:12px;">
-      </div>
-    </div>
+    <a href="dashboard.html" class="btn-kembali"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Kembali ke Portal Staf</span></a>
   </header>
 
   <!-- ================= ADMIN: IMPORT SK/SP (disorok buat masa ini) ================= -->
@@ -268,25 +398,28 @@
     </div>
   </details>
 
-  <div class="card-box">
-    <h2><span class="dot"></span>Pilih Kelas &amp; Subjek</h2>
-    <div class="grid-3">
+  <div class="card-box card-pengisian">
+    <div class="card-head"><span class="ch-ic"><svg class="" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span><h2>Maklumat Pengisian</h2></div>
+    <div class="grid-4">
       <div>
-        <label class="field-label">Tahun</label>
-        <select id="sel-tahun"><option value="">Pilih Tahun...</option></select>
+        <label class="field-label" for="sel-tahun-akademik">Tahun Akademik</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><select id="sel-tahun-akademik"></select></div>
       </div>
       <div>
-        <label class="field-label">Kelas</label>
-        <select id="sel-kelas"><option value="">Pilih Kelas...</option></select>
+        <label class="field-label" for="sel-tahun">Tahun</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg><select id="sel-tahun"><option value="">Pilih Tahun...</option></select></div>
       </div>
       <div>
-        <label class="field-label">Subjek</label>
-        <select id="sel-subjek"><option value="">Pilih Subjek...</option></select>
+        <label class="field-label" for="sel-kelas">Kelas</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><select id="sel-kelas"><option value="">Pilih Kelas...</option></select></div>
       </div>
       <div>
-        <label class="field-label">Tahun Akademik</label>
-        <select id="sel-tahun-akademik"></select>
+        <label class="field-label" for="sel-subjek">Subjek</label>
+        <div class="sel-wrap"><svg class="sel-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><select id="sel-subjek"><option value="">Pilih Subjek...</option></select></div>
       </div>
+    </div>
+    <div class="guru-row"><svg class="" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><label for="input-nama-guru">Nama Guru:</label>
+      <input type="text" id="input-nama-guru" placeholder="Taip nama guru" autocomplete="off">
     </div>
   </div>
 
@@ -323,8 +456,10 @@
     </p>
   </div>
 
-  <div class="card-box">
-    <h2><span class="dot"></span>Senarai Murid</h2>
+  <div class="card-box card-senarai">
+    <div class="card-head"><span class="ch-ic ch-gold"><svg class="" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      <div><h2>Senarai Murid &amp; Markah</h2><p id="sub-senarai" class="ch-sub">Pilih Tahun, Kelas dan Subjek</p></div>
+    </div>
 
     <div class="submode-toggle" id="submode-toggle-wrap" style="display:none;">
       <button type="button" id="submode-manual" class="active" style="display:none;">✏️ Input Manual</button>
@@ -341,14 +476,17 @@
     <div id="grid-wrap">
       <div class="empty-hint">Sila pilih Tahun, Kelas dan Subjek untuk memaparkan senarai murid.</div>
     </div>
-
-    <div class="actions-bar" id="actions-bar-utama">
-      <button type="button" class="btn-ghost" id="btn-reset">Kosongkan</button>
-      <button type="button" class="btn-ghost" id="btn-simpan-draf" style="border-color:var(--gold); color:var(--gold);">💾 Simpan Draf</button>
-      <button type="button" class="btn-primary" id="btn-simpan" disabled>📤 Hantar</button>
-    </div>
-    <p id="draf-status" style="font-size:11.5px; color:var(--muted); margin-top:8px; text-align:right;"></p>
   </div>
+
+  <div class="card-box actions-card" id="actions-bar-utama">
+    <div class="status-wrap"><svg class="" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>Status:</span><span id="status-pill" class="status-pill">Belum dihantar</span></div>
+    <div class="actions-btns">
+      <button type="button" class="btn-ghost btn-lg" id="btn-reset"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg><span>Kosongkan</span></button>
+      <button type="button" class="btn-ghost btn-lg btn-gold" id="btn-simpan-draf"><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><span>Simpan Draf</span></button>
+      <button type="button" class="btn-primary btn-lg" id="btn-simpan" disabled><svg class="" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg><span>Hantar</span></button>
+    </div>
+  </div>
+  <p id="draf-status"></p>
 
   <p class="diag">ePrestasi Akademik</p>
 </div>
@@ -397,6 +535,18 @@ document.querySelectorAll('#sidebar .nav-item').forEach(item=>{
   });
 });
 
+
+/* ---------- Kecilkan / besarkan menu kiri (butang hamburger & butang bulat) ---------- */
+(function(){
+  const togol = () => {
+    document.body.classList.toggle('sb-collapsed');
+    try{ localStorage.setItem('eprestasi_sb', document.body.classList.contains('sb-collapsed') ? '1' : '0'); }catch(e){}
+  };
+  ['tb-burger','sb-toggle'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('click', togol); });
+  try{ if (localStorage.getItem('eprestasi_sb') === '1') document.body.classList.add('sb-collapsed'); }catch(e){}
+})();
+
+document.querySelectorAll('#topbar .tb-act').forEach(b=> b.addEventListener('click', ()=> showToast('"'+b.textContent.trim()+'" akan datang dalam kemas kini seterusnya.')));
 /* ---------- Toast ---------- */
 function showToast(msg, type){
   const t = document.getElementById('toast');
@@ -639,27 +789,46 @@ function binaBarisMurid_(m, bil){
            <option value="4">TP4</option><option value="5">TP5</option><option value="6">TP6</option>
          </select>
        </td>`;
-  const lencana = m._baru
-    ? ` <span style="font-size:10px; font-weight:800; color:var(--gold); border:1px solid var(--gold); border-radius:999px; padding:1px 7px; margin-left:6px;">BAHARU</span> <button type="button" class="btn-buang-murid-baru" data-id="${escHtml_(m.ID)}" title="Buang murid baharu ini" style="border:none; background:none; color:#B42318; cursor:pointer; font-size:15px; font-weight:700;">×</button>`
-    : ` <button type="button" class="btn-buang-murid" data-id="${escHtml_(m.ID)}" title="Buang murid ini daripada senarai" style="border:none; background:none; color:#B42318; cursor:pointer; font-size:13px; font-weight:700; margin-left:6px;">🗑 Buang</button>`;
-  return `<tr data-baru="${m._baru ? 1 : 0}"><td class="row-idx">${bil}</td><td>${escHtml_(m.Nama)}${lencana}</td>${inputCell}</tr>`;
+  const lencana = m._baru ? ' <span class="lencana-baru">BAHARU</span>' : '';
+  const aksi = `<td class="aksi"><button type="button" class="btn-aksi ${m._baru ? 'btn-buang-murid-baru' : 'btn-buang-murid'}" data-id="${escHtml_(m.ID)}" title="Buang murid ini daripada senarai" aria-label="Buang murid"><svg class="" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg></button></td>`;
+  return `<tr data-baru="${m._baru ? 1 : 0}"><td class="row-idx">${bil}</td><td class="nama-murid">${escHtml_(m.Nama)}${lencana}</td>${inputCell}${aksi}</tr>`;
 }
 function renomborBaris_(){
   document.querySelectorAll('table.input-grid tbody tr').forEach((tr,i)=>{ const c = tr.querySelector('.row-idx'); if(c) c.textContent = i+1; });
+  kemaskiniSubtajuk_();
+}
+function kemaskiniSubtajuk_(){
+  const el = document.getElementById('sub-senarai'); if (!el) return;
+  const kelas = document.getElementById('sel-kelas').value, subjek = document.getElementById('sel-subjek').value;
+  const selT = document.getElementById('sel-tahun');
+  let thn = selT && selT.selectedOptions[0] ? selT.selectedOptions[0].textContent.trim() : '';
+  if (/^\d+$/.test(thn)) thn = 'Tahun ' + thn;
+  if (/^pilih/i.test(thn)) thn = '';
+  const n = document.querySelectorAll('table.input-grid tbody tr').length;
+  el.textContent = (kelas && subjek && document.querySelector('table.input-grid'))
+    ? n + ' murid \u2022 ' + subjek + (thn ? ' \u2022 ' + thn : '')
+    : (subjek ? subjek : 'Pilih Tahun, Kelas dan Subjek');
+}
+function setStatus_(teks, jenis){
+  const el = document.getElementById('status-pill'); if (!el) return;
+  el.textContent = teks; el.className = 'status-pill' + (jenis ? ' ' + jenis : '');
 }
 function pasangTambahMurid_(kelas){
   const wrap = document.getElementById('grid-wrap');
   const kotak = document.createElement('div');
   kotak.id = 'tambah-murid-wrap';
-  kotak.style.cssText = 'margin-top:14px;';
+  kotak.style.cssText = 'margin-top:18px;';
   kotak.innerHTML = `
-    <button type="button" class="btn-ghost" id="btn-tambah-murid" style="border-style:dashed;">➕ Tambah Murid Baharu</button>
-    <div id="borang-tambah-murid" style="display:none; margin-top:10px; gap:8px; align-items:center; flex-wrap:wrap;">
-      <input type="text" id="input-murid-baharu" placeholder="Nama penuh murid baharu" maxlength="120" style="flex:1; min-width:220px; padding:10px 12px; border-radius:10px; border:1.5px solid var(--border); font-family:inherit; font-size:13px;">
+    <div class="tambah-baris">
+      <button type="button" class="btn-ghost btn-tambah" id="btn-tambah-murid"><svg class="" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="M12 8v8M8 12h8" stroke="#fff"/></svg><span>Tambah Murid Baharu</span></button>
+      <span class="tambah-sep"></span>
+      <p class="tambah-nota">Murid baharu akan muncul di hujung senarai dan dihantar bersama markah apabila anda tekan Hantar.</p>
+    </div>
+    <div id="borang-tambah-murid" style="display:none; margin-top:12px; gap:8px; align-items:center; flex-wrap:wrap;">
+      <input type="text" id="input-murid-baharu" placeholder="Nama penuh murid baharu" maxlength="120" style="flex:1; min-width:220px; padding:12px 14px; border-radius:12px; border:1.5px solid #CBD3E3; font-family:inherit; font-size:15px;">
       <button type="button" class="btn-primary" id="btn-sahkan-murid-baru">Tambah</button>
       <button type="button" class="btn-ghost" id="btn-batal-murid-baru">Batal</button>
-    </div>
-    <p style="font-size:11.5px; color:var(--muted); margin-top:8px;">Murid baharu akan muncul di hujung senarai dan dihantar bersama markah apabila anda tekan Hantar.</p>`;
+    </div>`;
   wrap.appendChild(kotak);
 
   const borang = kotak.querySelector('#borang-tambah-murid');
@@ -723,6 +892,7 @@ function cubaPaparGrid(){
   }
 
   if (!kelas || (!subjek && !(state.mode === 'pbd' && (state.subMode === 'sppb')))){
+    kemaskiniSubtajuk_(); setStatus_('Belum dihantar');
     wrap.innerHTML = '<div class="empty-hint">Sila pilih Tahun dan Kelas' + (state.mode === 'pbd' && state.subMode === 'sppb' ? '' : ' dan Subjek') + ' untuk memaparkan senarai murid.</div>';
     btnSimpan.disabled = true;
     return;
@@ -748,20 +918,25 @@ function cubaPaparGrid(){
     .map(m => Object.assign({}, m, { _baru: true }));
   const senaraiMuridKelas = senaraiAsas.concat(senaraiBaru);
 
-  const kolInput = state.mode === 'peperiksaan'
-    ? `<th style="width:100px;" title="TOV = markah Ujian Akhir Tahun tahun sebelumnya">TOV ⓘ</th><th style="width:130px;">Ujian Pertengahan Tahun</th><th style="width:110px;">Ujian Akhir Tahun</th><th style="width:100px;">ETR (Sasaran)</th>`
-    : `<th style="width:150px;">Tahap Penguasaan</th>`;
+  const infoIc = '<span class="info-ic" title="TOV = markah Ujian Akhir Tahun tahun sebelumnya"><svg class="" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>';
+  const thead = state.mode === 'peperiksaan'
+    ? `<thead>
+        <tr><th class="c" rowspan="2" style="width:6%;">Bil.</th><th rowspan="2">Nama Murid</th><th class="c" rowspan="2" style="width:13%;">TOV ${infoIc}</th><th class="c" colspan="2" style="width:30%;">UJIAN</th><th class="c" rowspan="2" style="width:14%;">ETR (Sasaran)</th><th class="c" rowspan="2" style="width:9%;">Tindakan</th></tr>
+        <tr><th class="c">Pertengahan Tahun</th><th class="c">Ujian Akhir Tahun</th></tr>
+      </thead>`
+    : `<thead><tr><th class="c" style="width:6%;">Bil.</th><th>Nama Murid</th><th class="c" style="width:22%;">Tahap Penguasaan</th><th class="c" style="width:10%;">Tindakan</th></tr></thead>`;
 
   const rows = senaraiMuridKelas.map((m, i) => binaBarisMurid_(m, i+1)).join('');
 
   wrap.innerHTML = `
     <table class="input-grid">
-      <thead><tr><th></th><th>Nama Murid</th>${kolInput}</tr></thead>
+      ${thead}
       <tbody>${rows}</tbody>
     </table>
     ${senaraiMuridKelas.length === 0 ? '<div class="empty-hint">Tiada murid dijumpai untuk kelas ini. Anda boleh tambah murid di bawah.</div>' : ''}`;
   pasangTambahMurid_(kelas);
   pasangNotaDibuang_(kelas, subjek);
+  kemaskiniSubtajuk_(); setStatus_('Belum dihantar');
 
   if (senaraiMuridKelas.length === 0){
     btnSimpan.disabled = true;
@@ -1303,7 +1478,8 @@ document.getElementById('btn-simpan').addEventListener('click', async ()=>{
   };
 
   btn.disabled = true;
-  btn.textContent = 'Menghantar...';
+  const htmlAsal = btn.innerHTML;
+  btn.innerHTML = '<span>Menghantar...</span>';
 
   try{
     const res = await fetch(EPRESTASI_CONFIG.APPS_SCRIPT_URL, {
@@ -1314,6 +1490,7 @@ document.getElementById('btn-simpan').addEventListener('click', async ()=>{
     const data = await res.json();
     if (data.ok){
       showToast(`Berjaya dihantar: ${data.disimpan} rekod.`, 'ok');
+      setStatus_('Telah dihantar', 'ok');
       bersihkanDraf_(); // dah rasmi dihantar - buang draf tersimpan supaya tak dipulihkan semula
       if (state.mode === 'pbd' && state.subMode === 'upload'){
         state.parsedUploadRows = [];
@@ -1330,7 +1507,7 @@ document.getElementById('btn-simpan').addEventListener('click', async ()=>{
     showToast('Gagal hantar ke pelayan. Semak sambungan internet.', 'err');
   }finally{
     btn.disabled = false;
-    btn.textContent = '📤 Hantar';
+    btn.innerHTML = htmlAsal;
   }
 });/* ============================================================
  * ADMIN: IMPORT SK/SP (dipindah daripada pbd_borang_digital.html)
@@ -1696,6 +1873,7 @@ document.getElementById('btn-simpan-draf').addEventListener('click', ()=>{
     localStorage.setItem(kunciDraf_(), JSON.stringify(draf));
     const masa = new Date(draf.disimpanPada).toLocaleTimeString('ms-MY', { hour:'2-digit', minute:'2-digit' });
     status.textContent = `✓ Draf disimpan pada peranti ini (${masa}) — ${nilai.length} nilai. Draf akan dipulihkan automatik bila kembali ke kelas/subjek yang sama.`;
+    setStatus_('Draf disimpan', 'draf');
     showToast(`Draf disimpan (${nilai.length} nilai).`, 'ok');
   }catch(err){
     showToast('Gagal simpan draf (mungkin storan peranti penuh).', 'err');
@@ -1729,6 +1907,7 @@ function muatDrafJikaAda(){
 
   const masa = new Date(draf.disimpanPada).toLocaleTimeString('ms-MY', { hour:'2-digit', minute:'2-digit' });
   status.textContent = `📋 Draf tersimpan dipulihkan (disimpan ${masa}, ${draf.nilai.length} nilai). Sila semak sebelum "Hantar".`;
+  setStatus_('Draf dipulihkan', 'draf');
   showToast('Draf sebelum ini dipulihkan.', 'ok');
 }
 
