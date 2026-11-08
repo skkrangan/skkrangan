@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard ePrestasi Akademik | SK Krangan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Sora:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   :root{
@@ -16,7 +16,9 @@
   }
   *{box-sizing:border-box;}
   body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Plus Jakarta Sans', sans-serif; }
-  h1,h2,h3,.font-display{ font-family:'Fraunces', serif; }
+  h1,h2,h3,.font-display{ font-family:'Fraunces', serif; font-weight:600; }
+  /* sama seperti Portal Staf: Fraunces guna paksi optical-size 32 */
+  body{ font-variation-settings:'opsz' 32; }
 
   #shell{ display:flex; min-height:100vh; }
 
@@ -42,7 +44,7 @@
   #sidebar .nav-item.sub .ic{ font-size:11px; }
 
   #main{ flex:1; min-width:0; }
-  #wrap{ max-width:1200px; margin:0 auto; padding:22px 24px 70px; }
+  #wrap{ width:100%; max-width:none; margin:0; padding:22px 32px 70px; }
 
   @media (max-width: 900px){
     #shell{ flex-direction:column; }
@@ -414,7 +416,7 @@
     </div>
   </div>
 
-  <p class="diag" id="diag-version"></p>
+  <p class="diag" id="diag-version">ePrestasi Akademik</p>
 </div>
 
 <script>
@@ -502,7 +504,7 @@ async function muatSenaraiFilter(){
   state.kelas = rKelas.data || [];
   state.subjek = rSubjek.data || [];
   state.murid = rMurid.data || [];
-  document.getElementById('diag-version').textContent = rVersi.scriptVersion ? `ePrestasi Akademik · Versi Backend: ${rVersi.scriptVersion}` : '';
+  document.getElementById('diag-version').textContent = 'ePrestasi Akademik';
 
   const selTahun = document.getElementById('f-tahun');
   [...new Set(state.kelas.map(k=>k.Tahun))].forEach(t=>{
@@ -1318,6 +1320,16 @@ function purataSebenar_(arr){
   return a.length ? { purata: Number((a.reduce((x,y)=>x+y,0)/a.length).toFixed(1)), n: a.length } : { purata: null, n: 0 };
 }
 
+/* Pendidikan Islam: hanya murid khas (Tahun 1 Nur Fajriyah, Tahun 2 Nur Fatihah, atau murid yang
+   ditanda KhususSubjek). Subjek lain: murid khas PI disembunyikan. */
+function muridSesuaiSubjek_(m, subjek, tahunAngka){
+  const khusus = String(m.KhususSubjek || '').trim() === 'Pendidikan Islam';
+  if (String(subjek || '').trim().toLowerCase() === 'pendidikan islam'){
+    const re = tahunAngka === 1 ? /nur\s+fajri/i : (tahunAngka === 2 ? /nur\s+fatih/i : null);
+    return khusus || !!(re && re.test(String(m.Nama || '')));
+  }
+  return !khusus;
+}
 async function lihatSemuaMurid(){
   const subjekAwal = document.getElementById('subjek-sel-subjek').value;
   if (!subjekAwal){ showToastEprestasi('Sila pilih Subjek dahulu.', 'error'); return; }
@@ -1439,7 +1451,7 @@ async function lihatSemuaMurid(){
       ));
       const mk = {}; kelasSenarai.forEach(kls => Object.assign(mk, cache[`${kls}|${subjek}|${ta}`] || {}));
       const num = v => (v === undefined || v === null || v === '') ? null : Number(v);
-      barisSemasa = muridSemua.filter(m => kelasSenarai.includes(m.Kelas)).map(m => {
+      barisSemasa = muridSemua.filter(m => kelasSenarai.includes(m.Kelas) && muridSesuaiSubjek_(m, subjek, Number((String(tahunKelas[m.Kelas]||'').match(/\d/)||[])[0]||0))).map(m => {
         const x = mk[m.ID] || {};
         const r = { id:m.ID, nama:m.Nama, kelas:m.Kelas, tov:num(x[JENIS_LIHAT_.tov]), tengah:num(x[JENIS_LIHAT_.tengah]), akhir:num(x[JENIS_LIHAT_.akhir]), etr:num(x[JENIS_LIHAT_.etr]) };
         r.ada = [r.tov, r.tengah, r.akhir, r.etr].some(v => v != null);
