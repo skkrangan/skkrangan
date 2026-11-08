@@ -255,6 +255,26 @@
   .footer-bar .fb-nota{ display:flex; align-items:center; gap:12px; }
   .footer-bar svg{ flex-shrink:0; width:20px; height:20px; }
 
+  /* ---- skala kecil (lebih padat) ---- */
+  @media (min-width:901px){
+    #topbar{ height:58px; padding:0 20px 0 14px; border-bottom-width:3px; background-size:120px 58px, 100% 100%; }
+    #tb-burger{ width:40px; height:36px; border-radius:10px; border-width:1.6px; } #tb-burger svg{ width:22px; height:22px; }
+    .tb-brand{ gap:12px; } .tb-logo{ width:46px; height:40px; border-radius:11px; } .tb-logo svg{ width:26px; height:26px; }
+    .tb-brand h1{ font-size:21px; } .tb-sep{ height:28px; }
+    .tb-actions{ gap:14px; padding-right:52px; } .tb-act{ font-size:11.5px; gap:1px; } .tb-act svg{ width:20px; height:20px; }
+    #shell{ min-height:calc(100vh - 58px); }
+    #sidebar{ top:58px; height:calc(100vh - 58px); width:196px; padding:36px 10px 20px; }
+    #sidebar .nav-list{ gap:6px; }
+    #sidebar .nav-item{ font-size:14px; gap:11px; padding:8px 12px; border-radius:11px; }
+    #sidebar .nav-item svg, #sidebar .nav-item svg.ic{ width:19px !important; height:19px !important; }
+    #sb-toggle{ left:176px; top:330px; width:28px; height:28px; border-width:2px; } #sb-toggle svg{ width:16px; height:16px; }
+    body.sb-collapsed #sidebar{ width:58px; } body.sb-collapsed #sidebar .nav-item{ padding:8px 0; } body.sb-collapsed #sb-toggle{ left:38px; }
+    header.topbar{ margin-bottom:10px; }
+    header.topbar .brand{ gap:12px; }
+    header.topbar .brand-ic{ width:40px !important; height:40px !important; border-radius:11px; } header.topbar .brand-ic svg{ width:22px !important; height:22px !important; }
+    header.topbar h1{ font-size:21px !important; } header.topbar .sub{ font-size:12.5px !important; margin-top:1px; }
+    .btn-kembali{ font-size:13px !important; padding:7px 14px !important; gap:8px; border-width:1.6px; border-radius:10px; } .btn-kembali svg{ width:16px !important; height:16px !important; }
+  }
   @media (max-width:1100px){ .fb-row, .grid-4{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; } }
   @media (max-width:560px){ .fb-row, .grid-4{ grid-template-columns:1fr; } }
   @media (max-width:900px){
