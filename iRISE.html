@@ -2171,7 +2171,7 @@ function kelasKad(w,s,mode){
   let h='';
   if(s.merging)h+='<div class="merge busy" role="status"><b>'+esc(s.mstage||'Menggabungkan fail…')+'</b></div>';
   if(FULL&&s.upErr)h+='<p class="err" role="alert">'+esc(s.upErr)+'</p>';
-  if(FULL&&s.upFail&&!s.merging)h+='<div class="note fix" role="alert"><b>Fail belum berjaya digabungkan atau dimuat naik.</b><div class="actions"><button class="btn sm pri" data-act="upretry" data-w="'+w+'">Cuba semula</button>'+(s.file?' <button class="btn sm" data-act="upkeep" data-w="'+w+'">Guna fail terdahulu</button>':'')+'</div></div>';
+  if(FULL&&s.upFail&&!s.merging)h+=s.kelasRetryBlocked?'<div class="note fix" role="alert"><b>Pengemaskinian satu kelas belum disahkan.</b><p>Jangan tekan muat naik / gabung semula. Semak status pelayan dahulu. Fail lama tidak dipadam secara automatik.</p><div class="actions"><button class="btn sm pri" data-act="kelassegar" data-w="'+w+'">Semak status terkini</button></div></div>':'<div class="note fix" role="alert"><b>Fail belum berjaya digabungkan atau dimuat naik.</b><div class="actions"><button class="btn sm pri" data-act="upretry" data-w="'+w+'">Cuba semula</button>'+(s.file?' <button class="btn sm" data-act="upkeep" data-w="'+w+'">Guna fail terdahulu</button>':'')+'</div></div>';
   if(FULL&&s.file&&!parts.length&&!s.pend&&(s.status==='draf'||s.status==='belum'))h+='<div class="note warn" role="status"><b>Fail sudah dimuat naik ke pelayan: '+esc(s.file.name)+'</b><p>'+(LIVE&&slotsFor(ME,w).length&&!/pengurusan murid/i.test(ME_JAWATAN)?'Fail ini selamat. RPH baharu yang anda muat naik akan <b>ditambah</b> pada fail ini, bukan menggantikannya.'+(s.status==='draf'?' Tekan <b>Hantar</b> pada setiap hari untuk menghantar.':''):'Jika anda memuat naik fail di bawah, fail baharu akan menggantikan fail ini.')+'</p><div class="actions"><button class="btn sm" data-act="view" data-t="'+ME+'" data-w="'+w+'">Buka fail</button> <button class="btn sm warn" data-act="frm" data-w="'+w+'">Buang fail</button>'+(LIVE?' <button class="btn sm" data-act="semakfailrph" data-w="'+w+'">Semak simpanan</button>':'')+'</div></div>';
   const adaF=sl=>parts.some(p=>(p.slot==null?-1:p.slot)===sl);
   const HMk=s.hari||{},nF=SL.filter((x,i)=>adaF(i)||slotRph(ME,s,w,i)).length,done=a.slice(0,need).filter(rFull).length;
@@ -5062,6 +5062,30 @@ async function pukalHantarMinggu(w,disahkan){
   }catch(e){handleErr(e);return false;}
   finally{s.sending=false;render();}
 }
+/* Pastikan HTML dan Web App benar-benar versi yang sama SEBELUM sebarang
+   perubahan PDF. Versi pelayan lama ditolak dengan mesej yang boleh difahami. */
+const KELAS_BUILD_DIPERLUKAN = 'IRISE-KELAS-20261108-R3';
+async function preflightRphKelas(w,d,k,mode) {
+  const s=sub(ME,w);
+  if(!LIVE || !s.file || !s.file.fileId)throw new Error('Fail asal belum disahkan oleh pelayan. Muat semula halaman.');
+  let r;
+  try {
+    r=await api('semakVersiKelas',{w,d,k,mode,asas:s.file.fileId,sv:s.semakVersi||0});
+  } catch(e) {
+    if(e && (/Tindakan tidak sah/i.test(String(e.message||'')) || e.code==='TARIK_KELAS_VERSI')){
+      throw new Error('Code.gs pada Web App yang sedang digunakan masih VERSI LAMA. Terbitkan New version pada deployment yang SAMA dan pastikan URL API dalam iRISE.html sepadan. Tiada fail diubah.');
+    }
+    throw e;
+  }
+  if(!r || r.kelasBuild!==KELAS_BUILD_DIPERLUKAN){
+    throw new Error('Versi HTML dan Code.gs tidak sepadan. Terbitkan kedua-dua versi terkini sebelum menarik balik RPH kelas.');
+  }
+  if(String(r.asas)!==String(s.file.fileId) || Number(r.pages)!==Number(s.file.pages)){
+    throw new Error('Fail RPH telah berubah pada pelayan. Muat semula iRISE dan semak RPH sebelum mencuba lagi.');
+  }
+  return r;
+}
+
 /* Tindakan khusus kelas: semua PDF lama disalin semula tanpa mengubah teks/imej.
    Tindakan hanya aktif jika s.khal membuktikan julat halaman kelas. */
 function kelasInfo(w,i) {
@@ -5078,16 +5102,18 @@ async function tarikKelasRph(w,i) {
   const r=s.khal[d][k]||[],coverage=r.reduce((sum,p)=>sum+(p[1]-p[0]+1),0),hanyaSatu=jumlah===1&&coverage===Number(s.file.pages);
   s.sending=true;render();
   try{
+    const sah=await preflightRphKelas(w,d,k,'tarik');
+    s.upErr='';s.upFail=false;s.kelasRetryBlocked=false;
     if(hanyaSatu){
       const r=await apiSv(s,'tarikKelasAkhir',{w,d,k,asas:s.file.fileId});
       if(!r||!r.row)throw new Error('Pelayan belum mengesahkan penarikan balik.');
       applyRow(r.row);
     }else{
-      const ok=await mergeParts(w,{sel:[],ds:[d],append:true,tambah:true,kelasAksi:{mode:'tarik',d,k}});
-      if(!ok)throw new Error('PDF belum berjaya dikemas kini. Tiada kelas ditarik balik.');
+      const ok=await mergeParts(w,{sel:[],ds:[d],append:true,tambah:true,expectedPages:sah.afterPages,kelasAksi:{mode:'tarik',d,k}});
+      if(!ok)throw new Error('Tarik balik belum disahkan. Muat semula halaman untuk menyemak status. Jangan ulang menggunakan butang Cuba semula biasa.');
     }
     toast('Hanya RPH kelas dipilih ditarik balik. Versi lama masih disimpan.');
-  }catch(e){handleErr(e);}finally{s.sending=false;render();}
+  }catch(e){if(!s.upFail){s.upErr=String((e&&e.message)||e);s.upFail=true;s.kelasRetryBlocked=true;}handleErr(e);}finally{s.sending=false;render();}
 }
 async function gantiKelasRph(w,i,file) {
   let a;try{a=kelasInfo(w,i);}catch(e){toast(e.message,true);return;}
@@ -5096,8 +5122,11 @@ async function gantiKelasRph(w,i,file) {
   if(s.sending||s.merging||s.pend&&s.parts&&s.parts.length){toast('Selesaikan fail draf yang sedang diproses dahulu.',true);return;}
   if(!confirm('Ganti RPH '+slotLabel(ME,i,w)+' dengan '+file.name+'?\n\nHanya halaman kelas ini ditukar. Fail lama diarkibkan.'))return;
   const part={name:file.name,ext:'PDF',size:file.size,blob:file,slot:i};
-  s.parts=s.parts||[];s.parts.push(part);s.sending=true;render();
+  s.sending=true;render();
   try{
+    await preflightRphKelas(w,d,k,'ganti');
+    s.upErr='';s.upFail=false;s.kelasRetryBlocked=false;
+    s.parts=s.parts||[];s.parts.push(part);
     const ok=await mergeParts(w,{sel:[part],ds:[d],append:true,tambah:true,kelasAksi:{mode:'ganti',d,k,f:[file.name]}});
     if(!ok)throw new Error('PDF pengganti belum disahkan. Fail lama kekal.');
     s.parts=s.parts.filter(p=>p!==part);s.pend=s.parts.length>0;ptSave(w);
@@ -5218,6 +5247,7 @@ async function mergeParts(w,opt){
   const first=MYNAME.replace(/^Cg\.\s*/,'').split(' ')[0].toUpperCase();
   const stamp=()=>new Date().toISOString();
   s.merging=true;s.upFail=false;s.mstage='Menggabungkan fail…';
+  if(opt&&opt.kelasAksi){s.upErr='';s.kelasRetryBlocked=false;}
   try{
     if(LIVE&&parts.some(p=>p.ext==='DOCX'||p.ext==='DOC'||p.ext==='PPTX')){
       s.mstage='Menukar fail Word/PowerPoint kepada PDF…';render();
@@ -5331,6 +5361,7 @@ async function mergeParts(w,opt){
       if(end&&end[1]===i)end[1]=i+1;else a.push([i+1,i+1]);
     });
     if(aksi&&aksi.mode==='tarik'&&kelasHal[aksi.d]&&kelasHal[aksi.d][aksi.k])throw new Error('Halaman kelas masih ada, pembatalan tidak diteruskan.');
+    if(aksi&&aksi.mode==='tarik'&&Number.isInteger(opt.expectedPages)&&out.getPageCount()!==opt.expectedPages)throw new Error('Jumlah halaman selepas penarikan balik tidak sepadan dengan pengesahan pelayan. PDF asal tidak diubah.');
     if(opt){opt.halAll=halAll;opt.hal=hb||[prev+1,out.getPageCount()];}
     if(out.getPageCount()>80)throw Object.assign(new Error('Terlalu banyak halaman (maksimum 80 halaman satu minggu).'),{apiMsg:1});
     const bytes=await out.save();
@@ -5338,13 +5369,15 @@ async function mergeParts(w,opt){
     const blob=new Blob([bytes],{type:'application/pdf'});
     if(blob.size>20*1048576){s.merging=false;s.upFail=true;s.upErr='Fail gabungan melebihi 20 MB. Kecilkan saiz gambar atau kurangkan bilangan fail.';render();return;}
     const ok=await finishFile(w,s,tok,blob,{kelasHal:aksi?kelasHal:(Object.keys(kelasHal).length?kelasHal:undefined),kelasAksi:aksi||undefined,name:(opt&&opt.pukal?'RPH_PUKAL_M'+w+'_'+first+'.pdf':(/pengurusan murid/i.test(ME_JAWATAN)?'Laporan_M':'RPH_M')+w+'_'+first+'.pdf'),ext:'PDF',size:blob.size,date:fmtDT(new Date()),pages:out.getPageCount(),from:parts.length,pukal:!!(opt&&opt.pukal),asas:(opt&&opt.asas)||'',tambah:!!(opt&&opt.tambah),tarikHari:(opt&&opt.ganti)?opt.ganti.same:undefined,ganti:!!(opt&&opt.ganti),halSemua:opt&&opt.halAll&&Object.keys(opt.halAll).length?opt.halAll:undefined});
-    if(ok){drafSelesai(w,parts);dropOld();render();if(!opt)toast((parts.length>1?parts.length+' fail digabungkan menjadi satu. ':'')+'Fail berjaya dimuat naik. Belum dihantar kepada pentadbir.');}
+    if(ok){s.kelasRetryBlocked=false;s.upFail=false;s.upErr='';drafSelesai(w,parts);dropOld();render();if(!opt)toast((parts.length>1?parts.length+' fail digabungkan menjadi satu. ':'')+'Fail berjaya dimuat naik. Belum dihantar kepada pentadbir.');}
     return !!ok;
   }catch(e){
     if(s.mtok!==tok)return;
     s.merging=false;s.mstage='';
     if(e&&e.code==='AUTH'){handleErr(e);return;}
-    s.upFail=true;s.upErr=e&&e.apiMsg?e.message:(e&&e.message==='lib')?'Tidak dapat memuatkan pustaka penggabung. Semak sambungan internet dan cuba lagi.':(e&&/^Pelayan belum mengesahkan/.test(e.message||''))?e.message:'Satu fail tidak dapat dibaca atau dilindungi kata laluan. Buang fail itu dan cuba lagi.';
+    s.upFail=true;
+    if(opt&&opt.kelasAksi){s.kelasRetryBlocked=true;s.upErr='Tindakan kelas tidak disahkan: '+String((e&&e.message)||'Semak versi pelayan.').slice(0,350)+' Muat semula data sebelum mencuba lagi. Jangan gunakan Cuba semula gabungan biasa.';}
+    else{s.upErr=e&&e.apiMsg?e.message:(e&&e.message==='lib')?'Tidak dapat memuatkan pustaka penggabung. Semak sambungan internet dan cuba lagi.':(e&&/^Pelayan belum mengesahkan/.test(e.message||''))?e.message:'Satu fail tidak dapat dibaca atau dilindungi kata laluan. Buang fail itu dan cuba lagi.';}
     render();
   }
 }
@@ -5431,7 +5464,7 @@ function setupLive(p){
   SETTINGS=Object.assign({hariSebelum:1,jam:17},p.tetapan||{});ui.setF=null;
   buildWeeks(p.takwim);teachers=p.guru;teachers.forEach(t=>{t.sub=jwtLabel(t.sub);});setEx(p);ME_EMEL=p.me.emel||'';ME_JAWATAN=jwtLabel(p.me.jawatan);ME_PERANAN=p.me.peranan;ME_POSISI=p.me.posisi||'';ME_ADMIN=!!p.me.admin;ME_ICT=!!p.me.ict;ME_SEM=p.me.sementara||'';PM=p.penyemak||null;ME_MENGAJAR=!!p.me.mengajar;NOTIFS=p.notifikasi||[];JADUAL=p.jadual||{};SKIP=p.terlepas||[];ME=p.me.id;MYNAME=p.me.nama;
   const old=subs;subs={};
-  const KEEP=['parts','merging','mstage','upErr','mtok','upQ','draft','err','rdirty','rbusy','rver','rrid','rridV','rconflict','srvVer','srvTeks','_t','refleksi','refleksiVersi','file','retryN','offline','sending','upFail','pend','ptChk'];
+  const KEEP=['parts','merging','mstage','upErr','mtok','upQ','draft','err','rdirty','rbusy','rver','rrid','rridV','rconflict','srvVer','srvTeks','_t','refleksi','refleksiVersi','file','retryN','offline','sending','upFail','pend','ptChk','kelasRetryBlocked'];
   teachers.forEach(t=>weeks.forEach(w=>{const k=key(t.id,w.n),b=blankSub(),o=old[k];
     if(o)KEEP.forEach(f=>{if(o[f]!==undefined&&(f!=='refleksi'&&f!=='refleksiVersi'||o.rdirty||o.rbusy))b[f]=o[f];});
     subs[k]=b;}));
@@ -5605,7 +5638,8 @@ document.addEventListener('click',e=>{
   else if(a==='rretry'){const q=sub(ME,w);q.retryN=0;clearTimeout(q._t);saveRefl(w);}
   else if(a==='airefl'){bantuRefl(w,+b.dataset.i);}
   else if(a==='aiundo'){const i=+b.dataset.i,k=w+'-'+i,ta=document.querySelector('[data-rw="'+w+'"][data-ri="'+i+'"][data-rf="t"]');if(ta&&ui.aiUndo&&ui.aiUndo[k]!=null){ta.value=ui.aiUndo[k];ta.dispatchEvent(new Event('input',{bubbles:true}));delete ui.aiUndo[k];render();}}
-  else if(a==='upretry'){const q=sub(ME,w);q.upErr='';mergeParts(w);render();}
+  else if(a==='upretry'){const q=sub(ME,w);if(q.kelasRetryBlocked){toast('Jangan ulang gabungan biasa untuk penarikan balik kelas. Tekan Semak status terkini dahulu.',true);return;}q.upErr='';mergeParts(w);render();}
+  else if(a==='kelassegar'){const q=sub(ME,w);loadInit(ME_ADMIN).then(()=>{const z=sub(ME,w);z.upErr='';z.upFail=false;z.kelasRetryBlocked=false;render();toast('Status terkini dimuatkan. Semak nama fail dan kelas yang dihantar.');}).catch(handleErr);}
   else if(a==='upkeep'){const q=sub(ME,w);q.upErr='';q.upFail=false;q.parts=[];q.pend=false;ptSave(w);q.mtok=(q.mtok||0)+1;render();toast('Fail terdahulu digunakan semula.');}
   else if(a==='sambung'){sambungSemula();}
   else if(a==='drpulih'){const d=drGet(w),q=sub(ME,w);if(d){q.refleksi=d.t;q.rdirty=true;q.rver=(q.rver||0)+1;render();saveRefl(w);toast('Draf dipulihkan dan sedang disimpan.');}}
