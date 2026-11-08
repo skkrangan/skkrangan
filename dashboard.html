@@ -1659,8 +1659,19 @@ function renderStaffManagementList(){
           <input type="text" id="staf-${idx}-rolelabel" value="${(s.cmsRoleLabel||'').replace(/"/g,'&quot;')}" placeholder="cth. Guru ICT" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
         </div>
         <div>
-          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Nama Fail Gambar <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
-          <input type="text" id="staf-${idx}-photo" value="${(s.photo||'').replace(/"/g,'&quot;')}" placeholder="staf-namastaf.jpg" class="w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          <label class="text-[10px] font-bold uppercase text-ink-faint block mb-1">Gambar Staf <span class="text-ink-faint normal-case font-normal">(pilihan)</span></label>
+          <div class="flex items-center gap-3">
+            <div id="staf-${idx}-photo-pv" class="w-14 h-14 rounded-full overflow-hidden bg-white border border-line flex items-center justify-center shrink-0">${fotoStafPreviewHtml(s.photo)}</div>
+            <label class="text-xs font-bold text-navy bg-white hover:bg-navy hover:text-white border border-line px-4 py-2 rounded-full transition-all inline-flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i> <span id="staf-${idx}-photo-lbl">${s.photo ? 'Tukar Gambar' : 'Muat Naik Gambar'}</span>
+              <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="uploadFotoStaf(${idx}, event)">
+            </label>
+            <button type="button" id="staf-${idx}-photo-rm" onclick="buangFotoStaf(${idx})" class="${s.photo ? '' : 'hidden '}text-xs font-bold text-rose-600 hover:text-rose-800 px-2 py-2">Buang</button>
+          </div>
+          <details class="mt-1.5">
+            <summary class="text-[10px] text-ink-faint cursor-pointer select-none">Nama fail / pautan gambar (lanjutan)</summary>
+            <input type="text" id="staf-${idx}-photo" value="${(s.photo||'').replace(/"/g,'&quot;')}" placeholder="staf-namastaf.jpg atau https://..." oninput="kemasPreviewFotoStaf(${idx})" class="mt-1 w-full bg-white border border-line rounded-xl px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-navy focus:outline-none">
+          </details>
         </div>
       </div>
       <div class="mb-3">
@@ -1695,6 +1706,78 @@ function renderStaffManagementList(){
     </div>
   `).join('');
   lucide.createIcons();
+}
+
+/* Gambar staf: muat naik terus dari Urus Staf (gambar dipotong segi empat sama & dikecilkan dahulu supaya pantas).
+   Medan teks lama (nama fail / pautan) dikekalkan di bahagian "lanjutan". Gambar yang sama dipaparkan dalam iRISE. */
+function fotoStafPreviewHtml(photo){
+  const p = String(photo||'').trim();
+  if(!p) return '<i data-lucide="user" class="w-6 h-6 text-ink-faint"></i>';
+  return '<img src="' + p.replace(/"/g,'&quot;') + '" alt="" class="w-full h-full object-cover" onerror="this.outerHTML=\'<span class=&quot;text-[9px] text-rose-500 text-center leading-tight px-1&quot;>Gambar tidak ditemui</span>\'">';
+}
+function kemasPreviewFotoStaf(idx){
+  const inp = document.getElementById(`staf-${idx}-photo`), pv = document.getElementById(`staf-${idx}-photo-pv`);
+  const lbl = document.getElementById(`staf-${idx}-photo-lbl`), rm = document.getElementById(`staf-${idx}-photo-rm`);
+  const ada = !!(inp && inp.value.trim());
+  if(pv){ pv.innerHTML = fotoStafPreviewHtml(inp ? inp.value : ''); if(window.lucide) lucide.createIcons(); }
+  if(lbl) lbl.innerText = ada ? 'Tukar Gambar' : 'Muat Naik Gambar';
+  if(rm) rm.classList.toggle('hidden', !ada);
+}
+function kecilkanFotoStaf(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth, h = img.naturalHeight, sz = Math.min(w, h), S = Math.min(480, sz);
+      const c = document.createElement('canvas'); c.width = S; c.height = S;
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, S, S);
+      // Potret: ambil bahagian atas sedikit supaya muka tidak terpotong.
+      x.drawImage(img, (w - sz) / 2, Math.max(0, (h - sz) * 0.3), sz, sz, 0, 0, S, S);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Fail ini bukan gambar yang boleh dibaca. Guna JPG, PNG atau WEBP.')); };
+    img.src = url;
+  });
+}
+async function uploadFotoStaf(idx, event){
+  const file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if(!file) return;
+  if(file.size > 15 * 1024 * 1024){ showToast('Gambar terlalu besar (maksimum 15 MB).', 'error'); return; }
+  if(!CMS_SCRIPT_URL || CMS_SCRIPT_URL.includes('PLACEHOLDER')){ showToast('Storan dikongsi belum disediakan.', 'error'); return; }
+  const pv = document.getElementById(`staf-${idx}-photo-pv`);
+  if(pv) pv.innerHTML = '<span class="text-[9px] text-ink-faint">Memuat…</span>';
+  try{
+    const dataUrl = await kecilkanFotoStaf(file);
+    showToast('Memuat naik gambar staf...', 'info');
+    const res = await fetch(CMS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'uploadcartaunitfoto', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl })
+    });
+    const data = await res.json();
+    if(!(data && data.imageUrl)) throw new Error(data && data.error ? data.error : 'ralat tidak diketahui');
+    const inp = document.getElementById(`staf-${idx}-photo`);
+    if(inp) inp.value = data.imageUrl;
+    kemasPreviewFotoStaf(idx);
+    if(staffData[idx] && staffData[idx].id){
+      showToast('Gambar dimuat naik. Menyimpan...', 'info');
+      await saveStaffCard(idx);
+    } else {
+      showToast('Gambar dimuat naik. Klik "Tambah Staf Ini" untuk simpan.', 'success');
+    }
+  }catch(err){
+    kemasPreviewFotoStaf(idx);
+    showToast('Gagal muat naik gambar: ' + (err && err.message ? err.message : 'semak sambungan internet'), 'error');
+  }
+}
+async function buangFotoStaf(idx){
+  const s = staffData[idx];
+  if(!confirm(`Buang gambar ${s && s.name ? s.name : 'staf ini'}?`)) return;
+  const inp = document.getElementById(`staf-${idx}-photo`);
+  if(inp) inp.value = '';
+  kemasPreviewFotoStaf(idx);
+  if(s && s.id) await saveStaffCard(idx);
 }
 
 async function saveStaffCard(idx){
