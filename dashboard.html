@@ -1664,7 +1664,7 @@ function renderStaffManagementList(){
             <div id="staf-${idx}-photo-pv" class="w-14 h-14 rounded-full overflow-hidden bg-white border border-line flex items-center justify-center shrink-0">${fotoStafPreviewHtml(s.photo)}</div>
             <label class="text-xs font-bold text-navy bg-white hover:bg-navy hover:text-white border border-line px-4 py-2 rounded-full transition-all inline-flex items-center gap-1.5 cursor-pointer">
               <i data-lucide="upload" class="w-3.5 h-3.5"></i> <span id="staf-${idx}-photo-lbl">${s.photo ? 'Tukar Gambar' : 'Muat Naik Gambar'}</span>
-              <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="uploadFotoStaf(${idx}, event)">
+              <input type="file" accept="image/*" class="hidden" onchange="uploadFotoStaf(${idx}, event)">
             </label>
             <button type="button" id="staf-${idx}-photo-rm" onclick="buangFotoStaf(${idx})" class="${s.photo ? '' : 'hidden '}text-xs font-bold text-rose-600 hover:text-rose-800 px-2 py-2">Buang</button>
           </div>
@@ -1723,19 +1723,32 @@ function kemasPreviewFotoStaf(idx){
   if(lbl) lbl.innerText = ada ? 'Tukar Gambar' : 'Muat Naik Gambar';
   if(rm) rm.classList.toggle('hidden', !ada);
 }
+/* Gambar staf disimpan TERUS dalam rekod staf (Sheet) sebagai gambar kecil 200x200 (kira-kira 8-12 KB).
+   Tidak bergantung pada muat naik Google Drive (yang boleh gagal atau tidak dipaparkan kerana tetapan perkongsian DELIMa).
+   Gambar yang sama dibaca oleh iRISE. */
+const FOTO_STAF_PX = 200, FOTO_STAF_MAKS = 24000;
 function kecilkanFotoStaf(file){
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file), img = new Image();
     img.onload = () => {
-      const w = img.naturalWidth, h = img.naturalHeight, sz = Math.min(w, h), S = Math.min(480, sz);
-      const c = document.createElement('canvas'); c.width = S; c.height = S;
-      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, S, S);
+      try{
+      const w = img.naturalWidth, h = img.naturalHeight, sz = Math.min(w, h), S = Math.min(FOTO_STAF_PX, sz);
       // Potret: ambil bahagian atas sedikit supaya muka tidak terpotong.
-      x.drawImage(img, (w - sz) / 2, Math.max(0, (h - sz) * 0.3), sz, sz, 0, 0, S, S);
+      // Kualiti dan saiz dikurangkan berperingkat sehingga gambar kecil (sasaran di bawah 16 000 aksara).
+      let out = '';
+      for (const px of [S, Math.min(S, 160), Math.min(S, 128)]) {
+        const c = document.createElement('canvas'); c.width = px; c.height = px;
+        const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, px, px);
+        x.drawImage(img, (w - sz) / 2, Math.max(0, (h - sz) * 0.3), sz, sz, 0, 0, px, px);
+        for (const q of [0.82, 0.72, 0.62, 0.52]) { out = c.toDataURL('image/jpeg', q); if (out.length <= 16000) break; }
+        if (out.length <= 16000) break;
+      }
       URL.revokeObjectURL(url);
-      resolve(c.toDataURL('image/jpeg', 0.85));
+      if(!out || out.length < 100) throw new Error('gambar kosong');
+      resolve(out);
+      }catch(err){ URL.revokeObjectURL(url); reject(err); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Fail ini bukan gambar yang boleh dibaca. Guna JPG, PNG atau WEBP.')); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Fail ini tidak boleh dibaca pelayar. Guna gambar JPG, PNG atau WEBP (gambar HEIC iPhone: tukar ke JPG dahulu).')); };
     img.src = url;
   });
 }
@@ -1749,26 +1762,22 @@ async function uploadFotoStaf(idx, event){
   if(pv) pv.innerHTML = '<span class="text-[9px] text-ink-faint">Memuat…</span>';
   try{
     const dataUrl = await kecilkanFotoStaf(file);
-    showToast('Memuat naik gambar staf...', 'info');
-    const res = await fetch(CMS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'uploadcartaunitfoto', apiSecret: DASHBOARD_API_SECRET, imageBase64: dataUrl })
-    });
-    const data = await res.json();
-    if(!(data && data.imageUrl)) throw new Error(data && data.error ? data.error : 'ralat tidak diketahui');
+    if(dataUrl.length > FOTO_STAF_MAKS) throw new Error('gambar terlalu besar selepas dikecilkan');
     const inp = document.getElementById(`staf-${idx}-photo`);
-    if(inp) inp.value = data.imageUrl;
+    const lama = inp ? inp.value : '';
+    if(inp) inp.value = dataUrl;
     kemasPreviewFotoStaf(idx);
     if(staffData[idx] && staffData[idx].id){
-      showToast('Gambar dimuat naik. Menyimpan...', 'info');
-      await saveStaffCard(idx);
+      showToast('Menyimpan gambar...', 'info');
+      const ok = await saveStaffCard(idx);
+      if(ok){ showToast('Gambar disimpan.', 'success'); }
+      else { if(inp) inp.value = lama; kemasPreviewFotoStaf(idx); const se = document.getElementById(`staf-${idx}-status`); showToast('Gambar tidak dapat disimpan. ' + (se && se.innerText ? se.innerText : 'Lihat mesej di bawah kad staf.'), 'error'); }
     } else {
-      showToast('Gambar dimuat naik. Klik "Tambah Staf Ini" untuk simpan.', 'success');
+      showToast('Gambar sedia. Klik "Tambah Staf Ini" untuk simpan.', 'success');
     }
   }catch(err){
     kemasPreviewFotoStaf(idx);
-    showToast('Gagal muat naik gambar: ' + (err && err.message ? err.message : 'semak sambungan internet'), 'error');
+    showToast('Gagal memproses gambar: ' + (err && err.message ? err.message : 'cuba gambar lain'), 'error');
   }
 }
 async function buangFotoStaf(idx){
@@ -1777,7 +1786,7 @@ async function buangFotoStaf(idx){
   const inp = document.getElementById(`staf-${idx}-photo`);
   if(inp) inp.value = '';
   kemasPreviewFotoStaf(idx);
-  if(s && s.id) await saveStaffCard(idx);
+  if(s && s.id){ const ok = await saveStaffCard(idx); showToast(ok ? 'Gambar dibuang.' : 'Gambar tidak dapat dibuang. Lihat mesej di bawah kad staf.', ok ? 'success' : 'error'); }
 }
 
 async function saveStaffCard(idx){
@@ -1787,7 +1796,7 @@ async function saveStaffCard(idx){
   const email = document.getElementById(`staf-${idx}-email`).value.trim();
   if(!name || !email){
     if(statusEl){ statusEl.innerText = 'Nama dan Emel DELIMA wajib diisi.'; statusEl.className = 'text-xs text-rose-600'; }
-    return;
+    return false;
   }
   const cmsUnits = CMS_UNIT_OPTIONS.filter(u => {
     const el = document.getElementById(`staf-${idx}-unit-${u.replace(/\s+/g,'')}`);
@@ -1810,24 +1819,38 @@ async function saveStaffCard(idx){
   if(statusEl){ statusEl.innerText = 'Menyimpan...'; statusEl.className = 'text-xs text-ink-faint'; }
   if(!CMS_SCRIPT_URL || CMS_SCRIPT_URL.includes('PLACEHOLDER')){
     if(statusEl){ statusEl.innerText = 'Storan dikongsi belum disediakan.'; statusEl.className = 'text-xs text-rose-600'; }
-    return;
+    return false;
   }
   try{
-    const res = await fetch(CMS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
+    const ctrl = new AbortController(); const tmr = setTimeout(() => ctrl.abort(), 45000);
+    let res;
+    try{
+      res = await fetch(CMS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal
+      });
+    } finally { clearTimeout(tmr); }
+    const teks = await res.text();
+    let data;
+    try{ data = JSON.parse(teks); }
+    catch(_){
+      if(statusEl){ statusEl.innerText = 'Gagal simpan: skrip Google tidak membalas dengan betul (semak Deploy skrip: Execute as Me, Who has access: Anyone).'; statusEl.className = 'text-xs text-rose-600'; }
+      return false;
+    }
     if(data && data.success){
       Object.assign(s, { name, position: payload.position, delimaEmail: email, cmsUnits, cmsRoleLabel: payload.cmsRoleLabel, canViewAttendanceDashboard: payload.canViewAttendanceDashboard, excludeFromAttendance: payload.excludeFromAttendance, photo: payload.photo, id: data.id || s.id });
       if(statusEl){ statusEl.innerText = 'Disimpan ✓'; statusEl.className = 'text-xs text-emerald-600 font-semibold'; }
       renderStaffManagementList();
+      return true;
     } else {
       if(statusEl){ statusEl.innerText = 'Gagal simpan: ' + (data.error || 'ralat tidak diketahui'); statusEl.className = 'text-xs text-rose-600'; }
+      return false;
     }
   }catch(e){
-    if(statusEl){ statusEl.innerText = 'Ralat sambungan. Cuba lagi.'; statusEl.className = 'text-xs text-rose-600'; }
+    if(statusEl){ statusEl.innerText = (e && e.name === 'AbortError') ? 'Sambungan terlalu lama (lebih 45 saat). Cuba lagi.' : 'Ralat sambungan. Cuba lagi.'; statusEl.className = 'text-xs text-rose-600'; }
+    return false;
   }
 }
 
